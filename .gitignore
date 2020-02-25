@@ -1,0 +1,8 @@
+/composer.lock
+/composer.phar
+/phan.phar
+/php-cs-fixer-v2.phar
+/phpunit-7.phar
+/psalm.phar
+/vendor
+/.php_cs.cache

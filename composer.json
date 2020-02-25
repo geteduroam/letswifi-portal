@@ -1,0 +1,11 @@
+{
+	"name": "uninett/lets-wifi-portal",
+	"type": "project",
+	"license": "BSD-3-Clause",
+	"authors": [
+		{
+			"name": "Jørn Åne de Jong",
+			"email": "jorn.dejong@uninett.no"
+		}
+	]
+}
