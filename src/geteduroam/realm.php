@@ -7,7 +7,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-namespace geteduroam\Realm;
+namespace geteduroam;
 
 use DateTimeInterface;
 use DomainException;
@@ -19,7 +19,6 @@ use fyrkat\openssl\PKCS12;
 use fyrkat\openssl\PrivateKey;
 use fyrkat\openssl\X509;
 
-use geteduroam\Credential\User;
 use geteduroam\EapConfig\Auth\TlsAuthenticationMethod;
 use geteduroam\EapConfig\EapConfigGenerator;
 use geteduroam\EapConfig\Profile\EduroamProfileData;
@@ -67,7 +66,12 @@ class Realm
 	 */
 	public function getTrustedCaCertificates(): array
 	{
-		return \array_map( 'geteduroam\\Realm\\Realm::createX509', \explode( ';', $this->getRealmData( 'trustedCaCert' ) ) );
+		return \array_map( 'geteduroam\\Realm::createX509', \explode( ';', $this->getRealmData( 'trustedCaCert' ) ) );
+	}
+
+	public function getSecretKey(): string
+	{
+		return $this->getRealmData( 'secretKey' );
 	}
 
 	/**
@@ -76,12 +80,13 @@ class Realm
 	 */
 	public function writeRealmData( array $data ): void
 	{
-		$statement = $this->pdo->prepare( 'REPLACE INTO realm (domain, trustedCaCert, trustedServerName, signingCaCert, signingCaKey) VALUES (:domain, :trustedCaCert, :trustedServerName, :signingCaCert, :signingCaKey)' );
+		$statement = $this->pdo->prepare( 'REPLACE INTO realm (domain, trustedCaCert, trustedServerName, signingCaCert, signingCaKey, secretKey) VALUES (:domain, :trustedCaCert, :trustedServerName, :signingCaCert, :signingCaKey, :secretKey)' );
 		$statement->bindValue( 'domain', $this->getDomain(), PDO::PARAM_STR );
 		$statement->bindValue( 'trustedCaCert', $data['trustedCaCert'], PDO::PARAM_STR );
 		$statement->bindValue( 'trustedServerName', $data['trustedServerName'], PDO::PARAM_STR );
 		$statement->bindValue( 'signingCaCert', $data['signingCaCert'], PDO::PARAM_STR );
 		$statement->bindValue( 'signingCaKey', $data['signingCaKey'], PDO::PARAM_STR );
+		$statement->bindValue( 'secretKey', $data['secretKey'], PDO::PARAM_STR );
 		$statement->execute();
 		$rows = $statement->rowCount();
 		if ( 1 !== $rows ) {
@@ -167,7 +172,7 @@ class Realm
 	protected function getRealmData( string $field ): string
 	{
 		if ( null === $this->data ) {
-			$statement = $this->pdo->prepare( 'SELECT domain, trustedCaCert, trustedServerName, signingCaCert, signingCaKey FROM realm WHERE domain = ?' );
+			$statement = $this->pdo->prepare( 'SELECT domain, trustedCaCert, trustedServerName, signingCaCert, signingCaKey, secretKey FROM realm WHERE domain = ?' );
 			$statement->execute( [$this->domain] );
 			$realmData = $statement->fetch();
 			if ( !$realmData ) {

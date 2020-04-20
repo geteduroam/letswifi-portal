@@ -31,4 +31,5 @@ $realm->writeRealmData([
 		'trustedServerName' => 'radius.example.com',
 		'signingCaCert' => $caCertificate->getX509Pem(),
 		'signingCaKey' => $caPrivKey->getPrivateKeyPem( null ),
+		'secretKey' => random_bytes( 32 ),
 	]);

@@ -8,8 +8,10 @@ if ( $_SERVER['REQUEST_METHOD'] !== 'POST' ) {
 
 $app = new geteduroam\GetEduroamApp();
 $app->registerExceptionHandler();
-$user = $app->getCurrentUser();
-$realm = $app->getRealm( 'example.com' );
+$realm = $app->getRealm();
+$oauth = $app->getOAuthHandler( $realm );
+$token = $oauth->getAccessTokenFromRequest();
+$user = new geteduroam\User( $token->getSubject() );
 $generator = $realm->getUserEapConfig( $user, (new DateTime())->add( new DateInterval( 'P1D' ) ) );
 $payload = $generator->generate();
 header( 'Content-Type: ' . $generator->getContentType() );

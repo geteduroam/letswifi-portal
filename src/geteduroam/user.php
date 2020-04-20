@@ -7,20 +7,16 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-namespace geteduroam\Credential;
+namespace geteduroam;
 
 class User
 {
 	/** @var string */
 	private $userID;
 
-	/** @var array<string,string> */
-	private $attributes;
-
-	public function __construct( string $userID, array $attributes )
+	public function __construct( string $userID )
 	{
 		$this->userID = $userID;
-		$this->attributes = $attributes;
 	}
 
 	public function getUserID(): string

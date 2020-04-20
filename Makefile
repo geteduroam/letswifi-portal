@@ -47,13 +47,13 @@ syntax:
 	find . ! -path './vendor/*' -name \*.php -print0 | xargs -0 -n1 -P50 php -l
 
 etc/geteduroam.conf.php:
-	sh -c 'sed -e s/REPLACEMEREPLACEMEREPLACEMEREPLACEMEREPLACEMEREPLACEMEREPLACEMER/$$(base64 /dev/random | tr -dc 0123456789abcdef | head -c64)/ <etc/geteduroam.conf.dist.php >etc/geteduroam.conf.php'
+	cp etc/geteduroam.conf.dist.php etc/geteduroam.conf.php
 
 var:
 	mkdir -p var
 
 var/geteduroam-dev.sqlite: var
 	sqlite3 var/geteduroam-dev.sqlite <sql/geteduroam-dev.sqlite.sql
-	php bin/init-db.php || rm var/geteduroam-dev.sqlite && false
+	php bin/init-db.php || { rm var/geteduroam-dev.sqlite && false; }
 
 .PHONY: camera-ready codestyle psalm phan phpunit phpcs clean syntax test dev

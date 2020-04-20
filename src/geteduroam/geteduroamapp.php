@@ -13,9 +13,6 @@ use fyrkat\oauth\Client;
 use fyrkat\oauth\JWTSigner;
 use fyrkat\oauth\OAuth;
 
-use geteduroam\Credential\User;
-use geteduroam\Realm\Realm;
-
 use PDO;
 use Throwable;
 
@@ -46,14 +43,14 @@ class GetEduroamApp
 		$this->config = $config ?? new Config();
 	}
 
-	public function getCurrentUser(): User
+	public function getUserFromBrowserSession(): User
 	{
-		return new User( $this->getOAuthHandler()->getAccessTokenFromRequest()->getSubject(), [] );
+		return new User( 'charlie' );
 	}
 
-	public function getOAuthHandler(): OAuth
+	public function getOAuthHandler( Realm $realm ): OAuth
 	{
-		$oauth = new OAuth( new JWTSigner( $this->config->getString( 'oauth.jwt.key' ) ) );
+		$oauth = new OAuth( new JWTSigner( $realm->getSecretKey() ) );
 		foreach ( $this->config->getArray( 'oauth.clients' ) as $client ) {
 			$oauth->registerClient( new Client( $client['clientId'], $client['redirectUris'], $client['scopes'] ) );
 		}
@@ -61,9 +58,14 @@ class GetEduroamApp
 		return $oauth;
 	}
 
-	public function getRealm( string $domain ): Realm
+	public function getRealm( string $domain = null ): Realm
 	{
-		return new Realm( $this->getPDO(), $domain );
+		return new Realm( $this->getPDO(), $domain ?? $this->getDomain() );
+	}
+
+	public function getDomain(): string
+	{
+		return $this->config->getString( 'defaultDomain' );
 	}
 
 	public function registerExceptionHandler(): void

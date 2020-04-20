@@ -3,7 +3,8 @@ CREATE TABLE "realm" (
 	"trustedCaCert" TEXT NOT NULL,
 	"trustedServerName" TEXT NOT NULL,
 	"signingCaCert" TEXT NOT NULL,
-	"signingCaKey" TEXT NOT NULL
+	"signingCaKey" TEXT NOT NULL,
+	"secretKey" BLOB NOT NULL
 );
 CREATE TABLE "tlscredential" (
 	"serial" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
