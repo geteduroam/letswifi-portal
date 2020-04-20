@@ -64,7 +64,7 @@ submodule:
 
 simplesamlphp:
 	cp -n etc/letswifi.conf.simplesaml.php etc/letswifi.conf.php
-	curl -sSL https://github.com/simplesamlphp/simplesamlphp/releases/download/v1.18.6/simplesamlphp-1.18.6.tar.gz | tar xzv
+	curl -sSL https://github.com/simplesamlphp/simplesamlphp/releases/download/v1.18.6/simplesamlphp-1.18.6.tar.gz | tar xz
 	ln -s ../simplesamlphp/www/ www/simplesaml || true
 	ln -s simplesamlphp-1.18.6/ simplesamlphp || true
 
