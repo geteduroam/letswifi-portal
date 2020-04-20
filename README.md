@@ -32,6 +32,16 @@ Navigate to https://example.com/simplesaml/module.php/saml/sp/metadata.php/defau
 
 	make dev
 
+### Doing a flow manually
+
+* Open in your browser: http://[::1]:1080/oauth/authorize/?response_type=code&code_challenge_method=S256&scope=testscope&code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM&redirect_uri=http://[::1]:1234/callback/&client_id=no.fyrkat.oauth&state=0
+* Take note of the `code` in the response
+* `code=… curl -id "grant_type=authorization_code&redirect_uri=http://[::1]:1234/callback/&client_id=no.fyrkat.oauth&code=$code&code_verifier=dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk" 'http://[::1]:1080/oauth/token/'`
+* Take note of the `access_token` in the response
+* `access_token=… curl -d '' -iHAuthorization:Bearer\ $access_token 'http://[::1]:1080/api/eap-config/'`
+* If everything went fine, you get an eap-config XML payload
+* You will see the public key material logged in the `tlscredential` SQL table
+
 
 ## Contributing
 
