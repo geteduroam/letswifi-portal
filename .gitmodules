@@ -1,6 +1,6 @@
 [submodule "lib/git.sr.ht/~jornane/php-openssl"]
 	path = lib/git.sr.ht/~jornane/php-openssl
 	url = https://git.sr.ht/~jornane/php-openssl
-[submodule "lib/git.sr.ht/~jornane/php-oauth"]
-	path = lib/git.sr.ht/~jornane/php-oauth
+[submodule "lib/git.sr.ht/~jornane/php-oauth-server"]
+	path = lib/git.sr.ht/~jornane/php-oauth-server
 	url = https://git.sr.ht/~jornane/php-oauth-server
