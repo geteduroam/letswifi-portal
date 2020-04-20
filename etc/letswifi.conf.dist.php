@@ -1,4 +1,8 @@
 <?php return [
+	'auth.service' => 'BasicAuth',
+	'auth.params' => [
+		'admin' => 'admin123ABC',
+	],
 	'defaultDomain' => 'example.com',
 	'pdo.dsn' => 'sqlite:' . dirname( __DIR__ ) . '/var/letswifi-dev.sqlite',
 	'oauth.clients' => [
