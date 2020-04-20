@@ -8,6 +8,7 @@ dev: etc/letswifi.conf.php var/letswifi-dev.sqlite submodule
 
 clean:
 	rm -rf composer.phar etc/letswifi.conf.php phan.phar php-cs-fixer-v2.phar psalm.phar phpunit-7.phar simplesamlphp* vendor www/simplesaml
+	git submodule deinit --all
 
 test: syntax phpunit
 
@@ -53,7 +54,7 @@ var:
 	mkdir -p var
 
 var/letswifi-dev.sqlite: var submodule
-	rm var/letswifi-dev.sqlite
+	rm -f var/letswifi-dev.sqlite
 	sqlite3 var/letswifi-dev.sqlite <sql/letswifi-dev.sqlite.sql
 	php bin/init-db.php || { rm var/letswifi-dev.sqlite && false; }
 
