@@ -5,6 +5,7 @@ require implode(DIRECTORY_SEPARATOR, [dirname(__DIR__, 3), 'src', '_autoload.php
 // http://[::1]:1080/oauth/authorize/?response_type=code&code_challenge_method=S256&scope=testscope&code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM&redirect_uri=http://[::1]:1234/callback/&client_id=no.fyrkat.oauth&state=0
 
 $app = new letswifi\LetsWifiApp();
+$app->registerExceptionHandler();
 $realm = $app->getRealm();
 $oauth = $app->getOAuthHandler( $realm );
 
