@@ -10,13 +10,13 @@ use fyrkat\openssl\DN;
 use fyrkat\openssl\OpenSSLConfig;
 use fyrkat\openssl\PrivateKey;
 
-$app = new geteduroam\GetEduroamApp();
+$app = new letswifi\LetsWifiApp();
 $app->registerExceptionHandler();
 $realm = $app->getRealm( 'example.com' );
 
 $caPrivKey = new PrivateKey( new OpenSSLConfig( OpenSSLConfig::KEY_EC ) );
 $caCsr = CSR::generate(
-		new DN( ['CN' => 'geteduroam example CA'] ), // Subject
+		new DN( ['CN' => 'letswifi example CA'] ), // Subject
 		$caPrivKey // CA key
 	);
 $caCertificate = $caCsr->sign(

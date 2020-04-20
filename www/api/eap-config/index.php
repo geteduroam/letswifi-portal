@@ -6,12 +6,12 @@ if ( $_SERVER['REQUEST_METHOD'] !== 'POST' ) {
 	die( "405 Method Not Allowed\r\n\r\nOnly POST is allowed for this resource\r\n" );
 }
 
-$app = new geteduroam\GetEduroamApp();
+$app = new letswifi\LetsWifiApp();
 $app->registerExceptionHandler();
 $realm = $app->getRealm();
 $oauth = $app->getOAuthHandler( $realm );
 $token = $oauth->getAccessTokenFromRequest();
-$user = new geteduroam\User( $token->getSubject() );
+$user = new letswifi\User( $token->getSubject() );
 $generator = $realm->getUserEapConfig( $user, (new DateTime())->add( new DateInterval( 'P1D' ) ) );
 $payload = $generator->generate();
 header( 'Content-Type: ' . $generator->getContentType() );

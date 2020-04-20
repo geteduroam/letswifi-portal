@@ -3,11 +3,11 @@ camera-ready-dev: camera-ready dev
 
 camera-ready: syntax codestyle phpunit psalm phan
 
-dev: etc/geteduroam.conf.php var/geteduroam-dev.sqlite
+dev: etc/letswifi.conf.php var/letswifi-dev.sqlite
 	php -S [::1]:1080 -t www/
 
 clean:
-	rm -rf composer.phar etc/geteduroam.conf.php phan.phar php-cs-fixer-v2.phar psalm.phar phpunit-7.phar vendor
+	rm -rf composer.phar etc/letswifi.conf.php phan.phar php-cs-fixer-v2.phar psalm.phar phpunit-7.phar vendor
 
 test: syntax phpunit
 
@@ -46,14 +46,14 @@ phpunit: phpunit-7.phar
 syntax:
 	find . ! -path './vendor/*' -name \*.php -print0 | xargs -0 -n1 -P50 php -l
 
-etc/geteduroam.conf.php:
-	cp etc/geteduroam.conf.dist.php etc/geteduroam.conf.php
+etc/letswifi.conf.php:
+	cp etc/letswifi.conf.dist.php etc/letswifi.conf.php
 
 var:
 	mkdir -p var
 
-var/geteduroam-dev.sqlite: var
-	sqlite3 var/geteduroam-dev.sqlite <sql/geteduroam-dev.sqlite.sql
-	php bin/init-db.php || { rm var/geteduroam-dev.sqlite && false; }
+var/letswifi-dev.sqlite: var
+	sqlite3 var/letswifi-dev.sqlite <sql/letswifi-dev.sqlite.sql
+	php bin/init-db.php || { rm var/letswifi-dev.sqlite && false; }
 
 .PHONY: camera-ready codestyle psalm phan phpunit phpcs clean syntax test dev

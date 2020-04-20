@@ -1,13 +1,13 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of geteduroam; a system for easy eduroam device enrollment
+ * This file is part of letswifi; a system for easy eduroam device enrollment
  *
  * Copyright: 2018-2020, Jørn Åne de Jong, Uninett AS <jorn.dejong@uninett.no>
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-namespace geteduroam;
+namespace letswifi;
 
 use fyrkat\oauth\Client;
 use fyrkat\oauth\JWTSigner;
@@ -16,7 +16,7 @@ use fyrkat\oauth\OAuth;
 use PDO;
 use Throwable;
 
-class GetEduroamApp
+class LetsWifiApp
 {
 	const HTTP_CODES = [
 		400 => 'Bad Request',

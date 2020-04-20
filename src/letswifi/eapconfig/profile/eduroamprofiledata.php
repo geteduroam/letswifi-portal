@@ -1,17 +1,17 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of geteduroam; a system for easy eduroam device enrollment
+ * This file is part of letswifi; a system for easy eduroam device enrollment
  *
  * Copyright: 2018-2020, Jørn Åne de Jong, Uninett AS <jorn.dejong@uninett.no>
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-namespace geteduroam\EapConfig\Profile;
+namespace letswifi\EapConfig\Profile;
 
-use geteduroam\EapConfig\CredentialApplicability\HS20CredentialApplicability;
-use geteduroam\EapConfig\CredentialApplicability\ICredentialApplicability;
-use geteduroam\EapConfig\CredentialApplicability\SSIDCredentialApplicability;
+use letswifi\EapConfig\CredentialApplicability\HS20CredentialApplicability;
+use letswifi\EapConfig\CredentialApplicability\ICredentialApplicability;
+use letswifi\EapConfig\CredentialApplicability\SSIDCredentialApplicability;
 
 class EduroamProfileData extends AbstractProfileData
 {

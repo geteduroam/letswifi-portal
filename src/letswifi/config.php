@@ -1,13 +1,13 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of geteduroam; a system for easy eduroam device enrollment
+ * This file is part of letswifi; a system for easy eduroam device enrollment
  *
  * Copyright: 2018-2020, Jørn Åne de Jong, Uninett AS <jorn.dejong@uninett.no>
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-namespace geteduroam;
+namespace letswifi;
 
 use DomainException;
 use PDO;
@@ -26,7 +26,7 @@ class Config
 	public function __construct( $conf = null )
 	{
 		if ( null === $conf ) {
-			$conf = \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 2 ), 'etc', 'geteduroam.conf.php'] );
+			$conf = \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 2 ), 'etc', 'letswifi.conf.php'] );
 		}
 		/**
 		 * @psalm-suppress UnresolvableInclude
