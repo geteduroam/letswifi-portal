@@ -13,6 +13,10 @@ This is the reference CA for geteduroam.  It is intended to be used with an app 
 
 ## Getting up and running quick 'n dirty
 
+Initialize the SQLite database
+
+	make var/letswifi-dev.sqlite
+
 This quick'n'dirty guide assumes you'll be using SimpleSAMLphp (the only authentication method supported ATM)
 
 	make simplesamlphp
