@@ -1,10 +1,12 @@
 <?php declare(strict_types=1);
 require implode(DIRECTORY_SEPARATOR, [dirname(__DIR__, 3), 'src', '_autoload.php']);
 
+/* The current ionic app uses GET here, so allow for now
 if ( $_SERVER['REQUEST_METHOD'] !== 'POST' ) {
 	header( 'Content-Type: text/plain', true, 405 );
 	die( "405 Method Not Allowed\r\n\r\nOnly POST is allowed for this resource\r\n" );
 }
+*/
 
 $app = new letswifi\LetsWifiApp();
 $app->registerExceptionHandler();
