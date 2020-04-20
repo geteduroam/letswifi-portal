@@ -13,13 +13,15 @@ This is the reference CA for geteduroam.  It is intended to be used with an app 
 
 ## Getting up and running quick 'n dirty
 
+This quick'n'dirty guide assumes you'll be using SimpleSAMLphp (the only authentication method supported ATM)
+
+	make simplesamlphp
+
 Initialize the SQLite database
 
 	make var/letswifi-dev.sqlite
 
-This quick'n'dirty guide assumes you'll be using SimpleSAMLphp (the only authentication method supported ATM)
-
-	make simplesamlphp
+Edit etc/letswifi.conf.php and change `userIdAttribute` and `defaultDomain` to match your setup.
 
 Write metadata of your SAML IdP to simplesamlphp/metadata/saml20-idp-remote.php
 

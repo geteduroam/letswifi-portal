@@ -3,7 +3,7 @@ camera-ready-dev: camera-ready dev
 
 camera-ready: syntax codestyle phpunit psalm phan
 
-dev: etc/letswifi.conf.php var/letswifi-dev.sqlite
+dev: etc/letswifi.conf.php var/letswifi-dev.sqlite submodule
 	php -S [::1]:1080 -t www/
 
 clean:
@@ -29,18 +29,18 @@ phan.phar:
 #vendor: composer.phar
 #	php composer.phar install
 
-psalm: psalm.phar
+psalm: submodule psalm.phar
 	mkdir -p vendor
 	ln -s ../src/_autoload.php vendor/autoload.php || true
 	php psalm.phar
 
-phan: phan.phar
+phan: submodule phan.phar
 	php phan.phar --allow-polyfill-parser --no-progress-bar
 
 codestyle: php-cs-fixer-v2.phar
 	php php-cs-fixer-v2.phar fix
 
-phpunit: phpunit-7.phar
+phpunit: submodule phpunit-7.phar
 	php phpunit-7.phar
 
 syntax:
@@ -52,9 +52,14 @@ etc/letswifi.conf.php:
 var:
 	mkdir -p var
 
-var/letswifi-dev.sqlite: var
+var/letswifi-dev.sqlite: var submodule
+	rm var/letswifi-dev.sqlite
 	sqlite3 var/letswifi-dev.sqlite <sql/letswifi-dev.sqlite.sql
 	php bin/init-db.php || { rm var/letswifi-dev.sqlite && false; }
+
+submodule:
+	git submodule init
+	git submodule update
 
 simplesamlphp:
 	cp -n etc/letswifi.conf.simplesaml.php etc/letswifi.conf.php
@@ -62,4 +67,4 @@ simplesamlphp:
 	ln -s ../simplesamlphp/www/ www/simplesaml || true
 	ln -s simplesamlphp-1.18.6/ simplesamlphp || true
 
-.PHONY: camera-ready codestyle psalm phan phpunit phpcs clean syntax test dev
+.PHONY: camera-ready codestyle psalm phan phpunit phpcs submodule clean syntax test dev
