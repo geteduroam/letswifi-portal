@@ -5,6 +5,8 @@
 /php-cs-fixer-v2.phar
 /phpunit-7.phar
 /psalm.phar
+/simplesamlphp*
 /var
 /vendor
+/www/simplesaml
 /.php_cs.cache

@@ -7,7 +7,7 @@ dev: etc/letswifi.conf.php var/letswifi-dev.sqlite
 	php -S [::1]:1080 -t www/
 
 clean:
-	rm -rf composer.phar etc/letswifi.conf.php phan.phar php-cs-fixer-v2.phar psalm.phar phpunit-7.phar vendor
+	rm -rf composer.phar etc/letswifi.conf.php phan.phar php-cs-fixer-v2.phar psalm.phar phpunit-7.phar simplesamlphp* vendor www/simplesaml
 
 test: syntax phpunit
 
@@ -44,7 +44,7 @@ phpunit: phpunit-7.phar
 	php phpunit-7.phar
 
 syntax:
-	find . ! -path './vendor/*' -name \*.php -print0 | xargs -0 -n1 -P50 php -l
+	find . ! -path './vendor/*' ! -path './simplesaml*' -name \*.php -print0 | xargs -0 -n1 -P50 php -l
 
 etc/letswifi.conf.php:
 	cp etc/letswifi.conf.dist.php etc/letswifi.conf.php
@@ -55,5 +55,11 @@ var:
 var/letswifi-dev.sqlite: var
 	sqlite3 var/letswifi-dev.sqlite <sql/letswifi-dev.sqlite.sql
 	php bin/init-db.php || { rm var/letswifi-dev.sqlite && false; }
+
+simplesamlphp:
+	cp -n etc/letswifi.conf.simplesaml.php etc/letswifi.conf.php
+	curl -sSL https://github.com/simplesamlphp/simplesamlphp/releases/download/v1.18.6/simplesamlphp-1.18.6.tar.gz | tar xzv
+	ln -s ../simplesamlphp/www/ www/simplesaml || true
+	ln -s simplesamlphp-1.18.6/ simplesamlphp || true
 
 .PHONY: camera-ready codestyle psalm phan phpunit phpcs clean syntax test dev

@@ -67,6 +67,19 @@ class Config
 		return $data;
 	}
 
+	public function getArrayOrNull( string $key ): ?array
+	{
+		if ( !isset( $this->conf[$key] ) ) {
+			return null;
+		}
+		$data = $this->conf[$key];
+		if ( !\is_array( $data ) ) {
+			throw new DomainException( "Expecting config key ${key} to be string, but is " . \gettype( $data ) );
+		}
+
+		return $data;
+	}
+
 	public function getStringOrNull( string $key ): ?string
 	{
 		if ( !isset( $this->conf[$key] ) ) {

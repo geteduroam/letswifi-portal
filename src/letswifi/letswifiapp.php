@@ -9,9 +9,13 @@
 
 namespace letswifi;
 
+use DomainException;
+
 use fyrkat\oauth\Client;
 use fyrkat\oauth\JWTSigner;
 use fyrkat\oauth\OAuth;
+
+use letswifi\browserauth\BrowserAuthInterface;
 
 use PDO;
 use Throwable;
@@ -45,7 +49,32 @@ class LetsWifiApp
 
 	public function getUserFromBrowserSession(): User
 	{
-		return new User( 'charlie' );
+		$auth = $this->getBrowserAuthenticator();
+		$userId = $auth->requireAuth();
+
+		return new User( $userId );
+	}
+
+	/**
+	 * @psalm-suppress InvalidStringClass
+	 */
+	public function getBrowserAuthenticator(): BrowserAuthInterface
+	{
+		$service = $this->config->getString( 'auth.service' );
+		if ( !\preg_match( '/[A-Z][A-Za-z0-9]+/', $service ) ) {
+			throw new DomainException( 'Illegal auth.service specified in config' );
+		}
+		$service = 'letswifi\\browserauth\\' . $service;
+		$params = $this->config->getArrayOrNull( 'auth.params' );
+		if ( \is_array( $params ) ) {
+			$result = new $service( $params );
+		} else {
+			$result = new $service();
+		}
+		if ( $result instanceof BrowserAuthInterface ) {
+			return $result;
+		}
+		throw new DomainException( 'auth.service must point to a class that implements BrowserAuthInterface' );
 	}
 
 	public function getOAuthHandler( Realm $realm ): OAuth
