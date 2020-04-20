@@ -2,6 +2,12 @@
 	"name": "uninett/lets-wifi-portal",
 	"type": "project",
 	"license": "BSD-3-Clause",
+	"autoload": {
+		"classmap": ["src/"]
+	},
+	"require": {
+		"php": ">=7.1"
+	},
 	"authors": [
 		{
 			"name": "Jørn Åne de Jong",

@@ -42,7 +42,7 @@ use Phan\Issue;
  */
 return [
 
-	// Supported values: `'5.6'`, `'7.0'`, `'7.1'`, `'7.2'`, `'7.3'`, `null`.
+	// Supported values: `'5.6'`, `'7.0'`, `'7.1'`, `'7.2'`, `'7.3'`, `'7.4'`, `null`.
 	// If this is set to `null`,
 	// then Phan assumes the PHP version which is closest to the minor version
 	// of the php executable used to execute Phan.
@@ -101,23 +101,27 @@ return [
 	// (and reveal some bugs).
 	'strict_method_checking' => true,
 
+	// If enabled, Phan will warn if **any** type of the object expression for a property access
+	// does not contain that property.
+	'strict_object_checking' => true,
+
 	// If enabled, Phan will warn if **any** type in the argument's union type
 	// cannot be cast to a type in the parameter's expected union type.
 	// Setting this to true will introduce numerous false positives
 	// (and reveal some bugs).
 	'strict_param_checking' => true,
 
-	// If enabled, Phan will warn if **any** type in a returned value's union type
-	// cannot be cast to the declared return type.
-	// Setting this to true will introduce numerous false positives
-	// (and reveal some bugs).
-	'strict_return_checking' => true,
-
 	// If enabled, Phan will warn if **any** type in a property assignment's union type
 	// cannot be cast to a type in the property's declared union type.
 	// Setting this to true will introduce numerous false positives
 	// (and reveal some bugs).
 	'strict_property_checking' => true,
+
+	// If enabled, Phan will warn if **any** type in a returned value's union type
+	// cannot be cast to the declared return type.
+	// Setting this to true will introduce numerous false positives
+	// (and reveal some bugs).
+	'strict_return_checking' => true,
 
 	// If true, seemingly undeclared variables in the global
 	// scope will be ignored.
@@ -127,10 +131,13 @@ return [
 	'ignore_undeclared_variables_in_global_scope' => false,
 
 	// Set this to false to emit `PhanUndeclaredFunction` issues for internal functions that Phan has signatures for,
-	// but aren't available in the codebase, or the internal functions used to run Phan
+	// but aren't available in the codebase, or from Reflection.
 	// (may lead to false positives if an extension isn't loaded)
 	//
 	// If this is true(default), then Phan will not warn.
+	//
+	// Even when this is false, Phan will still infer return values and check parameters of internal functions
+	// if Phan has the signatures.
 	'ignore_undeclared_functions_with_known_signatures' => false,
 
 	// Backwards Compatibility Checking. This is slow
@@ -150,36 +157,6 @@ return [
 	// in the doc-block (if any) matches the return type
 	// declared in the method signature.
 	'check_docblock_signature_return_type_match' => true,
-
-	// If true, make narrowed types from phpdoc params override
-	// the real types from the signature, when real types exist.
-	// (E.g. allows specifying desired lists of subclasses,
-	//  or to indicate a preference for non-nullable types over nullable types)
-	//
-	// Affects analysis of the body of the method and the param types passed in by callers.
-	//
-	// (*Requires `check_docblock_signature_param_type_match` to be true*)
-	'prefer_narrowed_phpdoc_param_type' => true,
-
-	// (*Requires `check_docblock_signature_return_type_match` to be true*)
-	//
-	// If true, make narrowed types from phpdoc returns override
-	// the real types from the signature, when real types exist.
-	//
-	// (E.g. allows specifying desired lists of subclasses,
-	// or to indicate a preference for non-nullable types over nullable types)
-	//
-	// This setting affects the analysis of return statements in the body of the method and the return types passed in by callers.
-	'prefer_narrowed_phpdoc_return_type' => true,
-
-	// If enabled, check all methods that override a
-	// parent method to make sure its signature is
-	// compatible with the parent's.
-	//
-	// This check can add quite a bit of time to the analysis.
-	//
-	// This will also check if final methods are overridden, etc.
-	'analyze_signature_compatibility' => true,
 
 	// This setting maps case-insensitive strings to union types.
 	//
@@ -216,6 +193,19 @@ return [
 	// This has a few known false positives, e.g. for loops or branches.
 	'unused_variable_detection' => true,
 
+	// Set to true in order to attempt to detect redundant and impossible conditions.
+	//
+	// This has some false positives involving loops,
+	// variables set in branches of loops, and global variables.
+	'redundant_condition_detection' => true,
+
+	// If enabled, Phan will act as though it's certain of real return types of a subset of internal functions,
+	// even if those return types aren't available in reflection (real types were taken from php 7.3 or 8.0-dev, depending on target_php_version).
+	//
+	// Note that with php 7 and earlier, php would return null or false for many internal functions if the argument types or counts were incorrect.
+	// As a result, enabling this setting with target_php_version 8.0 may result in false positives for `--redundant-condition-detection` when codebases also support php 7.x.
+	'assume_real_types_for_internal_functions' => true,
+
 	// If true, this runs a quick version of checks that takes less
 	// time at the cost of not running as thorough
 	// of an analysis. You should consider setting this
@@ -247,20 +237,6 @@ return [
 	// `string` instead of an `int` as declared.
 	'quick_mode' => false,
 
-	// If true, then before analysis, try to simplify AST into a form
-	// which improves Phan's type inference in edge cases.
-	//
-	// This may conflict with `dead_code_detection`.
-	// When this is true, this slows down analysis slightly.
-	//
-	// E.g. rewrites `if ($a = value() && $a > 0) {...}`
-	// into `$a = value(); if ($a) { if ($a > 0) {...}}`
-	'simplify_ast' => true,
-
-	// Enable or disable support for generic templated
-	// class types.
-	'generic_types_enabled' => true,
-
 	// Override to hardcode existence and types of (non-builtin) globals in the global scope.
 	// Class names should be prefixed with `\`.
 	//
@@ -287,8 +263,8 @@ return [
 	// (e.g. `'@Test\.php$@'`, or `'@vendor/.*/(tests|Tests)/@'`)
 	'exclude_file_regex' => '@^vendor/.*/(tests?|Tests?)/@',
 
-	// A file list that defines files that will be excluded
-	// from parsing and analysis and will not be read at all.
+	// A list of files that will be excluded from parsing and analysis
+	// and will not be read at all.
 	//
 	// This is useful for excluding hopelessly unanalyzable
 	// files that can't be removed for whatever reason.
@@ -310,6 +286,7 @@ return [
 	],
 
 	// Enable this to enable checks of require/include statements referring to valid paths.
+	// The settings `include_paths` and `warn_about_relative_include_statement` affect the checks.
 	'enable_include_path_checks' => true,
 
 	// The number of processes to fork off during the analysis
@@ -350,6 +327,9 @@ return [
 		'SleepCheckerPlugin',
 		'UnreachableCodePlugin',
 		'UseReturnValuePlugin',
+		'EmptyStatementListPlugin',
+		'StrictComparisonPlugin',
+		'LoopVariableReusePlugin',
 	],
 
 	// A list of directories that should be parsed for class and
