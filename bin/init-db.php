@@ -26,10 +26,10 @@ $caCertificate = $caCsr->sign(
 		new OpenSSLConfig( OpenSSLConfig::X509_CA ) // EKU
 	);
 
-$realm->writeRealmData([
+$realm->writeRealmData( [
 		'trustedCaCert' => $caCertificate->getX509Pem(),
 		'trustedServerName' => 'radius.example.com',
 		'signingCaCert' => $caCertificate->getX509Pem(),
 		'signingCaKey' => $caPrivKey->getPrivateKeyPem( null ),
 		'secretKey' => random_bytes( 32 ),
-	]);
+	] );

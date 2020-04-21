@@ -4,6 +4,8 @@ html {
 	line-height: 1.15;
 	-webkit-text-size-adjust: 100%;
 	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+	margin: 0;
+	padding: 0;
 }
 body:before {
 	display: block;
@@ -20,6 +22,7 @@ body {
 	line-height: 1.5;
 	color: #212529;
 	text-align: left;
+	margin: 1em;
 }
 header .logout {
 	font-size: .8em;
@@ -45,6 +48,7 @@ main {
 	background: white;
 	border-radius: .3em;
 	box-shadow: rgba(0,0,0,.1) 0 .1em .3em;
+	min-height: 17em;
 }
 p {
 	font-size: .95em;
@@ -73,7 +77,11 @@ hr {
 	background: #337efe;
 	color: white;
 }
+.btn.btn-default:active {
+	background: #2e75eb;
+}
 .btn-txt {
+	color: #212529;
 	display: inline;
 	padding: 0;
 	margin: 0;
