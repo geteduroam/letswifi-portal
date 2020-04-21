@@ -25,8 +25,18 @@ header .logout {
 	font-size: .8em;
 	text-align: right;
 }
-main, header {
-	margin: 1em;
+html main, html header {
+	margin: 1em auto;
+	max-width: 60em;
+}
+html header {
+	max-width: 62em;
+}
+html.dialog main {
+	max-width: 24em;
+}
+html.dialog header {
+	max-width: 26em;
 }
 main {
 	display: block;

@@ -21,7 +21,7 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
 	die( "500 Internal Server Error\r\n\r\nRequest was not handled\r\n" );
 }
 ?><!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dialog">
 <link rel="stylesheet" href="/assets/geteduroam.css">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Authorize</title>
