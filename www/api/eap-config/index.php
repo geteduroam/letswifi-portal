@@ -10,7 +10,7 @@ if ( $_SERVER['REQUEST_METHOD'] !== 'POST' ) {
 
 $app = new letswifi\LetsWifiApp();
 $app->registerExceptionHandler();
-$realm = $app->getRealm();
+$realm = $app->getRealm( $_GET['realm'] ?? 'example.com' );
 $oauth = $app->getOAuthHandler( $realm );
 $token = $oauth->getAccessTokenFromRequest();
 $user = new letswifi\User( $token->getSubject() );

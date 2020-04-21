@@ -32,7 +32,7 @@ class Realm
 	private $pdo;
 
 	/** @var string */
-	private $domain;
+	private $name;
 
 	/** @var ?string */
 	private $signingPassphrase;
@@ -40,11 +40,11 @@ class Realm
 	/** @var ?array<string,string> */
 	private $data;
 
-	public function __construct( PDO $pdo, string $domain, ?string $signingPassphrase = null )
+	public function __construct( PDO $pdo, string $name, ?string $signingPassphrase = null )
 	{
 		$pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 		$this->pdo = $pdo;
-		$this->domain = $domain;
+		$this->name = $name;
 		$this->signingPassphrase = $signingPassphrase;
 	}
 
@@ -81,7 +81,7 @@ class Realm
 	public function writeRealmData( array $data ): void
 	{
 		$statement = $this->pdo->prepare( 'REPLACE INTO realm (domain, trustedCaCert, trustedServerName, signingCaCert, signingCaKey, secretKey) VALUES (:domain, :trustedCaCert, :trustedServerName, :signingCaCert, :signingCaKey, :secretKey)' );
-		$statement->bindValue( 'domain', $this->getDomain(), PDO::PARAM_STR );
+		$statement->bindValue( 'domain', $this->getName(), PDO::PARAM_STR );
 		$statement->bindValue( 'trustedCaCert', $data['trustedCaCert'], PDO::PARAM_STR );
 		$statement->bindValue( 'trustedServerName', $data['trustedServerName'], PDO::PARAM_STR );
 		$statement->bindValue( 'signingCaCert', $data['signingCaCert'], PDO::PARAM_STR );
@@ -117,9 +117,9 @@ class Realm
 	/**
 	 * @return string
 	 */
-	protected function getDomain(): string
+	public function getName(): string
 	{
-		return $this->domain;
+		return $this->name;
 	}
 
 	protected function getTrustedServerNames(): array
@@ -131,7 +131,7 @@ class Realm
 	{
 		$caCertificates = $this->getTrustedCaCertificates();
 		$serverNames = $this->getTrustedServerNames();
-		$anonymousIdentity = \rawurldecode( \strstr( $anonymousIdentity, '@', true ) ?: $anonymousIdentity ) . '@' . \rawurldecode( $this->getDomain() );
+		$anonymousIdentity = \rawurldecode( \strstr( $anonymousIdentity, '@', true ) ?: $anonymousIdentity ) . '@' . \rawurldecode( $this->getName() );
 
 		return new TlsAuthenticationMethod( $caCertificates, $serverNames, $anonymousIdentity, $pkcs12 );
 	}
@@ -144,7 +144,7 @@ class Realm
 	{
 		$csrData = $csr->getCSRPem();
 		$statement = $this->pdo->prepare( 'INSERT INTO tlscredential (domain, username, commonName, startDate, endDate, csr) VALUES (:domain, :username, :commonName, :startDate, :endDate, :csr)' );
-		$statement->bindValue( 'domain', $this->getDomain(), PDO::PARAM_STR );
+		$statement->bindValue( 'domain', $this->getName(), PDO::PARAM_STR );
 		$statement->bindValue( 'username', $user->getUserID(), PDO::PARAM_STR );
 		$statement->bindValue( 'commonName', $csr->getSubject(), PDO::PARAM_STR );
 		$statement->bindValue( 'startDate', \date( 'Y-m-d' ), PDO::PARAM_STR );
@@ -170,7 +170,7 @@ class Realm
 		$statement->bindValue( 'endDate', $userCert->getValidTo()->format( 'Y-m-d' ), PDO::PARAM_STR );
 		$statement->bindValue( 'x509', $userCert->getX509Pem(), PDO::PARAM_STR );
 		$statement->bindValue( 'serial', $userCert->getSerialNumber(), PDO::PARAM_INT );
-		$statement->bindValue( 'domain', $this->getDomain(), PDO::PARAM_STR );
+		$statement->bindValue( 'domain', $this->getName(), PDO::PARAM_STR );
 		$statement->bindValue( 'username', $user->getUserID(), PDO::PARAM_STR );
 		$statement->execute();
 		$rows = $statement->rowCount();
@@ -182,7 +182,7 @@ class Realm
 	protected function getProfileData(): IProfileData
 	{
 		// TODO add helpdesk info, logo and such
-		return new EduroamProfileData( $this->getDomain() );
+		return new EduroamProfileData( $this->getName() );
 	}
 
 	/**
@@ -193,10 +193,10 @@ class Realm
 	{
 		if ( null === $this->data ) {
 			$statement = $this->pdo->prepare( 'SELECT domain, trustedCaCert, trustedServerName, signingCaCert, signingCaKey, secretKey FROM realm WHERE domain = ?' );
-			$statement->execute( [$this->domain] );
+			$statement->execute( [$this->name] );
 			$realmData = $statement->fetch();
 			if ( !$realmData ) {
-				throw new DomainException( "Unable to find realm {$this->domain}", 404 );
+				throw new DomainException( "Unable to find realm {$this->name}", 404 );
 			}
 			$this->data = $realmData;
 		}
@@ -212,7 +212,7 @@ class Realm
 	protected function generateClientCertificate( User $user, DateTimeInterface $expiry ): PKCS12
 	{
 		$userKey = new PrivateKey( new OpenSSLConfig( OpenSSLConfig::KEY_EC ) );
-		$commonName = static::createUUID() . '@' . \rawurlencode( $this->getDomain() );
+		$commonName = static::createUUID() . '@' . \rawurlencode( $this->getName() );
 		$dn = new DN( ['CN' => $commonName] );
 		$csr = CSR::generate( $dn, $userKey );
 		$serial = $this->logPreparedUserCredential( $user, $csr, $expiry );

@@ -47,9 +47,9 @@ class LetsWifiApp
 		$this->config = $config ?? new Config();
 	}
 
-	public function getUserFromBrowserSession(): User
+	public function getUserFromBrowserSession( Realm $realm ): User
 	{
-		$auth = $this->getBrowserAuthenticator();
+		$auth = $this->getBrowserAuthenticator( $realm );
 		$userId = $auth->requireAuth();
 
 		return new User( $userId );
@@ -58,7 +58,7 @@ class LetsWifiApp
 	/**
 	 * @psalm-suppress InvalidStringClass
 	 */
-	public function getBrowserAuthenticator(): BrowserAuthInterface
+	public function getBrowserAuthenticator( Realm $realm ): BrowserAuthInterface
 	{
 		$service = $this->config->getString( 'auth.service' );
 		if ( !\preg_match( '/[A-Z][A-Za-z0-9]+/', $service ) ) {
@@ -66,6 +66,10 @@ class LetsWifiApp
 		}
 		$service = 'letswifi\\browserauth\\' . $service;
 		$params = $this->config->getArrayOrNull( 'auth.params' );
+		$realmParams = $this->config->getArrayOrEmpty( 'realm.auth' );
+		if ( \array_key_exists( $realm->getName(), $realmParams ) ) {
+			$params = ( $params ?? [] ) + $realmParams[$realm->getName()];
+		}
 		if ( \is_array( $params ) ) {
 			$result = new $service( $params );
 		} else {
@@ -87,14 +91,9 @@ class LetsWifiApp
 		return $oauth;
 	}
 
-	public function getRealm( string $domain = null ): Realm
+	public function getRealm( string $realmName = null ): Realm
 	{
-		return new Realm( $this->getPDO(), $domain ?? $this->getDomain() );
-	}
-
-	public function getDomain(): string
-	{
-		return $this->config->getString( 'defaultDomain' );
+		return new Realm( $this->getPDO(), $realmName ?? $this->config->getString( 'realm.default' ) );
 	}
 
 	public function registerExceptionHandler(): void

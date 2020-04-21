@@ -9,7 +9,7 @@ require implode(DIRECTORY_SEPARATOR, [dirname(__DIR__, 3), 'src', '_autoload.php
 
 $app = new letswifi\LetsWifiApp();
 $app->registerExceptionHandler();
-$realm = $app->getRealm();
+$realm = $app->getRealm( $_GET['realm'] ?? 'example.com' );
 $oauth = $app->getOAuthHandler( $realm );
 
 header( 'Content-Type: text/plain' );

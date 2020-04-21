@@ -67,6 +67,11 @@ class Config
 		return $data;
 	}
 
+	public function getArrayOrEmpty( string $key ): array
+	{
+		return $this->getArrayOrNull( $key ) ?? [];
+	}
+
 	public function getArrayOrNull( string $key ): ?array
 	{
 		if ( !isset( $this->conf[$key] ) ) {

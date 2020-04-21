@@ -28,6 +28,9 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 	/** @var ?array<string,array<string>> */
 	private $attributes = null;
 
+	/** @var ?string */
+	private $samlIdp;
+
 	/**
 	 * @psalm-suppress UndefinedClass We don't have a dependency on SimpleSAMLphp
 	 * @psalm-suppress UnresolvableInclude We don't know where SimpleSAMLphp is
@@ -42,6 +45,7 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 		}
 		$authSource = \array_key_exists( 'authSource', $params ) ? $params['authSource'] : 'default-sp';
 		$userIdAttribute = \array_key_exists( 'userIdAttribute', $params ) ? $params['userIdAttribute'] : 'eduPersonPrincipalName';
+		$this->samlIdp = \array_key_exists( 'samlIdp', $params ) ? $params['samlIdp'] : null;
 		$this->as = new \SimpleSAML\Auth\Simple( $authSource );
 		$this->userIdAttribute = $userIdAttribute;
 	}
@@ -52,7 +56,12 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 	 */
 	public function requireAuth(): string
 	{
-		$this->as->requireAuth();
+		$params = [];
+		if ( null !== $this->samlIdp ) {
+			$params['saml:idp'] = $this->samlIdp;
+		}
+
+		$this->as->requireAuth( $params );
 
 		return $this->getSingleAttributeValue( $this->userIdAttribute );
 	}

@@ -6,12 +6,12 @@ require implode(DIRECTORY_SEPARATOR, [dirname(__DIR__, 3), 'src', '_autoload.php
 
 $app = new letswifi\LetsWifiApp();
 $app->registerExceptionHandler();
-$realm = $app->getRealm();
+$realm = $app->getRealm( $_GET['realm'] ?? 'example.com' );
 $oauth = $app->getOAuthHandler( $realm );
 
 $oauth->assertAuthorizeRequest();
 
-$user = $app->getUserFromBrowserSession();
+$user = $app->getUserFromBrowserSession( $realm );
 
 if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
 	// This is how it should be done for production:

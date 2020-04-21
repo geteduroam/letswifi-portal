@@ -3,9 +3,18 @@
 	'auth.params' => [
 			'autoloadInclude' => dirname( __DIR__ ) . '/simplesamlphp/lib/_autoload.php',
 			'authSource' => 'default-sp',
-			'userIdAttribute' => 'eduPersonPrincipalName',
 		],
-	'defaultDomain' => 'example.com',
+	'realm.auth' => [
+			'demo.eduroam.no' => [
+					'userIdAttribute' => 'eduPersonPrincipalName',
+					'samlIdp' => 'https://idp-test.feide.no',
+				],
+			'letswifi.fyrkat.no' => [
+					'userIdAttribute' => 'userPrincipalName',
+					'samlIdp' => 'https://idp-test.feide.no',
+				],
+		],
+	'realm.default' => 'example.com',
 	'pdo.dsn' => 'sqlite:' . dirname( __DIR__ ) . '/var/letswifi-dev.sqlite',
 	'oauth.clients' => [
 			['clientId' => 'f817fbcc-e8f4-459e-af75-0822d86ff47a', 'redirectUris' => ['http://localhost:8080/'], 'scopes' => ['eap-metadata']],
