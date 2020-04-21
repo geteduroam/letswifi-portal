@@ -68,7 +68,7 @@ class LetsWifiApp
 		$params = $this->config->getArrayOrNull( 'auth.params' );
 		$realmParams = $this->config->getArrayOrEmpty( 'realm.auth' );
 		if ( \array_key_exists( $realm->getName(), $realmParams ) ) {
-			$params = ( $params ?? [] ) + $realmParams[$realm->getName()];
+			$params = array_merge( $params ?? [], $realmParams[$realm->getName()] );
 		}
 		if ( \is_array( $params ) ) {
 			$result = new $service( $params );
