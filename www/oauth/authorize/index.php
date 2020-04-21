@@ -22,8 +22,22 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
 }
 ?><!DOCTYPE html>
 <html lang="en">
+<link rel="stylesheet" href="/assets/geteduroam.css">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Authorize</title>
 <form method="post">
-	<button type="submit" name="approve" value="yes">Approve</button>
-	<button type="submit" name="approve" value="no">Reject</button>
+<header>
+	<p class="logout">
+		<button type="submit" name="approve" value="no" class="btn btn-txt">Not <?= htmlspecialchars( $user->getUserID() ); ?>?</button>
+	</p>
+</header>
+<main>
+	<p>Do you want to use your account to connect to eduroam on this device?</p>
+	<p class="text-center"><button type="submit" class="btn btn-default" name="approve" value="yes">Approve</button></p>
+	<hr>
+	<details>
+		<summary>Why is this needed?</summary>
+		<p>By clicking approve, you allow the application to receive Wi-Fi profiles on your behalf.</p>
+	</details>
+</main>
 </form>
