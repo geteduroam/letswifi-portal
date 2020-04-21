@@ -1,4 +1,9 @@
 <?php declare(strict_types=1);
+// Hack, https://github.com/geteduroam/ionic-app/issues/9
+if (strpos($_SERVER['QUERY_STRING'], '?')) {
+    parse_str(strtr($_SERVER['QUERY_STRING'],'?','&'), $_GET);
+}
+
 require implode(DIRECTORY_SEPARATOR, [dirname(__DIR__, 3), 'src', '_autoload.php']);
 
 // Test this file by serving it on http://[::1]:1080/oauth/authorize/ and point your browser to:

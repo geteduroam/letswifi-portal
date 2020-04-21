@@ -1,4 +1,9 @@
 <?php declare(strict_types=1);
+// Hack, https://github.com/geteduroam/ionic-app/issues/9
+if (strpos($_SERVER['QUERY_STRING'], '?')) {
+    parse_str(strtr($_SERVER['QUERY_STRING'],'?','&'), $_GET);
+}
+
 require implode(DIRECTORY_SEPARATOR, [dirname(__DIR__, 3), 'src', '_autoload.php']);
 
 // Ensure you send a access_token in POST or a Bearer
