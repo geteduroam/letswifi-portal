@@ -203,7 +203,7 @@ class Realm
 		$userCert = $csr->sign( $caCert, $caKey, $expiry, $conf, $serial );
 		$this->logCompletedUserCredential( $user, $userCert );
 
-		return new PKCS12( $userCert, $userKey, $this->getTrustedCaCertificates() );
+		return new PKCS12( $userCert, $userKey, [$caCert] );
 	}
 
 	protected function getSigningCACertificate(): X509
