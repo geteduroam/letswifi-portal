@@ -95,6 +95,26 @@ class Realm
 	}
 
 	/**
+	 * @param string                $commonName Common name of the server certificate
+	 * @param DateTimeInterface|int $expiry     Validity in days
+	 */
+	public function generateServerCertificate( string $commonName, $expiry ): PKCS12
+	{
+		$serverKey = new PrivateKey();
+		$dn = new DN( ['CN' => $commonName] );
+		$csr = CSR::generate( $dn, $serverKey );
+		// TODO we should probably log these?
+
+		$caCert = $this->getSigningCACertificate();
+		$caKey = $this->getSigningCAKey();
+		$conf = new OpenSSLConfig( OpenSSLConfig::X509_SERVER );
+		$serverCert = $csr->sign( $caCert, $caKey, $expiry, $conf /*, $serial */ );
+		// serial missing since we don't log
+
+		return new PKCS12( $serverCert, $serverKey, [$caCert] );
+	}
+
+	/**
 	 * @return string
 	 */
 	protected function getDomain(): string
@@ -199,7 +219,7 @@ class Realm
 
 		$caCert = $this->getSigningCACertificate();
 		$caKey = $this->getSigningCAKey();
-		$conf = new OpenSSLConfig();
+		$conf = new OpenSSLConfig( OpenSSLConfig::X509_CLIENT );
 		$userCert = $csr->sign( $caCert, $caKey, $expiry, $conf, $serial );
 		$this->logCompletedUserCredential( $user, $userCert );
 
