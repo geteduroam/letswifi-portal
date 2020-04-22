@@ -100,7 +100,7 @@ class Realm
 	 */
 	public function generateServerCertificate( string $commonName, $expiry ): PKCS12
 	{
-		$serverKey = new PrivateKey();
+		$serverKey = new PrivateKey( new OpenSSLConfig( OpenSSLConfig::KEY_EC ) );
 		$dn = new DN( ['CN' => $commonName] );
 		$csr = CSR::generate( $dn, $serverKey );
 		// TODO we should probably log these?
@@ -211,7 +211,7 @@ class Realm
 
 	protected function generateClientCertificate( User $user, DateTimeInterface $expiry ): PKCS12
 	{
-		$userKey = new PrivateKey();
+		$userKey = new PrivateKey( new OpenSSLConfig( OpenSSLConfig::KEY_EC ) );
 		$commonName = static::createUUID() . '@' . \rawurlencode( $this->getDomain() );
 		$dn = new DN( ['CN' => $commonName] );
 		$csr = CSR::generate( $dn, $userKey );
