@@ -1,5 +1,6 @@
 html {
 	background: #f5f4f2;
+	color: #212529;
 	font-family: sans-serif;
 	line-height: 1.15;
 	-webkit-text-size-adjust: 100%;
@@ -9,7 +10,9 @@ html {
 }
 body:before {
 	display: block;
-	background: url('eduroam.svg') no-repeat 50% 50%;
+	background-image: url('eduroam.svg');
+	background-repeat: no-repeat;
+	background-position: 50% 50%;
 	background-size: contain;
 	content: ' ';
 	width: 100%;
@@ -20,7 +23,6 @@ body {
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 	font-weight: 400;
 	line-height: 1.5;
-	color: #212529;
 	text-align: left;
 	margin: 1em;
 }
@@ -88,4 +90,22 @@ hr {
 	background: none;
 	text-decoration: underline;
 	font-size: inherit;
+}
+
+@media (prefers-color-scheme: dark) {
+	html {
+		color: #f5f4f2;
+		background: #111519;
+	}
+	body:before {
+		background-image: url('eduroam-dark.svg');
+	}
+	main {
+		background: #212529;
+		color: #f5f4f2;
+		box-shadow: rgba(0,0,0,.5) 0 .1em .5em;
+	}
+	.btn-txt {
+		color: #414549;
+	}
 }
