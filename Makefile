@@ -1,4 +1,6 @@
 
+REALM := example.com
+
 camera-ready-dev: camera-ready dev
 
 camera-ready: syntax codestyle phpunit psalm phan
@@ -56,7 +58,7 @@ var:
 var/letswifi-dev.sqlite: var submodule
 	rm -f var/letswifi-dev.sqlite
 	sqlite3 var/letswifi-dev.sqlite <sql/letswifi-dev.sqlite.sql
-	php bin/init-db.php || { rm var/letswifi-dev.sqlite && false; }
+	php bin/init-db.php $(REALM) || { rm var/letswifi-dev.sqlite && false; }
 
 submodule:
 	git submodule init
