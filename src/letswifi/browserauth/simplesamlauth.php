@@ -16,7 +16,10 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 	/**
 	 * @psalm-suppress PropertyNotSetInConstructor Yes it is!
 	 */
-	private $as;
+	protected $as;
+
+	/** @var ?string */
+	protected $samlIdp;
 
 	/**
 	 * @psalm-suppress PropertyNotSetInConstructor Yes it is!
@@ -27,9 +30,6 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 
 	/** @var ?array<string,array<string>> */
 	private $attributes = null;
-
-	/** @var ?string */
-	private $samlIdp;
 
 	/**
 	 * @psalm-suppress UndefinedClass We don't have a dependency on SimpleSAMLphp

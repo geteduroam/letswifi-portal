@@ -60,21 +60,22 @@ class LetsWifiApp
 	 */
 	public function getBrowserAuthenticator( Realm $realm ): BrowserAuthInterface
 	{
-		$service = $this->config->getString( 'auth.service' );
+		$params = $this->config->getArrayOrEmpty( 'auth.params' );
+		$realmParams = $this->config->getArrayOrEmpty( 'realm.auth' );
+		if ( \array_key_exists( $realm->getName(), $realmParams ) ) {
+			$params = \array_merge( $params, $realmParams[$realm->getName()] );
+		}
+
+		$service = \array_key_exists( 'auth.service', $params )
+			? $params['auth.service']
+			: $this->config->getString( 'auth.service' )
+			;
+
 		if ( !\preg_match( '/[A-Z][A-Za-z0-9]+/', $service ) ) {
 			throw new DomainException( 'Illegal auth.service specified in config' );
 		}
 		$service = 'letswifi\\browserauth\\' . $service;
-		$params = $this->config->getArrayOrNull( 'auth.params' );
-		$realmParams = $this->config->getArrayOrEmpty( 'realm.auth' );
-		if ( \array_key_exists( $realm->getName(), $realmParams ) ) {
-			$params = array_merge( $params ?? [], $realmParams[$realm->getName()] );
-		}
-		if ( \is_array( $params ) ) {
-			$result = new $service( $params );
-		} else {
-			$result = new $service();
-		}
+		$result = new $service( $params );
 		if ( $result instanceof BrowserAuthInterface ) {
 			return $result;
 		}
