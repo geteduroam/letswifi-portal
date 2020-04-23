@@ -14,10 +14,14 @@ class SimpleSAMLFeideAuth extends SimpleSAMLAuth
 	/** @var ?string */
 	private $feideHomeOrg;
 
+	/** @var string */
+	private $feideHostname;
+
 	public function __construct( array $params )
 	{
 		parent::__construct( $params );
 		$this->feideHomeOrg = \array_key_exists( 'feideHomeOrg', $params ) ? $params['feideHomeOrg'] : null;
+		$this->feideHostname = \array_key_exists( 'feideHostname', $params ) ? $params['feideHostname'] : 'idp.feide.no';
 	}
 
 	/**
@@ -31,7 +35,7 @@ class SimpleSAMLFeideAuth extends SimpleSAMLAuth
 			if ( null !== $this->samlIdp ) {
 				$loginUrl .= '&saml%3Aidp=' . \urlencode( $this->samlIdp );
 			}
-			\header( 'Location: https://idp.feide.no/simplesaml/module.php/feide/preselectOrg.php?' . \http_build_query( ['HomeOrg' => $this->feideHomeOrg, 'ReturnTo' => $loginUrl] ) );
+			\header( 'Location: https://' . $this->feideHostname . '/simplesaml/module.php/feide/preselectOrg.php?' . \http_build_query( ['HomeOrg' => $this->feideHomeOrg, 'ReturnTo' => $loginUrl] ) );
 			exit;
 		}
 
