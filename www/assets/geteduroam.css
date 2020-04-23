@@ -1,5 +1,5 @@
 html {
-	background: #f5f4f2;
+	background: #f6f4f2;
 	color: #212529;
 	font-family: sans-serif;
 	line-height: 1.15;
@@ -66,7 +66,8 @@ summary, button {
 }
 hr {
 	border: none;
-	border-top: 1px solid #f5f4f2;
+	border-top: 1px solid;
+	border-color: #f5f4f2;
 	margin: 2em;
 }
 .btn {
@@ -107,5 +108,8 @@ hr {
 	}
 	.btn-txt {
 		color: #414549;
+	}
+	hr {
+		border-color: #313539;
 	}
 }
