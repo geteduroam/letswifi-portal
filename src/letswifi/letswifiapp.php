@@ -92,9 +92,9 @@ class LetsWifiApp
 		return $oauth;
 	}
 
-	public function getRealm( string $realmName = null ): Realm
+	public function getRealm( string $realmName ): Realm
 	{
-		return new Realm( $this->getPDO(), $realmName ?? $this->config->getString( 'realm.default' ) );
+		return new Realm( $this->getPDO(), $realmName );
 	}
 
 	public function registerExceptionHandler(): void

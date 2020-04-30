@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php declare(strict_types=1);
 if ( PHP_SAPI !== 'cli' ) {
 	header( 'Content-Type: text/plain', true, 403 );

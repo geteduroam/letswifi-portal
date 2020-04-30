@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php declare(strict_types=1);
 if ( PHP_SAPI !== 'cli' ) {
 	header( 'Content-Type: text/plain', true, 403 );
@@ -16,11 +17,11 @@ use fyrkat\openssl\PrivateKey;
 
 $app = new letswifi\LetsWifiApp();
 $app->registerExceptionHandler();
-$realm = $app->getRealm( $argv[2] );
+$realm = $app->getRealm( $argv[1] );
 
 $caPrivKey = new PrivateKey( new OpenSSLConfig( OpenSSLConfig::KEY_EC ) );
 $caCsr = CSR::generate(
-		new DN( ['CN' => $argv[2] . ' Let\'s Wi-Fi CA'] ), // Subject
+		new DN( ['CN' => $argv[2] ?? ( $argv[1] . ' Let\'s Wi-Fi CA' )] ), // Subject
 		$caPrivKey // CA key
 	);
 $caCertificate = $caCsr->sign(
@@ -32,7 +33,7 @@ $caCertificate = $caCsr->sign(
 
 $realm->writeRealmData( [
 		'trustedCaCert' => $caCertificate->getX509Pem(),
-		'trustedServerName' => 'radius.' . $argv[2],
+		'trustedServerName' => 'radius.' . $argv[1],
 		'signingCaCert' => $caCertificate->getX509Pem(),
 		'signingCaKey' => $caPrivKey->getPrivateKeyPem( null ),
 		'secretKey' => random_bytes( 32 ),

@@ -14,7 +14,6 @@
 					'samlIdp' => 'https://idp-test.feide.no',
 				],
 		],
-	'realm.default' => 'example.com',
 	'pdo.dsn' => 'sqlite:' . dirname( __DIR__ ) . '/var/letswifi-dev.sqlite',
 	'oauth.clients' => [
 			['clientId' => 'f817fbcc-e8f4-459e-af75-0822d86ff47a', 'redirectUris' => ['http://localhost:8080/'], 'scopes' => ['eap-metadata']],

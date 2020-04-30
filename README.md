@@ -21,7 +21,7 @@ Initialize the SQLite database
 
 	make var/letswifi-dev.sqlite
 
-Edit etc/letswifi.conf.php and change `userIdAttribute` and `defaultDomain` to match your setup.
+Edit etc/letswifi.conf.php and change `userIdAttribute` to match your setup.
 
 Write metadata of your SAML IdP to simplesamlphp/metadata/saml20-idp-remote.php
 
@@ -34,7 +34,7 @@ Navigate to https://example.com/simplesaml/module.php/saml/sp/metadata.php/defau
 
 ### Doing a flow manually
 
-* Open in your browser: http://[::1]:1080/oauth/authorize/?response_type=code&code_challenge_method=S256&scope=testscope&code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM&redirect_uri=http://[::1]:1234/callback/&client_id=no.fyrkat.oauth&state=0
+* Open in your browser: http://[::1]:1080/oauth/authorize/?realm=example.com&response_type=code&code_challenge_method=S256&scope=testscope&code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM&redirect_uri=http://[::1]:1234/callback/&client_id=no.fyrkat.oauth&state=0
 * Take note of the `code` in the response
 * `code=… curl -id "grant_type=authorization_code&redirect_uri=http://[::1]:1234/callback/&client_id=no.fyrkat.oauth&code=$code&code_verifier=dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk" 'http://[::1]:1080/oauth/token/'`
 * Take note of the `access_token` in the response
