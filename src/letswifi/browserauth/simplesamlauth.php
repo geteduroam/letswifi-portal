@@ -63,6 +63,12 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 
 		$this->as->requireAuth( $params );
 
+		if ( null !== $this->samlIdp ) {
+			if ( $this->as->getAuthData( 'saml:sp:IdP' ) !== $this->samlIdp ) {
+				throw new MismatchIdpException( $this->samlIdp, $this->as->getAuthData( 'saml:sp:IdP' ) );
+			}
+		}
+
 		return $this->getSingleAttributeValue( $this->userIdAttribute );
 	}
 

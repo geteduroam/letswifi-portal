@@ -15,12 +15,16 @@ class SimpleSAMLFeideAuth extends SimpleSAMLAuth
 	private $feideHomeOrg;
 
 	/** @var string */
+	private $feideOrgAttribute;
+
+	/** @var string */
 	private $feideHostname;
 
 	public function __construct( array $params )
 	{
 		parent::__construct( $params );
 		$this->feideHomeOrg = \array_key_exists( 'feideHomeOrg', $params ) ? $params['feideHomeOrg'] : null;
+		$this->feideOrgAttribute = \array_key_exists( 'feideOrgAttribute', $params ) ? $params['feideOrgAttribute'] : 'schacHomeOrganization';
 		$this->feideHostname = \array_key_exists( 'feideHostname', $params ) ? $params['feideHostname'] : 'idp.feide.no';
 	}
 
@@ -39,6 +43,15 @@ class SimpleSAMLFeideAuth extends SimpleSAMLAuth
 			exit;
 		}
 
-		return parent::requireAuth();
+		$result = parent::requireAuth();
+
+		if ( isset( $this->feideHomeOrg ) ) {
+			$org = $this->getSingleAttributeValue( $this->feideOrgAttribute );
+			if ( $org !== $this->feideHomeOrg ) {
+				throw new MismatchFeideException( $this->feideHomeOrg, $org );
+			}
+		}
+
+		return $result;
 	}
 }
