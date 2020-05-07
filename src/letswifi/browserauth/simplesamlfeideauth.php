@@ -9,6 +9,8 @@
 
 namespace letswifi\browserauth;
 
+use Throwable;
+
 class SimpleSAMLFeideAuth extends SimpleSAMLAuth
 {
 	/** @var ?string */
@@ -53,5 +55,22 @@ class SimpleSAMLFeideAuth extends SimpleSAMLAuth
 		}
 
 		return $result;
+	}
+
+	public function guessRealm( array $params ): ?string
+	{
+		foreach ( $params as $candidate => $p ) {
+			try {
+				if ( \array_key_exists( 'feideOrgAttribute', $p ) && \array_key_exists( 'feideHomeOrg', $p ) ) {
+					if ( $this->getSingleAttributeValue( $p['feideOrgAttribute'] ) === $p['feideHomeOrg'] ) {
+						return $candidate;
+					}
+				}
+			} catch ( Throwable $_ ) {
+				/* we're guessing so no need to handle */
+			}
+		}
+
+		return parent::guessRealm( $params );
 	}
 }

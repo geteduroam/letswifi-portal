@@ -19,5 +19,7 @@ interface BrowserAuthInterface
 	 */
 	public function requireAuth(): string;
 
+	public function guessRealm( array $params ): ?string;
+
 	public function getLogoutURL( ?string $redirect = null ): ?string;
 }

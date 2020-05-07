@@ -10,6 +10,7 @@
 namespace letswifi\browserauth;
 
 use OutOfBoundsException;
+use Throwable;
 
 class SimpleSAMLAuth implements BrowserAuthInterface
 {
@@ -97,6 +98,32 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 	public function getLogoutUrl( ?string $redirect = null ): string
 	{
 		return $this->as->getLogoutURL( $redirect );
+	}
+
+	/**
+	 * @suppress PhanUndeclaredClassMethod We don't have a dependency on SimpleSAMLphp
+	 */
+	public function guessRealm( array $params ): ?string
+	{
+		$providedIdP = $this->as->getAuthData( 'saml:sp:IdP' );
+		/** @var ?string */
+		$result = null;
+		foreach ( $params as $candidate => $p ) {
+			try {
+				if ( \array_key_exists( 'samlIdp', $p ) ) {
+					static::checkIdP( $p['samlIdp'], $providedIdP );
+					if ( null !== $result ) {
+						return null;
+					}
+
+					$result = $candidate;
+				}
+			} catch ( Throwable $_ ) {
+				/* we're guessing so no need to handle */
+			}
+		}
+
+		return $result;
 	}
 
 	private static function checkIdP( ?string $expectedIdP, string $providedIdP ): void
