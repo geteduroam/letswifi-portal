@@ -16,7 +16,14 @@ $oauth = $app->getOAuthHandler( $realm );
 
 $oauth->assertAuthorizeRequest();
 
-$user = $app->getUserFromBrowserSession( $realm );
+try {
+	$user = $app->getUserFromBrowserSession( $realm );
+} catch ( letswifi\browserauth\MismatchIdpException $e ) {
+	require 'realmchooser.php';
+	exit;
+}
+
+$browserAuth = $app->getBrowserAuthenticator( $realm );
 
 if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
 	// This is how it should be done for production:
