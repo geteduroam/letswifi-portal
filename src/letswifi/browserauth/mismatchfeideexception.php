@@ -11,7 +11,7 @@ namespace letswifi\browserauth;
 
 use RuntimeException;
 
-class MismatchFeideException extends RuntimeException
+class MismatchFeideException extends MismatchIdpException
 {
 	/** @var string */
 	private $required;
@@ -27,6 +27,6 @@ class MismatchFeideException extends RuntimeException
 		$this->required = $required;
 		$this->provided = $provided;
 		$this->username = $username;
-		parent::__construct( "Expected Feide org ${required} but got ${provided}" . ( isset( $username ) ? " with username ${username}" : '' ) );
+		RuntimeException::__construct( "Expected Feide org ${required} but got ${provided}" . ( isset( $username ) ? " with username ${username}" : '' ) );
 	}
 }

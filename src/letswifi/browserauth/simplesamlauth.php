@@ -63,11 +63,7 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 
 		$this->as->requireAuth( $params );
 
-		if ( null !== $this->samlIdp ) {
-			if ( $this->as->getAuthData( 'saml:sp:IdP' ) !== $this->samlIdp ) {
-				throw new MismatchIdpException( $this->samlIdp, $this->as->getAuthData( 'saml:sp:IdP' ) );
-			}
-		}
+		static::checkIdP( $this->samlIdp, $this->as->getAuthData( 'saml:sp:IdP' ) );
 
 		return $this->getSingleAttributeValue( $this->userIdAttribute );
 	}
@@ -93,5 +89,12 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 		\assert( \is_string( $result ), 'Attributes returned by SimpleSAMLphp are always of type string' );
 
 		return $result;
+	}
+
+	private static function checkIdP( ?string $expectedIdP, string $providedIdP ): void
+	{
+		if ( null !== $expectedIdP && $expectedIdP !== $providedIdP ) {
+			throw new MismatchIdpException( $expectedIdP, $providedIdP );
+		}
 	}
 }
