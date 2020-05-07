@@ -11,7 +11,7 @@ require implode(DIRECTORY_SEPARATOR, [dirname(__DIR__, 3), 'src', '_autoload.php
 
 $app = new letswifi\LetsWifiApp();
 $app->registerExceptionHandler();
-$realm = $app->getRealm( $_GET['realm'] ?? 'example.com' );
+$realm = $app->getRealm( $_GET['realm'] );
 $oauth = $app->getOAuthHandler( $realm );
 
 $oauth->assertAuthorizeRequest();
