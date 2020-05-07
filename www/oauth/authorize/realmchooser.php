@@ -46,7 +46,7 @@ endif; ?>
 		</a>
 	</p>
 	<p>
-		<a href="<?= htmlspecialchars( $browserAuth->getLogoutUrl( $oauth->getRedirectUrlForRefusedAuthorizeRequest() ), ENT_QUOTES ) ?>" class="btn btn-default fullwidth">
+		<a href="<?= htmlspecialchars( $oauth->getRedirectUrlForRefusedAuthorizeRequest(), ENT_QUOTES ) ?>" class="btn btn-default fullwidth">
 			Go back and try a different institution
 		</a>
 	</p>
