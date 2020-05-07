@@ -18,4 +18,6 @@ interface BrowserAuthInterface
 	 * @return string User ID
 	 */
 	public function requireAuth(): string;
+
+	public function getLogoutURL( ?string $redirect = null ): ?string;
 }

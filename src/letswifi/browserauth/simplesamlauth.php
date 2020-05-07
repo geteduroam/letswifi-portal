@@ -91,6 +91,14 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 		return $result;
 	}
 
+	/**
+	 * @suppress PhanUndeclaredClassMethod We don't have a dependency on SimpleSAMLphp
+	 */
+	public function getLogoutUrl( ?string $redirect = null ): string
+	{
+		return $this->as->getLogoutURL( $redirect );
+	}
+
 	private static function checkIdP( ?string $expectedIdP, string $providedIdP ): void
 	{
 		if ( null !== $expectedIdP && $expectedIdP !== $providedIdP ) {

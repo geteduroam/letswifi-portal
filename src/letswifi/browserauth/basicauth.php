@@ -32,4 +32,9 @@ class BasicAuth implements BrowserAuthInterface
 		\header( 'WWW-Authenticate: Basic realm="letswifi-ca"', true, 401 );
 		die( "401 Unauthorized\r\n" );
 	}
+
+	public function getLogoutURL( string $_ = null ): ?string
+	{
+		return null;
+	}
 }

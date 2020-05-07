@@ -31,11 +31,15 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Authorize</title>
 <form method="post">
+<?php if ( $logoutUrl = $browserAuth->getLogoutUrl() ): ?>
 <header>
 	<p class="logout">
-		<button type="submit" name="approve" value="no" class="btn btn-txt">Not <?= htmlspecialchars( $user->getUserID() ); ?>?</button>
+		<a href="<?= htmlspecialchars( $logoutUrl, ENT_QUOTES ) ?>" class="btn-txt">
+			Not <?= htmlspecialchars( $user->getUserID() ); ?>?
+		</a>
 	</p>
 </header>
+<?php endif; ?>
 <main>
 	<p>Do you want to use your account to connect to eduroam on this device?</p>
 	<p class="text-center"><button type="submit" class="btn btn-default" name="approve" value="yes">Approve</button></p>
