@@ -12,7 +12,6 @@ if ( !( $e instanceof letswifi\browserauth\MismatchIdpException ) ) {
 <link rel="stylesheet" href="/assets/geteduroam.css">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Login mismatch</title>
-<form method="post">
 <main>
 	<p>
 		Your account is not valid for <strong><?= htmlspecialchars( $realm->getName() ) ?></strong><?= '' ?>
@@ -47,9 +46,8 @@ endif; ?>
 		</a>
 	</p>
 	<p>
-		<button type="submit" class="btn btn-default fullwidth" name="approve" value="no">
+		<a href="<?= htmlspecialchars( $browserAuth->getLogoutUrl( $oauth->getRedirectUrlForRefusedAuthorizeRequest() ), ENT_QUOTES ) ?>" class="btn btn-default fullwidth">
 			Go back and try a different institution
-		</button>
+		</a>
 	</p>
 </main>
-</form>
