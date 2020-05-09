@@ -107,8 +107,8 @@ hr {
 }
 
 body{
-	display:grid;
-	grid-template-columns:1fr;
+	display: grid;
+	grid-template-columns: 1fr;
 }
 nav ul {
 	margin: 0;
@@ -189,25 +189,32 @@ main h1:first-child {
 
 @media (min-width: 800px) {
 	body{
-		grid-template-columns:10em auto 10em;
-		column-gap:1.5em;
+		grid-template-columns: 10em auto 10em;
+		column-gap: 1.5em;
 	}
 	html.dialog body {
-		grid-template-columns:1fr;
-		column-gap:0;
+		grid-template-columns: 1fr;
+		column-gap: 0;
 	}
 	html header {
-		max-width: auto;
-		margin:0 11.5em;
+		max-width: none;
+		margin: 0 11.5em;
+	}
+	html header > * {
+		/* 60em is max-width for main */
+		/* 1em is padding for main */
+		max-width: 62rem; /* 60 + 1 + 1 */
+		margin-left: auto;
+		margin-right: auto;
 	}
 	body:before{
 		margin-bottom: 2em;
 	}
 	body:before,header{
-		grid-column:1/4;
+		grid-column: 1/4;
 	}
 	nav li {
-		display:block;
+		display: block;
 	}
 	nav li a {
 		display: block;

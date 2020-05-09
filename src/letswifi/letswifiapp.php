@@ -11,6 +11,8 @@ namespace letswifi;
 
 use DomainException;
 
+use fkooman\Template\Tpl;
+
 use fyrkat\oauth\Client;
 use fyrkat\oauth\JWTSigner;
 use fyrkat\oauth\OAuth;
@@ -41,6 +43,9 @@ class LetsWifiApp
 
 	/** @var ?PDO */
 	private $pdo;
+
+	/** @var ?Tpl */
+	private $tpl;
 
 	public function __construct( Config $config = null )
 	{
@@ -121,6 +126,25 @@ class LetsWifiApp
 		$message = $ex->getMessage();
 		\header( 'Content-Type: text/plain', true, $code );
 		echo "${code} ${codeExplain}\r\n\r\n${message}\r\n";
+	}
+
+	public function render( array $data, ?string $template = null ): void
+	{
+		if ( null === $template || \array_key_exists( 'json', $_GET ) || false === \strpos( $_SERVER['HTTP_ACCEPT'], 'text/html' ) ) {
+			\header( 'Content-Type: application/json' );
+			die( \json_encode( $data ) );
+		}
+		die( $this->getTemplate()->render( $template, $data ) );
+	}
+
+	protected function getTemplate(): Tpl
+	{
+		if ( null === $this->tpl ) {
+			$dirs = $this->config->getArrayOrNull('tpldir') ?? [\implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 2 ), 'tpl'])];
+			$this->tpl = new Tpl( $dirs );
+		}
+
+		return $this->tpl;
 	}
 
 	protected function getPDO(): PDO

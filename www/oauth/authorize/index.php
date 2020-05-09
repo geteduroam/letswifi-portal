@@ -4,6 +4,9 @@ if (strpos($_SERVER['QUERY_STRING'], '?')) {
     parse_str(strtr($_SERVER['QUERY_STRING'],'?','&'), $_GET);
 }
 
+const POST_FIELD = 'approve';
+const POST_VALUE = 'yes';
+
 require implode(DIRECTORY_SEPARATOR, [dirname(__DIR__, 3), 'src', '_autoload.php']);
 
 // Test this file by serving it on http://[::1]:1080/oauth/authorize/ and point your browser to:
@@ -19,41 +22,45 @@ $oauth->assertAuthorizeRequest();
 try {
 	$user = $app->getUserFromBrowserSession( $realm );
 } catch ( letswifi\browserauth\MismatchIdpException $e ) {
-	require 'realmchooser.php';
+	$guessRealm = $app->guessRealm( $realm );
+	$browserAuth = $app->getBrowserAuthenticator( $realm );
+
+	if ( null !== $guessRealm ) {
+		$switchRealmParams = $_GET + ['realm' => $guessRealm->getName()];
+	}
+	try {
+		$guessUser = $app->getUserFromBrowserSession( $guessRealm );
+	} catch ( letswifi\browserauth\MismatchIdpException $e ) {
+		$guessUser = null;
+	}
+
+	$app->render( [
+		'realmName' => $realm->getName(),
+		'guessRealmName' => $guessRealm ? $guessRealm->getName() : null,
+		'guessUserId' => $guessUser ? $guessUser->getUserId() : null,
+		'logoutUrl' => $browserAuth->getLogoutUrl(),
+
+		'switchRealmLink' => $guessRealm ? '?' . http_build_query( $switchRealmParams ) : null,
+		'switchUserLink' => $browserAuth->getLogoutUrl(),
+		'refuseRequestLink' => $oauth->getRedirectUrlForRefusedAuthorizeRequest(),
+	], 'realmchooser' );
 	exit;
 }
 
 $browserAuth = $app->getBrowserAuthenticator( $realm );
 
 if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
-	// This is how it should be done for production:
-	$oauth->handleAuthorizePostRequest( $user->getUserID(), $_POST['approve'] === 'yes' );
-	// function either throws exception or dies, but does not return
+	$oauth->handleAuthorizePostRequest( $user->getUserID(), $_POST[POST_FIELD] === POST_VALUE );
+
+	// handler should never return, this code should be unreachable
 	header( 'Content-Type: text/plain' );
 	die( "500 Internal Server Error\r\n\r\nRequest was not handled\r\n" );
 }
-?><!DOCTYPE html>
-<html lang="en" class="dialog">
-<link rel="stylesheet" href="/assets/geteduroam.css">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Authorize</title>
-<form method="post">
-<?php if ( $logoutUrl = $browserAuth->getLogoutUrl() ): ?>
-<header>
-	<p class="logout">
-		<a href="<?= htmlspecialchars( $logoutUrl, ENT_QUOTES ) ?>" class="btn-txt">
-			Not <?= htmlspecialchars( $user->getUserID() ); ?>?
-		</a>
-	</p>
-</header>
-<?php endif; ?>
-<main>
-	<p>Do you want to use your account to connect to eduroam on this device?</p>
-	<p class="text-center"><button type="submit" class="btn btn-default" name="approve" value="yes">Approve</button></p>
-	<hr>
-	<details>
-		<summary>Why is this needed?</summary>
-		<p>By clicking approve, you allow the application to receive Wi-Fi profiles on your behalf.</p>
-	</details>
-</main>
-</form>
+
+$app->render( [
+	'realmName' => $realm->getName(),
+	'logoutUrl' => $browserAuth->getLogoutUrl(),
+	'userId' => $user->getUserID(),
+	'postField' => POST_FIELD,
+	'postValue' => POST_VALUE,
+], 'authorize' );

@@ -4,3 +4,6 @@
 [submodule "lib/git.sr.ht/~jornane/php-oauth-server"]
 	path = lib/git.sr.ht/~jornane/php-oauth-server
 	url = https://git.sr.ht/~jornane/php-oauth-server
+[submodule "lib/git.tuxed.net/fkooman/php-tpl"]
+	path = lib/git.tuxed.net/fkooman/php-tpl
+	url = https://git.tuxed.net/fkooman/php-tpl
