@@ -20,6 +20,7 @@ use fyrkat\oauth\OAuth;
 use letswifi\browserauth\BrowserAuthInterface;
 
 use PDO;
+use RuntimeException;
 use Throwable;
 
 class LetsWifiApp
@@ -66,15 +67,11 @@ class LetsWifiApp
 	public function getBrowserAuthenticator( Realm $realm ): BrowserAuthInterface
 	{
 		$params = $this->config->getArrayOrEmpty( 'auth.params' );
+		$service = $this->config->getString( 'auth.service' );
 		$realmParams = $this->config->getArrayOrEmpty( 'realm.auth' );
 		if ( \array_key_exists( $realm->getName(), $realmParams ) ) {
 			$params = \array_merge( $params, $realmParams[$realm->getName()] );
 		}
-
-		$service = \array_key_exists( 'auth.service', $params )
-			? $params['auth.service']
-			: $this->config->getString( 'auth.service' )
-			;
 
 		if ( !\preg_match( '/[A-Z][A-Za-z0-9]+/', $service ) ) {
 			throw new DomainException( 'Illegal auth.service specified in config' );
@@ -97,8 +94,12 @@ class LetsWifiApp
 		return $oauth;
 	}
 
-	public function getRealm( string $realmName ): Realm
+	public function getRealm( string $realmName = null ): Realm
 	{
+		if ( null === $realmName ) {
+			$realmName = $this->getCurrentRealmName();
+		}
+
 		return new Realm( $this->getPDO(), $realmName );
 	}
 
@@ -159,5 +160,16 @@ class LetsWifiApp
 		}
 
 		return $this->pdo;
+	}
+
+	private function getCurrentRealmName(): string
+	{
+		if ( !\array_key_exists( 'realm', $_GET ) ) {
+			throw new RuntimeException( 'No realm set' );
+		}
+		if ( \is_string( $_GET['realm'] ) ) {
+			return $_GET['realm'];
+		}
+		throw new RuntimeException( 'realm parameter must be string' );
 	}
 }

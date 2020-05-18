@@ -14,16 +14,32 @@ require implode(DIRECTORY_SEPARATOR, [dirname(__DIR__, 3), 'src', '_autoload.php
 
 $app = new letswifi\LetsWifiApp();
 $app->registerExceptionHandler();
-$realm = $app->getRealm( $_GET['realm'] );
+$realm = $app->getRealm();
 $oauth = $app->getOAuthHandler( $realm );
 
 $oauth->assertAuthorizeRequest();
+$browserAuth = $app->getBrowserAuthenticator( $realm );
 
 try {
 	$user = $app->getUserFromBrowserSession( $realm );
+
+	if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
+		$oauth->handleAuthorizePostRequest( $user->getUserID(), $_POST[POST_FIELD] === POST_VALUE );
+
+		// handler should never return, this code should be unreachable
+		header( 'Content-Type: text/plain' );
+		die( "500 Internal Server Error\r\n\r\nRequest was not handled\r\n" );
+	}
+
+	$app->render( [
+		'realmName' => $realm->getName(),
+		'logoutUrl' => $browserAuth->getLogoutUrl(),
+		'userId' => $user->getUserID(),
+		'postField' => POST_FIELD,
+		'postValue' => POST_VALUE,
+	], 'authorize' );
 } catch ( letswifi\browserauth\MismatchIdpException $e ) {
 	$guessRealm = $app->guessRealm( $realm );
-	$browserAuth = $app->getBrowserAuthenticator( $realm );
 
 	if ( null !== $guessRealm ) {
 		$switchRealmParams = $_GET + ['realm' => $guessRealm->getName()];
@@ -46,21 +62,3 @@ try {
 	], 'realmchooser' );
 	exit;
 }
-
-$browserAuth = $app->getBrowserAuthenticator( $realm );
-
-if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
-	$oauth->handleAuthorizePostRequest( $user->getUserID(), $_POST[POST_FIELD] === POST_VALUE );
-
-	// handler should never return, this code should be unreachable
-	header( 'Content-Type: text/plain' );
-	die( "500 Internal Server Error\r\n\r\nRequest was not handled\r\n" );
-}
-
-$app->render( [
-	'realmName' => $realm->getName(),
-	'logoutUrl' => $browserAuth->getLogoutUrl(),
-	'userId' => $user->getUserID(),
-	'postField' => POST_FIELD,
-	'postValue' => POST_VALUE,
-], 'authorize' );
