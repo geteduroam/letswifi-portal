@@ -6,10 +6,11 @@ CREATE TABLE "realm" (
 	"signingCaKey" TEXT NOT NULL,
 	"secretKey" BLOB NOT NULL
 );
-CREATE TABLE "tlscredential" (
+CREATE TABLE "tlsindex" (
 	"serial" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
 	"domain" TEXT REFERENCES "realm" NOT NULL,
-	"username" TEXT NOT NULL,
+	"requester" TEXT NOT NULL,
+	"usage" TEXT NOT NULL,
 	"commonName" TEXT NOT NULL,
 	"startDate" TEXT NOT NULL,
 	"endDate" TEXT NOT NULL,

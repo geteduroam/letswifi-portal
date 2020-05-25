@@ -90,26 +90,27 @@ class Realm
 		$statement->execute();
 		$rows = $statement->rowCount();
 		if ( 1 !== $rows ) {
-			throw new DomainException( "Unable to create realm; expected 1 rows to be updated but got ${rows}" );
+			throw new DomainException( "Unable to create realm; expected 1 row to be updated but got ${rows}" );
 		}
 	}
 
 	/**
-	 * @param string                $commonName Common name of the server certificate
-	 * @param DateTimeInterface|int $expiry     Validity in days
+	 * @param User              $requester  User requesting the certificate
+	 * @param string            $commonName Common name of the server certificate
+	 * @param DateTimeInterface $expiry     Validity in days
 	 */
-	public function generateServerCertificate( string $commonName, $expiry ): PKCS12
+	public function generateServerCertificate( User $requester, string $commonName, DateTimeInterface $expiry ): PKCS12
 	{
 		$serverKey = new PrivateKey( new OpenSSLConfig( OpenSSLConfig::KEY_EC ) );
 		$dn = new DN( ['CN' => $commonName] );
 		$csr = CSR::generate( $dn, $serverKey );
-		// TODO we should probably log these?
+		$serial = $this->logPreparedUserCredential( $requester, $csr, $expiry );
 
 		$caCert = $this->getSigningCACertificate();
 		$caKey = $this->getSigningCAKey();
 		$conf = new OpenSSLConfig( OpenSSLConfig::X509_SERVER );
-		$serverCert = $csr->sign( $caCert, $caKey, $expiry, $conf /*, $serial */ );
-		// serial missing since we don't log
+		$serverCert = $csr->sign( $caCert, $caKey, $expiry, $conf, $serial );
+		$this->logCompletedUserCredential( $requester, $serverCert );
 
 		return new PKCS12( $serverCert, $serverKey, [$caCert] );
 	}
@@ -136,16 +137,27 @@ class Realm
 		return new TlsAuthenticationMethod( $caCertificates, $serverNames, $anonymousIdentity, $pkcs12 );
 	}
 
+	protected function logPreparedUserCredential( User $requester, CSR $csr, DateTimeInterface $expiry ): int
+	{
+		return $this->logPreparedCredential( $requester, $csr, $expiry, 'client' );
+	}
+
+	protected function logPreparedServerCredential( User $requester, CSR $csr, DateTimeInterface $expiry ): int
+	{
+		return $this->logPreparedCredential( $requester, $csr, $expiry, 'server' );
+	}
+
 	/**
 	 * @suppress PhanPossiblyNonClassMethodCall
 	 * @suppress PhanPluginUseReturnValueInternalKnown
 	 */
-	protected function logPreparedUserCredential( User $user, CSR $csr, DateTimeInterface $expiry ): int
+	protected function logPreparedCredential( User $requester, CSR $csr, DateTimeInterface $expiry, string $usage ): int
 	{
 		$csrData = $csr->getCSRPem();
-		$statement = $this->pdo->prepare( 'INSERT INTO tlscredential (domain, username, commonName, startDate, endDate, csr) VALUES (:domain, :username, :commonName, :startDate, :endDate, :csr)' );
+		$statement = $this->pdo->prepare( 'INSERT INTO tlsindex (domain, requester, usage, commonName, startDate, endDate, csr) VALUES (:domain, :requester, :usage, :commonName, :startDate, :endDate, :csr)' );
 		$statement->bindValue( 'domain', $this->getName(), PDO::PARAM_STR );
-		$statement->bindValue( 'username', $user->getUserID(), PDO::PARAM_STR );
+		$statement->bindValue( 'requester', $requester->getUserID(), PDO::PARAM_STR );
+		$statement->bindValue( 'usage', $usage, PDO::PARAM_STR );
 		$statement->bindValue( 'commonName', $csr->getSubject(), PDO::PARAM_STR );
 		$statement->bindValue( 'startDate', \date( 'Y-m-d' ), PDO::PARAM_STR );
 		$statement->bindValue( 'endDate', $expiry->format( 'Y-m-d' ), PDO::PARAM_STR );
@@ -159,19 +171,30 @@ class Realm
 		throw new DomainException( 'Unable to retrieve last insert ID from database' );
 	}
 
+	protected function logCompletedUserCredential( User $user, X509 $userCert ): void
+	{
+		$this->logCompletedCredential( $user, $userCert, 'client' );
+	}
+
+	protected function logCompletedServerCredential( User $user, X509 $userCert ): void
+	{
+		$this->logCompletedCredential( $user, $userCert, 'server' );
+	}
+
 	/**
 	 * @suppress PhanPossiblyNonClassMethodCall
 	 * @suppress PhanPluginUseReturnValueInternalKnown
 	 */
-	protected function logCompletedUserCredential( User $user, X509 $userCert ): void
+	protected function logCompletedCredential( User $user, X509 $userCert, string $usage ): void
 	{
-		$statement = $this->pdo->prepare( 'UPDATE tlscredential SET startDate = :startDate, endDate = :endDate, x509 = :x509 WHERE serial = :serial AND domain = :domain AND username = :username' );
+		$statement = $this->pdo->prepare( 'UPDATE tlsindex SET startDate = :startDate, endDate = :endDate, x509 = :x509 WHERE serial = :serial AND domain = :domain AND requester = :requester AND usage = :usage' );
 		$statement->bindValue( 'startDate', $userCert->getValidFrom()->format( 'Y-m-d' ), PDO::PARAM_STR );
 		$statement->bindValue( 'endDate', $userCert->getValidTo()->format( 'Y-m-d' ), PDO::PARAM_STR );
 		$statement->bindValue( 'x509', $userCert->getX509Pem(), PDO::PARAM_STR );
 		$statement->bindValue( 'serial', $userCert->getSerialNumber(), PDO::PARAM_INT );
 		$statement->bindValue( 'domain', $this->getName(), PDO::PARAM_STR );
-		$statement->bindValue( 'username', $user->getUserID(), PDO::PARAM_STR );
+		$statement->bindValue( 'requester', $user->getUserID(), PDO::PARAM_STR );
+		$statement->bindValue( 'usage', $usage, PDO::PARAM_STR );
 		$statement->execute();
 		$rows = $statement->rowCount();
 		if ( 1 !== $rows ) {
