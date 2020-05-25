@@ -1,4 +1,4 @@
-<?php $this->layout('base', ['title' => 'Authorize', 'documentClass' => 'dialog'])?>
+<?php $this->layout('dialog', ['title' => 'Authorize'])?>
 <?php $this->start('content') ?>
 <form method="post">
 <?php if (null !== $logoutUrl): ?>

@@ -18,4 +18,4 @@ $realm = $app->getRealm();
 $oauth = $app->getOAuthHandler( $realm );
 
 header( 'Content-Type: text/plain' );
-die( 'Subject: ' . $oauth->getAccessTokenFromRequest()->getSubject() . "\n" );
+die( 'Subject: ' . $oauth->getAccessTokenFromRequest( null )->getSubject() . "\n" );

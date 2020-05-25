@@ -1,4 +1,4 @@
-<?php $this->layout('base', ['title' => 'Login mismatch', 'documentClass' => 'dialog'])?>
+<?php $this->layout('dialog', ['title' => 'Login mismatch'])?>
 <?php $this->start('content') ?>
 
 <main>
