@@ -3,7 +3,6 @@ require implode(DIRECTORY_SEPARATOR, [dirname(__DIR__, 2), 'src', '_autoload.php
 
 $app = new letswifi\LetsWifiApp();
 $app->registerExceptionHandler();
-//$realm = $app->getRealm();
 
 $app->render( [
 		'apps' => [
