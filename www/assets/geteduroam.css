@@ -212,15 +212,8 @@ ul.buttons li {
 		column-gap: 0;
 	}
 	html header {
-		max-width: none;
-		margin: 0 11.5em;
-	}
-	html header > * {
-		/* 60em is max-width for main */
-		/* 1em is padding for main */
-		max-width: 62rem; /* 60 + 1 + 1 */
-		margin-left: auto;
-		margin-right: auto;
+		max-width: 38rem;
+		width: 100%;
 	}
 	body:before{
 		margin-bottom: 2em;
