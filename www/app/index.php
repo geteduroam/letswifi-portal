@@ -5,6 +5,7 @@ $app = new letswifi\LetsWifiApp();
 $app->registerExceptionHandler();
 
 $app->render( [
+		'href' => '/app/',
 		'apps' => [
 				'android' => [
 						'url' => 'https://geteduroam.no/app/geteduroam.apk',
@@ -19,4 +20,4 @@ $app->render( [
 						'name' => 'Windows',
 					],
 			],
-	], 'apps' );
+	], 'app' );

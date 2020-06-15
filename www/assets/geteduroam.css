@@ -107,6 +107,12 @@ body{
 	display: grid;
 	grid-template-columns: 1fr;
 }
+a {
+	color: #05f;
+}
+a:visited {
+	color: #64f;
+}
 nav ul {
 	margin: 0;
 	padding: 0 .5em;
@@ -177,6 +183,12 @@ ul.buttons li {
 		color: #f5f4f2;
 		box-shadow: rgba(0,0,0,.5) 0 .1em .5em;
 		border-color: #008fa7;
+	}
+	a {
+		color: #8cf;
+	}
+	a:visited {
+		color: #cbf;
 	}
 	.btn-txt {
 		color: #616569;
