@@ -76,7 +76,10 @@ class TlsAuthenticationMethod extends AbstractAuthenticationMethod
 				;
 			if ( null !== $this->identity ) {
 				$result .= ''
-					. "\r\n\t\t\t\t\t" . '<AnonymousIdentity>' . static::e( $this->identity ) . '</AnonymousIdentity>'
+					. "\r\n\t\t\t\t\t" . '<OuterIdentity>' . static::e( $this->identity ) . '</OuterIdentity>'
+					;
+				$result .= ''
+					. "\r\n\t\t\t\t\t" . '<AnonymousIdentity>' . static::e( $this->identity ) . '</AnonymousIdentity><!-- INVALID ACCORDING TO SCHEMA, TO BE REMOVED SOON -->'
 					;
 			}
 			$result .= ''
