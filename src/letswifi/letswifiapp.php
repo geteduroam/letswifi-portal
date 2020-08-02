@@ -14,7 +14,7 @@ use DomainException;
 use fkooman\Template\Tpl;
 
 use fyrkat\oauth\Client;
-use fyrkat\oauth\JWTSigner;
+use fyrkat\oauth\sealer\JWTSealer;
 use fyrkat\oauth\OAuth;
 
 use letswifi\browserauth\BrowserAuthInterface;
@@ -86,7 +86,7 @@ class LetsWifiApp
 
 	public function getOAuthHandler( Realm $realm ): OAuth
 	{
-		$oauth = new OAuth( new JWTSigner( $realm->getSecretKey() ) );
+		$oauth = new OAuth( new JWTSealer( $realm->getSecretKey() ) );
 		foreach ( $this->config->getArray( 'oauth.clients' ) as $client ) {
 			$oauth->registerClient( new Client( $client['clientId'], $client['redirectUris'], $client['scopes'] ) );
 		}
