@@ -124,7 +124,7 @@ nav li {
 	padding: .2em 0;
 	text-align: left;
 }
-nav li a {
+nav li a, nav li a:visited {
 	color: #206eb0;
 	border-radius: .3em;
 	padding: .2em .3em;
@@ -148,6 +148,7 @@ h1 small {
 }
 html main {
 	margin: 0 auto;
+	width: 100%;
 }
 main h1:first-child {
 	margin-top: 0;
@@ -204,9 +205,11 @@ ul.buttons li {
 	}
 	nav li a:hover, nav li a:focus {
 		background: rgba(255,255,255,.05);
+		color: #206eb0;
 	}
 	nav li.active a, nav li a:active {
 		background: #007fa7;
+		color: white;
 	}
 	nav li a {
 		color: #b1d0de;
@@ -218,6 +221,8 @@ ul.buttons li {
 	body{
 		grid-template-columns: 10em auto 10em;
 		column-gap: 1.5em;
+		max-width: 80em;
+		margin: 0 auto;
 	}
 	html.dialog body {
 		grid-template-columns: 1fr;

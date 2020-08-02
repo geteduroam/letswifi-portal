@@ -12,7 +12,7 @@ $app->render( [
 						'name' => 'Android',
 					],
 				'ios' => [
-						'url' => 'https://testflight.apple.com/join/80AujtVR',
+						'url' => 'https://apps.apple.com/nl/app/geteduroam/id1504076137?l=en',
 						'name' => 'iOS',
 					],
 				'windows' => [
