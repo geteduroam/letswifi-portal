@@ -15,4 +15,4 @@ $app->registerExceptionHandler();
 $realm = $app->getRealm();
 $oauth = $app->getOAuthHandler( $realm );
 
-$oauth->handleAccessTokenPostRequest();
+$oauth->handleTokenPostRequest();

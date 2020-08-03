@@ -15,6 +15,7 @@ use fkooman\Template\Tpl;
 
 use fyrkat\oauth\Client;
 use fyrkat\oauth\sealer\JWTSealer;
+use fyrkat\oauth\sealer\PDOSealer;
 use fyrkat\oauth\OAuth;
 
 use letswifi\browserauth\BrowserAuthInterface;
@@ -87,8 +88,9 @@ class LetsWifiApp
 	public function getOAuthHandler( Realm $realm ): OAuth
 	{
 		$oauth = new OAuth( new JWTSealer( $realm->getSecretKey() ) );
+		$oauth->registerRefreshTokenSealer( new PDOSealer( $this->pdo ) );
 		foreach ( $this->config->getArray( 'oauth.clients' ) as $client ) {
-			$oauth->registerClient( new Client( $client['clientId'], $client['redirectUris'], $client['scopes'] ) );
+			$oauth->registerClient( new Client( $client['clientId'], $client['redirectUris'], $client['scopes'], $client['refresh'] ?? false ) );
 		}
 
 		return $oauth;
