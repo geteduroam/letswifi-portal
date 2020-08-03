@@ -83,7 +83,7 @@ class TlsAuthenticationMethod extends AbstractAuthenticationMethod
 					;
 			}
 			$result .= ''
-				. "\r\n\t\t\t\t" . '<ClientCertificate>' . \base64_encode( $this->pkcs12->getPKCS12Bytes( $this->passphrase ) ) . '</ClientCertificate>'
+				. "\r\n\t\t\t\t" . '<ClientCertificate format="PKCS12" encoding="base64">' . \base64_encode( $this->pkcs12->getPKCS12Bytes( $this->passphrase ) ) . '</ClientCertificate>'
 				. "\r\n\t\t\t\t" . '<Passphrase>' . static::e( $this->passphrase ) . '</Passphrase>'
 				. "\r\n\t\t\t\t" . '</ClientSideCredential>'
 				;
