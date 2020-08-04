@@ -88,7 +88,9 @@ class LetsWifiApp
 	public function getOAuthHandler( Realm $realm ): OAuth
 	{
 		$oauth = new OAuth( new JWTSealer( $realm->getSecretKey() ) );
-		$oauth->registerRefreshTokenSealer( new PDOSealer( $this->pdo ) );
+		$sealer = new PDOSealer( $this->pdo );
+		$oauth->registerRefreshTokenSealer( $sealer );
+		$oauth->registerAuthorizationCodeSealer( $sealer );
 		foreach ( $this->config->getArray( 'oauth.clients' ) as $client ) {
 			$oauth->registerClient( new Client( $client['clientId'], $client['redirectUris'], $client['scopes'], $client['refresh'] ?? false ) );
 		}

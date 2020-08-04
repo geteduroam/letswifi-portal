@@ -18,14 +18,16 @@ CREATE TABLE "tlsindex" (
 	"x509" TEXT,
 	"revokedDate" TEXT
 );
-CREATE TABLE "grant_data" (
-"sid" TEXT PRIMARY KEY,
-"grant_data" TEXT NOT NULL,
-"exp" INTEGER NOT NULL
+CREATE TABLE "oauth_grant" (
+	"sid" TEXT PRIMARY KEY,
+	"grant_data" TEXT NOT NULL,
+	"sub" TEXT NOT NULL,
+	"exp" INTEGER NOT NULL
 );
-CREATE TABLE "refresh_token" (
-"token" TEXT PRIMARY KEY,
-"sid" TEXT NOT NULL REFERENCES "grant_data"("sid"),
-"used" INTEGER,
-"exp" INTEGER NOT NULL
+CREATE TABLE "oauth_token" (
+	"token" TEXT PRIMARY KEY,
+	"sid" TEXT NOT NULL REFERENCES "grant_data"("sid"),
+	"used" INTEGER,
+	"exp" INTEGER NOT NULL,
+	"type" TEXT NOT NULL
 );
