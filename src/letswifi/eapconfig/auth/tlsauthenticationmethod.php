@@ -75,11 +75,13 @@ class TlsAuthenticationMethod extends AbstractAuthenticationMethod
 				. "\r\n\t\t\t\t" . '<ClientSideCredential>'
 				;
 			if ( null !== $this->identity ) {
+				// https://github.com/GEANT/CAT/blob/v2.0.3/devices/xml/eap-metadata.xsd
+				// The schema specifies <OuterIdentity>
+				// https://tools.ietf.org/html/draft-winter-opsawg-eap-metadata-02
+				// Expired draft specifices <AnonymousIdentity>
+				// cat.eduroam.org uses <OuterIdentity>, so we do too
 				$result .= ''
 					. "\r\n\t\t\t\t\t" . '<OuterIdentity>' . static::e( $this->identity ) . '</OuterIdentity>'
-					;
-				$result .= ''
-					. "\r\n\t\t\t\t\t" . '<AnonymousIdentity>' . static::e( $this->identity ) . '</AnonymousIdentity><!-- INVALID ACCORDING TO SCHEMA, TO BE REMOVED SOON -->'
 					;
 			}
 			$result .= ''
