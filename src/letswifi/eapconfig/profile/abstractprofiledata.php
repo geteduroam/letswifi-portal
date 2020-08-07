@@ -58,26 +58,26 @@ class AbstractProfileData implements IProfileData
 
 	public function getDescription(): ?string
 	{
-		return $this->data['description'];
+		return $this->data['description'] ?? null;
 	}
 
 	public function getProviderLocation(): ?Location
 	{
-		return $this->data['location'];
+		return $this->data['location'] ?? null;
 	}
 
 	public function getProviderLogo(): ?Logo
 	{
-		return $this->data['logo'];
+		return $this->data['logo'] ?? null;
 	}
 
 	public function getTermsOfUse(): ?string
 	{
-		return $this->data['terms'];
+		return $this->data['terms'] ?? null;
 	}
 
 	public function getHelpDesk(): ?Helpdesk
 	{
-		return $this->data['helpdesk'];
+		return $this->data['helpdesk'] ?? null;
 	}
 }
