@@ -4,11 +4,6 @@ then
 	printf 'Usage:\n%s base-url [realm]\n\nExample:\n%s "http://[::1]:1080" demo.eduroam.no >eduroam.eap-config\n\nPlease note: base-url must be available from both your webbrowser and this script\n\n' "$0" "$0" >&2
 	exit 2
 fi
-if test "$(uname)" = Linux
-then
-	printf "\033[0;1;37;41m -- WARNING: This script has known issues with netcat on Linux, please run on FreeBSD or MacOS -- \033[0m\n" >&2
-	sleep 2
-fi
 
 URL="$1"
 SCOPE="eap-metadata"
@@ -52,7 +47,7 @@ getJson() {
 }
 
 serve() {
-	cat fifo | nc -l $PORT | while read line
+	cat fifo | ( nc -l -p $PORT 2>/dev/null|| nc -l $PORT ) | while read line
 	do
 		error="$(echo $line | urlToQuery | getQuery error)"
 		if [ -n "$error" ]
@@ -67,7 +62,7 @@ serve() {
 }
 
 redirect() { # $1 = url
-	cat fifo | nc -l $PORT | while read line
+	cat fifo | ( nc -l -p $PORT 2>/dev/null|| nc -l $PORT ) | while read line
 	do
 		printf 'HTTP/1.0 302 Found\r\nLocation: %s\r\n\r\n%s\r\n' "$1" "$1" >fifo
 		break
