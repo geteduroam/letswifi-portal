@@ -1,7 +1,7 @@
 #!/bin/sh
 if test -z $1
 then
-	printf 'Usage:\n%s base-url [realm]\n\nExample:\n%s "http://[::1]:1080" demo.eduroam.no >eduroam.eap-config\n\nPlease note: base-url must be available from both your webbrowser and this script\n\n' "$0" "$0" >&2
+	printf '\033[0musage: %s base-url [realm]\n\nexample: \033[1m%s "http://[::1]:1080" demo.eduroam.no >eduroam.eap-config\033[0m\n\nPlease note: base-url must be available from both your webbrowser and this script,\nuse -R1080:localhost:1080 if you want to test a local server from remote\n\n' "$0" "$0" >&2
 	exit 2
 fi
 
