@@ -1,6 +1,7 @@
 /composer.lock
 /composer.phar
 /etc/letswifi.conf.php
+/fifo
 /phan.phar
 /php-cs-fixer-v2.phar
 /phpunit-7.phar
@@ -9,4 +10,6 @@
 /var
 /vendor
 /www/simplesaml
+/.geteduroam-refresh-*
 /.php_cs.cache
+*.eap-config

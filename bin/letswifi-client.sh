@@ -40,13 +40,14 @@ parseQuery() {
 	tr \& \\n
 }
 getQuery() {
-	parseQuery | fgrep "${1}=" | cut -d= -f2-
+	parseQuery | grep -F "${1}=" | cut -d= -f2-
 }
 getJson() {
-	fgrep "    \"${1}\": " | cut -d\" -f4- | sed -e's/",\{0,1\}$//'
+	grep -F "    \"${1}\": " | cut -d\" -f4- | sed -e's/",\{0,1\}$//'
 }
 
 serve() {
+	[ -p fifo ] || mkfifo fifo
 	cat fifo | ( nc -l -p $PORT 2>/dev/null || nc -l $PORT ) | while read line
 	do
 		error="$(echo $line | urlToQuery | getQuery error)"
@@ -66,14 +67,17 @@ serve() {
 		fi
 		break
 	done
+	[ -p fifo ] && rm fifo
 }
 
 redirect() { # $1 = url
+	[ -p fifo ] || mkfifo fifo
 	cat fifo | ( nc -l -p $PORT 2>/dev/null || nc -l $PORT ) | while read line
 	do
 		printf 'HTTP/1.0 302 Found\r\nLocation: %s\r\n\r\n%s\r\n' "$1" "$1" >fifo
 		break
 	done
+	[ -p fifo ] && rm fifo
 }
 
 window() { # $1 = title, $2 = text
@@ -104,10 +108,9 @@ printf '\n\n\n\n\n' >&2
 if test -z "$access_token"
 then
 	code_challenge="$(printf "$CODE_VERIFIER" | sha256bin | urlb64)"
-	separator=$(echo "$AUTHORIZE_URL" | fgrep -q '?' && printf '&' || printf '?')
+	separator=$(echo "$AUTHORIZE_URL" | grep -Fq '?' && printf '&' || printf '?')
 	authorize_url="${AUTHORIZE_URL}${separator}response_type=code&code_challenge_method=S256&scope=$SCOPE&code_challenge=$code_challenge&redirect_uri=$REDIRECT_URI&client_id=$CLIENT_ID&state=$STATE"
 	window 'Please visit the following URL in your webbrowser' "$(echo "\033[4;34m$REDIRECT_URI")"
-	[ -p fifo ] || mkfifo fifo
 	redirect "$authorize_url"
 	window 'Please log in and approve this application in your webbrowser' 'Waiting for response...'
 	code=
