@@ -47,22 +47,29 @@ getJson() {
 }
 
 serve() {
-	cat fifo | ( nc -l -p $PORT 2>/dev/null|| nc -l $PORT ) | while read line
+	cat fifo | ( nc -l -p $PORT 2>/dev/null || nc -l $PORT ) | while read line
 	do
 		error="$(echo $line | urlToQuery | getQuery error)"
 		if [ -n "$error" ]
 		then
-			printf 'HTTP/1.0 500 Internal Server Error\r\nContent-Type: text/plain\r\n\r\n%s\r\n' "$error" >fifo
-			printf '\033[1;41m%s\033[0m' "$error" >&2
+			if [ "$error" = 'access_denied' ]
+			then
+				printf 'HTTP/1.0 403 Forbidden\r\nContent-Type: text/plain\r\n\r\n%s\r\n' "$error" >fifo
+				window 'Access denied' "$(printf '\033[31mThe user refused access to this application, press ^C to exit')"
+			else
+				printf 'HTTP/1.0 500 Internal Server Error\r\nContent-Type: text/plain\r\n\r\n%s\r\n' "$error" >fifo
+				window 'Error' "$(printf '\033[31mAn unexpected error occurred: \033[1m%s\033[0;31m, press ^C to exit' "$error")"
+			fi
+		else
+			echo $line | urlToQuery
+			printf 'HTTP/1.0 200 OK\r\nContent-Type: text/plain\r\n\r\nAll done! Close browser tab.' >fifo
 		fi
-		echo $line | urlToQuery
-		printf 'HTTP/1.0 200 OK\r\nContent-Type: text/plain\r\n\r\nAll done! Close browser tab.' >fifo
 		break
 	done
 }
 
 redirect() { # $1 = url
-	cat fifo | ( nc -l -p $PORT 2>/dev/null|| nc -l $PORT ) | while read line
+	cat fifo | ( nc -l -p $PORT 2>/dev/null || nc -l $PORT ) | while read line
 	do
 		printf 'HTTP/1.0 302 Found\r\nLocation: %s\r\n\r\n%s\r\n' "$1" "$1" >fifo
 		break
@@ -99,7 +106,7 @@ then
 	code_challenge="$(printf "$CODE_VERIFIER" | sha256bin | urlb64)"
 	separator=$(echo "$AUTHORIZE_URL" | fgrep -q '?' && printf '&' || printf '?')
 	authorize_url="${AUTHORIZE_URL}${separator}response_type=code&code_challenge_method=S256&scope=$SCOPE&code_challenge=$code_challenge&redirect_uri=$REDIRECT_URI&client_id=$CLIENT_ID&state=$STATE"
-	window 'Please visit the following URL in your webbrowser' "$REDIRECT_URI"
+	window 'Please visit the following URL in your webbrowser' "$(echo "\033[4;34m$REDIRECT_URI")"
 	[ -p fifo ] || mkfifo fifo
 	redirect "$authorize_url"
 	window 'Please log in and approve this application in your webbrowser' 'Waiting for response...'
