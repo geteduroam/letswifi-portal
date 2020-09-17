@@ -8,7 +8,7 @@ $app->render( [
 		'href' => '/app/',
 		'apps' => [
 				'android' => [
-						'url' => 'https://geteduroam.no/app/geteduroam.apk',
+						'url' => 'https://play.google.com/store/apps/details?id=app.eduroam.geteduroam',
 						'name' => 'Android',
 					],
 				'ios' => [
