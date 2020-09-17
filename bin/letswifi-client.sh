@@ -1,4 +1,11 @@
 #!/bin/sh
+# Client for retrieving eap-config from geteduroam server
+#
+# Copyright (c) 2019-2020 Jørn Åne de Jong
+#
+# LICENSE: BSD-3-Clause
+# http://opensource.org/licenses/BSD-3-Clause
+
 if test -z $1
 then
 	printf '\033[0musage: %s base-url [realm]\n\nexample: \033[1m%s "http://[::1]:1080" demo.eduroam.no >eduroam.eap-config\033[0m\n\nPlease note: base-url must be available from both your webbrowser and this script,\nuse -R1080:localhost:1080 if you want to test a local server from remote\n\n' "$0" "$0" >&2
@@ -7,17 +14,23 @@ fi
 
 URL="$1"
 SCOPE="eap-metadata"
-PORT=8080
+PORT="0$3"
+while [ $PORT -lt 1024 -o $PORT -gt 65535 ]
+do
+	PORT=$RANDOM
+	test -z "$PORT" && PORT=$(tr -cd '0123456789' </dev/urandom | head -c5)
+done
+PORT=$(echo $PORT | sed -es/\^0\*//)
 CLIENT_ID="app.geteduroam.sh"
-REDIRECT_URI=http://127.0.0.1:8080/
+REDIRECT_URI="http://127.0.0.1:$PORT/"
 
 if test -n $2
 then
 	REALM_PARAM="?realm=$2"
 fi
-AUTHORIZE_URL="$URL/oauth/authorize/?realm=demo.eduroam.no"
-TOKEN_URL="$URL/oauth/token/?realm=demo.eduroam.no"
-GENERATE_URL="$URL/api/eap-config/?realm=demo.eduroam.no"
+AUTHORIZE_URL="$URL/oauth/authorize/$REALM_PARAM"
+TOKEN_URL="$URL/oauth/token/$REALM_PARAM"
+GENERATE_URL="$URL/api/eap-config/$REALM_PARAM"
 
 REFRESH_TOKEN_FILENAME=".geteduroam-refresh-$(echo "$TOKEN_URL" | openssl sha256 | tail -c16)"
 
@@ -48,8 +61,18 @@ getJson() {
 
 serve() {
 	[ -p fifo ] || mkfifo fifo
-	cat fifo | ( nc -l -p $PORT 2>/dev/null || nc -l $PORT ) | while read line
+	answered=0
+	cat fifo | ( nc -Clp $PORT 2>/dev/null || nc -l $PORT ) | while read line
 	do
+		# We got a response, show this message in case we get stuck
+		window 'Closing connection' "Response received, but we're stuck, refresh your browser"
+		# If we aren't actually stuck the message won't appear long enough for the user to read
+
+		# We get stuck when nc doesn't quit after receiving an EOF on the fifo,
+		# which is implicitly sent upon redirecting the printf (or any other) output there
+		# so we have to convince the browser to close the TCP connection
+		# Only the Linux version of nc seems to be able to get stuck
+
 		error="$(echo $line | urlToQuery | getQuery error)"
 		if [ -n "$error" ]
 		then
@@ -63,7 +86,10 @@ serve() {
 			fi
 		else
 			echo $line | urlToQuery
-			printf 'HTTP/1.0 200 OK\r\nContent-Type: text/plain\r\n\r\nAll done! Close browser tab.' >fifo
+			# We lie about the Content-Length (we report two bytes less, the CRLF)
+			# so hopefully the browser will cut us off and set us free
+			# (only needed on Linux, but doesn't hurt on BSD)
+			printf 'HTTP/1.0 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 28\r\n\r\nAll done! Close browser tab.\r\n' >fifo
 		fi
 		break
 	done
@@ -72,7 +98,7 @@ serve() {
 
 redirect() { # $1 = url
 	[ -p fifo ] || mkfifo fifo
-	cat fifo | ( nc -l -p $PORT 2>/dev/null || nc -l $PORT ) | while read line
+	cat fifo | ( nc -Clp $PORT 2>/dev/null || nc -l $PORT ) | while read line
 	do
 		printf 'HTTP/1.0 302 Found\r\nLocation: %s\r\n\r\n%s\r\n' "$1" "$1" >fifo
 		break
@@ -117,12 +143,14 @@ then
 	while [ -z "$code" ]
 	do
 		response="$(serve)"
+		window 'Please wait' 'Parsing response'
 		code="$(echo $response | getQuery code)"
 		state="$(echo $response | getQuery state)"
 	done
+
+	# We have received an access token, so we must assume our refresh_token is burned (if we used one)
 	rm -f "$REFRESH_TOKEN_FILENAME"
 
-	
 	window 'Please wait' "Fetching token from $TOKEN_URL"
 	token_data="$(curl \
 		--fail \
@@ -142,7 +170,7 @@ fi
 window 'Please wait' "Fetching eap-config from $GENERATE_URL"
 curl --fail --silent --show-error -HAuthorization:"Bearer $access_token" "$GENERATE_URL"
 
-
+printf '\n\n\n\n\n' >&2
 window 'Success' 'Successfully downloaded eap-config file'
 
 if test -n "$refresh_token"
