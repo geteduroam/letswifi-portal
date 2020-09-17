@@ -5,7 +5,8 @@ camera-ready-dev: camera-ready dev
 
 camera-ready: syntax codestyle phpunit psalm phan
 
-dev: etc/letswifi.conf.php var/letswifi-dev.sqlite submodule
+dev: etc/letswifi.conf.php submodule
+	test -f var/letswifi-dev.sqlite || make var/letswifi-dev.sqlite
 	php -S [::1]:1080 -t www/
 
 clean:
