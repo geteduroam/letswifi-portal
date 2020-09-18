@@ -28,7 +28,7 @@ try {
 
 		// handler should never return, this code should be unreachable
 		header( 'Content-Type: text/plain' );
-		die( "500 Internal Server Error\r\n\r\nRequest was not handled\r\n" );
+		die( "500 Internal Server Error\r\n\r\nServer error: OAuth POST request was not handled\r\n" );
 	}
 
 	$app->render( [

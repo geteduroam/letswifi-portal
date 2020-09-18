@@ -22,13 +22,13 @@ php-cs-fixer-v2.phar:
 	curl -sSLO https://cs.sensiolabs.org/download/php-cs-fixer-v2.phar || wget https://cs.sensiolabs.org/download/php-cs-fixer-v2.phar
 
 psalm.phar:
-	curl -sSLO https://github.com/vimeo/psalm/releases/download/3.10.1/psalm.phar || wget https://github.com/vimeo/psalm/releases/download/3.10.1/psalm.phar
+	curl -sSLO https://github.com/vimeo/psalm/releases/download/3.16/psalm.phar || wget https://github.com/vimeo/psalm/releases/download/3.16/psalm.phar
 
 phpunit-7.phar:
 	curl -sSLO https://phar.phpunit.de/phpunit-7.phar || wget https://phar.phpunit.de/phpunit-7.phar
 
 phan.phar:
-	curl -sSLO https://github.com/phan/phan/releases/download/2.7.0/phan.phar || wget https://github.com/phan/phan/releases/download/2.7.0/phan.phar
+	curl -sSLO https://github.com/phan/phan/releases/download/3.2.1/phan.phar || wget https://github.com/phan/phan/releases/download/3.2.1/phan.phar
 
 #vendor: composer.phar
 #	php composer.phar install
@@ -48,7 +48,7 @@ phpunit: submodule phpunit-7.phar
 	php phpunit-7.phar
 
 syntax:
-	find . ! -path './vendor/*' ! -path './simplesaml*' -name \*.php -print0 | xargs -0 -n1 -P50 php -l
+	find . ! -path './vendor/*' ! -path './simplesaml*' ! -path './lib/*' -name \*.php -print0 | xargs -0 -n1 -P50 php -l
 
 etc/letswifi.conf.php:
 	cp etc/letswifi.conf.dist.php etc/letswifi.conf.php

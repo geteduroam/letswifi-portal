@@ -33,12 +33,18 @@ class BasicAuth implements BrowserAuthInterface
 		die( "401 Unauthorized\r\n" );
 	}
 
-	public function guessRealm( array $_ ): ?string
+	/**
+	 * @param array $params @unused-param
+	 */
+	public function guessRealm( array $params ): ?string
 	{
 		return null;
 	}
 
-	public function getLogoutURL( string $_ = null ): ?string
+	/**
+	 * @param ?string $redirect @unused-param
+	 */
+	public function getLogoutURL( string $redirect = null ): ?string
 	{
 		return null;
 	}

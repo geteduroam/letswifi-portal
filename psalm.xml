@@ -7,5 +7,10 @@
 		</ignoreFiles>
 	</projectFiles>
 	<issueHandlers>
+		<MissingPropertyType>
+			<errorLevel type="suppress">
+				<file name="src/letswifi/browserauth/simplesamlauth.php"/>
+			</errorLevel>
+		</MissingPropertyType>
 	</issueHandlers>
 </psalm>
