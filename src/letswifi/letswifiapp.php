@@ -20,6 +20,10 @@ use fyrkat\oauth\sealer\PDOSealer;
 
 use letswifi\browserauth\BrowserAuthInterface;
 
+use letswifi\realm\Realm;
+use letswifi\realm\RealmManager;
+use letswifi\realm\User;
+
 use PDO;
 use RuntimeException;
 use Throwable;
@@ -45,6 +49,9 @@ class LetsWifiApp
 
 	/** @var ?PDO */
 	private $pdo;
+
+	/** @var ?RealmManager */
+	private $realmManager;
 
 	/** @var ?Tpl */
 	private $tpl;
@@ -104,7 +111,16 @@ class LetsWifiApp
 			$realmName = $this->getCurrentRealmName();
 		}
 
-		return new Realm( $this->getPDO(), $realmName );
+		return $this->getRealmManager()->getRealm( $realmName );
+	}
+
+	public function getRealmManager(): RealmManager
+	{
+		if ( null === $this->realmManager ) {
+			$this->realmManager = new RealmManager( $this->getPDO() );
+		}
+
+		return $this->realmManager;
 	}
 
 	public function guessRealm( Realm $baseRealm ): ?Realm

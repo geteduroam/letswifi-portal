@@ -18,7 +18,7 @@ $app->registerExceptionHandler();
 $realm = $app->getRealm();
 $oauth = $app->getOAuthHandler( $realm );
 $token = $oauth->getAccessTokenFromRequest( 'eap-metadata' );
-$user = new letswifi\User( $token->getGrant()->getSub() );
+$user = new letswifi\realm\User( $token->getGrant()->getSub() );
 $generator = $realm->getUserEapConfig( $user, (new DateTime())->add( new DateInterval( 'P1D' ) ) );
 $payload = $generator->generate();
 header( 'Content-Type: ' . $generator->getContentType() );

@@ -4,7 +4,7 @@ if ( PHP_SAPI !== 'cli' ) {
 	header( 'Content-Type: text/plain', true, 403 );
 	die( "403 Forbidden\r\n\r\nThis script is intended to be run from the commandline only\r\n");
 }
-if ( sizeof( $argv ) !== 2 ) {
+if ( sizeof( $argv ) !== 2 && sizeof( $argv ) !== 3 ) {
 	echo "init-db.php realm [common_name]\n";
 	die( 2 );
 }
@@ -17,7 +17,7 @@ use fyrkat\openssl\PrivateKey;
 
 $app = new letswifi\LetsWifiApp();
 $app->registerExceptionHandler();
-$realm = $app->getRealm( $argv[1] );
+$realmManager = $app->getRealmManager();
 
 $caPrivKey = new PrivateKey( new OpenSSLConfig( OpenSSLConfig::KEY_EC ) );
 $caCsr = CSR::generate(
@@ -31,10 +31,8 @@ $caCertificate = $caCsr->sign(
 		new OpenSSLConfig( OpenSSLConfig::X509_CA ) // EKU
 	);
 
-$realm->writeRealmData( [
-		'trustedCaCert' => $caCertificate->getX509Pem(),
-		'trustedServerName' => 'radius.' . $argv[1],
-		'signingCaCert' => $caCertificate->getX509Pem(),
-		'signingCaKey' => $caPrivKey->getPrivateKeyPem( null ),
-		'secretKey' => random_bytes( 32 ),
-	] );
+$realmManager->createRealm( $argv[1] );
+$realmManager->importCA( $caCertificate, $caPrivKey );
+$realmManager->addTrustedCa( $argv[1], $caCertificate->getSubject()->__toString() );
+$realmManager->setSignerCa( $argv[1], $caCertificate->getSubject()->__toString() );
+$realmManager->addServer( $argv[1], 'radius.' . $argv[1] );

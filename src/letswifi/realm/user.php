@@ -7,7 +7,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-namespace letswifi;
+namespace letswifi\realm;
 
 class User
 {
