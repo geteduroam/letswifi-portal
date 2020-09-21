@@ -12,6 +12,7 @@ namespace letswifi\realm;
 use DateInterval;
 use DateTimeInterface;
 use DomainException;
+use DateTimeImmutable;
 
 use fyrkat\openssl\CSR;
 use fyrkat\openssl\PrivateKey;
@@ -29,6 +30,11 @@ class RealmManager extends DatabaseStorage
 
 	public function getRealm( string $realm ): Realm
 	{
+		// Guarantee that realm exists
+		if ( null === $this->getSingleFieldFromTableWhere( 'realm', 'realm', ['realm' => $realm] ) ) {
+			throw new InvalidArgumentException( "Realm $realm does not exist" );
+		}
+
 		return new Realm( $this, $realm );
 	}
 
@@ -245,8 +251,6 @@ class RealmManager extends DatabaseStorage
 			}
 		}
 
-		// TODO check realm existence
-
 		$statement = $this->pdo->prepare( 'INSERT INTO ca (sub, pub, key, issuer) VALUES (:sub, :pub, :key, :issuer)' );
 		$statement->bindValue( 'sub', $sub );
 		$statement->bindValue( 'pub', $x509->getX509Pem() );
@@ -263,8 +267,6 @@ class RealmManager extends DatabaseStorage
 		if ( null === $this->getCA( $sub ) ) {
 			throw new InvalidArgumentException( "Attempted to trust CA ${sub}, but it is not known" );
 		}
-
-		// TODO check realm existence
 
 		$statement = $this->pdo->prepare( 'INSERT INTO realm_trust (realm, trusted_ca_sub) VALUES (:realm, :sub)' );
 		$statement->bindValue( 'realm', $realm );
@@ -294,8 +296,6 @@ class RealmManager extends DatabaseStorage
 
 		$epoch = new DateTimeImmutable( '@0' );
 		$validitySeconds = $epoch->add( $defaultValidity )->getTimestamp();
-
-		// TODO check realm existence
 
 		$statement = $this->pdo->prepare( 'REPLACE INTO realm_signer (realm, signer_ca_sub, default_validity) VALUES (:realm, :sub, :validity_seconds)' );
 		$statement->bindValue( 'realm', $realm );
