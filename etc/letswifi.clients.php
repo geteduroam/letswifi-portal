@@ -2,6 +2,7 @@
 	# Shell script test application
 	[
 		'clientId' => 'app.geteduroam.sh', 
+		// No IPv6 because the nc binary might not support it
 		'redirectUris' => ['http://127.0.0.1/'], 
 		'scopes' => ['eap-metadata'], 
 		'refresh' => true

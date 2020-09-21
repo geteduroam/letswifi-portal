@@ -10,9 +10,9 @@
 namespace letswifi\realm;
 
 use DateInterval;
+use DateTimeImmutable;
 use DateTimeInterface;
 use DomainException;
-use DateTimeImmutable;
 
 use fyrkat\openssl\CSR;
 use fyrkat\openssl\PrivateKey;
@@ -32,7 +32,7 @@ class RealmManager extends DatabaseStorage
 	{
 		// Guarantee that realm exists
 		if ( null === $this->getSingleFieldFromTableWhere( 'realm', 'realm', ['realm' => $realm] ) ) {
-			throw new InvalidArgumentException( "Realm $realm does not exist" );
+			throw new InvalidArgumentException( "Realm ${realm} does not exist" );
 		}
 
 		return new Realm( $this, $realm );

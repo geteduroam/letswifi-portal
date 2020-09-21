@@ -13,15 +13,25 @@ This is the reference CA for geteduroam.  It is intended to be used with an app 
 
 ## Getting up and running quick 'n dirty
 
+Upload this whole project to a webserver, and make `www/` accessible, ideally as the root
+
 This quick'n'dirty guide assumes you'll be using SimpleSAMLphp (the only authentication method supported ATM)
 
 	make simplesamlphp
 
-Initialize the SQLite database
 
-	make var/letswifi-dev.sqlite
+Initialize the SQLite database (should be possible to use other SQL databases, but this is not tested)
 
-Edit etc/letswifi.conf.php and change `userIdAttribute` to match your setup.
+	mkdir var
+	sqlite3 var/letswifi-dev.sqlite <sql/letswifi-dev.sqlite.sql
+
+
+Create the realm with a default client certificate validity of one year
+
+	bin/init-db.php example.com 365
+
+
+Copy etc/letswifi.conf.simplesaml.php etc/letswifi.conf.php and change `userIdAttribute` to match your setup.
 
 Write metadata of your SAML IdP to simplesamlphp/metadata/saml20-idp-remote.php
 
@@ -30,13 +40,15 @@ Navigate to https://example.com/simplesaml/module.php/saml/sp/metadata.php/defau
 
 ## Running a development server
 
+	make simplesamlphp
 	make dev
+
 
 ### Testing manually
 
 There is a shell script to initiate an OAuth flow
 
-	bin/letswifi-client.sh "http://[::1]:1080" demo.eduroam.no >test.eap-config
+	bin/letswifi-client.sh 'http://[::1]:1080' example.com >test.eap-config
 
 * If everything went fine, you get an eap-config XML payload in test.eap-config
 * You will see the public key material logged in the `tlscredential` SQL table
