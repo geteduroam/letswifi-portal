@@ -3,7 +3,6 @@
 $menu = [
 	'home' => ['name' => 'Info', 'href' => '/'],
 	'app' => ['name' => 'Apps', 'href' => '/app/'],
-	'dev' => ['name' => 'Development', 'href' => '/dev/'],
 ];
 ?>
 <?php $this->start('layout') ?>
