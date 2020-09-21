@@ -9,6 +9,7 @@
 
 namespace letswifi\realm;
 
+use DateInterval;
 use DateTimeInterface;
 use DomainException;
 
@@ -74,6 +75,18 @@ class RealmManager extends DatabaseStorage
 		}
 
 		return $ca;
+	}
+
+	/**
+	 * @internal
+	 *
+	 * @return DateInterval
+	 */
+	public function getDefaultValidity( string $realm ): DateInterval
+	{
+		$validity = $this->getSingleFieldFromTableWhere( 'realm_signer', 'default_validity', ['realm' => $realm] );
+
+		return new DateInterval( "PT${validity}S" );
 	}
 
 	/**
@@ -273,17 +286,21 @@ class RealmManager extends DatabaseStorage
 	/**
 	 * @suppress PhanPossiblyNonClassMethodCall Phan doesn't understand PDO
 	 */
-	public function setSignerCa( string $realm, string $sub ): void
+	public function setSignerCa( string $realm, string $sub, DateInterval $defaultValidity ): void
 	{
 		if ( null === $this->getCA( $sub ) ) {
 			throw new InvalidArgumentException( "Attempted to trust CA ${sub}, but it is not known" );
 		}
 
+		$epoch = new DateTimeImmutable( '@0' );
+		$validitySeconds = $epoch->add( $defaultValidity )->getTimestamp();
+
 		// TODO check realm existence
 
-		$statement = $this->pdo->prepare( 'REPLACE INTO realm_signer (realm, signer_ca_sub) VALUES (:realm, :sub)' );
+		$statement = $this->pdo->prepare( 'REPLACE INTO realm_signer (realm, signer_ca_sub, default_validity) VALUES (:realm, :sub, :validity_seconds)' );
 		$statement->bindValue( 'realm', $realm );
 		$statement->bindValue( 'sub', $sub );
+		$statement->bindValue( 'validity_seconds', $validitySeconds );
 		$statement->execute();
 	}
 

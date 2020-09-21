@@ -21,6 +21,7 @@ $realmManager = $app->getRealmManager();
 $user = new letswifi\realm\User( 'cli' );
 
 $realm = $realmManager->getRealm( $argv[1] );
-$pkcs12 = $realm->generateServerCertificate( $user, $argv[2], (new DateTime())->add( new DateInterval( 'P' . ( sizeof( $argv ) === 4 ? $argv[3] : 1095 ) . 'D' ) ) );
+$pkcs12 = $realm->generateServerCertificate( $user, $argv[2], sizeof( $argv ) === 4 ? new DateInterval( 'P' . $argv[3] . 'D' ) : null );
+
 echo $pkcs12->getPrivateKey()->getPrivateKeyPem( null );
 echo $pkcs12->getX509();

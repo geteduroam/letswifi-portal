@@ -9,6 +9,8 @@
 
 namespace letswifi\realm;
 
+use DateInterval;
+use DateTimeImmutable;
 use DateTimeInterface;
 
 use fyrkat\openssl\CSR;
@@ -45,8 +47,12 @@ class Realm
 	 *
 	 * @return EapConfigGenerator
 	 */
-	public function getUserEapConfig( User $user, DateTimeInterface $expiry ): EapConfigGenerator
+	public function getUserEapConfig( User $user, ?DateInterval $validity = null ): EapConfigGenerator
 	{
+		if ( null === $validity ) {
+			$validity = $this->manager->getDefaultValidity( $this->name );
+		}
+		$expiry = (new DateTimeImmutable())->add( $validity );
 		// TODO more generic method to get an arbitrary generator
 		$pkcs12 = $this->generateClientCertificate( $user, $expiry );
 		$anonymousIdentity = $user->getAnonymousUsername();

@@ -1,7 +1,8 @@
 
 CREATE TABLE IF NOT EXISTS "realm_signer" (
 		"realm" TEXT PRIMARY KEY REFERENCES "realm"("realm"),
-		"signer_ca_sub" NOT NULL REFERENCES "ca"("sub")
+		"signer_ca_sub" NOT NULL REFERENCES "ca"("sub"),
+		"default_validity" INTEGER NOT NULL
 	);
 
 CREATE TABLE IF NOT EXISTS "ca" (

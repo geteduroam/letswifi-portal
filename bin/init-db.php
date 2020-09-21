@@ -5,6 +5,7 @@ if ( PHP_SAPI !== 'cli' ) {
 	die( "403 Forbidden\r\n\r\nThis script is intended to be run from the commandline only\r\n");
 }
 if ( sizeof( $argv ) !== 2 && sizeof( $argv ) !== 3 ) {
+	// TODO make validity configurable
 	echo "init-db.php realm [common_name]\n";
 	die( 2 );
 }
@@ -34,5 +35,5 @@ $caCertificate = $caCsr->sign(
 $realmManager->createRealm( $argv[1] );
 $realmManager->importCA( $caCertificate, $caPrivKey );
 $realmManager->addTrustedCa( $argv[1], $caCertificate->getSubject()->__toString() );
-$realmManager->setSignerCa( $argv[1], $caCertificate->getSubject()->__toString() );
+$realmManager->setSignerCa( $argv[1], $caCertificate->getSubject()->__toString(), new DateInterval( 'P1D' ) );
 $realmManager->addServer( $argv[1], 'radius.' . $argv[1] );
