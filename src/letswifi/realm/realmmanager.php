@@ -45,7 +45,7 @@ class RealmManager extends DatabaseStorage
 	 */
 	public function getServerNames( string $realm ): array
 	{
-		return $this->getFieldsFromTableWhere( 'realm_server', 'server_name', ['realm' => $realm] );
+		return $this->getFieldsFromTableWhere( 'realm_server_name', 'server_name', ['realm' => $realm] );
 	}
 
 	/**
@@ -309,7 +309,7 @@ class RealmManager extends DatabaseStorage
 	 */
 	public function addServer( string $realm, string $serverName ): void
 	{
-		$statement = $this->pdo->prepare( 'INSERT INTO realm_server (realm, server_name) VALUES (:realm, :server_name)' );
+		$statement = $this->pdo->prepare( 'INSERT INTO realm_server_name (realm, server_name) VALUES (:realm, :server_name)' );
 		$statement->bindValue( 'realm', $realm );
 		$statement->bindValue( 'server_name', $serverName );
 		$statement->execute();
@@ -320,7 +320,7 @@ class RealmManager extends DatabaseStorage
 	 */
 	public function removeServer( string $realm, string $serverName ): void
 	{
-		$statement = $this->pdo->prepare( 'DELETE FROM realm_server WHERE realm = :realm AND server_name = :server_name' );
+		$statement = $this->pdo->prepare( 'DELETE FROM realm_server_name WHERE realm = :realm AND server_name = :server_name' );
 		$statement->bindValue( 'realm', $realm );
 		$statement->bindValue( 'server_name', $serverName );
 		$statement->execute();

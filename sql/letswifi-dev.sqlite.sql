@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS "realm" (
 		"realm" TEXT PRIMARY KEY
 	);
 
-CREATE TABLE IF NOT EXISTS "realm_server" (
+CREATE TABLE IF NOT EXISTS "realm_server_name" (
 		"realm" TEXT REFERENCES "realm"("realm") NOT NULL,
 		"server_name" TEXT NOT NULL
 	);
