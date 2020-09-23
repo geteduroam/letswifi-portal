@@ -58,6 +58,13 @@ CREATE TABLE `realm_signing_log` (
 		FOREIGN KEY(ca_sub) REFERENCES ca(sub)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE `realm_vhost` (
+		`http_host` varchar(127) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+		`realm` varchar(127) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+		PRIMARY KEY (`http_host`),
+		FOREIGN KEY(realm) REFERENCES realm(realm)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE `oauth_grant` (
 		`sid` varchar(127) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
 		`grant_data` text COLLATE utf8mb4_unicode_ci NOT NULL,

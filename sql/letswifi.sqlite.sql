@@ -1,19 +1,19 @@
 
 CREATE TABLE IF NOT EXISTS "realm_signer" (
-		"realm" TEXT PRIMARY KEY REFERENCES "realm"("realm"),
+		"realm" TEXT NOT NULL PRIMARY KEY REFERENCES "realm"("realm"),
 		"signer_ca_sub" NOT NULL REFERENCES "ca"("sub"),
 		"default_validity_days" INTEGER NOT NULL
 	);
 
 CREATE TABLE IF NOT EXISTS "ca" (
-		"sub" TEXT PRIMARY KEY,
+		"sub" TEXT NOT NULL PRIMARY KEY,
 		"pub" BLOB NOT NULL,
 		"key" BLOB,
 		"issuer" TEXT REFERENCES ""("sub")
 	);
 
 CREATE TABLE IF NOT EXISTS "realm" (
-		"realm" TEXT PRIMARY KEY
+		"realm" TEXT NOT NULL PRIMARY KEY
 	);
 
 CREATE TABLE IF NOT EXISTS "realm_server_name" (
@@ -27,14 +27,14 @@ CREATE TABLE IF NOT EXISTS "realm_trust" (
 	);
 
 CREATE TABLE IF NOT EXISTS "oauth_grant" (
-		"sid" TEXT PRIMARY KEY,
+		"sid" TEXT NOT NULL PRIMARY KEY,
 		"grant_data" TEXT NOT NULL,
 		"sub" TEXT NOT NULL,
 		"exp" INTEGER NOT NULL
 	);
 
 CREATE TABLE IF NOT EXISTS "oauth_token" (
-		"token" TEXT PRIMARY KEY,
+		"token" TEXT NOT NULL PRIMARY KEY,
 		"sid" TEXT NOT NULL REFERENCES "grant_data"("sid"),
 		"used" INTEGER,
 		"exp" INTEGER NOT NULL,
@@ -42,14 +42,19 @@ CREATE TABLE IF NOT EXISTS "oauth_token" (
 	);
 
 CREATE TABLE IF NOT EXISTS "realm_key" (
-		"realm" TEXT PRIMARY KEY REFERENCES "realm"("realm"),
+		"realm" TEXT NOT NULL PRIMARY KEY REFERENCES "realm"("realm"),
 		"key" BLOB NOT NULL,
 		"issued" INTEGER NOT NULL,
 		"expires" INTEGER
 	);
 
+CREATE TABLE "realm_vhost" (
+		"http_host" TEXT NOT NULL PRIMARY KEY,
+		"realm" TEXT NOT NULL REFERENCES "realm"("realm")
+	);
+
 CREATE TABLE IF NOT EXISTS "realm_signing_log" (
-		"serial" INTEGER PRIMARY KEY AUTOINCREMENT,
+		"serial" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 		"realm" TEXT REFERENCES "realm"("realm") NOT NULL,
 		"ca_sub" TEXT REFERENCES "ca"("sub") NOT NULL,
 		"requester" TEXT NOT NULL,
