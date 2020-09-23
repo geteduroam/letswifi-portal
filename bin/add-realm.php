@@ -6,7 +6,7 @@ if ( PHP_SAPI !== 'cli' ) {
 }
 if ( sizeof( $argv ) !== 3 && sizeof( $argv ) !== 4 ) {
 	// TODO make validity configurable
-	echo "init-db.php realm client_cert_validity_days [common_name]\n";
+	echo $argv[0] . " realm client_cert_validity_days [common_name]\n";
 	die( 2 );
 }
 require implode(DIRECTORY_SEPARATOR, [dirname(__DIR__, 1), 'src', '_autoload.php']);

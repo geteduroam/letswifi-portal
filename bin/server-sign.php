@@ -5,7 +5,7 @@ if ( PHP_SAPI !== 'cli' ) {
 	die( "403 Forbidden\r\n\r\nThis script is intended to be run from the commandline only\r\n");
 }
 if ( sizeof( $argv ) !== 3 && sizeof( $argv ) !== 4 ) {
-	echo "serversign.php realm common_name [days_valid=1095]\n";
+	echo $argv[0] . " realm common_name [days_valid=1095]\n";
 	die( 2 );
 }
 require implode(DIRECTORY_SEPARATOR, [dirname(__DIR__, 1), 'src', '_autoload.php']);
