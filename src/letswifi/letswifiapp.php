@@ -184,6 +184,26 @@ class LetsWifiApp
 
 	private function getCurrentRealmName(): string
 	{
+		switch ( $this->config->getStringOrNull( 'realm.selector' ) ) {
+			case 'getparam': return $this->getCurrentRealmNameFromGetParam();
+			case 'httphost': return $this->getCurrentRealmNameFromHttpHost();
+			default: return $this->config->getString( 'realm.default' );
+		}
+	}
+
+	private function getCurrentRealmNameFromHttpHost(): string
+	{
+		$httpHost = $_SERVER['HTTP_HOST'];
+		$realm = $this->getRealmManager()->getRealmNameByHttpHost( $httpHost );
+		if ( null === $realm ) {
+			throw new RuntimeException( "No realm set for HTTP hostname ${httpHost}" );
+		}
+
+		return $realm;
+	}
+
+	private function getCurrentRealmNameFromGetParam(): string
+	{
 		if ( !\array_key_exists( 'realm', $_GET ) ) {
 			throw new RuntimeException( 'No realm set' );
 		}

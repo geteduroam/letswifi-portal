@@ -4,13 +4,11 @@
 			'autoloadInclude' => dirname( __DIR__ ) . '/simplesamlphp/lib/_autoload.php',
 			'authSource' => 'default-sp',
 		],
+	'realm.selector' => 'getparam', // one of null, getparam or hostname
+	'realm.default' => 'demo.eduroam.no', // used when realm.selector = null
 	'realm.auth' => [
 			'demo.eduroam.no' => [
 					'userIdAttribute' => 'eduPersonPrincipalName',
-					'samlIdp' => 'https://idp-test.feide.no',
-				],
-			'letswifi.fyrkat.no' => [
-					'userIdAttribute' => 'userPrincipalName',
 					'samlIdp' => 'https://idp-test.feide.no',
 				],
 		],

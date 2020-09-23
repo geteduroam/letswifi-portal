@@ -96,6 +96,18 @@ class RealmManager extends DatabaseStorage
 	}
 
 	/**
+	 * Get realm name for HTTP hostname
+	 *
+	 * @param string $httpHost Hostname, aka $_SERVER['HTTP_HOST']
+	 *
+	 * @return ?string Realm name to be used for RealmManager::getRealm()
+	 */
+	public function getRealmNameByHttpHost( string $httpHost ): ?string
+	{
+		return $this->getSingleFieldFromTableWhere( 'realm_vhost', 'realm', ['http_host' => $httpHost] );
+	}
+
+	/**
 	 * @internal
 	 *
 	 * @return string
@@ -323,6 +335,28 @@ class RealmManager extends DatabaseStorage
 		$statement = $this->pdo->prepare( 'DELETE FROM `realm_server_name` WHERE `realm` = :realm AND `server_name` = :server_name' );
 		$statement->bindValue( 'realm', $realm );
 		$statement->bindValue( 'server_name', $serverName );
+		$statement->execute();
+	}
+
+	/**
+	 * @suppress PhanPossiblyNonClassMethodCall Phan doesn't understand PDO
+	 */
+	public function addVhost( string $realm, string $httpHost ): void
+	{
+		$statement = $this->pdo->prepare( 'INSERT INTO `realm_vhost` (`realm`, `server_name`) VALUES (:realm, :server_name)' );
+		$statement->bindValue( 'realm', $realm );
+		$statement->bindValue( 'http_host', $httpHost );
+		$statement->execute();
+	}
+
+	/**
+	 * @suppress PhanPossiblyNonClassMethodCall Phan doesn't understand PDO
+	 */
+	public function removeVhost( string $realm, string $httpHost ): void
+	{
+		$statement = $this->pdo->prepare( 'DELETE FROM `realm_vhost` WHERE `realm` = :realm AND `http_host` = :httpHost' );
+		$statement->bindValue( 'realm', $realm );
+		$statement->bindValue( 'http_host', $httpHost );
 		$statement->execute();
 	}
 }

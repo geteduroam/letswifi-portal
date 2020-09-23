@@ -3,6 +3,11 @@
 	'auth.params' => [
 		'admin' => 'admin123ABC',
 	],
+	'realm.selector' => 'getparam', // one of null, getparam or hostname
+	'realm.default' => 'demo.eduroam.no', // used when realm.selector = null
+	'realm.auth' => [
+			'demo.eduroam.no' => [], // No settings needed
+		],
 	'pdo.dsn' => 'sqlite:' . dirname( __DIR__ ) . '/var/letswifi-dev.sqlite',
 	'pdo.username' => null,
 	'pdo.password' => null,
