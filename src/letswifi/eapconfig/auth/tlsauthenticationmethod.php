@@ -55,7 +55,7 @@ class TlsAuthenticationMethod extends AbstractAuthenticationMethod
 			;
 		foreach ( $this->getServerCACertificates() as $ca ) {
 			$result .= ''
-				. "\r\n\t\t\t\t\t" . '<CA format="X.509" encoding="base64">' . \base64_encode( $ca->getX509Pem() ) . '</CA>'
+				. "\r\n\t\t\t\t\t" . '<CA format="X.509" encoding="base64">' . static::pemToBase64Der( $ca->getX509Pem() ) . '</CA>'
 				;
 		}
 		foreach ( $this->getServerNames() as $serverName ) {
