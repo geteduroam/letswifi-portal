@@ -92,7 +92,7 @@ class RealmManager extends DatabaseStorage
 	{
 		$validity = $this->getSingleFieldFromTableWhere( 'realm_signer', 'default_validity_days', ['realm' => $realm] );
 
-		return new DateInterval( "PT${validity}D" );
+		return new DateInterval( "P${validity}D" );
 	}
 
 	/**

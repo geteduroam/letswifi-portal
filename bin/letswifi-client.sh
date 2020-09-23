@@ -24,7 +24,7 @@ PORT=$(echo $PORT | sed -es/\^0\*//)
 CLIENT_ID="app.geteduroam.sh"
 REDIRECT_URI="http://127.0.0.1:$PORT/"
 
-if test -n $2
+if test -n "$2"
 then
 	REALM_PARAM="?realm=$2"
 fi

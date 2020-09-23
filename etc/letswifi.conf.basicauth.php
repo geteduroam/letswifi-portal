@@ -3,7 +3,7 @@
 	'auth.params' => [
 		'admin' => 'admin123ABC',
 	],
-	'realm.selector' => 'getparam', // one of null, getparam or hostname
+	'realm.selector' => 'getparam', // one of null, getparam or httphost
 	'realm.default' => 'demo.eduroam.no', // used when realm.selector = null
 	'realm.auth' => [
 			'demo.eduroam.no' => [], // No settings needed
