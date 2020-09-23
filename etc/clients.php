@@ -9,7 +9,7 @@
 	],
 
 	# Windows application
-	# https://github.com/geteduroam/eduroam-supplicant-win
+	# https://github.com/geteduroam/windows-app
 	[
 		'clientId' => 'app.geteduroam.win',
 		'redirectUris' => ['http://[::1]/'],
@@ -18,7 +18,8 @@
 	],
 	[
 		# deprecated Windows client
-		# Also stolen by ionic-app?!??!!?!
+		# Also clientId stolen by ionic-app?!??!!?!
+		# https://github.com/geteduroam/ionic-app
 		'clientId' => 'f817fbcc-e8f4-459e-af75-0822d86ff47a',
 		'redirectUris' => [
 			'http://[::1]/',
