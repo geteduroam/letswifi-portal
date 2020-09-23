@@ -258,7 +258,7 @@ class RealmManager extends DatabaseStorage
 		$sub = $x509->getSubject()->__toString();
 
 		if ( $issuer !== $sub ) {
-			if ( null === $this->getCA( $sub ) ) {
+			if ( null === $this->getCA( $issuer ) ) {
 				throw new InvalidArgumentException( 'Attempted to import intermediate certificate without known root' );
 			}
 		}
