@@ -26,4 +26,19 @@
 			'http://localhost:8080/'],
 		'scopes' => ['eap-metadata']
 	],
+
+	# Mobile application
+	# https://github.com/geteduroam/ionic-app/pull
+	[
+		'client_id' => 'app.geteduroam.ionic',
+		'redirectUris' => [
+			# Old client used http://localhost:8080 but we're not allowing that anymore
+			'http://[::1]/', 'http://127.0.0.1/',
+
+			# This was supposed to be the redirect for ionic-app, but it was never used
+			# TODO Do we still need this?
+			'letswifi://auth_callback',
+		],
+		'scopes' => ['eap-metadata']
+	],
 ];
