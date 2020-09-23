@@ -20,17 +20,17 @@ $app->registerExceptionHandler();
 $realmManager = $app->getRealmManager();
 
 $stdin = file_get_contents( 'php://stdin' );
-preg_match_all( '/(^|\n)-----BEGIN( EC)? PRIVATE KEY-----\n?.*\n-----END\1 PRIVATE KEY-----($|\n)/sm', $stdin, $keys );
+preg_match_all( '/(^|\n)-----BEGIN( EC)? PRIVATE KEY-----\n.*?\n-----END\1 PRIVATE KEY-----($|\n)/sm', $stdin, $keys );
 preg_match_all( '/(^|\n)-----BEGIN CERTIFICATE-----\n.*?\n-----END CERTIFICATE-----($|\n)/sm', $stdin, $certificates );
 
-$keys = array_map( function( string $key ){
+$keys = array_map( function( string $key ) {
 		return new PrivateKey( $key );
 	}, $keys[0] );
-$certificates = array_map( function( string $certificate ){
+$certificates = array_map( function( string $certificate ) {
 		return new X509( $certificate );
 	}, $certificates[0] );
 
-for( $i = count( $certificates ); $i--; $i >= 0 ){
+for( $i = count( $certificates ); $i--; $i >= 0 ) {
 	$x509 = $certificates[$i];
 	$sub = (string) $x509->getSubject();
 	if ( null !== $realmManager->getCA( $sub ) ) {
