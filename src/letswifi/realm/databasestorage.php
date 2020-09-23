@@ -110,16 +110,16 @@ class DatabaseStorage
 	protected function getEntriesFromTableWhere( string $table, array $where ): array
 	{
 		static::safeString( $table, 'SQL table' );
-		$query = "SELECT * FROM ${table}";
+		$query = "SELECT * FROM `${table}`";
 		$first = true;
 		foreach ( $where as $key => $_ ) {
 			static::safeString( $key, 'SQL field name' );
 			$query .= $first ? ' WHERE ' : ' AND ';
 			$first = false;
 			switch ( $key ) {
-				case 'issued': $query .= 'issued < :issued'; break;
-				case 'expires': $query .= '(expires > :expires OR expires IS NULL)'; break;
-				default: $query .= "${key} = :${key}";
+				case 'issued': $query .= '`issued` < :issued'; break;
+				case 'expires': $query .= '(`expires` > :expires OR `expires` IS NULL)'; break;
+				default: $query .= "`${key}` = :${key}";
 			}
 		}
 

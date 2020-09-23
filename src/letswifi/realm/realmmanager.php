@@ -90,9 +90,9 @@ class RealmManager extends DatabaseStorage
 	 */
 	public function getDefaultValidity( string $realm ): DateInterval
 	{
-		$validity = $this->getSingleFieldFromTableWhere( 'realm_signer', 'default_validity', ['realm' => $realm] );
+		$validity = $this->getSingleFieldFromTableWhere( 'realm_signer', 'default_validity_days', ['realm' => $realm] );
 
-		return new DateInterval( "PT${validity}S" );
+		return new DateInterval( "PT${validity}D" );
 	}
 
 	/**
@@ -159,7 +159,7 @@ class RealmManager extends DatabaseStorage
 	public function logPreparedCredential( string $realm, X509 $caCert, User $requester, CSR $csr, DateTimeInterface $expiry, string $usage ): int
 	{
 		$csrData = $csr->getCSRPem();
-		$statement = $this->pdo->prepare( 'INSERT INTO realm_signing_log (realm, ca_sub, requester, usage, sub, issued, expires, csr) VALUES (:realm, :ca_sub, :requester, :usage, :sub, :issued, :expires, :csr)' );
+		$statement = $this->pdo->prepare( 'INSERT INTO `realm_signing_log` (`realm`, `ca_sub`, `requester`, `usage`, `sub`, `issued`, `expires`, `csr`) VALUES (:realm, :ca_sub, :requester, :usage, :sub, :issued, :expires, :csr)' );
 		$statement->bindValue( 'realm', $realm, PDO::PARAM_STR );
 		$statement->bindValue( 'ca_sub', $caCert->getSubject(), PDO::PARAM_STR );
 		$statement->bindValue( 'requester', $requester->getUserID(), PDO::PARAM_STR );
@@ -183,7 +183,7 @@ class RealmManager extends DatabaseStorage
 	 */
 	public function logCompletedCredential( string $realm, User $user, X509 $userCert, string $usage ): void
 	{
-		$statement = $this->pdo->prepare( 'UPDATE realm_signing_log SET issued = :issued, expires = :expires, x509 = :x509 WHERE serial = :serial AND realm = :realm AND requester = :requester AND usage = :usage AND ca_sub = :ca_sub' );
+		$statement = $this->pdo->prepare( 'UPDATE `realm_signing_log` SET `issued` = :issued, `expires` = :expires, `x509` = :x509 WHERE `serial` = :serial AND `realm` = :realm AND `requester` = :requester AND `usage` = :usage AND `ca_sub` = :ca_sub' );
 		$statement->bindValue( 'issued', $userCert->getValidFrom()->format( 'Y-m-d' ), PDO::PARAM_STR );
 		$statement->bindValue( 'expires', $userCert->getValidTo()->format( 'Y-m-d' ), PDO::PARAM_STR );
 		$statement->bindValue( 'x509', $userCert->getX509Pem(), PDO::PARAM_STR );
@@ -204,7 +204,7 @@ class RealmManager extends DatabaseStorage
 	 */
 	public function createRealm( string $realm ): void
 	{
-		$statement = $this->pdo->prepare( 'INSERT INTO realm (realm) VALUES (:realm)' );
+		$statement = $this->pdo->prepare( 'INSERT INTO `realm` (`realm`) VALUES (:realm)' );
 		$statement->bindValue( 'realm', $realm );
 		$statement->execute();
 
@@ -222,11 +222,11 @@ class RealmManager extends DatabaseStorage
 		}
 		$this->pdo->beginTransaction();
 
-		$statement1 = $this->pdo->prepare( 'UPDATE realm_key SET expires = :expires WHERE realm = :realm AND expires IS NULL' );
+		$statement1 = $this->pdo->prepare( 'UPDATE `realm_key` SET `expires` = :expires WHERE `realm` = :realm AND `expires` IS NULL' );
 		$statement1->bindValue( 'realm', $realm );
 		$statement1->bindValue( 'expires', $now + $grace );
 
-		$statement2 = $this->pdo->prepare( 'INSERT INTO realm_key (realm, key, issued) VALUES (:realm, :key, :issued)');
+		$statement2 = $this->pdo->prepare( 'INSERT INTO `realm_key` (`realm`, `key`, `issued`) VALUES (:realm, :key, :issued)');
 		$statement2->bindValue( 'realm', $realm );
 		$statement2->bindValue( 'key', \base64_encode( \random_bytes( 32 ) ) );
 		$statement2->bindValue( 'issued', $now );
@@ -251,7 +251,7 @@ class RealmManager extends DatabaseStorage
 			}
 		}
 
-		$statement = $this->pdo->prepare( 'INSERT INTO ca (sub, pub, key, issuer) VALUES (:sub, :pub, :key, :issuer)' );
+		$statement = $this->pdo->prepare( 'INSERT INTO `ca` (`sub`, `pub`, `key`, `issuer`) VALUES (:sub, :pub, :key, :issuer)' );
 		$statement->bindValue( 'sub', $sub );
 		$statement->bindValue( 'pub', $x509->getX509Pem() );
 		$statement->bindValue( 'key', $privateKey ? $privateKey->getPrivateKeyPem( null ) : null );
@@ -268,7 +268,7 @@ class RealmManager extends DatabaseStorage
 			throw new InvalidArgumentException( "Attempted to trust CA ${sub}, but it is not known" );
 		}
 
-		$statement = $this->pdo->prepare( 'INSERT INTO realm_trust (realm, trusted_ca_sub) VALUES (:realm, :sub)' );
+		$statement = $this->pdo->prepare( 'INSERT INTO `realm_trust` (`realm`, `trusted_ca_sub`) VALUES (:realm, :sub)' );
 		$statement->bindValue( 'realm', $realm );
 		$statement->bindValue( 'sub', $sub );
 		$statement->execute();
@@ -279,7 +279,7 @@ class RealmManager extends DatabaseStorage
 	 */
 	public function removeTrustedCa( string $realm, string $sub ): void
 	{
-		$statement = $this->pdo->prepare( 'DELETE FROM realm_trust WHERE realm = :realm AND trusted_ca_sub = :sub' );
+		$statement = $this->pdo->prepare( 'DELETE FROM `realm_trust` WHERE `realm` = :realm AND trusted_ca_sub = :sub' );
 		$statement->bindValue( 'realm', $realm );
 		$statement->bindValue( 'sub', $sub );
 		$statement->execute();
@@ -297,7 +297,7 @@ class RealmManager extends DatabaseStorage
 		$epoch = new DateTimeImmutable( '@0' );
 		$validitySeconds = $epoch->add( $defaultValidity )->getTimestamp();
 
-		$statement = $this->pdo->prepare( 'REPLACE INTO realm_signer (realm, signer_ca_sub, default_validity) VALUES (:realm, :sub, :validity_seconds)' );
+		$statement = $this->pdo->prepare( 'REPLACE INTO `realm_signer` (`realm`, `signer_ca_sub`, `default_validity_days`) VALUES (:realm, :sub, :validity_seconds)' );
 		$statement->bindValue( 'realm', $realm );
 		$statement->bindValue( 'sub', $sub );
 		$statement->bindValue( 'validity_seconds', $validitySeconds );
@@ -309,7 +309,7 @@ class RealmManager extends DatabaseStorage
 	 */
 	public function addServer( string $realm, string $serverName ): void
 	{
-		$statement = $this->pdo->prepare( 'INSERT INTO realm_server_name (realm, server_name) VALUES (:realm, :server_name)' );
+		$statement = $this->pdo->prepare( 'INSERT INTO `realm_server_name` (`realm`, `server_name`) VALUES (:realm, :server_name)' );
 		$statement->bindValue( 'realm', $realm );
 		$statement->bindValue( 'server_name', $serverName );
 		$statement->execute();
@@ -320,7 +320,7 @@ class RealmManager extends DatabaseStorage
 	 */
 	public function removeServer( string $realm, string $serverName ): void
 	{
-		$statement = $this->pdo->prepare( 'DELETE FROM realm_server_name WHERE realm = :realm AND server_name = :server_name' );
+		$statement = $this->pdo->prepare( 'DELETE FROM `realm_server_name` WHERE `realm` = :realm AND `server_name` = :server_name' );
 		$statement->bindValue( 'realm', $realm );
 		$statement->bindValue( 'server_name', $serverName );
 		$statement->execute();
