@@ -3,6 +3,7 @@ CREATE TABLE `realm_signer` (
 		`signer_ca_sub` varchar(127) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
 		`default_validity_days` int(11) NOT NULL,
 		PRIMARY KEY (`realm`)
+		FOREIGN KEY(realm) REFERENCES realm(realm)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `ca` (
