@@ -53,6 +53,8 @@ class Realm
 			$validity = $this->manager->getDefaultValidity( $this->name );
 		}
 		$expiry = (new DateTimeImmutable())->add( $validity );
+		// TODO check that $expiry is not too far in the future,
+		//	during some test we ended up with 88363-05-14 and MySQL didn't like
 		// TODO more generic method to get an arbitrary generator
 		$pkcs12 = $this->generateClientCertificate( $user, $expiry );
 		$anonymousIdentity = $user->getAnonymousUsername();

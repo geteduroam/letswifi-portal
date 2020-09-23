@@ -307,12 +307,12 @@ class RealmManager extends DatabaseStorage
 		}
 
 		$epoch = new DateTimeImmutable( '@0' );
-		$validitySeconds = $epoch->add( $defaultValidity )->getTimestamp();
+		$validityDays = $epoch->add( $defaultValidity )->getTimestamp() / 86400;
 
-		$statement = $this->pdo->prepare( 'REPLACE INTO `realm_signer` (`realm`, `signer_ca_sub`, `default_validity_days`) VALUES (:realm, :sub, :validity_seconds)' );
+		$statement = $this->pdo->prepare( 'REPLACE INTO `realm_signer` (`realm`, `signer_ca_sub`, `default_validity_days`) VALUES (:realm, :sub, :validity_days)' );
 		$statement->bindValue( 'realm', $realm );
 		$statement->bindValue( 'sub', $sub );
-		$statement->bindValue( 'validity_seconds', $validitySeconds );
+		$statement->bindValue( 'validity_days', $validityDays );
 		$statement->execute();
 	}
 
