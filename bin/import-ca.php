@@ -32,6 +32,11 @@ $certificates = array_map( function( string $certificate ){
 
 for( $i = count( $certificates ); $i--; $i >= 0 ){
 	$x509 = $certificates[$i];
+	$sub = (string) $x509->getSubject();
+	if ( null !== $realmManager->getCA( $sub ) ) {
+		echo "Skipping $sub (already imported)\n";
+		continue;
+	}
 	$key = null;
 	foreach( $keys as $candidateKey ) {
 		if ( $x509->checkPrivateKey( $candidateKey ) ) {
@@ -45,6 +50,6 @@ for( $i = count( $certificates ); $i--; $i >= 0 ){
 	}
 	echo ":\n";
 	echo 'i: ' . $x509->getIssuerSubject() . "\n";
-	echo 's: ' . $x509->getSubject() . "\n";
+	echo 's: ' . $sub . "\n";
 	$realmManager->importCA( $x509, $key );
 }
