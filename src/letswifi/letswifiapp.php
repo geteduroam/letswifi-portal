@@ -145,7 +145,7 @@ class LetsWifiApp
 		}
 		$codeExplain = static::HTTP_CODES[$code];
 		$message = $ex->getMessage();
-		if ( PHP_SAPI !== 'cli' ) {
+		if ( \PHP_SAPI !== 'cli' ) {
 			\header( 'Content-Type: text/plain', true, $code );
 		}
 		echo "${code} ${codeExplain}\r\n\r\n${message}\r\n";
