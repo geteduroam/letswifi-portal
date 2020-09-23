@@ -26,7 +26,7 @@ $generator = $realm->getUserEapConfig( $user );
 $payload = $generator->generate();
 
 // Hack, https://github.com/geteduroam/ionic-app/issues/31
-if ( $grant->getClientId() === '07dc14f4-62d1-400a-a25b-7acba9bd7773' ) {
+if ( $grant->getClientId() === 'f817fbcc-e8f4-459e-af75-0822d86ff47a' ) {
 	$payload = str_replace( '<ClientCertificate format="PKCS12" encoding="base64">', '<ClientCertificate>', $payload );
 }
 

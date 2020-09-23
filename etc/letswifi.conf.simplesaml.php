@@ -15,7 +15,7 @@
 	'pdo.dsn' => 'sqlite:' . dirname( __DIR__ ) . '/var/letswifi-dev.sqlite',
 	'pdo.username' => null,
 	'pdo.password' => null,
-	'oauth.clients' => (require __DIR__ . DIRECTORY_SEPARATOR . 'letswifi.clients.php') + [
+	'oauth.clients' => (require __DIR__ . DIRECTORY_SEPARATOR . 'clients.php') + [
 			[
 				'clientId' => 'no.fyrkat.oauth', 
 				'redirectUris' => ['http://[::1]/callback/'], 
