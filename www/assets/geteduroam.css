@@ -71,6 +71,7 @@ hr {
 	border-color: #f5f4f2;
 	margin: 2em;
 }
+
 .btn {
 	font-size: 1em;
 	border: none;
@@ -101,6 +102,41 @@ hr {
 	width: 100%;
 	box-sizing: border-box;
 	text-align: left;
+}
+
+#loginform {
+	font-size: 1.2em;
+}
+#loginform p span {
+	width: 25%;
+	display: inline-block;
+	text-align: right;
+	float: left;
+	padding-right: 2%;
+	position: relative;
+	top: -.15em;
+}
+#loginform p {
+	border-bottom: 1px solid gray;
+}
+#loginform p:last-child {
+	border: none;
+}
+
+#loginform input[type=text], #loginform input[type=password] {
+	background: none;
+	border: none;
+	color: inherit;
+	display: block;
+	font-size: inherit;
+	font-weight: bold;
+	margin: .7em 0;
+	width: 65%;
+	padding: 0;
+}
+
+#loginform *:focus {
+    outline: none;
 }
 
 body{
