@@ -101,12 +101,12 @@ class Realm
 		$dn = new DN( ['CN' => $commonName] );
 		$csr = CSR::generate( $dn, $serverKey );
 		$caCert = $this->getSigningCACertificate();
-		$serial = $this->logPreparedUserCredential( $caCert, $requester, $csr, $expiry );
+		$serial = $this->logPreparedServerCredential( $caCert, $requester, $csr, $expiry );
 
 		$caKey = $this->getSigningCAKey();
 		$conf = new OpenSSLConfig( OpenSSLConfig::X509_SERVER );
 		$serverCert = $csr->sign( $caCert, $caKey, $expiry, $conf, $serial );
-		$this->logCompletedUserCredential( $requester, $serverCert );
+		$this->logCompletedServerCredential( $requester, $serverCert );
 
 		return new PKCS12( $serverCert, $serverKey, [$caCert] );
 	}
@@ -148,9 +148,9 @@ class Realm
 		$this->manager->logCompletedCredential( $this->name, $user, $userCert, 'client' );
 	}
 
-	protected function logCompletedServerCredential( User $user, X509 $userCert ): void
+	protected function logCompletedServerCredential( User $user, X509 $serverCert ): void
 	{
-		$this->manager->logCompletedCredential( $this->name, $user, $userCert, 'server' );
+		$this->manager->logCompletedCredential( $this->name, $user, $serverCert, 'server' );
 	}
 
 	protected function getProfileData(): IProfileData
