@@ -126,7 +126,7 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 		return $result;
 	}
 
-	private static function checkIdP( ?string $expectedIdP, string $providedIdP ): void
+	private static function checkIdP( ?string $expectedIdP, ?string $providedIdP ): void
 	{
 		if ( null !== $expectedIdP && $expectedIdP !== $providedIdP ) {
 			throw new MismatchIdpException( $expectedIdP, $providedIdP );
