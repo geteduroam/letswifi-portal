@@ -28,7 +28,7 @@
 	],
 
 	# Mobile application
-	# https://github.com/geteduroam/ionic-app/pull
+	# https://github.com/geteduroam/ionic-app/pull/47
 	[
 		'clientId' => 'app.geteduroam.ionic',
 		'redirectUris' => [

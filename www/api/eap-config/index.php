@@ -22,9 +22,21 @@ $payload = $generator->generate();
 
 // Hack, https://github.com/geteduroam/ionic-app/issues/31
 if ( $grant->getClientId() === 'f817fbcc-e8f4-459e-af75-0822d86ff47a' ) {
-	$payload = str_replace( '<ClientCertificate format="PKCS12" encoding="base64">', '<ClientCertificate>', $payload );
-	// Allow the old app to behave badly
+	$payload = str_replace(
+			[
+				// The ionic app fails when 'format="PKCS12" encoding="base64" is present
+				'<ClientCertificate format="PKCS12" encoding="base64">',
+				// The ionic app fails if the ConsortiumOID is before the SSID
+				"\t\t\t<IEEE80211>\r\n\t\t\t\t<ConsortiumOID>001bc50460</ConsortiumOID>\r\n\t\t\t</IEEE80211>\r\n\t\t\t<IEEE80211>\r\n\t\t\t\t<SSID>eduroam</SSID>\r\n\t\t\t\t<MinRSNProto>CCMP</MinRSNProto>\r\n\t\t\t</IEEE80211>",
+			],
+			[
+				'<ClientCertificate>',
+				"\t\t\t<IEEE80211>\r\n\t\t\t\t<SSID>eduroam</SSID>\r\n\t\t\t\t<MinRSNProto>CCMP</MinRSNProto>\r\n\t\t\t</IEEE80211>\r\n\t\t\t<IEEE80211>\r\n\t\t\t\t<ConsortiumOID>001bc50460</ConsortiumOID>\r\n\t\t\t</IEEE80211>",
+			],
+			$payload
+		);
 }
+// Allow the old app to behave badly
 if ( in_array( $grant->getClientId(),
 		[
 			// List of clients that GET where they should POST
