@@ -30,7 +30,7 @@
 	# Mobile application
 	# https://github.com/geteduroam/ionic-app/pull
 	[
-		'client_id' => 'app.geteduroam.ionic',
+		'clientId' => 'app.geteduroam.ionic',
 		'redirectUris' => [
 			# Old client used http://localhost:8080 but we're not allowing that anymore
 			'http://[::1]/', 'http://127.0.0.1/',

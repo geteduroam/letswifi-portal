@@ -24,6 +24,14 @@ $payload = $generator->generate();
 if ( $grant->getClientId() === 'f817fbcc-e8f4-459e-af75-0822d86ff47a' ) {
 	$payload = str_replace( '<ClientCertificate format="PKCS12" encoding="base64">', '<ClientCertificate>', $payload );
 	// Allow the old app to behave badly
+}
+if ( in_array( $grant->getClientId(),
+		[
+			// List of clients that GET where they should POST
+			'app.geteduroam.win',
+			'f817fbcc-e8f4-459e-af75-0822d86ff47a',
+		], true )
+) {
 	$invalidRequest = false;
 }
 if ( $invalidRequest ) {

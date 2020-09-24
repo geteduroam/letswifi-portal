@@ -168,7 +168,7 @@ then
 fi
 
 window 'Please wait' "Fetching eap-config from $GENERATE_URL"
-curl --fail --silent --show-error -HAuthorization:"Bearer $access_token" "$GENERATE_URL"
+curl --fail --silent --show-error -HAuthorization:"Bearer $access_token" -d '' "$GENERATE_URL"
 
 printf '\n\n\n\n\n' >&2
 window 'Success' 'Successfully downloaded eap-config file'
