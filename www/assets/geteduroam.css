@@ -104,15 +104,12 @@ hr {
 	text-align: left;
 }
 
-#loginform {
-	font-size: 1.2em;
-}
 #loginform p span {
-	width: 25%;
+	width: 35%;
 	display: inline-block;
 	text-align: right;
 	float: left;
-	padding-right: 2%;
+	padding-right: 8%;
 	position: relative;
 	top: -.15em;
 }
@@ -131,7 +128,7 @@ hr {
 	font-size: inherit;
 	font-weight: bold;
 	margin: .7em 0;
-	width: 65%;
+	width: 50%;
 	padding: 0;
 }
 
