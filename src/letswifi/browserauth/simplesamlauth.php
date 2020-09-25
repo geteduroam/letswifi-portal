@@ -80,7 +80,11 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 			\assert( \is_array( $this->attributes ), 'SimpleSAMLphp always returns an array' );
 		}
 		if ( !\array_key_exists( $key, $this->attributes ) ) {
-			throw new OutOfBoundsException( "Attribute ${key} not present in SAML assertion" );
+			$shibKey = $this->attributeToShib( $key );
+			if ( !\array_key_exists( $shibKey, $this->attributes ) ) {
+				throw new OutOfBoundsException( "Attribute ${key} not present in SAML assertion" );
+			}
+			$key = $shibKey;
 		}
 		\assert( \is_array( $this->attributes[$key] ), 'SimpleSAMLphp always returns attributes as array' );
 		if ( 1 !== \count( $this->attributes[$key] ) ) {
@@ -126,10 +130,96 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 		return $result;
 	}
 
+	/**
+	 * Check that the provided IdP equals the expected IdP
+	 *
+	 * @throws MismatchIdpException If an IdP was expected, and the provided one doesn't match it
+	 */
 	private static function checkIdP( ?string $expectedIdP, ?string $providedIdP ): void
 	{
 		if ( null !== $expectedIdP && $expectedIdP !== $providedIdP ) {
 			throw new MismatchIdpException( $expectedIdP, $providedIdP );
+		}
+	}
+	/**
+	 * 
+	 */
+	private static function attributeToShib( string $key ): string
+	{
+		switch ($key) {
+			case 'uid': return 'urn:oid:0.9.2342.19200300.100.1.1';
+			case 'mail': return 'urn:oid:0.9.2342.19200300.100.1.3';
+			case 'manager': return 'urn:oid:0.9.2342.19200300.100.1.10';
+			case 'homePhone': return 'urn:oid:0.9.2342.19200300.100.1.20';
+			case 'homePostalAddress': return 'urn:oid:0.9.2342.19200300.100.1.39';
+			case 'mobile': return 'urn:oid:0.9.2342.19200300.100.1.41';
+			case 'pager': return 'urn:oid:0.9.2342.19200300.100.1.42';
+			case 'uniqueIdentifier': return 'urn:oid:0.9.2342.19200300.100.1.44';
+			case 'audio': return 'urn:oid:0.9.2342.19200300.100.1.55';
+			case 'jpegPhoto': return 'urn:oid:0.9.2342.19200300.100.1.60';
+			case 'labeledURI': return 'urn:oid:1.3.6.1.4.1.250.1.57';
+			case 'eduPersonAffiliation': return 'urn:oid:1.3.6.1.4.1.5923.1.1.1.1';
+			case 'eduPersonNickname': return 'urn:oid:1.3.6.1.4.1.5923.1.1.1.2';
+			case 'eduPersonOrgDN': return 'urn:oid:1.3.6.1.4.1.5923.1.1.1.3';
+			case 'eduPersonOrgUnitDN': return 'urn:oid:1.3.6.1.4.1.5923.1.1.1.4';
+			case 'eduPersonPrimaryAffiliation': return 'urn:oid:1.3.6.1.4.1.5923.1.1.1.5';
+			case 'eduPersonPrincipalName': return 'urn:oid:1.3.6.1.4.1.5923.1.1.1.6';
+			case 'eduPersonEntitlement': return 'urn:oid:1.3.6.1.4.1.5923.1.1.1.7';
+			case 'eduPersonPrimaryOrgUnitDN': return 'urn:oid:1.3.6.1.4.1.5923.1.1.1.8';
+			case 'eduPersonScopedAffiliation': return 'urn:oid:1.3.6.1.4.1.5923.1.1.1.9';
+			case 'eduPersonTargetedID': return 'urn:oid:1.3.6.1.4.1.5923.1.1.1.10';
+			case 'eduPersonAssurance': return 'urn:oid:1.3.6.1.4.1.5923.1.1.1.11';
+			case 'eduPersonPrincipalNamePrior': return 'urn:oid:1.3.6.1.4.1.5923.1.1.1.12';
+			case 'eduPersonUniqueId': return 'urn:oid:1.3.6.1.4.1.5923.1.1.1.13';
+			case 'eduPersonOrcid': return 'urn:oid:1.3.6.1.4.1.5923.1.1.1.16';
+			case 'isMemberOf': return 'urn:oid:1.3.6.1.4.1.5923.1.5.1.1';
+			case 'schacYearOfBirth': return 'urn:oid:1.3.6.1.4.1.25178.1.0.2.3';
+			case 'schacMotherTongue': return 'urn:oid:1.3.6.1.4.1.25178.1.2.1';
+			case 'schacGender': return 'urn:oid:1.3.6.1.4.1.25178.1.2.2';
+			case 'schacDateOfBirth': return 'urn:oid:1.3.6.1.4.1.25178.1.2.3';
+			case 'schacPlaceOfBirth': return 'urn:oid:1.3.6.1.4.1.25178.1.2.4';
+			case 'schacCountryOfCitizenship': return 'urn:oid:1.3.6.1.4.1.25178.1.2.5';
+			case 'schacSn1': return 'urn:oid:1.3.6.1.4.1.25178.1.2.6';
+			case 'schacSn2': return 'urn:oid:1.3.6.1.4.1.25178.1.2.7';
+			case 'schacPersonalTitle': return 'urn:oid:1.3.6.1.4.1.25178.1.2.8';
+			case 'schacHomeOrganization': return 'urn:oid:1.3.6.1.4.1.25178.1.2.9';
+			case 'schacHomeOrganizationType': return 'urn:oid:1.3.6.1.4.1.25178.1.2.10';
+			case 'schacCountryOfResidence': return 'urn:oid:1.3.6.1.4.1.25178.1.2.11';
+			case 'schacUserPresenceID': return 'urn:oid:1.3.6.1.4.1.25178.1.2.12';
+			case 'schacPersonalPosition': return 'urn:oid:1.3.6.1.4.1.25178.1.2.13';
+			case 'schacPersonalUniqueCode': return 'urn:oid:1.3.6.1.4.1.25178.1.2.14';
+			case 'schacPersonalUniqueID': return 'urn:oid:1.3.6.1.4.1.25178.1.2.15';
+			case 'schacExpiryDate': return 'urn:oid:1.3.6.1.4.1.25178.1.2.17';
+			case 'schacUserPrivateAttribute': return 'urn:oid:1.3.6.1.4.1.25178.1.2.18';
+			case 'schacUserStatus': return 'urn:oid:1.3.6.1.4.1.25178.1.2.19';
+			case 'schacProjectMembership': return 'urn:oid:1.3.6.1.4.1.25178.1.2.20';
+			case 'schacProjectSpecificRole': return 'urn:oid:1.3.6.1.4.1.25178.1.2.21';
+			case 'cn': return 'urn:oid:2.5.4.3';
+			case 'sn': return 'urn:oid:2.5.4.4';
+			case 'l': return 'urn:oid:2.5.4.7';
+			case 'st': return 'urn:oid:2.5.4.8';
+			case 'o': return 'urn:oid:2.5.4.10';
+			case 'ou': return 'urn:oid:2.5.4.11';
+			case 'title': return 'urn:oid:2.5.4.12';
+			case 'description': return 'urn:oid:2.5.4.13';
+			case 'postalAddress': return 'urn:oid:2.5.4.16';
+			case 'postalCode': return 'urn:oid:2.5.4.17';
+			case 'postOfficeBox': return 'urn:oid:2.5.4.18';
+			case 'telephoneNumber': return 'urn:oid:2.5.4.20';
+			case 'facsimileTelephoneNumber(defined': return 'urn:oid:2.5.4.23';
+			case 'seeAlso': return 'urn:oid:2.5.4.34';
+			case 'userPassword': return 'urn:oid:2.5.4.35';
+			case 'userCertificate': return 'urn:oid:2.5.4.36';
+			case 'givenName': return 'urn:oid:2.5.4.42';
+			case 'initials': return 'urn:oid:2.5.4.43';
+			case 'x500uniqueIdentifier': return 'urn:oid:2.5.4.45';
+			case 'preferredLanguage': return 'urn:oid:2.16.840.1.113730.3.1.39';
+			case 'userSMIMECertificate': return 'urn:oid:2.16.840.1.113730.3.1.40';
+			case 'displayName': return 'urn:oid:2.16.840.1.113730.3.1.241';
+			case 'street': return 'urn:oid::2.5.4.9';
+			case 'pairwise-id': return 'urn:oasis:names:tc:SAML:attribute:pairwise-id';
+			case 'subject-id': return 'urn:oasis:names:tc:SAML:attribute:subject-id';
+			default: return $key;
 		}
 	}
 }
