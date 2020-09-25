@@ -46,9 +46,9 @@ Navigate to https://example.com/simplesaml/module.php/saml/sp/metadata.php/defau
 
 ### Testing manually
 
-There is a shell script to initiate an OAuth flow
+There is a [shell script to initiate an OAuth flow](https://github.com/geteduroam/geteduroam-sh)
 
-	bin/letswifi-client.sh 'http://[::1]:1080' example.com >test.eap-config
+	./geteduroam.sh 'http://[::1]:1080' example.com >test.eap-config
 
 * If everything went fine, you get an eap-config XML payload in test.eap-config
 * You will see the public key material logged in the `tlscredential` SQL table
