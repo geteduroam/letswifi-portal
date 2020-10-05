@@ -125,7 +125,7 @@ hr {
 	border: none;
 	color: inherit;
 	display: block;
-	font-size: inherit;
+	font-size: max(1em, 16px); /* Webkit will automatically zoom if less than 16px */
 	font-weight: bold;
 	margin: .7em 0;
 	width: 50%;
@@ -181,7 +181,7 @@ h1 small {
 }
 html main {
 	margin: 0 auto;
-	width: 100%;
+	width: initial;
 }
 main h1:first-child {
 	margin-top: 0;
