@@ -8,7 +8,7 @@ require implode(DIRECTORY_SEPARATOR, [dirname(__DIR__, 3), 'src', '_autoload.php
 
 // The old ionic app uses GET here, so allow for now to keep compatibility
 // The current ionic app does this OK, so no issue link
-$invalidRequest = $_SERVER['REQUEST_METHOD'] !== 'POST';
+$usedGetButShouldHaveUsedPost = $_SERVER['REQUEST_METHOD'] !== 'POST';
 
 $app = new letswifi\LetsWifiApp();
 $app->registerExceptionHandler();
@@ -20,33 +20,58 @@ $user = new letswifi\realm\User( $grant->getSub() );
 $generator = $realm->getUserEapConfig( $user );
 $payload = $generator->generate();
 
-// Hack, https://github.com/geteduroam/ionic-app/issues/31
-if ( $grant->getClientId() === 'f817fbcc-e8f4-459e-af75-0822d86ff47a' ) {
+// Hack, fix clients that care about the ordering of <IEEE80211> elementsHack
+if ( in_array( $grant->getClientId(),
+	[
+		// https://github.com/geteduroam/ionic-app/issues/31
+		'f817fbcc-e8f4-459e-af75-0822d86ff47a',
+	], true )
+) {
 	$payload = str_replace(
-			[
-				// The ionic app fails when 'format="PKCS12" encoding="base64" is present
-				'<ClientCertificate format="PKCS12" encoding="base64">',
-				// The ionic app fails if the ConsortiumOID is before the SSID
-				"\t\t\t<IEEE80211>\r\n\t\t\t\t<ConsortiumOID>001bc50460</ConsortiumOID>\r\n\t\t\t</IEEE80211>\r\n\t\t\t<IEEE80211>\r\n\t\t\t\t<SSID>eduroam</SSID>\r\n\t\t\t\t<MinRSNProto>CCMP</MinRSNProto>\r\n\t\t\t</IEEE80211>",
-			],
-			[
-				'<ClientCertificate>',
-				"\t\t\t<IEEE80211>\r\n\t\t\t\t<SSID>eduroam</SSID>\r\n\t\t\t\t<MinRSNProto>CCMP</MinRSNProto>\r\n\t\t\t</IEEE80211>\r\n\t\t\t<IEEE80211>\r\n\t\t\t\t<ConsortiumOID>001bc50460</ConsortiumOID>\r\n\t\t\t</IEEE80211>",
-			],
+			// The ionic app fails if the ConsortiumOID is before the SSID
+			"\t\t\t<IEEE80211>\r\n\t\t\t\t<ConsortiumOID>001bc50460</ConsortiumOID>\r\n\t\t\t</IEEE80211>\r\n\t\t\t<IEEE80211>\r\n\t\t\t\t<SSID>eduroam</SSID>\r\n\t\t\t\t<MinRSNProto>CCMP</MinRSNProto>\r\n\t\t\t</IEEE80211>",
+			"\t\t\t<IEEE80211>\r\n\t\t\t\t<SSID>eduroam</SSID>\r\n\t\t\t\t<MinRSNProto>CCMP</MinRSNProto>\r\n\t\t\t</IEEE80211>\r\n\t\t\t<IEEE80211>\r\n\t\t\t\t<ConsortiumOID>001bc50460</ConsortiumOID>\r\n\t\t\t</IEEE80211>",
 			$payload
 		);
 }
-// Allow the old app to behave badly
+
+// Hack, fix clients that don't understand attributes in <ClientCertificate>
+if ( in_array( $grant->getClientId(),
+	[
+		// https://github.com/geteduroam/ionic-app/issues/51
+		'f817fbcc-e8f4-459e-af75-0822d86ff47a',
+
+		// https://github.com/geteduroam/ionic-app/issues/51
+		'app.geteduroam.ionic'
+	], true )
+) {
+	$payload = str_replace(
+			// The ionic app fails when 'format="PKCS12" encoding="base64" is present
+			'<ClientCertificate format="PKCS12" encoding="base64">',
+			'<ClientCertificate>',
+			$payload
+		);
+}
+
+// Hack, fix clients that GET where they should POST
 if ( in_array( $grant->getClientId(),
 		[
-			// List of clients that GET where they should POST
-			'app.geteduroam.win',
+			// https://github.com/geteduroam/ionic-app/issues/50
+			'app.geteduroam.ionic',
+
+			// https://github.com/geteduroam/ionic-app/issues/50
 			'f817fbcc-e8f4-459e-af75-0822d86ff47a',
+
+			// https://github.com/geteduroam/windows-app/issues/27, fixed in 61127d8
+			// but keep allowing while old clients are still in rotation
+			'app.geteduroam.win',
 		], true )
 ) {
-	$invalidRequest = false;
+	// These clients GET instead, so it's expected
+	$usedGetButShouldHaveUsedPost = false;
 }
-if ( $invalidRequest ) {
+
+if ( $usedGetButShouldHaveUsedPost ) {
 	header( 'Content-Type: text/plain', true, 405 );
 	die( "405 Method Not Allowed\r\n\r\nOnly POST is allowed for this resource\r\n" );
 }
