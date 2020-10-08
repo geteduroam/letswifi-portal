@@ -160,12 +160,21 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 			throw new MismatchIdpException( $expectedIdP, $providedIdP );
 		}
 	}
+
 	/**
-	 * 
+	 * Take a human readable attribute name and return the Shibboleth OID
+	 *
+	 * Useful for when the IdP is Shibboleth.
+	 *
+	 * If no match is found, it will just return the input.
+	 *
+	 * @param string $attr Attribute name (e.g. eduPersonPrincipalName)
+	 *
+	 * @return string Shibboleth OID
 	 */
-	private static function attributeToShib( string $key ): string
+	private static function attributeToShib( string $attr ): string
 	{
-		switch ($key) {
+		switch ( $attr ) {
 			case 'uid': return 'urn:oid:0.9.2342.19200300.100.1.1';
 			case 'mail': return 'urn:oid:0.9.2342.19200300.100.1.3';
 			case 'manager': return 'urn:oid:0.9.2342.19200300.100.1.10';
@@ -238,7 +247,7 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 			case 'street': return 'urn:oid::2.5.4.9';
 			case 'pairwise-id': return 'urn:oasis:names:tc:SAML:attribute:pairwise-id';
 			case 'subject-id': return 'urn:oasis:names:tc:SAML:attribute:subject-id';
-			default: return $key;
+			default: return $attr;
 		}
 	}
 }
