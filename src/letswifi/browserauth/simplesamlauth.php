@@ -22,6 +22,9 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 	/** @var ?string */
 	protected $samlIdp;
 
+	/** @var array<string> */
+	protected $idpList;
+
 	/**
 	 * @psalm-suppress PropertyNotSetInConstructor Yes it is!
 	 *
@@ -46,7 +49,12 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 		}
 		$authSource = \array_key_exists( 'authSource', $params ) ? $params['authSource'] : 'default-sp';
 		$userIdAttribute = \array_key_exists( 'userIdAttribute', $params ) ? $params['userIdAttribute'] : 'eduPersonPrincipalName';
-		$this->samlIdp = \array_key_exists( 'samlIdp', $params ) ? $params['samlIdp'] : null;
+		$samlIdp = \array_key_exists( 'samlIdp', $params ) ? $params['samlIdp'] : null;
+		$idpList = \array_key_exists( 'idpList', $params ) ? $params['idpList'] : [];
+		\assert( \is_string( $samlIdp ) || null === $samlIdp, 'samlIdp must be string if provided' );
+		\assert( \is_array( $idpList ), 'idpList must be array if provided' );
+		$this->samlIdp = $samlIdp;
+		$this->idpList = $idpList;
 		$this->as = new \SimpleSAML\Auth\Simple( $authSource );
 		$this->userIdAttribute = $userIdAttribute;
 	}
@@ -60,6 +68,17 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 		$params = [];
 		if ( null !== $this->samlIdp ) {
 			$params['saml:idp'] = $this->samlIdp;
+		}
+		if ( \count( $this->idpList ) > 0 ) {
+			$params['saml:IDPList'] = $this->idpList;
+			if ( null !== $this->samlIdp ) {
+				// SimpleSAMLphp does a local check of the IDPList and will throw an exception
+				// if the saml:IDPList param doesn't contain any IdP it knows about,
+				// which is silly because it should just forward this list to the proxy,
+				// not handle it by itself.
+				// This check is in the Auth\Source\SP::authenticate() function.
+				$params['saml:IDPList'][] = $this->samlIdp;
+			}
 		}
 
 		$this->as->requireAuth( $params );

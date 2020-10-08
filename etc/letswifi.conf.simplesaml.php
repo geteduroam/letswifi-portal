@@ -11,6 +11,13 @@
 					'userIdAttribute' => 'eduPersonPrincipalName',
 					'samlIdp' => 'https://idp-test.feide.no',
 				],
+			'demo.eduroam.nl' => [
+					'userIdAttribute' => 'eduPersonPrincipalName',
+					'samlIdp' => 'https://engine.test.surfconext.nl/authentication/idp/metadata',
+					'idpList' => [
+							'https://example.com'
+						],
+				],
 		],
 	'pdo.dsn' => 'sqlite:' . dirname( __DIR__ ) . '/var/letswifi-dev.sqlite',
 	'pdo.username' => null,
