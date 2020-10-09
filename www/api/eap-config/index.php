@@ -40,9 +40,6 @@ if ( in_array( $grant->getClientId(),
 	[
 		// https://github.com/geteduroam/ionic-app/issues/51
 		'f817fbcc-e8f4-459e-af75-0822d86ff47a',
-
-		// https://github.com/geteduroam/ionic-app/issues/51
-		'app.geteduroam.ionic'
 	], true )
 ) {
 	$payload = str_replace(
