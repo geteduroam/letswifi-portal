@@ -25,6 +25,7 @@ if (strlen($this->data['username']) > 0) {
 				<?php echo ($this->data['forceUsername']) ? ' disabled="disabled"' : ''; ?>
 				type="text"
 				name="username"
+				autocapitalize="none"
 				required
 				<?php if (!$this->data['forceUsername']) {
 					echo 'tabindex="1"';
