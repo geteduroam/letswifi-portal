@@ -14,9 +14,6 @@ use Throwable;
 
 class SimpleSAMLAuth implements BrowserAuthInterface
 {
-	/**
-	 * @psalm-suppress PropertyNotSetInConstructor Yes it is!
-	 */
 	protected $as;
 
 	/** @var ?string */
@@ -26,8 +23,6 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 	protected $idpList;
 
 	/**
-	 * @psalm-suppress PropertyNotSetInConstructor Yes it is!
-	 *
 	 * @var string
 	 */
 	private $userIdAttribute;
@@ -40,7 +35,7 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 	 * @psalm-suppress UnresolvableInclude We don't know where SimpleSAMLphp is
 	 * @suppress PhanUndeclaredClassMethod We don't have a dependency on SimpleSAMLphp
 	 *
-	 * @param array<string,string> $params
+	 * @param array<string,array<string>|string> $params
 	 */
 	public function __construct( array $params )
 	{
@@ -51,6 +46,7 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 		$userIdAttribute = \array_key_exists( 'userIdAttribute', $params ) ? $params['userIdAttribute'] : 'eduPersonPrincipalName';
 		$samlIdp = \array_key_exists( 'samlIdp', $params ) ? $params['samlIdp'] : null;
 		$idpList = \array_key_exists( 'idpList', $params ) ? $params['idpList'] : [];
+		\assert( \is_string( $userIdAttribute ), 'userIdAttribute must be string' );
 		\assert( \is_string( $samlIdp ) || null === $samlIdp, 'samlIdp must be string if provided' );
 		\assert( \is_array( $idpList ), 'idpList must be array if provided' );
 		$this->samlIdp = $samlIdp;
@@ -60,7 +56,6 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 	}
 
 	/**
-	 * @psalm-suppress UndefinedClass We don't have a dependency on SimpleSAMLphp
 	 * @suppress PhanUndeclaredClassMethod We don't have a dependency on SimpleSAMLphp
 	 */
 	public function requireAuth(): string
@@ -89,7 +84,6 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 	}
 
 	/**
-	 * @psalm-suppress UndefinedClass We don't have a dependency on SimpleSAMLphp
 	 * @suppress PhanUndeclaredClassMethod We don't have a dependency on SimpleSAMLphp
 	 */
 	public function getSingleAttributeValue( string $key ): string

@@ -31,7 +31,6 @@ class SimpleSAMLFeideAuth extends SimpleSAMLAuth
 	}
 
 	/**
-	 * @psalm-suppress UndefinedClass We don't have a dependency on SimpleSAMLphp
 	 * @suppress PhanUndeclaredClassMethod We don't have a dependency on SimpleSAMLphp
 	 */
 	public function requireAuth(): string

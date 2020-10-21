@@ -22,7 +22,7 @@ php-cs-fixer-v2.phar:
 	curl -sSLO https://cs.sensiolabs.org/download/php-cs-fixer-v2.phar || wget https://cs.sensiolabs.org/download/php-cs-fixer-v2.phar
 
 psalm.phar:
-	curl -sSLO https://github.com/vimeo/psalm/releases/download/3.16/psalm.phar || wget https://github.com/vimeo/psalm/releases/download/3.16/psalm.phar
+	curl -sSLO https://github.com/vimeo/psalm/releases/download/4.0.1/psalm.phar || wget https://github.com/vimeo/psalm/releases/download/4.0.1/psalm.phar
 
 phpunit-7.phar:
 	curl -sSLO https://phar.phpunit.de/phpunit-7.phar || wget https://phar.phpunit.de/phpunit-7.phar

@@ -30,7 +30,6 @@ class Config
 		}
 		/**
 		 * @psalm-suppress UnresolvableInclude
-		 * @psalm-suppress UndefinedThisPropertyFetch
 		 */
 		if ( \is_string( $conf ) ) {
 			$conf = require $conf;
