@@ -26,12 +26,18 @@ Initialize the SQLite database (should be possible to use other SQL databases, b
 	sqlite3 var/letswifi-dev.sqlite <sql/letswifi-dev.sqlite.sql
 
 
+Copy etc/letswifi.conf.simplesaml.php etc/letswifi.conf.php and change `userIdAttribute` to match your setup.
+
+
+Initialize required submodules
+
+        make submodule
+
+
 Create the realm with a default client certificate validity of one year
 
-	bin/init-db.php example.com 365
+	bin/add-realm.php example.com 365
 
-
-Copy etc/letswifi.conf.simplesaml.php etc/letswifi.conf.php and change `userIdAttribute` to match your setup.
 
 Write metadata of your SAML IdP to simplesamlphp/metadata/saml20-idp-remote.php
 
