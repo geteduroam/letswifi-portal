@@ -9,6 +9,8 @@
 
 namespace letswifi\EapConfig\Auth;
 
+use DateTimeInterface;
+
 use fyrkat\openssl\PKCS12;
 use fyrkat\openssl\X509;
 
@@ -95,6 +97,11 @@ class TlsAuthenticationMethod extends AbstractAuthenticationMethod
 				;
 
 		return $result;
+	}
+
+	public function getExpiry(): ?DateTimeInterface
+	{
+		return null === $this->pkcs12 ? null : $this->pkcs12->getX509()->getValidTo();
 	}
 
 	private static function e( string $s ): string

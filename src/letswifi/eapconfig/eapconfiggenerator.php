@@ -9,6 +9,8 @@
 
 namespace letswifi\EapConfig;
 
+use DateTimeInterface;
+
 use letswifi\EapConfig\Auth\IAuthenticationMethod;
 use letswifi\EapConfig\Profile\IProfileData;
 
@@ -49,6 +51,13 @@ class EapConfigGenerator
 		$result .= ''
 			. "\r\n" . '<EAPIdentityProviderList xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="eap-metadata.xsd">'
 			. "\r\n\t" . '<EAPIdentityProvider ID="' . static::e( $this->profileData->getRealm() ) . '" namespace="urn:RFC4282:realm" lang="' . static::e( $this->profileData->getLanguageCode() ) . '" version="1">'
+			;
+		if ( null !== $expiry = $this->getExpiry() ) {
+			$result .= ''
+				. "\r\n\t\t" . '<ValidUntil>' . $expiry->format( 'Y-m-d\\TH:i:s' ) . '</ValidUntil>'
+				;
+		}
+		$result .= ''
 			. "\r\n\t\t" . '<AuthenticationMethods>'
 			;
 		foreach ( $this->authenticationMethods as $authentication ) {
@@ -94,6 +103,21 @@ class EapConfigGenerator
 			. "\r\n\t" . '</EAPIdentityProvider>'
 			. "\r\n" . '</EAPIdentityProviderList>'
 			. "\r\n";
+
+		return $result;
+	}
+
+	public function getExpiry(): ?DateTimeInterface
+	{
+		$result = null;
+		foreach ( $this->authenticationMethods as $authentication ) {
+			$expiry = $authentication->getExpiry();
+			if ( null !== $expiry ) {
+				if ( null === $result || $result->getTimestamp() > $expiry->getTimestamp() ) {
+					$result = $expiry;
+				}
+			}
+		}
 
 		return $result;
 	}

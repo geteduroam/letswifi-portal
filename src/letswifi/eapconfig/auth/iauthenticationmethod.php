@@ -9,7 +9,11 @@
 
 namespace letswifi\EapConfig\Auth;
 
+use DateTimeInterface;
+
 interface IAuthenticationMethod
 {
 	public function generateEapConfigXml(): string;
+
+	public function getExpiry(): ?DateTimeInterface;
 }
