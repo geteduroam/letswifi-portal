@@ -80,12 +80,12 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 
 		static::checkIdP( $this->samlIdp, $this->as->getAuthData( 'saml:sp:IdP' ) );
 
-		if ( $this->userIdAttribute == "nameid" ) {
+		if ( 'nameid' === $this->userIdAttribute ) {
 			// in SimpleSAMLphp version 2 ->value should be replaced with ->getValue()
-			return $this->as->getAuthData('saml:sp:NameID')->value;
-		} else {
-			return $this->getSingleAttributeValue( $this->userIdAttribute );
+			return $this->as->getAuthData( 'saml:sp:NameID' )->value;
 		}
+
+		return $this->getSingleAttributeValue( $this->userIdAttribute );
 	}
 
 	/**
