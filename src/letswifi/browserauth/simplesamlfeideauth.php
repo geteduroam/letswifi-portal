@@ -9,6 +9,7 @@
 
 namespace letswifi\browserauth;
 
+use OutOfBoundsException;
 use Throwable;
 
 class SimpleSAMLFeideAuth extends SimpleSAMLAuth
@@ -44,16 +45,20 @@ class SimpleSAMLFeideAuth extends SimpleSAMLAuth
 			exit;
 		}
 
-		$result = parent::requireAuth();
+		$username = parent::requireAuth();
 
 		if ( isset( $this->feideHomeOrg ) ) {
-			$org = $this->getSingleAttributeValue( $this->feideOrgAttribute );
+			try {
+				$org = $this->getSingleAttributeValue( $this->feideOrgAttribute );
+			} catch ( OutOfBoundsException $_ ) {
+				$org = \strstr( $username, '@', true ) ?: '';
+			}
 			if ( $org !== $this->feideHomeOrg ) {
 				throw new MismatchFeideException( $this->feideHomeOrg, $org );
 			}
 		}
 
-		return $result;
+		return $username;
 	}
 
 	public function guessRealm( array $params ): ?string
