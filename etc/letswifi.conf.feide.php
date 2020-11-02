@@ -8,14 +8,14 @@
 	'realm.default' => 'demo.eduroam.no', // used when realm.selector = null
 	'realm.auth' => [
 			'uninett.geteduroam.no' => [
-					'userIdAttribute' => 'eduPersonPrincipalName',
+					'userIdAttribute' => 'eduPersonPrincipalName', // null for NameID
 					'homeOrgAttribute' => 'schacHomeOrganization',
 					'samlIdp' => 'https://idp-test.feide.no',
 					'feideHomeOrg' => 'uninett.no',
 					'feideHostname' => 'idp-test.feide.no',
 				],
 			'demo.eduroam.no' => [
-					'userIdAttribute' => 'eduPersonPrincipalName',
+					'userIdAttribute' => 'eduPersonPrincipalName', // null for NameID
 					'samlIdp' => 'https://idp-test.feide.no',
 				],
 		],

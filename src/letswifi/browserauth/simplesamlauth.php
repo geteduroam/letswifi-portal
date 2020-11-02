@@ -23,7 +23,9 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 	protected $idpList;
 
 	/**
-	 * @var string
+	 * The attribute containing the user ID, null for nameID
+	 *
+	 * @var ?string
 	 */
 	private $userIdAttribute;
 
@@ -43,7 +45,7 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 			require $params['autoloadInclude'];
 		}
 		$authSource = \array_key_exists( 'authSource', $params ) ? $params['authSource'] : 'default-sp';
-		$userIdAttribute = \array_key_exists( 'userIdAttribute', $params ) ? $params['userIdAttribute'] : 'eduPersonPrincipalName';
+		$userIdAttribute = \array_key_exists( 'userIdAttribute', $params ) ? $params['userIdAttribute'] : null;
 		$samlIdp = \array_key_exists( 'samlIdp', $params ) ? $params['samlIdp'] : null;
 		$idpList = \array_key_exists( 'idpList', $params ) ? $params['idpList'] : [];
 		\assert( \is_string( $userIdAttribute ), 'userIdAttribute must be string' );
@@ -80,7 +82,7 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 
 		static::checkIdP( $this->samlIdp, $this->as->getAuthData( 'saml:sp:IdP' ) );
 
-		if ( 'nameid' === $this->userIdAttribute ) {
+		if ( null === $this->userIdAttribute ) {
 			// in SimpleSAMLphp version 2 ->value should be replaced with ->getValue()
 			return $this->as->getAuthData( 'saml:sp:NameID' )->value;
 		}

@@ -8,11 +8,11 @@
 	'realm.default' => 'demo.eduroam.no', // used when realm.selector = null
 	'realm.auth' => [
 			'demo.eduroam.no' => [
-					'userIdAttribute' => 'eduPersonPrincipalName',
+					'userIdAttribute' => 'eduPersonPrincipalName', // null for NameID
 					'samlIdp' => 'https://idp-test.feide.no',
 				],
 			'demo.eduroam.nl' => [
-					'userIdAttribute' => 'eduPersonPrincipalName',
+					'userIdAttribute' => 'eduPersonPrincipalName', // null for NameID
 					'samlIdp' => 'https://engine.test.surfconext.nl/authentication/idp/metadata',
 					'idpList' => [
 							'https://example.com'
