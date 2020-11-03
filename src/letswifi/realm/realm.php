@@ -85,11 +85,6 @@ class Realm
 		return $result;
 	}
 
-	public function getSecretKey(): string
-	{
-		return $this->manager->getCurrentOAuthKey( $this->name );
-	}
-
 	/**
 	 * @param User              $requester  User requesting the certificate
 	 * @param string            $commonName Common name of the server certificate
@@ -119,9 +114,30 @@ class Realm
 		return $this->name;
 	}
 
-	protected function getTrustedServerNames(): array
+	public function getTrustedServerNames(): array
 	{
 		return $this->manager->getServerNames( $this->name );
+	}
+
+	public function getProfileData(): IProfileData
+	{
+		// TODO add helpdesk info, logo and such
+		return new EduroamProfileData( $this->getName() );
+	}
+
+	public function getSigningCACertificate(): X509
+	{
+		return $this->manager->getSignerCa( $this->name )->getX509();
+	}
+
+	public function getSecretKey(): string
+	{
+		return $this->manager->getCurrentOAuthKey( $this->name );
+	}
+
+	public function getSigningCAKey(): PrivateKey
+	{
+		return $this->manager->getSignerCa( $this->name )->getPrivateKey();
 	}
 
 	protected function createAuthenticationMethod( PKCS12 $pkcs12, string $anonymousIdentity ): TlsAuthenticationMethod
@@ -153,12 +169,6 @@ class Realm
 		$this->manager->logCompletedCredential( $this->name, $user, $serverCert, 'server' );
 	}
 
-	protected function getProfileData(): IProfileData
-	{
-		// TODO add helpdesk info, logo and such
-		return new EduroamProfileData( $this->getName() );
-	}
-
 	protected function generateClientCertificate( User $user, DateTimeInterface $expiry ): PKCS12
 	{
 		$userKey = new PrivateKey( new OpenSSLConfig( OpenSSLConfig::KEY_EC ) );
@@ -176,17 +186,7 @@ class Realm
 		return new PKCS12( $userCert, $userKey, [$caCert] );
 	}
 
-	protected function getSigningCACertificate(): X509
-	{
-		return $this->manager->getSignerCa( $this->name )->getX509();
-	}
-
-	protected function getSigningCAKey(): PrivateKey
-	{
-		return $this->manager->getSignerCa( $this->name )->getPrivateKey();
-	}
-
-	private function createUUID(): string
+	private static function createUUID(): string
 	{
 		$bytes = \random_bytes( 16 );
 		$bytes[6] = \chr( \ord( $bytes[6] ) & 0x0F | 0x40 );
