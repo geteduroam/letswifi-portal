@@ -77,9 +77,9 @@ class DatabaseStorage
 	}
 
 	/**
-	 * @param string                   $table
-	 * @param string                   $field
-	 * @param array<string,int|string> $where
+	 * @param string                                     $table
+	 * @param string                                     $field
+	 * @param array<string,array<int|string>|int|string> $where
 	 *
 	 * @return array<mixed>
 	 */
@@ -102,8 +102,8 @@ class DatabaseStorage
 	 * @suppress PhanPossiblyNonClassMethodCall Phan doesn't understand PDO
 	 * @suppress PhanPossiblyFalseTypeReturn Phan doesn't understand PDO
 	 *
-	 * @param string                   $table
-	 * @param array<string,int|string> $where
+	 * @param string                                     $table
+	 * @param array<string,array<int|string>|int|string> $where
 	 *
 	 * @return array<array<array-key,mixed>>
 	 */
@@ -112,20 +112,31 @@ class DatabaseStorage
 		static::safeString( $table, 'SQL table' );
 		$query = "SELECT * FROM `${table}`";
 		$first = true;
-		foreach ( $where as $key => $_ ) {
+		$bind = [];
+		foreach ( $where as $key => $value ) {
 			static::safeString( $key, 'SQL field name' );
+			if ( \is_array( $value ) ) {
+				foreach ( $value as $vkey => $vvalue ) {
+					$bind[$key . $vkey] = $vvalue;
+				}
+			} else {
+				$bind[$key] = $value;
+			}
 			$query .= $first ? ' WHERE ' : ' AND ';
 			$first = false;
 			switch ( $key ) {
 				case 'issued': $query .= '`issued` < :issued'; break;
 				case 'expires': $query .= '(`expires` > :expires OR `expires` IS NULL)'; break;
-				default: $query .= "`${key}` = :${key}";
+				default: $query .= \is_array( $value )
+					? "`${key}` IN (:" . $key . \implode( ",:${key}", \array_keys( $value ) ) . ')'
+					: "`${key}` = :${key}"
+					;
 			}
 		}
 
 		$this->pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 		$statement = $this->pdo->prepare( $query );
-		$statement->execute( $where );
+		$statement->execute( $bind );
 
 		return $statement->fetchAll();
 	}

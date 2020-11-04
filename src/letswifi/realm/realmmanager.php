@@ -41,15 +41,15 @@ class RealmManager extends DatabaseStorage
 	/**
 	 * Get realms that can be served by the specified server
 	 *
-	 * @param string $serverName
+	 * @param array<string> $serverNames
 	 *
 	 * @return array<Realm> All matching realms
 	 */
-	public function getRealmsByServerName( string $serverName ): array
+	public function getRealmsByServerName( array $serverNames ): array
 	{
 		return \array_map(
 				function( $r ) { return new Realm( $this, $r ); },
-				\array_unique( $this->getFieldsFromTableWhere( 'realm_server_name', 'realm', ['server_name' => $serverName] ) )
+				\array_unique( $this->getFieldsFromTableWhere( 'realm_server_name', 'realm', ['server_name' => $serverNames] ) )
 			);
 	}
 
