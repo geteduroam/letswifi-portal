@@ -7,10 +7,6 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-if (\strpos($_SERVER['QUERY_STRING'], '?')) {
-	\parse_str(\strtr($_SERVER['QUERY_STRING'], '?', '&'), $_GET);
-}
-
 require \implode(\DIRECTORY_SEPARATOR, [\dirname(__DIR__, 3), 'src', '_autoload.php']);
 
 // Fetch your code by running authorize/index.php

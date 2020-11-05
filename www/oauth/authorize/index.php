@@ -7,14 +7,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-if (\strpos($_SERVER['QUERY_STRING'], '?')) {
-	\parse_str(\strtr($_SERVER['QUERY_STRING'], '?', '&'), $_GET);
-}
+require \implode(\DIRECTORY_SEPARATOR, [\dirname(__DIR__, 3), 'src', '_autoload.php']);
 
 const POST_FIELD = 'approve';
 const POST_VALUE = 'yes';
-
-require \implode(\DIRECTORY_SEPARATOR, [\dirname(__DIR__, 3), 'src', '_autoload.php']);
 
 // Test this file by serving it on http://[::1]:1080/oauth/authorize/ and point your browser to:
 // http://[::1]:1080/oauth/authorize/?response_type=code&code_challenge_method=S256&scope=testscope&code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM&redirect_uri=http://[::1]:1234/callback/&client_id=no.fyrkat.oauth&state=0

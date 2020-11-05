@@ -7,10 +7,6 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-if (\strpos($_SERVER['QUERY_STRING'], '?')) {
-	\parse_str(\strtr($_SERVER['QUERY_STRING'], '?', '&'), $_GET);
-}
-
 require \implode(\DIRECTORY_SEPARATOR, [\dirname(__DIR__, 3), 'src', '_autoload.php']);
 
 // The old ionic app uses GET here, so allow for now to keep compatibility
@@ -32,45 +28,9 @@ $user = new letswifi\realm\User( $sub );
 $generator = $realm->getUserEapConfig( $user );
 $payload = $generator->generate();
 
-// Hack, fix clients that care about the ordering of <IEEE80211> elementsHack
-if ( \in_array( $grant->getClientId(),
-	[
-		// https://github.com/geteduroam/ionic-app/issues/31
-		'f817fbcc-e8f4-459e-af75-0822d86ff47a',
-	], true )
-) {
-	$payload = \str_replace(
-			// The ionic app fails if the ConsortiumOID is before the SSID
-			"\t\t\t<IEEE80211>\r\n\t\t\t\t<ConsortiumOID>001bc50460</ConsortiumOID>\r\n\t\t\t</IEEE80211>\r\n\t\t\t<IEEE80211>\r\n\t\t\t\t<SSID>eduroam</SSID>\r\n\t\t\t\t<MinRSNProto>CCMP</MinRSNProto>\r\n\t\t\t</IEEE80211>",
-			"\t\t\t<IEEE80211>\r\n\t\t\t\t<SSID>eduroam</SSID>\r\n\t\t\t\t<MinRSNProto>CCMP</MinRSNProto>\r\n\t\t\t</IEEE80211>\r\n\t\t\t<IEEE80211>\r\n\t\t\t\t<ConsortiumOID>001bc50460</ConsortiumOID>\r\n\t\t\t</IEEE80211>",
-			$payload
-		);
-}
-
-// Hack, fix clients that don't understand attributes in <ClientCertificate>
-if ( \in_array( $grant->getClientId(),
-	[
-		// https://github.com/geteduroam/ionic-app/issues/51
-		'f817fbcc-e8f4-459e-af75-0822d86ff47a',
-	], true )
-) {
-	$payload = \str_replace(
-			// The ionic app fails when 'format="PKCS12" encoding="base64" is present
-			'<ClientCertificate format="PKCS12" encoding="base64">',
-			'<ClientCertificate>',
-			$payload
-		);
-}
-
 // Hack, fix clients that GET where they should POST
 if ( \in_array( $grant->getClientId(),
 		[
-			// https://github.com/geteduroam/ionic-app/issues/50
-			'app.geteduroam.ionic',
-
-			// https://github.com/geteduroam/ionic-app/issues/50
-			'f817fbcc-e8f4-459e-af75-0822d86ff47a',
-
 			// https://github.com/geteduroam/windows-app/issues/27, fixed in 61127d8
 			// but keep allowing while old clients are still in rotation
 			'app.geteduroam.win',
