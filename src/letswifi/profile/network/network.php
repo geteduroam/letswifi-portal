@@ -7,13 +7,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-namespace letswifi\EapConfig\Auth;
+namespace letswifi\profile\network;
 
-use DateTimeInterface;
-
-interface IAuthenticationMethod
+interface Network
 {
 	public function generateEapConfigXml(): string;
-
-	public function getExpiry(): ?DateTimeInterface;
 }

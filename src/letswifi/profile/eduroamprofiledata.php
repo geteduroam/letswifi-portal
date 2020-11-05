@@ -7,11 +7,11 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-namespace letswifi\EapConfig\Profile;
+namespace letswifi\profile;
 
-use letswifi\EapConfig\CredentialApplicability\HS20CredentialApplicability;
-use letswifi\EapConfig\CredentialApplicability\ICredentialApplicability;
-use letswifi\EapConfig\CredentialApplicability\SSIDCredentialApplicability;
+use letswifi\profile\network\HS20Network;
+use letswifi\profile\network\Network;
+use letswifi\profile\network\SSIDNetwork;
 
 class EduroamProfileData extends AbstractProfileData
 {
@@ -21,13 +21,13 @@ class EduroamProfileData extends AbstractProfileData
 	}
 
 	/**
-	 * @return array<ICredentialApplicability>
+	 * @return array<Network>
 	 */
-	public function getCredentialApplicabilities(): array
+	public function getNetworks(): array
 	{
-		$result = parent::getCredentialApplicabilities();
-		$result[] = new HS20CredentialApplicability( '001bc50460' );
-		$result[] = new SSIDCredentialApplicability( 'eduroam' );
+		$result = parent::getNetworks();
+		$result[] = new HS20Network( '001bc50460' );
+		$result[] = new SSIDNetwork( 'eduroam' );
 
 		return $result;
 	}

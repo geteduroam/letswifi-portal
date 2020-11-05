@@ -7,14 +7,14 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-namespace letswifi\EapConfig\Auth;
+namespace letswifi\profile\auth;
 
 use DateTimeInterface;
 
 use fyrkat\openssl\PKCS12;
 use fyrkat\openssl\X509;
 
-class TlsAuthenticationMethod extends AbstractAuthenticationMethod
+class TlsAuth extends AbstractAuth
 {
 	/** @var ?PKCS12 */
 	private $pkcs12;

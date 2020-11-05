@@ -7,12 +7,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-namespace letswifi\EapConfig;
+namespace letswifi\profile\generator;
 
 use DateTimeInterface;
 
-use letswifi\EapConfig\Auth\IAuthenticationMethod;
-use letswifi\EapConfig\Profile\IProfileData;
+use letswifi\profile\auth\Auth;
+use letswifi\profile\IProfileData;
 
 class EapConfigGenerator
 {
@@ -26,15 +26,15 @@ class EapConfigGenerator
 	/**
 	 * Possible authentication methods
 	 *
-	 * @var array<IAuthenticationMethod>
+	 * @var array<Auth>
 	 */
 	protected $authenticationMethods;
 
 	/**
 	 * Create a new generator.
 	 *
-	 * @param IProfileData                 $profileData           Profile data
-	 * @param array<IAuthenticationMethod> $authenticationMethods Authentication methods
+	 * @param IProfileData $profileData           Profile data
+	 * @param array<Auth>  $authenticationMethods Authentication methods
 	 */
 	public function __construct( IProfileData $profileData, array $authenticationMethods )
 	{
@@ -67,7 +67,7 @@ class EapConfigGenerator
 			. "\r\n\t\t" . '</AuthenticationMethods>'
 			. "\r\n\t\t" . '<CredentialApplicability>'
 			;
-		foreach ( $this->profileData->getCredentialApplicabilities() as $credentialApplicability ) {
+		foreach ( $this->profileData->getNetworks() as $credentialApplicability ) {
 			$result .= $credentialApplicability->generateEapConfigXml();
 		}
 		$result .= ''

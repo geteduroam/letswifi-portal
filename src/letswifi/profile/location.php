@@ -7,7 +7,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-namespace letswifi\EapConfig\Profile;
+namespace letswifi\profile;
 
 class Location
 {

@@ -7,9 +7,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-namespace letswifi\EapConfig\CredentialApplicability;
+namespace letswifi\profile\network;
 
-class HS20CredentialApplicability implements ICredentialApplicability
+class HS20Network implements Network
 {
 	/** @var string */
 	private $consortiumOID;

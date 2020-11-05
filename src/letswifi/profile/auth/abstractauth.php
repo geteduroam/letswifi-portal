@@ -7,13 +7,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-namespace letswifi\EapConfig\Auth;
+namespace letswifi\profile\auth;
 
 use fyrkat\openssl\X509;
 
 use InvalidArgumentException;
 
-abstract class AbstractAuthenticationMethod implements IAuthenticationMethod
+abstract class AbstractAuth implements Auth
 {
 	/** @var array<X509> */
 	private $caCertificates;

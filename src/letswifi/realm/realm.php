@@ -20,10 +20,12 @@ use fyrkat\openssl\PKCS12;
 use fyrkat\openssl\PrivateKey;
 use fyrkat\openssl\X509;
 
-use letswifi\EapConfig\Auth\TlsAuthenticationMethod;
-use letswifi\EapConfig\EapConfigGenerator;
-use letswifi\EapConfig\Profile\EduroamProfileData;
-use letswifi\EapConfig\Profile\IProfileData;
+use letswifi\profile\auth\TlsAuth;
+
+use letswifi\profile\EduroamProfileData;
+use letswifi\profile\generator\EapConfigGenerator;
+
+use letswifi\profile\IProfileData;
 
 class Realm
 {
@@ -140,13 +142,13 @@ class Realm
 		return $this->manager->getSignerCa( $this->name )->getPrivateKey();
 	}
 
-	protected function createAuthenticationMethod( PKCS12 $pkcs12, string $anonymousIdentity ): TlsAuthenticationMethod
+	protected function createAuthenticationMethod( PKCS12 $pkcs12, string $anonymousIdentity ): TlsAuth
 	{
 		$caCertificates = $this->getTrustedCaCertificates();
 		$serverNames = $this->getTrustedServerNames();
 		$anonymousIdentity = \rawurldecode( \strstr( $anonymousIdentity, '@', true ) ?: $anonymousIdentity ) . '@' . \rawurldecode( $this->getName() );
 
-		return new TlsAuthenticationMethod( $caCertificates, $serverNames, $anonymousIdentity, $pkcs12 );
+		return new TlsAuth( $caCertificates, $serverNames, $anonymousIdentity, $pkcs12 );
 	}
 
 	protected function logPreparedUserCredential( X509 $caCert, User $requester, CSR $csr, DateTimeInterface $expiry ): int

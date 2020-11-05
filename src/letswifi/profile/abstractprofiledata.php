@@ -7,9 +7,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-namespace letswifi\EapConfig\Profile;
+namespace letswifi\profile;
 
-use letswifi\EapConfig\CredentialApplicability\ICredentialApplicability;
+use letswifi\profile\network\Network;
 
 class AbstractProfileData implements IProfileData
 {
@@ -44,9 +44,9 @@ class AbstractProfileData implements IProfileData
 	}
 
 	/**
-	 * @return array<ICredentialApplicability>
+	 * @return array<Network>
 	 */
-	public function getCredentialApplicabilities(): array
+	public function getNetworks(): array
 	{
 		return $this->data['credentialApplicability'] ?? [];
 	}

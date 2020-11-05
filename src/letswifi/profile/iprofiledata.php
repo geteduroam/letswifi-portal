@@ -7,9 +7,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-namespace letswifi\EapConfig\Profile;
+namespace letswifi\profile;
 
-use letswifi\EapConfig\CredentialApplicability\ICredentialApplicability;
+use letswifi\profile\network\Network;
 
 interface IProfileData
 {
@@ -18,9 +18,9 @@ interface IProfileData
 	public function getLanguageCode(): string;
 
 	/**
-	 * @return array<ICredentialApplicability>
+	 * @return array<Network>
 	 */
-	public function getCredentialApplicabilities(): array;
+	public function getNetworks(): array;
 
 	public function getDisplayName(): string;
 

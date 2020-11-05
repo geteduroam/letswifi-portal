@@ -7,9 +7,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-namespace letswifi\EapConfig\CredentialApplicability;
+namespace letswifi\profile\auth;
 
-interface ICredentialApplicability
+use DateTimeInterface;
+
+interface Auth
 {
 	public function generateEapConfigXml(): string;
+
+	public function getExpiry(): ?DateTimeInterface;
 }

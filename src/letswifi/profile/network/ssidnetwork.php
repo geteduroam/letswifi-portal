@@ -7,9 +7,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-namespace letswifi\EapConfig\CredentialApplicability;
+namespace letswifi\profile\network;
 
-class SSIDCredentialApplicability implements ICredentialApplicability
+class SSIDNetwork implements Network
 {
 	/** @var string */
 	private $ssid;
