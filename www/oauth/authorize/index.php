@@ -41,11 +41,13 @@ try {
 } catch ( letswifi\browserauth\MismatchIdpException $e ) {
 	$guessRealm = $app->guessRealm( $realm );
 
-	if ( null !== $guessRealm ) {
-		$switchRealmParams = $_GET + ['realm' => $guessRealm->getName()];
-	}
+	$switchRealmParams = null === $guessRealm
+		? $_GET
+		: $_GET + ['realm' => $guessRealm->getName()]
+		;
+
 	try {
-		$guessUser = $app->getUserFromBrowserSession( $guessRealm );
+		$guessUser = $guessRealm ? $app->getUserFromBrowserSession( $guessRealm ) : null;
 	} catch ( letswifi\browserauth\MismatchIdpException $e ) {
 		$guessUser = null;
 	}

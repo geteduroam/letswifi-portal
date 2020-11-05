@@ -1,7 +1,9 @@
 <?xml version="1.0"?>
 <psalm totallyTyped="false" useDocblockTypes="true">
 	<projectFiles>
+		<directory name="bin"/>
 		<directory name="src"/>
+		<directory name="www"/>
 		<ignoreFiles>
 			<directory name="vendor"/>
 		</ignoreFiles>
@@ -12,5 +14,11 @@
 				<file name="src/letswifi/browserauth/simplesamlauth.php"/>
 			</errorLevel>
 		</MissingPropertyType>
+		<UnresolvableInclude>
+			<errorLevel type="suppress">
+				<directory name="bin"/>
+				<directory name="www"/>
+			</errorLevel>
+		</UnresolvableInclude>
 	</issueHandlers>
 </psalm>

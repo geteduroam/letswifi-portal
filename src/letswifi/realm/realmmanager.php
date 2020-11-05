@@ -175,9 +175,6 @@ class RealmManager extends DatabaseStorage
 		return $this->getEntriesFromTableWhere( 'realm_key', ['realm' => $realm, 'issued' => $now, 'expires' => $now]);
 	}
 
-	/**
-	 * @internal
-	 */
 	public function getCA( string $sub ): ?CA
 	{
 		$entry = $this->getSingleEntryFromTableWhere( 'ca', ['sub' => $sub] );

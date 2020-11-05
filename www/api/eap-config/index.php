@@ -16,7 +16,12 @@ $realm = $app->getRealm();
 $oauth = $app->getOAuthHandler( $realm );
 $token = $oauth->getAccessTokenFromRequest( 'eap-metadata' );
 $grant = $token->getGrant();
-$user = new letswifi\realm\User( $grant->getSub() );
+$sub = $grant->getSub();
+if ( null === $sub ) {
+	header( 'Content-Type: text/plain', true, 403 );
+	die( "403 Forbidden\r\n\r\nNo user subject available\r\n" );
+}
+$user = new letswifi\realm\User( $sub );
 $generator = $realm->getUserEapConfig( $user );
 $payload = $generator->generate();
 
