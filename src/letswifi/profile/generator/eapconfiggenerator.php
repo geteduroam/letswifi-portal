@@ -16,41 +16,14 @@ use letswifi\profile\auth\AbstractAuth;
 use letswifi\profile\auth\Auth;
 
 use letswifi\profile\Helpdesk;
-use letswifi\profile\IProfileData;
 use letswifi\profile\Location;
 
 use letswifi\profile\network\HS20Network;
 use letswifi\profile\network\Network;
 use letswifi\profile\network\SSIDNetwork;
 
-class EapConfigGenerator
+class EapConfigGenerator extends AbstractGenerator
 {
-	/**
-	 * Data about the institution
-	 *
-	 * @var IProfileData
-	 */
-	protected $profileData;
-
-	/**
-	 * Possible authentication methods
-	 *
-	 * @var array<Auth>
-	 */
-	protected $authenticationMethods;
-
-	/**
-	 * Create a new generator.
-	 *
-	 * @param IProfileData $profileData           Profile data
-	 * @param array<Auth>  $authenticationMethods Authentication methods
-	 */
-	public function __construct( IProfileData $profileData, array $authenticationMethods )
-	{
-		$this->profileData = $profileData;
-		$this->authenticationMethods = $authenticationMethods;
-	}
-
 	/**
 	 * Generate the eap-config profile
 	 */
@@ -276,10 +249,5 @@ class EapConfigGenerator
 			. "\r\n<Longitude>${lon}</Longitude>"
 			. "\r\n</ProviderLocation>"
 			;
-	}
-
-	private static function e( string $s ): string
-	{
-		return \htmlspecialchars( $s, \ENT_QUOTES, 'UTF-8' );
 	}
 }

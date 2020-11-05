@@ -252,7 +252,11 @@ return [
 
 	// Add any issue types (such as `'PhanUndeclaredMethod'`)
 	// to this black-list to inhibit them from being reported.
-	'suppress_issue_types' => [],
+	'suppress_issue_types' => [
+		// Phan has been a bit too strict regarding PHP 8.
+		// It should be okay for closures I think.
+		'PhanParamNameIndicatingUnusedInClosure',
+	],
 
 	// A regular expression to match files to be excluded
 	// from parsing and analysis and will not be read at all.
