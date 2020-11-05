@@ -1,10 +1,17 @@
 <?php declare(strict_types=1);
-// Hack, https://github.com/geteduroam/ionic-app/issues/9
-if (strpos($_SERVER['QUERY_STRING'], '?')) {
-    parse_str(strtr($_SERVER['QUERY_STRING'],'?','&'), $_GET);
+
+/*
+ * This file is part of letswifi; a system for easy eduroam device enrollment
+ *
+ * Copyright: 2018-2020, Jørn Åne de Jong, Uninett AS <jorn.dejong@uninett.no>
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+if (\strpos($_SERVER['QUERY_STRING'], '?')) {
+	\parse_str(\strtr($_SERVER['QUERY_STRING'], '?', '&'), $_GET);
 }
 
-require implode(DIRECTORY_SEPARATOR, [dirname(__DIR__, 3), 'src', '_autoload.php']);
+require \implode(\DIRECTORY_SEPARATOR, [\dirname(__DIR__, 3), 'src', '_autoload.php']);
 
 // Fetch your code by running authorize/index.php
 // export code=…

@@ -1,13 +1,20 @@
 <?php declare(strict_types=1);
-// Hack, https://github.com/geteduroam/ionic-app/issues/9
-if (strpos($_SERVER['QUERY_STRING'], '?')) {
-    parse_str(strtr($_SERVER['QUERY_STRING'],'?','&'), $_GET);
+
+/*
+ * This file is part of letswifi; a system for easy eduroam device enrollment
+ *
+ * Copyright: 2018-2020, Jørn Åne de Jong, Uninett AS <jorn.dejong@uninett.no>
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+if (\strpos($_SERVER['QUERY_STRING'], '?')) {
+	\parse_str(\strtr($_SERVER['QUERY_STRING'], '?', '&'), $_GET);
 }
 
 const POST_FIELD = 'approve';
 const POST_VALUE = 'yes';
 
-require implode(DIRECTORY_SEPARATOR, [dirname(__DIR__, 3), 'src', '_autoload.php']);
+require \implode(\DIRECTORY_SEPARATOR, [\dirname(__DIR__, 3), 'src', '_autoload.php']);
 
 // Test this file by serving it on http://[::1]:1080/oauth/authorize/ and point your browser to:
 // http://[::1]:1080/oauth/authorize/?response_type=code&code_challenge_method=S256&scope=testscope&code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM&redirect_uri=http://[::1]:1234/callback/&client_id=no.fyrkat.oauth&state=0
@@ -23,11 +30,11 @@ $browserAuth = $app->getBrowserAuthenticator( $realm );
 try {
 	$user = $app->getUserFromBrowserSession( $realm );
 
-	if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
-		$oauth->handleAuthorizePostRequest( $user->getUserID(), $_POST[POST_FIELD] === POST_VALUE );
+	if ( 'POST' === $_SERVER['REQUEST_METHOD'] ) {
+		$oauth->handleAuthorizePostRequest( $user->getUserID(), POST_VALUE === $_POST[POST_FIELD] );
 
 		// handler should never return, this code should be unreachable
-		header( 'Content-Type: text/plain' );
+		\header( 'Content-Type: text/plain' );
 		die( "500 Internal Server Error\r\n\r\nServer error: OAuth POST request was not handled\r\n" );
 	}
 
@@ -58,7 +65,7 @@ try {
 		'guessUserId' => $guessUser ? $guessUser->getUserId() : null,
 		'logoutUrl' => $browserAuth->getLogoutUrl(),
 
-		'switchRealmLink' => $guessRealm ? '?' . http_build_query( $switchRealmParams ) : null,
+		'switchRealmLink' => $guessRealm ? '?' . \http_build_query( $switchRealmParams ) : null,
 		'switchUserLink' => $browserAuth->getLogoutUrl(),
 		'refuseRequestLink' => $oauth->getRedirectUrlForRefusedAuthorizeRequest(),
 	], 'realmchooser' );
