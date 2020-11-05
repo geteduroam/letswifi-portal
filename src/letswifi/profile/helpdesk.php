@@ -27,25 +27,18 @@ class Helpdesk
 		$this->phone = $phone;
 	}
 
-	public function generateEapConfigXml(): string
+	public function getMail(): ?string
 	{
-		$result = "\r\n\t\t\t<Helpdesk>";
-		if ( null !== $this->mail ) {
-			$result .= "\r\n\t\t\t\t<EmailAddress>" . static::e( $this->mail ) . '</EmailAddress>';
-		}
-		if ( null !== $this->web ) {
-			$result .= "\r\n\t\t\t\t<WebAddress>" . static::e( $this->web ) . '</WebAddress>';
-		}
-		if ( null !== $this->phone ) {
-			$result .= "\r\n\t\t\t\t<Phone>" . static::e( $this->phone ) . '</Phone>';
-		}
-		$result .= "\r\n\t\t\t</Helpdesk>";
-
-		return $result;
+		return $this->mail;
 	}
 
-	private static function e( string $s ): string
+	public function getWeb(): ?string
 	{
-		return \htmlspecialchars( $s, \ENT_QUOTES, 'UTF-8' );
+		return $this->web;
+	}
+
+	public function getPhone(): ?string
+	{
+		return $this->phone;
 	}
 }

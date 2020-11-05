@@ -40,72 +40,23 @@ class TlsAuth extends AbstractAuth
 		$this->passphrase = $passphrase ?? 'pkcs12';
 	}
 
-	/**
-	 * Generate EAP config data for EAP-TLS authentication
-	 *
-	 * @return string XML portion for wifi and certificates, to be used in a EAP config file
-	 */
-	public function generateEapConfigXml(): string
-	{
-		$result = '';
-		$result .= ''
-			. "\r\n\t\t\t" . '<AuthenticationMethod>'
-			. "\r\n\t\t\t\t" . '<EAPMethod>'
-			. "\r\n\t\t\t\t\t" . '<Type>13</Type>'
-			. "\r\n\t\t\t\t" . '</EAPMethod>'
-			. "\r\n\t\t\t\t" . '<ServerSideCredential>'
-			;
-		foreach ( $this->getServerCACertificates() as $ca ) {
-			$result .= ''
-				. "\r\n\t\t\t\t\t" . '<CA format="X.509" encoding="base64">' . static::pemToBase64Der( $ca->getX509Pem() ) . '</CA>'
-				;
-		}
-		foreach ( $this->getServerNames() as $serverName ) {
-			$result .= ''
-				. "\r\n\t\t\t\t\t" . '<ServerID>' . static::e( $serverName ) . '</ServerID>'
-				;
-		}
-		$result .= ''
-			. "\r\n\t\t\t\t" . '</ServerSideCredential>'
-			;
-		if ( null === $this->pkcs12 ) {
-			$result .= ''
-				. "\r\n\t\t\t\t" . '<ClientSideCredential/>'
-				;
-		} else {
-			$result .= ''
-				. "\r\n\t\t\t\t" . '<ClientSideCredential>'
-				;
-			if ( null !== $this->identity ) {
-				// https://github.com/GEANT/CAT/blob/v2.0.3/devices/xml/eap-metadata.xsd
-				// The schema specifies <OuterIdentity>
-				// https://tools.ietf.org/html/draft-winter-opsawg-eap-metadata-02
-				// Expired draft specifices <AnonymousIdentity>
-				// cat.eduroam.org uses <OuterIdentity>, so we do too
-				$result .= ''
-					. "\r\n\t\t\t\t\t" . '<OuterIdentity>' . static::e( $this->identity ) . '</OuterIdentity>'
-					;
-			}
-			$result .= ''
-				. "\r\n\t\t\t\t" . '<ClientCertificate format="PKCS12" encoding="base64">' . \base64_encode( $this->pkcs12->getPKCS12Bytes( $this->passphrase ) ) . '</ClientCertificate>'
-				. "\r\n\t\t\t\t" . '<Passphrase>' . static::e( $this->passphrase ) . '</Passphrase>'
-				. "\r\n\t\t\t\t" . '</ClientSideCredential>'
-				;
-		}
-		$result .= ''
-				. "\r\n\t\t\t" . '</AuthenticationMethod>'
-				;
-
-		return $result;
-	}
-
 	public function getExpiry(): ?DateTimeInterface
 	{
 		return null === $this->pkcs12 ? null : $this->pkcs12->getX509()->getValidTo();
 	}
 
-	private static function e( string $s ): string
+	public function getPKCS12(): ?PKCS12
 	{
-		return \htmlspecialchars( $s, \ENT_QUOTES, 'UTF-8' );
+		return $this->pkcs12;
+	}
+
+	public function getPassphrase(): string
+	{
+		return $this->passphrase;
+	}
+
+	public function getIdentity(): ?string
+	{
+		return $this->identity;
 	}
 }

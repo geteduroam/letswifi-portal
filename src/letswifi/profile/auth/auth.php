@@ -13,7 +13,5 @@ use DateTimeInterface;
 
 interface Auth
 {
-	public function generateEapConfigXml(): string;
-
 	public function getExpiry(): ?DateTimeInterface;
 }

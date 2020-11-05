@@ -54,7 +54,7 @@ abstract class AbstractAuth implements Auth
 	 *
 	 * @return string base64 encoded DER certificate
 	 */
-	protected static function pemToBase64Der( string $pem ): string
+	public static function pemToBase64Der( string $pem ): string
 	{
 		$pem = \trim( $pem );
 		if ( '-----BEGIN CERTIFICATE-----' !== \substr( $pem, 0, 27 ) || '-----END CERTIFICATE-----' !== \substr( $pem, -25 ) ) {

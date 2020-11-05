@@ -11,5 +11,4 @@ namespace letswifi\profile\network;
 
 interface Network
 {
-	public function generateEapConfigXml(): string;
 }

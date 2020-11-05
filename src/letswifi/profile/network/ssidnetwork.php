@@ -23,18 +23,13 @@ class SSIDNetwork implements Network
 		$this->minRSNProto = $minRSNProto;
 	}
 
-	public function generateEapConfigXml(): string
+	public function getSSID(): string
 	{
-		return ''
-			. "\r\n\t\t\t" . '<IEEE80211>'
-			. "\r\n\t\t\t\t" . '<SSID>' . static::e( $this->ssid ) . '</SSID>'
-			. "\r\n\t\t\t\t" . '<MinRSNProto>' . static::e( $this->minRSNProto ) . '</MinRSNProto>'
-			. "\r\n\t\t\t" . '</IEEE80211>'
-			;
+		return $this->ssid;
 	}
 
-	private static function e( string $s ): string
+	public function getMinRSNProto(): string
 	{
-		return \htmlspecialchars( $s, \ENT_QUOTES, 'UTF-8' );
+		return $this->minRSNProto;
 	}
 }

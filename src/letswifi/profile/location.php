@@ -23,13 +23,13 @@ class Location
 		$this->lon = $lon;
 	}
 
-	public function generateEapConfigXml(): string
+	public function getLatitude(): float
 	{
-		return ''
-			. "\r\n<ProviderLocation>"
-			. "\r\n<Longitude>{$this->lon}</Longitude>"
-			. "\r\n<Latitude>{$this->lat}</Latitude>"
-			. "\r\n</ProviderLocation>"
-			;
+		return $this->lat;
+	}
+
+	public function getLongitude(): float
+	{
+		return $this->lon;
 	}
 }

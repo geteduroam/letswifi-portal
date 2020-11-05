@@ -19,17 +19,8 @@ class HS20Network implements Network
 		$this->consortiumOID = $consortiumOID;
 	}
 
-	public function generateEapConfigXml(): string
+	public function getConsortiumOID(): string
 	{
-		return ''
-			. "\r\n\t\t\t" . '<IEEE80211>'
-			. "\r\n\t\t\t\t" . '<ConsortiumOID>' . static::e( $this->consortiumOID ) . '</ConsortiumOID>'
-			. "\r\n\t\t\t" . '</IEEE80211>'
-			;
-	}
-
-	private static function e( string $s ): string
-	{
-		return \htmlspecialchars( $s, \ENT_QUOTES, 'UTF-8' );
+		return $this->consortiumOID;
 	}
 }
