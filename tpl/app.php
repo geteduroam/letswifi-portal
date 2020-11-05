@@ -11,7 +11,7 @@
 	<hr>
 	<details>
 		<summary>Options for other platforms and professional users</summary>
-		<p class="apps"><a href="/credentials/" class="btn btn-default">Generate a certificate for manual use</a></p>
+		<p class="apps"><a href="<?=$this->e($manual['url'])?>" class="btn btn-default">Generate a certificate for manual use</a></p>
 	</details>
 </main>
 <?php $this->stop('content') ?>

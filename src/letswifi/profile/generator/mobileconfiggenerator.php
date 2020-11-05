@@ -63,7 +63,6 @@ class MobileConfigGenerator extends AbstractGenerator
 			. "\n" . '	<string>' . static::e( $uuid ) . '</string>'
 			. "\n" . '	<key>PayloadVersion</key>'
 			. "\n" . '	<integer>1</integer>'
-			. "\n" . '	<key>PayloadContent</key>'
 			. "\n";
 		if ( null !== $description = $this->profileData->getDescription() ) {
 			$result .= '	<key>PayloadDescription</key>'
@@ -78,10 +77,12 @@ class MobileConfigGenerator extends AbstractGenerator
 			. "\n" . '			<key>PayloadUUID</key>'
 			. "\n" . '			<string>' . static::e( $tlsAuthMethodUuid ) . '</string>'
 			. "\n" . '			<key>PayloadCertificateFileName</key>'
-			. "\n" . '			<string>' . static::e( $pkcs12->getX509()->getName() ) . '.p12</string>'
+			. "\n" . '			<string>' . static::e( $pkcs12->getX509()->getSubject()->toArray()['CN'] ) . '.p12</string>'
+			. "\n" . '			<key>PayloadDisplayName</key>'
+			. "\n" . '			<string>' . static::e( $pkcs12->getX509()->getSubject()->toArray()['CN'] ) . '</string>'
 			. "\n" . '			<key>PayloadContent</key>'
 			. "\n" . '			<data>'
-			. "\n" . '				' . static::e( static::base64format( $pkcs12->getPKCS12Bytes( $passphrase ), 52, 4 ) )
+			. "\n" . '				' . static::e( static::columnFormat( base64_encode( $pkcs12->getPKCS12Bytes( $passphrase ) ), 52, 4 ) )
 			. "\n" . '			</data>'
 			. "\n" . '			<key>PayloadType</key>'
 			. "\n" . '			<string>com.apple.security.pkcs12</string>'
@@ -100,13 +101,13 @@ class MobileConfigGenerator extends AbstractGenerator
 			$result .= ''
 				. "\n" . '		<dict>'
 				. "\n" . '			<key>PayloadCertificateFileName</key>'
-				. "\n" . '			<string>showcase-ca.cer</string>'
+				. "\n" . '			<string>' . static::e( $ca->getSubject()->toArray()['CN'] ) . '.cer</string>'
 				. "\n" . '			<key>PayloadContent</key>'
 				. "\n" . '			<data>'
-				. "\n" . '				' . static::e( static::base64format( AbstractAuth::pemToBase64Der( $ca->getX509Pem() ), 52, 4 ) )
+				. "\n" . '				' . static::e( static::columnFormat( AbstractAuth::pemToBase64Der( $ca->getX509Pem() ), 52, 4 ) )
 				. "\n" . '			</data>'
 				. "\n" . '			<key>PayloadDisplayName</key>'
-				. "\n" . '			<string>' . static::e( $ca->getName() ) . '</string>'
+				. "\n" . '			<string>' . static::e( $ca->getSubject()->toArray()['CN'] ) . '</string>'
 				. "\n" . '			<key>PayloadIdentifier</key>'
 				. "\n" . '			<string>' . static::e( $identifier ) . '.' . static::e( $uuid ) . '</string>'
 				. "\n" . '			<key>PayloadType</key>'
@@ -186,6 +187,9 @@ class MobileConfigGenerator extends AbstractGenerator
 			. "\n";
 
 		return $result;
+	}
+	public function getFileExtension():string{
+		return 'mobileconfig';
 	}
 
 	public function getContentType(): string

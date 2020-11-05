@@ -25,7 +25,7 @@ if ( null === $sub ) {
 	die( "403 Forbidden\r\n\r\nNo user subject available\r\n" );
 }
 $user = new letswifi\realm\User( $sub );
-$generator = $realm->getUserEapConfig( $user );
+$generator = $realm->getConfigGenerator( \letswifi\profile\generator\EapConfigGenerator::class, $user );
 $payload = $generator->generate();
 
 // Hack, fix clients that GET where they should POST

@@ -13,7 +13,7 @@ use DateTimeInterface;
 use letswifi\profile\auth\Auth;
 use letswifi\profile\IProfileData;
 
-abstract class AbstractGenerator
+abstract class AbstractGenerator implements Generator
 {
 	/**
 	 * Data about the institution
@@ -40,12 +40,19 @@ abstract class AbstractGenerator
 		$this->profileData = $profileData;
 		$this->authenticationMethods = $authenticationMethods;
 	}
+	public function getFilename(): string{
+		$identifier = \implode( '.', \array_reverse( \explode( '.', $this->profileData->getRealm() ) ) );
+		$datetime = date( 'YmdHis' );
+		$extension = $this->getFileExtension();
+		return "$identifier.$datetime.$extension";
+	}
+	abstract public function getFileExtension():string;
 
 	abstract public function getContentType(): string;
 
 	abstract public function generate(): string;
 
-	protected function getExpiry(): ?DateTimeInterface
+	public function getExpiry(): ?DateTimeInterface
 	{
 		$result = null;
 		foreach ( $this->authenticationMethods as $authentication ) {
@@ -65,12 +72,12 @@ abstract class AbstractGenerator
 		return \htmlspecialchars( $s, \ENT_QUOTES, 'UTF-8' );
 	}
 
-	protected static function base64format( string $data, int $length = null, int $indentation = 0 ): string
+	protected static function columnFormat( string $data, int $length = null, int $indentation = 0 ): string
 	{
 		return \implode(
 				"\n" . \str_repeat( "\t", $indentation ),
 				\str_split(
-						\base64_encode( $data ),
+						$data,
 						$length ?: \strlen( $data ) * 4
 					)
 			);

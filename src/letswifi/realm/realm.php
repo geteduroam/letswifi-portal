@@ -23,7 +23,7 @@ use fyrkat\openssl\X509;
 use letswifi\profile\auth\TlsAuth;
 
 use letswifi\profile\EduroamProfileData;
-use letswifi\profile\generator\EapConfigGenerator;
+use letswifi\profile\generator\Generator;
 
 use letswifi\profile\IProfileData;
 
@@ -45,11 +45,13 @@ class Realm
 	}
 
 	/**
+	 * @param class-string<T extends Generator> The config generator to return
 	 * @param User $user
-	 *
-	 * @return EapConfigGenerator
+	 * @psalm-suppress LessSpecificReturnStatement
+	 * @psalm-suppress MoreSpecificReturnType
+	 * @return Generator
 	 */
-	public function getUserEapConfig( User $user, ?DateInterval $validity = null ): EapConfigGenerator
+	public function getConfigGenerator( string $generator, User $user, ?DateInterval $validity = null ): Generator
 	{
 		if ( null === $validity ) {
 			$validity = $this->manager->getDefaultValidity( $this->name );
@@ -61,7 +63,7 @@ class Realm
 		$pkcs12 = $this->generateClientCertificate( $user, $expiry );
 		$anonymousIdentity = $user->getAnonymousUsername();
 
-		return new EapConfigGenerator( $this->getProfileData(), [$this->createAuthenticationMethod( $pkcs12, $anonymousIdentity )] );
+		return new $generator( $this->getProfileData(), [$this->createAuthenticationMethod( $pkcs12, $anonymousIdentity )] );
 	}
 
 	/**

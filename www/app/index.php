@@ -28,4 +28,7 @@ $app->render( [
 			'name' => 'Windows',
 		],
 	],
+	'manual' => [
+		'url' => '../profiles/new/',
+	],
 ], 'app' );

@@ -111,6 +111,9 @@ class EapConfigGenerator extends AbstractGenerator
 		// Unregistered content types should use the x- prefix though.
 		return 'application/x-eap-config';
 	}
+	public function getFileExtension():string{
+		return 'eap-config';
+	}
 
 	private static function generateNetworkXml( Network $network ): string
 	{
