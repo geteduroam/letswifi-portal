@@ -49,6 +49,7 @@ class Realm
 	 * @param User $user
 	 * @psalm-suppress LessSpecificReturnStatement
 	 * @psalm-suppress MoreSpecificReturnType
+	 *
 	 * @return Generator
 	 */
 	public function getConfigGenerator( string $generator, User $user, ?DateInterval $validity = null ): Generator
@@ -60,7 +61,7 @@ class Realm
 		// TODO check that $expiry is not too far in the future,
 		//	during some test we ended up with 88363-05-14 and MySQL didn't like
 		// TODO more generic method to get an arbitrary generator
-		if ($generator == "letswifi\profile\generator\MobileConfigGenerator") {
+		if ('letswifi\\profile\\generator\\MobileConfigGenerator' === $generator) {
 			// .mobileconfig files don't need the (often self signed) CA of the client-certificate
 			$pkcs12 = $this->generateClientCertificate( $user, $expiry, false );
 		} else {
@@ -194,9 +195,9 @@ class Realm
 
 		if ($withSignerCa) {
 			return new PKCS12( $userCert, $userKey, [$caCert] );
-		} else {
-			return new PKCS12( $userCert, $userKey);
 		}
+
+		return new PKCS12( $userCert, $userKey);
 	}
 
 	private static function createUUID(): string
