@@ -9,6 +9,7 @@
 
 namespace letswifi\profile\generator;
 
+use fyrkat\openssl\PKCS12;
 use InvalidArgumentException;
 
 use letswifi\profile\auth\AbstractAuth;
@@ -42,7 +43,11 @@ class MobileConfigGenerator extends AbstractGenerator
 		\assert( $tlsAuthMethod instanceof TlsAuth );
 		$tlsAuthMethodUuid = static::uuidgen();
 		$passphrase = $tlsAuthMethod->getPassphrase();
-		$pkcs12 = $tlsAuthMethod->getPKCS12();
+		if ( $pkcs12 = $tlsAuthMethod->getPKCS12() ) {
+			// Remove the CA from the PKCS12 object,
+			// because otherwise MacOS would trust that CA for HTTPS traffic
+			$pkcs12 = new PKCS12( $pkcs12->getX509(), $pkcs12->getPrivateKey() );
+		}
 		/** @var array<\fyrkat\openssl\X509> */
 		$caCertificates = \array_merge( $caCertificates, $tlsAuthMethod->getServerCACertificates() );
 		\assert( null !== $pkcs12 );

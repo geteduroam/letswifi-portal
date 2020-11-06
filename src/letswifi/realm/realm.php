@@ -61,12 +61,7 @@ class Realm
 		// TODO check that $expiry is not too far in the future,
 		//	during some test we ended up with 88363-05-14 and MySQL didn't like
 		// TODO more generic method to get an arbitrary generator
-		if ('letswifi\\profile\\generator\\MobileConfigGenerator' === $generator) {
-			// .mobileconfig files don't need the (often self signed) CA of the client-certificate
-			$pkcs12 = $this->generateClientCertificate( $user, $expiry, false );
-		} else {
-			$pkcs12 = $this->generateClientCertificate( $user, $expiry );
-		}
+		$pkcs12 = $this->generateClientCertificate( $user, $expiry );
 		$anonymousIdentity = $user->getAnonymousUsername();
 
 		return new $generator( $this->getProfileData(), [$this->createAuthenticationMethod( $pkcs12, $anonymousIdentity )] );
@@ -179,7 +174,7 @@ class Realm
 		$this->manager->logCompletedCredential( $this->name, $user, $serverCert, 'server' );
 	}
 
-	protected function generateClientCertificate( User $user, DateTimeInterface $expiry, bool $withSignerCa = true ): PKCS12
+	protected function generateClientCertificate( User $user, DateTimeInterface $expiry ): PKCS12
 	{
 		$userKey = new PrivateKey( new OpenSSLConfig( OpenSSLConfig::KEY_EC ) );
 		$commonName = static::createUUID() . '@' . \rawurlencode( $this->getName() );
@@ -193,11 +188,7 @@ class Realm
 		$userCert = $csr->sign( $caCert, $caKey, $expiry, $conf, $serial );
 		$this->logCompletedUserCredential( $user, $userCert );
 
-		if ($withSignerCa) {
-			return new PKCS12( $userCert, $userKey, [$caCert] );
-		}
-
-		return new PKCS12( $userCert, $userKey);
+		return new PKCS12( $userCert, $userKey, [$caCert] );
 	}
 
 	private static function createUUID(): string
