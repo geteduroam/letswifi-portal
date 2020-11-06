@@ -11,7 +11,6 @@ namespace letswifi\profile\generator;
 
 use fyrkat\openssl\PKCS12;
 use InvalidArgumentException;
-
 use letswifi\profile\auth\AbstractAuth;
 use letswifi\profile\auth\TlsAuth;
 
@@ -193,7 +192,9 @@ class MobileConfigGenerator extends AbstractGenerator
 
 		return $result;
 	}
-	public function getFileExtension():string{
+
+	public function getFileExtension(): string
+	{
 		return 'mobileconfig';
 	}
 

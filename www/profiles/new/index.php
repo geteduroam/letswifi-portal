@@ -16,7 +16,7 @@ $browserAuth = $app->getBrowserAuthenticator( $realm );
 $sub = $browserAuth->requireAuth();
 $user = new letswifi\realm\User( $sub );
 
-switch( $_SERVER['REQUEST_METHOD'] ) {
+switch ( $_SERVER['REQUEST_METHOD'] ) {
 	case 'GET': return $app->render(
 		[
 			'href' => '/profile/new/',
@@ -29,22 +29,22 @@ switch( $_SERVER['REQUEST_METHOD'] ) {
 				],
 			],
 			'app' => [
-				'url' => '../../app/'
+				'url' => '../../app/',
 			],
 		], 'profiles-new' );
 	case 'POST':
-		switch( $device = $_POST['device'] ?? '' ) {
+		switch ( $device = $_POST['device'] ?? '' ) {
 			case 'apple-mobileconfig': $generator = $realm->getConfigGenerator( \letswifi\profile\generator\MobileConfigGenerator::class, $user ); break;
 			case 'eap-config': $generator = $realm->getConfigGenerator( \letswifi\profile\generator\EapConfigGenerator::class, $user ); break;
 			default:
-				header( 'Content-Type: text/plain', true, 400 );
-				die( "400 Bad Request\r\n\r\nUnknown device $device\r\n" );
+				\header( 'Content-Type: text/plain', true, 400 );
+				die( "400 Bad Request\r\n\r\nUnknown device ${device}\r\n" );
 		}
 		$payload = $generator->generate();
-		header( 'Content-Disposition: attachment; filename="'. $generator->getFilename() .'"' );
+		\header( 'Content-Disposition: attachment; filename="' . $generator->getFilename() . '"' );
 		\header( 'Content-Type: ' . $generator->getContentType() );
 		die( $payload );
 	default:
-		header( 'Content-Type: text/plain', true, 405 );
+		\header( 'Content-Type: text/plain', true, 405 );
 		die( "405 Method Not Allowed\r\n" );
 }

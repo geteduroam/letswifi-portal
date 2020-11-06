@@ -8,11 +8,16 @@
  */
 
 namespace letswifi\profile\generator;
+
 use DateTimeInterface;
+
 interface Generator
 {
-	function getExpiry(): ?DateTimeInterface;
-	function generate(): string;
-	function getContentType(): string;
-	function getFilename(): string;
+	public function getExpiry(): ?DateTimeInterface;
+
+	public function generate(): string;
+
+	public function getContentType(): string;
+
+	public function getFilename(): string;
 }

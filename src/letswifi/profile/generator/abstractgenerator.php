@@ -40,13 +40,17 @@ abstract class AbstractGenerator implements Generator
 		$this->profileData = $profileData;
 		$this->authenticationMethods = $authenticationMethods;
 	}
-	public function getFilename(): string{
+
+	public function getFilename(): string
+	{
 		$identifier = \implode( '.', \array_reverse( \explode( '.', $this->profileData->getRealm() ) ) );
-		$datetime = date( 'YmdHis' );
+		$datetime = \date( 'YmdHis' );
 		$extension = $this->getFileExtension();
-		return "$identifier.$datetime.$extension";
+
+		return "${identifier}.${datetime}.${extension}";
 	}
-	abstract public function getFileExtension():string;
+
+	abstract public function getFileExtension(): string;
 
 	abstract public function getContentType(): string;
 

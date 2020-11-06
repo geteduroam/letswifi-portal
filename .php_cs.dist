@@ -49,7 +49,7 @@ EOD
 			'single_item_single_line' => false,
 			'single_line' => false,
 		],
-		'class_keyword_remove' => true,
+		'class_keyword_remove' => false,
 		'combine_consecutive_issets' => true,
 		'combine_consecutive_unsets' => true,
 		'comment_to_phpdoc' => true,
