@@ -8,6 +8,14 @@
 		<li><a class="btn btn-default" href="<?=$this->e($app['url'])?>"><?=$this->e($app['name'])?></a></li>
 <?php endforeach; ?>
 	</ul>
+	<!-- this section isn't pretty, but can be removed once the macOS App is release -->
+	<p>For macOS, the current option is to install a .mobileconfig profile.</p>
+	<ul class="apps buttons devices">
+	<form method="post" action="/profiles/new/">
+		<li><button type="submit" name="device" value="apple-mobileconfig" class="btn btn-default">macOS</button></li>
+	</form>
+	</ul>
+	<!-- end of to be removed section -->
 	<hr>
 	<details>
 		<summary>Options for other platforms and professional users</summary>
