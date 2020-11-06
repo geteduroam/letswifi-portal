@@ -45,12 +45,16 @@ class Realm
 	}
 
 	/**
-	 * @param class-string<T extends Generator> The config generator to return
-	 * @param User $user
+	 * @psalm-template T of Generator
+	 *
+	 * @psalm-param class-string<T> $generator The config generator to return
+	 *
+	 * @param string $generator The config generator class to return
+	 * @param User   $user
 	 * @psalm-suppress LessSpecificReturnStatement
 	 * @psalm-suppress MoreSpecificReturnType
 	 *
-	 * @return Generator
+	 * @psalm-return T
 	 */
 	public function getConfigGenerator( string $generator, User $user, ?DateInterval $validity = null ): Generator
 	{
