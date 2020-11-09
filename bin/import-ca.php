@@ -50,5 +50,9 @@ for ( $i = \count( $certificates ); --$i; $i >= 0 ) {
 	echo ":\n";
 	echo 'i: ' . $x509->getIssuerSubject() . "\n";
 	echo 's: ' . $sub . "\n";
-	$realmManager->importCA( $x509, $key );
+	try {
+		$realmManager->importCA( $x509, $key );
+	} catch ( Exception $e ) {
+		echo 'ERR: ' . $e->getMessage() . "\n";
+	}
 }
