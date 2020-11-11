@@ -66,9 +66,8 @@ class Realm
 		//	during some test we ended up with 88363-05-14 and MySQL didn't like
 		// TODO more generic method to get an arbitrary generator
 		$pkcs12 = $this->generateClientCertificate( $user, $expiry );
-		$anonymousIdentity = $user->getAnonymousUsername();
 
-		return new $generator( $this->getProfileData(), [$this->createAuthenticationMethod( $pkcs12, $anonymousIdentity )] );
+		return new $generator( $this->getProfileData(), [$this->createAuthenticationMethod( $pkcs12 )] );
 	}
 
 	/**
@@ -149,13 +148,12 @@ class Realm
 		return $this->manager->getSignerCa( $this->name )->getPrivateKey();
 	}
 
-	protected function createAuthenticationMethod( PKCS12 $pkcs12, string $anonymousIdentity ): TlsAuth
+	protected function createAuthenticationMethod( PKCS12 $pkcs12 ): TlsAuth
 	{
 		$caCertificates = $this->getTrustedCaCertificates();
 		$serverNames = $this->getTrustedServerNames();
-		$anonymousIdentity = \rawurldecode( \strstr( $anonymousIdentity, '@', true ) ?: $anonymousIdentity ) . '@' . \rawurldecode( $this->getName() );
 
-		return new TlsAuth( $caCertificates, $serverNames, $anonymousIdentity, $pkcs12 );
+		return new TlsAuth( $caCertificates, $serverNames, $pkcs12 );
 	}
 
 	protected function logPreparedUserCredential( X509 $caCert, User $requester, CSR $csr, DateTimeInterface $expiry ): int

@@ -23,9 +23,4 @@ class User
 	{
 		return $this->userID;
 	}
-
-	public function getAnonymousUsername(): string
-	{
-		return 'anonymous';
-	}
 }

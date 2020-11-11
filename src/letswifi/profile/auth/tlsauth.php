@@ -22,20 +22,15 @@ class TlsAuth extends AbstractAuth
 	/** @var string */
 	private $passphrase;
 
-	/** @var ?string */
-	private $identity;
-
 	/**
 	 * @param array<X509>   $caCertificates Trusted CA certificates
 	 * @param array<string> $serverNames    Accepted server names
-	 * @param ?string       $identity       Anonymous identity
 	 * @param ?PKCS12       $pkcs12         Certificate for user/device authentication
 	 * @param ?string       $passphrase     Transient password to be used for encrypting the PKCS12 payload
 	 */
-	public function __construct( array $caCertificates, array $serverNames, ?string $identity, ?PKCS12 $pkcs12, ?string $passphrase = null )
+	public function __construct( array $caCertificates, array $serverNames, ?PKCS12 $pkcs12, ?string $passphrase = null )
 	{
 		parent::__construct( $caCertificates, $serverNames );
-		$this->identity = $identity;
 		$this->pkcs12 = $pkcs12;
 		$this->passphrase = $passphrase ?? 'pkcs12';
 	}
@@ -57,6 +52,11 @@ class TlsAuth extends AbstractAuth
 
 	public function getIdentity(): ?string
 	{
-		return $this->identity;
+		$pkcs12 = $this->getPKCS12();
+
+		return null === $pkcs12
+			? null
+			: $pkcs12->getX509()->getSubject()->getCommonName()
+			;
 	}
 }
