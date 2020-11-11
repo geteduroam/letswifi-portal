@@ -9,7 +9,9 @@
 
 namespace letswifi\profile\generator;
 
+use DateTimeImmutable;
 use DateTimeInterface;
+use DateTimeZone;
 use InvalidArgumentException;
 
 use letswifi\profile\auth\AbstractAuth;
@@ -35,9 +37,13 @@ class EapConfigGenerator extends AbstractGenerator
 			. "\r\n\t" . '<EAPIdentityProvider ID="' . static::e( $this->profileData->getRealm() ) . '" namespace="urn:RFC4282:realm" lang="' . static::e( $this->profileData->getLanguageCode() ) . '" version="1">'
 			;
 		if ( null !== $expiry = $this->getExpiry() ) {
-			$result .= ''
-				. "\r\n\t\t" . '<ValidUntil>' . $expiry->format( 'Y-m-d\\TH:i:s' ) . '</ValidUntil>'
-				;
+			$expiry = new DateTimeImmutable( '@' . $expiry->getTimestamp(), new DateTimeZone( 'UTC' ) );
+			$expiryString = $expiry->format( 'Y-m-d\\TH:i:s\\Z' );
+			if ( \is_string( $expiryString ) ) {
+				$result .= ''
+					. "\r\n\t\t" . '<ValidUntil>' . static::e( $expiryString ) . '</ValidUntil>'
+					;
+			}
 		}
 		$result .= ''
 			. "\r\n\t\t" . '<AuthenticationMethods>'
