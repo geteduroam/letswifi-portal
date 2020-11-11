@@ -9,8 +9,13 @@
 
 namespace letswifi\profile\generator;
 
+use DateTimeImmutable;
+use DateTimeZone;
+
 use fyrkat\openssl\PKCS12;
+
 use InvalidArgumentException;
+
 use letswifi\profile\auth\AbstractAuth;
 use letswifi\profile\auth\TlsAuth;
 
@@ -59,12 +64,12 @@ class MobileConfigGenerator extends AbstractGenerator
 			. "\n" . '	<string>' . static::e( $this->profileData->getDisplayName() ) . '</string>'
 			. "\n" . '	<key>PayloadIdentifier</key>'
 			. "\n" . '	<string>' . static::e( $identifier ) . '</string>'
+			. "\n" . '	<key>PayloadUUID</key>'
+			. "\n" . '	<string>' . static::e( $uuid ) . '</string>'
 			. "\n" . '	<key>PayloadRemovalDisallowed</key>'
 			. "\n" . '	<false/>'
 			. "\n" . '	<key>PayloadType</key>'
 			. "\n" . '	<string>Configuration</string>'
-			. "\n" . '	<key>PayloadUUID</key>'
-			. "\n" . '	<string>' . static::e( $uuid ) . '</string>'
 			. "\n" . '	<key>PayloadVersion</key>'
 			. "\n" . '	<integer>1</integer>'
 			. "\n";
@@ -72,6 +77,15 @@ class MobileConfigGenerator extends AbstractGenerator
 			$result .= '	<key>PayloadDescription</key>'
 				. "\n" . '	<string>' . static::e( $description ) . '</string>'
 				. "\n";
+		}
+		if ( null !== $expiry = $this->getExpiry() ) {
+			$expiry = new DateTimeImmutable( '@' . $expiry->getTimestamp(), new DateTimeZone( 'UTC' ) );
+			$expiryString = $expiry->format( 'Y-m-d\\TH:i:s\\Z' );
+			if ( \is_string( $expiryString ) ) {
+				$result .= '	<key>RemovalDate</key>'
+						. "\n" . '	<date>' . static::e( $expiryString ) . '</date>'
+						. "\n";
+			}
 		}
 		$result .= '	<key>PayloadContent</key>'
 			. "\n" . '	<array>'
