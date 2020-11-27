@@ -11,7 +11,7 @@
 	<!-- this section isn't pretty, but can be removed once the macOS App is release -->
 	<p>For macOS, the current option is to install a .mobileconfig profile.</p>
 	<ul class="apps buttons devices">
-	<form method="post" action="/profiles/new/">
+	<form method="get" action="/profiles/new/get.php">
 		<li><button type="submit" name="device" value="apple-mobileconfig" class="btn btn-default">macOS</button></li>
 	</form>
 	</ul>
