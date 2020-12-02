@@ -13,7 +13,7 @@ This is the reference CA for geteduroam.  It is intended to be used with an app 
 
 ## Getting up and running quick 'n dirty
 
-Upload this whole project to a webserver, and make `www/` accessible, ideally as the root
+Upload this whole project to a webserver, and make `www/` accessible as the top level directory.
 
 This quick'n'dirty guide assumes you'll be using SimpleSAMLphp (the only authentication method supported ATM)
 
