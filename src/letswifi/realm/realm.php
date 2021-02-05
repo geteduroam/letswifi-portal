@@ -179,7 +179,7 @@ class Realm
 	protected function generateClientCertificate( User $user, DateTimeInterface $expiry ): PKCS12
 	{
 		$userKey = new PrivateKey( new OpenSSLConfig( OpenSSLConfig::KEY_EC ) );
-		$commonName = static::createRANDID() . '@' . \rawurlencode( $this->getName() );
+		$commonName = static::createCommonName('@' . \rawurlencode( $this->getName() ));
 		$dn = new DN( ['CN' => $commonName] );
 		$csr = CSR::generate( $dn, $userKey );
 		$caCert = $this->getSigningCACertificate();
@@ -193,14 +193,14 @@ class Realm
 		return new PKCS12( $userCert, $userKey, [$caCert] );
 	}
 
-	private static function createRANDID(): string
+	private static function createCommonName( String $realm ): string
 	{
 		$keys = array_merge(range(0, 9), range('a', 'z'));
 		$randid = "";
-		for($i=0; $i < 16; $i++) {
+		for($i=0; $i < 64 - strlen($realm); $i++) {
 			$randid .= $keys[mt_rand(0, count($keys) - 1)];
 		}
-		return $randid;
+		return $randid . $realm;
 	}
 
 	private static function createUUID(): string
