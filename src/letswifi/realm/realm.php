@@ -198,7 +198,7 @@ class Realm
 		$keys = array_merge(range(0, 9), range('a', 'z'));
 		$randid = "";
 		for($i=0; $i < 16; $i++) {
-			$randid .= $keys[mt_rand(0, count($keys) - 1)];
+			$randid .= $keys[random_int(0, count($keys) - 1)];
 		}
 		return $randid;
 	}
