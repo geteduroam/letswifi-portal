@@ -82,6 +82,11 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 
 		static::checkIdP( $this->samlIdp, $this->as->getAuthData( 'saml:sp:IdP' ) );
 
+		// Also check the saml:AuthenticatingAuthority for the entries in idpList if there is one
+		if ( \count( $this->idpList ) > 0 ) {
+			static::checkIdPList ( $this->idpList, $this->as->getAuthData('saml:AuthenticatingAuthority') );
+		}
+
 		if ( null === $this->userIdAttribute ) {
 			// in SimpleSAMLphp version 2 ->value should be replaced with ->getValue()
 			return $this->as->getAuthData( 'saml:sp:NameID' )->value;
@@ -159,6 +164,18 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 	{
 		if ( null !== $expectedIdP && $expectedIdP !== $providedIdP ) {
 			throw new MismatchIdpException( $expectedIdP, $providedIdP );
+		}
+	}
+
+	/**
+	 * Check that the saml:AuthenticatingAuthority contains the IdPList used in scoping
+	 *
+	 * @throws MismatchIdpException If the IdPList is not entirely present in the saml:AuthenticatingAuthority
+	 */
+	private static function checkIdPList( array $expectedIdPList, array $authenticatingAuthority ): void
+	{
+		if ( $expectedIdPList != array_intersect($expectedIdPList, $authenticatingAuthority) ) {
+			throw new MismatchIdpException( $expectedIdPList[0], $authenticatingAuthority[0] );
 		}
 	}
 
