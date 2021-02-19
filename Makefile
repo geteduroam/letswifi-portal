@@ -19,7 +19,7 @@ composer.phar:
 	curl -sSLO https://getcomposer.org/composer.phar || wget https://getcomposer.org/composer.phar
 
 php-cs-fixer-v2.phar:
-	curl -sSLO https://cs.sensiolabs.org/download/php-cs-fixer-v2.phar || wget https://cs.sensiolabs.org/download/php-cs-fixer-v2.phar
+	curl -sSLO https://cs.symfony.com/download/php-cs-fixer-v2.phar || wget https://cs.symfony.com/download/php-cs-fixer-v2.phar
 
 psalm.phar:
 	curl -sSLO https://github.com/vimeo/psalm/releases/download/4.0.1/psalm.phar || wget https://github.com/vimeo/psalm/releases/download/4.0.1/psalm.phar
