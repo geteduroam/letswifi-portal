@@ -10,6 +10,7 @@
 namespace letswifi\browserauth;
 
 use OutOfBoundsException;
+use Exception;
 use Throwable;
 
 class SimpleSAMLAuth implements BrowserAuthInterface
@@ -21,6 +22,9 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 
 	/** @var array<string> */
 	protected $idpList;
+
+	/** @var array<string> */
+	protected $authzAttributeValue;
 
 	/**
 	 * The attribute containing the user ID, null for nameID
@@ -48,11 +52,14 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 		$userIdAttribute = \array_key_exists( 'userIdAttribute', $params ) ? $params['userIdAttribute'] : null;
 		$samlIdp = \array_key_exists( 'samlIdp', $params ) ? $params['samlIdp'] : null;
 		$idpList = \array_key_exists( 'idpList', $params ) ? $params['idpList'] : [];
+		$authzAttributeValue = \array_key_exists( 'authzAttributeValue', $params ) ? $params['authzAttributeValue'] : [];
 		\assert( \is_string( $userIdAttribute ), 'userIdAttribute must be string' );
 		\assert( \is_string( $samlIdp ) || null === $samlIdp, 'samlIdp must be string if provided' );
 		\assert( \is_array( $idpList ), 'idpList must be array if provided' );
+		\assert( \is_array( $authzAttributeValue ), 'authzAttributeValue must be array if provided' );
 		$this->samlIdp = $samlIdp;
 		$this->idpList = $idpList;
+		$this->authzAttributeValue = $authzAttributeValue;
 		$this->as = new \SimpleSAML\Auth\Simple( $authSource );
 		$this->userIdAttribute = $userIdAttribute;
 	}
@@ -84,12 +91,18 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 
 		// Also check the saml:AuthenticatingAuthority for the entries in idpList if there is one
 		if ( \count( $this->idpList ) > 0 ) {
-			static::checkIdPList ( $this->idpList, $this->as->getAuthData('saml:AuthenticatingAuthority') );
+			static::checkIdPList( $this->idpList, $this->as->getAuthData('saml:AuthenticatingAuthority') );
 		}
 
 		if ( null === $this->userIdAttribute ) {
 			// in SimpleSAMLphp version 2 ->value should be replaced with ->getValue()
 			return $this->as->getAuthData( 'saml:sp:NameID' )->value;
+		}
+
+		// authzAttributeValue validates SAML attributes against the attribute-value map for additional authorization
+		if ( \count( $this->authzAttributeValue) > 0 ) {
+			// can wrap this around try {} / catch {} if we need nicer error handling
+			static::checkAuthzAttributeValue( $this->authzAttributeValue );
 		}
 
 		return $this->getSingleAttributeValue( $this->userIdAttribute );
@@ -119,6 +132,32 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 		\assert( \is_string( $result ), 'Attributes returned by SimpleSAMLphp are always of type string' );
 
 		return $result;
+	}
+
+	/**
+	 * Perform authorization based on SAML attributes
+	 */
+	public function checkAuthzAttributeValue( array $authzAttributeValue ): void
+	{
+		if ( null === $this->attributes ) {
+			$this->attributes = $this->as->getAttributes();
+			\assert( \is_array( $this->attributes ), 'SimpleSAMLphp always returns an array' );
+		}
+		foreach ( $authzAttributeValue as $attribute => $value ) {
+			if ( !\array_key_exists( $attribute, $this->attributes ) ) {
+				throw new Exception( "Attribute ${attribute} not present in SAML assertion" );
+			}
+			if ( \is_array( $value ) ) {
+				if ( !\array_intersect( $value, $this->attributes[$attribute]) ) {
+					throw new Exception( "Attribute ${attribute} does not have one of the permitted values" );
+				}
+			}
+			if ( \is_string( $value ) ) {
+				if ( !\array_intersect( [$value], $this->attributes[$attribute]) ) {
+					throw new Exception( "Attribute ${attribute} does not have the permitted value of ${value}" );
+				}
+			}
+		}
 	}
 
 	/**
@@ -174,7 +213,7 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 	 */
 	private static function checkIdPList( array $expectedIdPList, array $authenticatingAuthority ): void
 	{
-		if ( $expectedIdPList != array_intersect($expectedIdPList, $authenticatingAuthority) ) {
+		if ( $expectedIdPList !== \array_intersect($expectedIdPList, $authenticatingAuthority) ) {
 			throw new MismatchIdpException( $expectedIdPList[0], $authenticatingAuthority[0] );
 		}
 	}
