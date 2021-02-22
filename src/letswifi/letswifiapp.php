@@ -94,8 +94,7 @@ class LetsWifiApp
 
 	public function getSigningCertificate(): ?string
 	{
-		$signing_cert = $this->config->getStringOrNull( 'signing.cert' );
-		return $signing_cert;
+		return $this->config->getStringOrNull( 'signing.cert' );
 	}
 
 	public function getOAuthHandler( Realm $realm ): OAuth

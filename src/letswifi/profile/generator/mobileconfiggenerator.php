@@ -209,16 +209,16 @@ class MobileConfigGenerator extends AbstractGenerator
 			. "\n";
 
 		$app = new LetsWifiApp();
-		if($sign_cert = $app->getSigningCertificate()) {
-			$unsigned = tempnam(sys_get_temp_dir(), 'unsigned');
-			$signed = tempnam(sys_get_temp_dir(), 'signed');
-			file_put_contents($unsigned, $result);
-			$sign = @openssl_pkcs7_sign($unsigned, $signed, 'file://' . $sign_cert, 'file://' . $sign_cert, array(), 0, $sign_cert);
-			$b64signed = file_get_contents($signed);
-			$trimmed = preg_replace('/(.+\n)+\n/', '', $b64signed, 1);
-			$result = base64_decode($trimmed);
-			@unlink($unsigned);
-			@unlink($signed);
+		if ($sign_cert = $app->getSigningCertificate()) {
+			$unsigned = \tempnam(\sys_get_temp_dir(), 'unsigned');
+			$signed = \tempnam(\sys_get_temp_dir(), 'signed');
+			\file_put_contents($unsigned, $result);
+			$sign = \openssl_pkcs7_sign($unsigned, $signed, 'file://' . $sign_cert, 'file://' . $sign_cert, [], 0, $sign_cert);
+			$b64signed = \file_get_contents($signed);
+			$trimmed = \preg_replace('/(.+\n)+\n/', '', $b64signed, 1);
+			$result = \base64_decode($trimmed, true);
+			\unlink($unsigned);
+			\unlink($signed);
 		}
 
 		return $result;
