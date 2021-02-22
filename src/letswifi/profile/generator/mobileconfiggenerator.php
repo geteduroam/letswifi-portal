@@ -22,6 +22,8 @@ use letswifi\profile\auth\TlsAuth;
 use letswifi\profile\network\HS20Network;
 use letswifi\profile\network\SSIDNetwork;
 
+use letswifi\LetsWifiApp;
+
 /**
  * @suppress PhanParamNameIndicatingUnusedInClosure
  */
@@ -206,8 +208,8 @@ class MobileConfigGenerator extends AbstractGenerator
 			. "\n" . '</plist>'
 			. "\n";
 
-		//$sign_cert = '/path/to/key-certificate-chain.pem';
-		if($sign_cert) {
+		$app = new LetsWifiApp();
+		if($sign_cert = $app->getSigningCertificate()) {
 			$unsigned = tempnam(sys_get_temp_dir(), 'unsigned');
 			$signed = tempnam(sys_get_temp_dir(), 'signed');
 			file_put_contents($unsigned, $result);

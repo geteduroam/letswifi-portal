@@ -92,6 +92,12 @@ class LetsWifiApp
 		throw new DomainException( 'auth.service must point to a class that implements BrowserAuthInterface' );
 	}
 
+	public function getSigningCertificate(): ?string
+	{
+		$signing_cert = $this->config->getStringOrNull( 'signing.cert' );
+		return $signing_cert;
+	}
+
 	public function getOAuthHandler( Realm $realm ): OAuth
 	{
 		$oauth = new OAuth( new JWTSealer( $realm->getSecretKey() ) );
