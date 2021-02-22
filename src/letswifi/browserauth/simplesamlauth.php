@@ -94,15 +94,15 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 			static::checkIdPList( $this->idpList, $this->as->getAuthData('saml:AuthenticatingAuthority') );
 		}
 
-		if ( null === $this->userIdAttribute ) {
-			// in SimpleSAMLphp version 2 ->value should be replaced with ->getValue()
-			return $this->as->getAuthData( 'saml:sp:NameID' )->value;
-		}
-
 		// authzAttributeValue validates SAML attributes against the attribute-value map for additional authorization
 		if ( \count( $this->authzAttributeValue) > 0 ) {
 			// can wrap this around try {} / catch {} if we need nicer error handling
 			static::checkAuthzAttributeValue( $this->authzAttributeValue );
+		}
+
+		if ( null === $this->userIdAttribute ) {
+			// in SimpleSAMLphp version 2 ->value should be replaced with ->getValue()
+			return $this->as->getAuthData( 'saml:sp:NameID' )->value;
 		}
 
 		return $this->getSingleAttributeValue( $this->userIdAttribute );
