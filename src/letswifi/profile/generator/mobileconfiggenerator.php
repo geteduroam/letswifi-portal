@@ -141,8 +141,9 @@ class MobileConfigGenerator extends AbstractGenerator
 				. "\n" . '		</dict>'
 				. "\n";
 		}
+		$payloadNetworkCount=0;
 		foreach ( $this->profileData->getNetworks() as $network ) {
-			if ( $network instanceof SSIDNetwork ) {
+			if ( $network instanceof SSIDNetwork || $network instanceof HS20Network) {
 				// TODO assumes TLSAuth, it's the only option currently
 				$result .= '		<dict>'
 					. "\n" . '			<key>AutoJoin</key>'
@@ -174,6 +175,11 @@ class MobileConfigGenerator extends AbstractGenerator
 					$result .= '					<string>' . static::e( $serverName ) . '</string>'
 						. "\n";
 				}
+				if ( $network instanceof SSIDNetwork ) {
+					$payloadDisplayName = static::e( $network->getSSID() );
+				} elseif ( $network instanceof HS20Network ) {
+					$payloadDisplayName = "roaming via Passpoint";
+				}
 				$result .= '				</array>'
 					. "\n" . '			</dict>'
 					. "\n" . '			<key>EncryptionType</key>'
@@ -183,9 +189,9 @@ class MobileConfigGenerator extends AbstractGenerator
 					. "\n" . '			<key>PayloadCertificateUUID</key>'
 					. "\n" . '			<string>' . static::e( $tlsAuthMethodUuid ) . '</string>'
 					. "\n" . '			<key>PayloadDisplayName</key>'
-					. "\n" . '			<string>Wi-Fi (' . static::e( $network->getSSID() ) . ')</string>'
+					. "\n" . '			<string>Wi-Fi (' . static::e( $payloadDisplayName ) . ')</string>'
 					. "\n" . '			<key>PayloadIdentifier</key>'
-					. "\n" . '			<string>' . static::e( $identifier ) . '.wifi</string>'
+					. "\n" . '			<string>' . static::e( $identifier ) . '.wifi.' . $payloadNetworkCount . '</string>'
 					. "\n" . '			<key>PayloadType</key>'
 					. "\n" . '			<string>com.apple.wifi.managed</string>'
 					. "\n" . '			<key>PayloadUUID</key>'
@@ -194,14 +200,34 @@ class MobileConfigGenerator extends AbstractGenerator
 					. "\n" . '			<integer>1</integer>'
 					. "\n" . '			<key>ProxyType</key>'
 					. "\n" . '			<string>None</string>'
-					. "\n" . '			<key>SSID_STR</key>'
+					. "\n";
+			}
+			if ( $network instanceof SSIDNetwork ) {
+				$result .= '			<key>SSID_STR</key>'
 					. "\n" . '			<string>' . static::e( $network->getSSID() ) . '</string>'
 					. "\n" . '		</dict>'
 					. "\n";
 			} elseif ( $network instanceof HS20Network ) {
+				$result .= '			<key>IsHotspot</key>'
+					. "\n" . '			<true/>'
+					. "\n" . '			<key>ServiceProviderRoamingEnabled</key>'
+					. "\n" . '			<true/>'
+					. "\n" . '			<key>DisplayedOperatorName</key>'
+					. "\n" . '			<string>' . static::e( $this->profileData->getRealm() ) . ' via Passpoint</string>'
+					. "\n" . '			<key>DomainName</key>'
+					. "\n" . '			<string>' . static::e( $this->profileData->getRealm() ) . '</string>'
+					. "\n" . '			<key>RoamingConsortiumOIs</key>'
+					. "\n" . '			<array>'
+					. "\n" . '				<string>' . \strtoupper( static::e( $network->getConsortiumOID() ) ) . '</string>'
+					. "\n" . '			</array>'
+					. "\n" . '			<key>_UsingHotspot20</key>'
+					. "\n" . '			<true/>'
+					. "\n" . '		</dict>'
+					. "\n";
 			} else {
 				throw new InvalidArgumentException( 'Only SSID or Hotspot 2.0 networks are supported, got ' . \get_class( $network ) );
 			}
+			$payloadNetworkCount++;
 		}
 		$result .= '	</array>'
 			. "\n" . '</dict>'
