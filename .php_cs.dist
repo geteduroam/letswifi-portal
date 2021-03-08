@@ -212,6 +212,7 @@ EOD
 		'phpdoc_var_without_name' => true,
 		'pow_to_exponentiation' => true,
 		'psr4' => false, /* PSR4 is in conflict with SPL (Standard Php Library), we use SPL, not PSR4 */
+		'psr_autoloading' => false, /* breaks SPL autoloading */
 		'return_assignment' => true,
 		'return_type_declaration' => true,
 		'self_accessor' => true,

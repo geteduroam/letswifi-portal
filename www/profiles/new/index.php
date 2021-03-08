@@ -38,13 +38,13 @@ switch ( $_SERVER['REQUEST_METHOD'] ) {
 			case 'eap-config': $generator = $realm->getConfigGenerator( \letswifi\profile\generator\EapConfigGenerator::class, $user ); break;
 			default:
 				\header( 'Content-Type: text/plain', true, 400 );
-				die( "400 Bad Request\r\n\r\nUnknown device ${device}\r\n" );
+				exit( "400 Bad Request\r\n\r\nUnknown device ${device}\r\n" );
 		}
 		$payload = $generator->generate();
 		\header( 'Content-Disposition: attachment; filename="' . $generator->getFilename() . '"' );
 		\header( 'Content-Type: ' . $generator->getContentType() );
-		die( $payload );
+		exit( $payload );
 	default:
 		\header( 'Content-Type: text/plain', true, 405 );
-		die( "405 Method Not Allowed\r\n" );
+		exit( "405 Method Not Allowed\r\n" );
 }

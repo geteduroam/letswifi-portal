@@ -2,11 +2,11 @@
 <?php declare(strict_types=1);
 if ( \PHP_SAPI !== 'cli' ) {
 	\header( 'Content-Type: text/plain', true, 403 );
-	die( "403 Forbidden\r\n\r\nThis script is intended to be run from the commandline only\r\n");
+	exit( "403 Forbidden\r\n\r\nThis script is intended to be run from the commandline only\r\n");
 }
 if ( 3 !== \count( $argv ) && 4 !== \count( $argv ) ) {
 	echo $argv[0] . " realm common_name [days_valid=1095]\n";
-	die( 2 );
+	exit( 2 );
 }
 require \implode(\DIRECTORY_SEPARATOR, [\dirname(__DIR__, 1), 'src', '_autoload.php']);
 

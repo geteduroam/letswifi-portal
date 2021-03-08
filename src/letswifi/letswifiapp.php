@@ -161,9 +161,9 @@ class LetsWifiApp
 		$accept = \array_key_exists( 'HTTP_ACCEPT', $_SERVER ) ? $_SERVER['HTTP_ACCEPT'] : '';
 		if ( null === $template || \array_key_exists( 'json', $_GET ) || false === \strpos( $accept, 'text/html' ) ) {
 			\header( 'Content-Type: application/json' );
-			die( \json_encode( $data ) );
+			exit( \json_encode( $data ) );
 		}
-		die( $this->getTemplate()->render( $template, $data ) );
+		exit( $this->getTemplate()->render( $template, $data ) );
 	}
 
 	protected function getTemplate(): Tpl
