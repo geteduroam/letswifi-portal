@@ -179,7 +179,7 @@ class Realm
 	protected function generateClientCertificate( User $user, DateTimeInterface $expiry ): PKCS12
 	{
 		$userKey = new PrivateKey( new OpenSSLConfig( OpenSSLConfig::KEY_RSA ) );
-		$commonName = static::createRANDID() . '@' . \rawurlencode( $this->getName() );
+		$commonName = static::createRandomId() . '@' . \rawurlencode( $this->getName() );
 		$dn = new DN( ['CN' => $commonName] );
 		$csr = CSR::generate( $dn, $userKey );
 		$caCert = $this->getSigningCACertificate();
@@ -193,27 +193,8 @@ class Realm
 		return new PKCS12( $userCert, $userKey, [$caCert] );
 	}
 
-	private static function createRANDID(): string
+	private static function createRandomId(): string
 	{
-		$keys = array_merge(range(0, 9), range('a', 'z'));
-		$randid = "";
-		for($i=0; $i < 16; $i++) {
-			$randid .= $keys[random_int(0, count($keys) - 1)];
-		}
-		return $randid;
-	}
-
-	private static function createUUID(): string
-	{
-		$bytes = \random_bytes( 16 );
-		$bytes[6] = \chr( \ord( $bytes[6] ) & 0x0F | 0x40 );
-		$bytes[8] = \chr( \ord( $bytes[8] ) & 0x3F | 0x40 );
-
-		return \bin2hex( $bytes[0] . $bytes[1] . $bytes[2] . $bytes[3] )
-			. '-' . \bin2hex( $bytes[4] . $bytes[5] )
-			. '-' . \bin2hex( $bytes[6] . $bytes[7] )
-			. '-' . \bin2hex( $bytes[8] . $bytes[9] )
-			. '-' . \bin2hex( $bytes[10] . $bytes[11] . $bytes[12] . $bytes[13] . $bytes[14] . $bytes[15] )
-			;
+		return strtolower( strtr( base64_encode( random_bytes( 12 ) ), '/+9876', '012345' ) );
 	}
 }
