@@ -19,7 +19,7 @@ $user = new letswifi\realm\User( $sub );
 switch ( $_SERVER['REQUEST_METHOD'] ) {
 	case 'GET': return $app->render(
 		[
-			'href' => '/profile/new/',
+			'href' => '/profiles/new/',
 			'devices' => [
 				'apple-mobileconfig' => [
 					'name' => 'Apple (iOS/MacOS)',
