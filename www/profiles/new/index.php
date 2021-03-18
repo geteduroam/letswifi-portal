@@ -27,6 +27,9 @@ switch ( $_SERVER['REQUEST_METHOD'] ) {
 				'eap-config' => [
 					'name' => 'eap-config',
 				],
+				'pkcs12' => [
+					'name' => 'PKCS12',
+				],
 			],
 			'app' => [
 				'url' => '../../app/',
@@ -36,6 +39,7 @@ switch ( $_SERVER['REQUEST_METHOD'] ) {
 		switch ( $device = $_POST['device'] ?? '' ) {
 			case 'apple-mobileconfig': $generator = $realm->getConfigGenerator( \letswifi\profile\generator\MobileConfigGenerator::class, $user ); break;
 			case 'eap-config': $generator = $realm->getConfigGenerator( \letswifi\profile\generator\EapConfigGenerator::class, $user ); break;
+			case 'pkcs12': $generator = $realm->getConfigGenerator( \letswifi\profile\generator\PKCS12Generator::class, $user ); break;
 			default:
 				\header( 'Content-Type: text/plain', true, 400 );
 				exit( "400 Bad Request\r\n\r\nUnknown device ${device}\r\n" );
