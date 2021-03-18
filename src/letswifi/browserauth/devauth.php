@@ -17,7 +17,7 @@ class DevAuth implements BrowserAuthInterface
 
 	public function __construct( array $params )
 	{
-		if ( PHP_SAPI !== 'cli-server' ) {
+		if ( \PHP_SAPI !== 'cli-server' ) {
 			\header( 'Content-Type: text/plain' );
 			exit( 'Development auth module cannot be used in production' . \PHP_EOL );
 		}
