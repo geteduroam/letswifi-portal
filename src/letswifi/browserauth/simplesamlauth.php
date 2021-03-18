@@ -9,8 +9,8 @@
 
 namespace letswifi\browserauth;
 
-use OutOfBoundsException;
 use Exception;
+use OutOfBoundsException;
 use Throwable;
 
 class SimpleSAMLAuth implements BrowserAuthInterface

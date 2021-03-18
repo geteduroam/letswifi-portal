@@ -195,6 +195,6 @@ class Realm
 
 	private static function createRandomId(): string
 	{
-		return strtolower( strtr( base64_encode( random_bytes( 12 ) ), '/+9876', '012345' ) );
+		return \strtolower( \strtr( \base64_encode( \random_bytes( 12 ) ), '/+9876', '012345' ) );
 	}
 }

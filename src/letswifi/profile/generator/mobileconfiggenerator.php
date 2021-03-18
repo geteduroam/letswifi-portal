@@ -16,13 +16,13 @@ use fyrkat\openssl\PKCS12;
 
 use InvalidArgumentException;
 
+use letswifi\LetsWifiApp;
+
 use letswifi\profile\auth\AbstractAuth;
 use letswifi\profile\auth\TlsAuth;
 
 use letswifi\profile\network\HS20Network;
 use letswifi\profile\network\SSIDNetwork;
-
-use letswifi\LetsWifiApp;
 
 /**
  * @suppress PhanParamNameIndicatingUnusedInClosure
@@ -141,7 +141,7 @@ class MobileConfigGenerator extends AbstractGenerator
 				. "\n" . '		</dict>'
 				. "\n";
 		}
-		$payloadNetworkCount=0;
+		$payloadNetworkCount = 0;
 		foreach ( $this->profileData->getNetworks() as $network ) {
 			if ( $network instanceof SSIDNetwork || $network instanceof HS20Network) {
 				// TODO assumes TLSAuth, it's the only option currently
@@ -175,10 +175,17 @@ class MobileConfigGenerator extends AbstractGenerator
 					$result .= '					<string>' . static::e( $serverName ) . '</string>'
 						. "\n";
 				}
+				/**
+				 *@psalm-suppress RedundantCondition
+				 * We know $network is one of SSIDNetwork or HS20Network,
+				 * but the code is clearer this way.
+				 */
 				if ( $network instanceof SSIDNetwork ) {
 					$payloadDisplayName = static::e( $network->getSSID() );
 				} elseif ( $network instanceof HS20Network ) {
-					$payloadDisplayName = "roaming via Passpoint";
+					$payloadDisplayName = 'roaming via Passpoint';
+				} else {
+					throw new InvalidArgumentException( 'Only SSID or Hotspot 2.0 networks are supported, got ' . \get_class( $network ) );
 				}
 				$result .= '				</array>'
 					. "\n" . '			</dict>'
@@ -227,7 +234,7 @@ class MobileConfigGenerator extends AbstractGenerator
 			} else {
 				throw new InvalidArgumentException( 'Only SSID or Hotspot 2.0 networks are supported, got ' . \get_class( $network ) );
 			}
-			$payloadNetworkCount++;
+			++$payloadNetworkCount;
 		}
 		$result .= '	</array>'
 			. "\n" . '</dict>'

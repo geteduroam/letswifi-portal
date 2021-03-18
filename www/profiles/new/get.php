@@ -16,7 +16,7 @@ $browserAuth = $app->getBrowserAuthenticator( $realm );
 $sub = $browserAuth->requireAuth();
 $user = new letswifi\realm\User( $sub );
 
-if ( $_SERVER['REQUEST_METHOD'] === 'GET' ) {
+if ( 'GET' === $_SERVER['REQUEST_METHOD'] ) {
 	switch ( $device = $_GET['device'] ?? '' ) {
 		case 'apple-mobileconfig-download':
 			$generator = $realm->getConfigGenerator( \letswifi\profile\generator\MobileConfigGenerator::class, $user );
