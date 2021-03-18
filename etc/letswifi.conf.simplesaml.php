@@ -22,6 +22,7 @@
 	'pdo.dsn' => 'sqlite:' . dirname( __DIR__ ) . '/var/letswifi-dev.sqlite',
 	'pdo.username' => null,
 	'pdo.password' => null,
+	//'signing.cert' => __DIR__ . DIRECTORY_SEPARATOR . 'signing.pem',
 	'oauth.clients' => (require __DIR__ . DIRECTORY_SEPARATOR . 'clients.php') + [
 			[
 				'clientId' => 'no.fyrkat.oauth', 
