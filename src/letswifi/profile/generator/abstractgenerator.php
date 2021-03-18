@@ -78,12 +78,12 @@ abstract class AbstractGenerator implements Generator
 
 	protected static function columnFormat( string $data, int $length = null, int $indentation = 0 ): string
 	{
+		$length = $length ?: \strlen( $data ) * 4;
+		\assert( $length > 0, 'Cannot format columns with width less than 1' );
+
 		return \implode(
 				"\n" . \str_repeat( "\t", $indentation ),
-				\str_split(
-						$data,
-						$length ?: \strlen( $data ) * 4
-					)
+				\str_split( $data, $length )
 			);
 	}
 

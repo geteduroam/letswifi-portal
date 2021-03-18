@@ -136,6 +136,8 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 
 	/**
 	 * Perform authorization based on SAML attributes
+	 *
+	 * @suppress PhanUndeclaredClassMethod We don't have a dependency on SimpleSAMLphp
 	 */
 	public function checkAuthzAttributeValue( array $authzAttributeValue ): void
 	{

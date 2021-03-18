@@ -22,13 +22,13 @@ php-cs-fixer-v2.phar:
 	curl -sSLO https://cs.symfony.com/download/php-cs-fixer-v2.phar || wget https://cs.symfony.com/download/php-cs-fixer-v2.phar
 
 psalm.phar:
-	curl -sSLO https://github.com/vimeo/psalm/releases/download/4.0.1/psalm.phar || wget https://github.com/vimeo/psalm/releases/download/4.0.1/psalm.phar
+	curl -sSLO https://github.com/vimeo/psalm/releases/download/4.6.4/psalm.phar || wget https://github.com/vimeo/psalm/releases/download/4.6.4/psalm.phar
 
 phpunit-7.phar:
 	curl -sSLO https://phar.phpunit.de/phpunit-7.phar || wget https://phar.phpunit.de/phpunit-7.phar
 
 phan.phar:
-	curl -sSLO https://github.com/phan/phan/releases/download/3.2.1/phan.phar || wget https://github.com/phan/phan/releases/download/3.2.1/phan.phar
+	curl -sSLO https://github.com/phan/phan/releases/download/4.0.3/phan.phar || wget https://github.com/phan/phan/releases/download/4.0.3/phan.phar
 
 #vendor: composer.phar
 #	php composer.phar install
