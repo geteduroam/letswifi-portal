@@ -14,6 +14,10 @@
 			'demo.eduroam.nl' => [
 					'userIdAttribute' => 'eduPersonPrincipalName', // null for NameID
 					'samlIdp' => 'https://engine.test.surfconext.nl/authentication/idp/metadata',
+					//'authzAttributeValue' => [
+					//	'eduPersonAffiliation' => ['employee','staff'],
+					//	'eduPersonEntitlement' => 'geteduroam-user',
+					//	],
 					'idpList' => [
 							'https://example.com'
 						],
