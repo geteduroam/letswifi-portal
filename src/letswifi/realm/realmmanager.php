@@ -187,9 +187,8 @@ class RealmManager extends DatabaseStorage
 
 	/**
 	 * @internal
-	 * @suppress PhanPossiblyNonClassMethodCall
-	 * @suppress PhanPluginUseReturnValueInternalKnown
-	 * @suppress PhanPossiblyFalseTypeArgumentInternal
+	 * @suppress PhanPossiblyNonClassMethodCall Phan doesn't understand PDO
+	 * @suppress PhanPossiblyFalseTypeArgumentInternal Assume getTimestamp() doesn't return false
 	 */
 	public function logPreparedCredential( string $realm, X509 $caCert, User $requester, CSR $csr, DateTimeInterface $expiry, string $usage ): int
 	{
@@ -215,7 +214,7 @@ class RealmManager extends DatabaseStorage
 	/**
 	 * @internal
 	 * @suppress PhanPossiblyNonClassMethodCall Phan doesn't understand PDO
-	 * @suppress PhanPossiblyFalseTypeArgumentInternal
+	 * @suppress PhanPossiblyFalseTypeArgumentInternal Assume getTimestamp() doesn't return false
 	 */
 	public function logCompletedCredential( string $realm, User $user, X509 $userCert, string $usage ): void
 	{

@@ -26,9 +26,6 @@ use letswifi\profile\network\SSIDNetwork;
 
 use RuntimeException;
 
-/**
- * @suppress PhanParamNameIndicatingUnusedInClosure
- */
 class MobileConfigGenerator extends AbstractGenerator
 {
 	/**

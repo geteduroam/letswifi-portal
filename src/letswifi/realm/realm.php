@@ -51,8 +51,6 @@ class Realm
 	 *
 	 * @param string $generator The config generator class to return
 	 * @param User   $user
-	 * @psalm-suppress LessSpecificReturnStatement
-	 * @psalm-suppress MoreSpecificReturnType
 	 *
 	 * @psalm-return T
 	 */

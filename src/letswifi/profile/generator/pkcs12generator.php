@@ -17,9 +17,6 @@ use letswifi\profile\IProfileData;
 
 use UnexpectedValueException;
 
-/**
- * @suppress PhanParamNameIndicatingUnusedInClosure
- */
 class PKCS12Generator extends AbstractGenerator
 {
 	/** @var string */

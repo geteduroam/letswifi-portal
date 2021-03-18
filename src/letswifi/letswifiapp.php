@@ -69,9 +69,6 @@ class LetsWifiApp
 		return new User( $userId );
 	}
 
-	/**
-	 * @psalm-suppress InvalidStringClass
-	 */
 	public function getBrowserAuthenticator( Realm $realm ): BrowserAuthInterface
 	{
 		$params = $this->config->getArrayOrEmpty( 'auth.params' );
