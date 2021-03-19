@@ -13,9 +13,7 @@ require \implode(\DIRECTORY_SEPARATOR, [\dirname(__DIR__, 3), 'src', '_autoload.
 $app = new letswifi\LetsWifiApp();
 $app->registerExceptionHandler();
 $realm = $app->getRealm();
-$browserAuth = $app->getBrowserAuthenticator( $realm );
-$sub = $browserAuth->requireAuth();
-$user = new letswifi\realm\User( $sub );
+$user = $app->getUserFromBrowserSession( $realm );
 
 switch ( $_SERVER['REQUEST_METHOD'] ) {
 	case 'GET': return $app->render(

@@ -194,7 +194,7 @@ class RealmManager extends DatabaseStorage
 	public function logPreparedCredential( string $realm, X509 $caCert, User $requester, CSR $csr, DateTimeInterface $expiry, string $usage ): int
 	{
 		$csrData = $csr->getCSRPem();
-		$statement = $this->pdo->prepare( 'INSERT INTO `realm_signing_log` (`realm`, `ca_sub`, `requester`, `usage`, `sub`, `issued`, `expires`, `csr`) VALUES (:realm, :ca_sub, :requester, :usage, :sub, :issued, :expires, :csr)' );
+		$statement = $this->pdo->prepare( 'INSERT INTO `realm_signing_log` (`realm`, `ca_sub`, `requester`, `usage`, `sub`, `issued`, `expires`, `csr`, `client`, `user_agent`, `ip`) VALUES (:realm, :ca_sub, :requester, :usage, :sub, :issued, :expires, :csr, :client, :user_agent, :ip)' );
 		$statement->bindValue( 'realm', $realm, PDO::PARAM_STR );
 		$statement->bindValue( 'ca_sub', $caCert->getSubject(), PDO::PARAM_STR );
 		$statement->bindValue( 'requester', $requester->getUserID(), PDO::PARAM_STR );
@@ -203,6 +203,9 @@ class RealmManager extends DatabaseStorage
 		$statement->bindValue( 'issued', \gmdate( 'Y-m-d H:i:s' ), PDO::PARAM_STR );
 		$statement->bindValue( 'expires', \gmdate( 'Y-m-d H:i:s', $expiry->getTimestamp() ), PDO::PARAM_STR );
 		$statement->bindValue( 'csr', $csrData, PDO::PARAM_STR );
+		$statement->bindValue( 'client', $requester->getClientId(), PDO::PARAM_STR );
+		$statement->bindValue( 'user_agent', $requester->getUserAgent(), PDO::PARAM_STR );
+		$statement->bindValue( 'ip', $requester->getIP(), PDO::PARAM_STR );
 		$statement->execute();
 		$last = $this->pdo->lastInsertId();
 		$lastId = (int)$last;

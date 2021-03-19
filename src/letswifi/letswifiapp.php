@@ -18,6 +18,7 @@ use fyrkat\oauth\Client;
 use fyrkat\oauth\OAuth;
 use fyrkat\oauth\sealer\JWTSealer;
 use fyrkat\oauth\sealer\PDOSealer;
+use fyrkat\oauth\token\Grant;
 
 use letswifi\browserauth\BrowserAuthInterface;
 
@@ -67,7 +68,22 @@ class LetsWifiApp
 		$auth = $this->getBrowserAuthenticator( $realm );
 		$userId = $auth->requireAuth();
 
-		return new User( $userId );
+		return new User( $userId, null, $this->getIP(), $_SERVER['HTTP_USER_AGENT'] );
+	}
+
+	public function getUserFromGrant( Grant $grant ): User
+	{
+		$sub = $grant->getSub();
+		if ( null === $sub ) {
+			throw new DomainException( 'No user subject available' );
+		}
+
+		return new User( $sub, $grant->getClientId(), $this->getIP(), $_SERVER['HTTP_USER_AGENT'] );
+	}
+
+	public function getIP(): string
+	{
+		return $_SERVER['REMOTE_ADDR'];
 	}
 
 	public function getBrowserAuthenticator( Realm $realm ): BrowserAuthInterface

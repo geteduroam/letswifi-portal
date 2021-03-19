@@ -64,5 +64,8 @@ CREATE TABLE IF NOT EXISTS "realm_signing_log" (
 		"csr" TEXT NOT NULL,
 		"x509" TEXT,
 		"revoked" TEXT,
-		"usage" TEXT NOT NULL
+		"usage" TEXT NOT NULL,
+		"client" TEXT,
+		"user_agent" TEXT,
+		"ip" TEXT
 	);

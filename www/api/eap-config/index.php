@@ -20,14 +20,6 @@ $realm = $app->getRealm();
 $oauth = $app->getOAuthHandler( $realm );
 $token = $oauth->getAccessTokenFromRequest( 'eap-metadata' );
 $grant = $token->getGrant();
-$sub = $grant->getSub();
-if ( null === $sub ) {
-	\header( 'Content-Type: text/plain', true, 403 );
-	exit( "403 Forbidden\r\n\r\nNo user subject available\r\n" );
-}
-$user = new letswifi\realm\User( $sub );
-$generator = $realm->getConfigGenerator( \letswifi\profile\generator\EapConfigGenerator::class, $user );
-$payload = $generator->generate();
 
 // Hack, fix clients that GET where they should POST
 if ( \in_array( $grant->getClientId(),
@@ -45,6 +37,10 @@ if ( $usedGetButShouldHaveUsedPost ) {
 	\header( 'Content-Type: text/plain', true, 405 );
 	exit( "405 Method Not Allowed\r\n\r\nOnly POST is allowed for this resource\r\n" );
 }
+
+$user = $app->getUserFromGrant( $grant );
+$generator = $realm->getConfigGenerator( \letswifi\profile\generator\EapConfigGenerator::class, $user );
+$payload = $generator->generate();
 
 \header( 'Content-Type: ' . $generator->getContentType() );
 echo $payload;

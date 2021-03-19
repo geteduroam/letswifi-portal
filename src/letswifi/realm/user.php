@@ -13,15 +13,42 @@ namespace letswifi\realm;
 class User
 {
 	/** @var string */
-	private $userID;
+	private $userId;
 
-	public function __construct( string $userID )
+	/** @var ?string */
+	private $clientId;
+
+	/** @var ?string */
+	private $ip;
+
+	/** @var ?string */
+	private $userAgent;
+
+	public function __construct( string $userId, ?string $clientId = null, ?string $ip = null, ?string $userAgent = null )
 	{
-		$this->userID = $userID;
+		$this->userId = $userId;
+		$this->clientId = $clientId;
+		$this->ip = $ip;
+		$this->userAgent = $userAgent;
 	}
 
 	public function getUserID(): string
 	{
-		return $this->userID;
+		return $this->userId;
+	}
+
+	public function getClientId(): ?string
+	{
+		return $this->clientId;
+	}
+
+	public function getIP(): ?string
+	{
+		return $this->ip;
+	}
+
+	public function getUserAgent(): ?string
+	{
+		return $this->userAgent;
 	}
 }

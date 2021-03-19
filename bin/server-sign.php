@@ -13,7 +13,7 @@ require \implode(\DIRECTORY_SEPARATOR, [\dirname(__DIR__, 1), 'src', '_autoload.
 $app = new letswifi\LetsWifiApp();
 $app->registerExceptionHandler();
 $realmManager = $app->getRealmManager();
-$user = new letswifi\realm\User( 'cli' );
+$user = new letswifi\realm\User( 'cli', 'cli' );
 
 $realm = $realmManager->getRealm( $argv[1] );
 $pkcs12 = $realm->generateServerCertificate( $user, $argv[2], (new DateTimeImmutable())->add( new DateInterval( 'P' . ( 4 === \count( $argv ) ? $argv[3] : 1095 ) . 'D' ) ) );
