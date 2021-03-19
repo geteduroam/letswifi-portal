@@ -32,7 +32,7 @@ class User
 		$this->userAgent = $userAgent;
 	}
 
-	public function getUserID(): string
+	public function getUserId(): string
 	{
 		return $this->userId;
 	}

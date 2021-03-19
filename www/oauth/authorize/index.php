@@ -28,7 +28,7 @@ try {
 	$user = $app->getUserFromBrowserSession( $realm );
 
 	if ( 'POST' === $_SERVER['REQUEST_METHOD'] ) {
-		$oauth->handleAuthorizePostRequest( $user->getUserID(), POST_VALUE === $_POST[POST_FIELD] );
+		$oauth->handleAuthorizePostRequest( $user->getUserId(), POST_VALUE === $_POST[POST_FIELD] );
 
 		// handler should never return, this code should be unreachable
 		\header( 'Content-Type: text/plain' );
