@@ -20,7 +20,7 @@ switch ( $_SERVER['REQUEST_METHOD'] ) {
 		[
 			'href' => '/profiles/mac/',
 			'action' => '/profiles/new/',
-			'device' => 'eap-config',
+			'device' => 'apple-mobileconfig',
 		], 'mobileconfig-mac-new' );
 }
 
