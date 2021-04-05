@@ -11,43 +11,12 @@ This is the reference CA for geteduroam.  It is intended to be used with an app 
 * The server logs the public key material generated
 
 
-## Getting up and running quick 'n dirty
-
-Upload this whole project to a webserver, and make `www/` accessible as the top level directory.
-
-This quick'n'dirty guide assumes you'll be using SimpleSAMLphp (the only authentication method supported ATM)
-
-	make simplesamlphp
-
-
-Initialize the SQLite database (should be possible to use other SQL databases, but this is not tested)
-
-	mkdir var
-	sqlite3 var/letswifi-dev.sqlite <sql/letswifi-dev.sqlite.sql
-
-
-Copy etc/letswifi.conf.simplesaml.php etc/letswifi.conf.php and change `userIdAttribute` to match your setup.
-
-
-Initialize required submodules
-
-        make submodule
-
-
-Create the realm with a default client certificate validity of one year
-
-	bin/add-realm.php example.com 365
-
-
-Write metadata of your SAML IdP to simplesamlphp/metadata/saml20-idp-remote.php
-
-Navigate to https://example.com/simplesaml/module.php/saml/sp/metadata.php/default-sp?output=xhtml to get the metadata of the service, and register it in your IdP
-
-
 ## Running a development server
 
-	make simplesamlphp
+	rm -rf etc/letswifi.conf.php var
 	make dev
+
+The realm being used is `example.com`
 
 
 ### Testing manually
@@ -58,6 +27,36 @@ There is a [shell script to initiate an OAuth flow](https://github.com/geteduroa
 
 * If everything went fine, you get an eap-config XML payload in test.eap-config
 * You will see the public key material logged in the `tlscredential` SQL table
+
+
+## Getting up and running quick 'n dirty
+
+Upload this whole project to a webserver, and make `www/` accessible as the top level directory.
+
+This quick'n'dirty guide assumes you'll be using SimpleSAMLphp (the only authentication method supported for production)
+
+	make simplesamlphp
+
+Initialize the SQLite database (MySQL is also supported, this should be straightforward from the config file)
+
+	mkdir var
+	sqlite3 var/letswifi-dev.sqlite <sql/letswifi-dev.sqlite.sql
+
+Copy etc/letswifi.conf.simplesaml.php etc/letswifi.conf.php and change `userIdAttribute` to match your setup.
+
+	cp etc/letswifi.conf.simplesaml.php etc/letswifi.conf.php
+
+Initialize required submodules
+
+	make submodule
+
+Create the realm with a default client certificate validity of one year
+
+	bin/add-realm.php example.com 365
+
+Write metadata of your SAML IdP to simplesamlphp/metadata/saml20-idp-remote.php
+
+Navigate to https://example.com/simplesaml/module.php/saml/sp/metadata.php/default-sp?output=xhtml to get the metadata of the service, and register it in your IdP
 
 
 ## Contributing
