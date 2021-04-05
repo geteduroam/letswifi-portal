@@ -16,28 +16,9 @@
 		'scopes' => ['eap-metadata'],
 		'refresh' => true
 	],
-	[
-		# deprecated Windows client
-		# Also clientId stolen by ionic-app?!??!!?!
-		# https://github.com/geteduroam/ionic-app
-		'clientId' => 'f817fbcc-e8f4-459e-af75-0822d86ff47a',
-		'redirectUris' => [
-			'http://[::1]/',
-			'http://localhost:8080/'],
-		'scopes' => ['eap-metadata']
-	],
 
 	# Mobile application
 	# https://github.com/geteduroam/ionic-app/pull/47
-	[
-		'clientId' => 'app.geteduroam.ionic',
-		'redirectUris' => [
-			# Old client used http://localhost:8080 but we're not allowing that anymore
-			'http://[::1]/', 'http://127.0.0.1/',
-		],
-		'scopes' => ['eap-metadata']
-	],
-
 	[
 		'clientId' => 'app.eduroam.geteduroam',
 		'redirectUris' => ['app.eduroam.geteduroam:/'],
