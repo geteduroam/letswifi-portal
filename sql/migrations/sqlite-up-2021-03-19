@@ -1,0 +1,27 @@
+BEGIN;
+
+CREATE TABLE "new__realm_signing_log" (
+                "serial" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                "realm" TEXT REFERENCES "realm"("realm") NOT NULL,
+                "ca_sub" TEXT REFERENCES "ca"("sub") NOT NULL,
+                "requester" TEXT NOT NULL,
+                "sub" TEXT NOT NULL,
+                "issued" TEXT NOT NULL,
+                "expires" TEXT NOT NULL,
+                "csr" TEXT NOT NULL,
+                "x509" TEXT,
+                "revoked" TEXT,
+                "usage" TEXT NOT NULL,
+                "client" TEXT,
+                "user_agent" TEXT,
+                "ip" TEXT
+        );
+
+INSERT INTO "new__realm_signing_log" ("serial", "realm", "ca_sub", "requester", "sub", "issued", "expires", "csr", "x509", "revoked", "usage", "client", "user_agent", "ip")
+        SELECT "serial", "realm", "ca_sub", "requester", "sub", "issued", "expires", "csr", "x509", "revoked", "usage", NULL, NULL, NULL
+        FROM "realm_signing_log";
+
+DROP TABLE "realm_signing_log";
+ALTER TABLE "new__realm_signing_log" RENAME TO "realm_signing_log";
+
+COMMIT;

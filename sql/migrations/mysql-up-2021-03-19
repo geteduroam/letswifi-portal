@@ -1,0 +1,30 @@
+BEGIN;
+
+CREATE TABLE `new__realm_signing_log` (
+                `serial` int(11) unsigned NOT NULL AUTO_INCREMENT,
+                `realm` varchar(127) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+                `ca_sub` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+                `requester` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+                `sub` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+                `issued` datetime NOT NULL,
+                `expires` datetime NOT NULL,
+                `csr` blob NOT NULL,
+                `x509` blob DEFAULT NULL,
+                `revoked` datetime DEFAULT NULL,
+                `usage` enum('client','server') COLLATE utf8mb4_unicode_ci NOT NULL,
+                `client` varchar(127) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+                `user_agent` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+                `ip` varchar(39) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+                PRIMARY KEY (`serial`),
+                FOREIGN KEY(realm) REFERENCES realm(realm),
+                FOREIGN KEY(ca_sub) REFERENCES ca(sub)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO `new__realm_signing_log` (`serial`, `realm`, `ca_sub`, `requester`, `sub`, `issued`, `expires`, `csr`, `x509`, `revoked`, `usage`, `client`, `user_agent`, `ip`)
+        SELECT `serial`, `realm`, `ca_sub`, `requester`, `sub`, `issued`, `expires`, `csr`, `x509`, `revoked`, `usage`, NULL, NULL, NULL
+        FROM `realm_signing_log`;
+
+DROP TABLE `realm_signing_log`;
+ALTER TABLE `new__realm_signing_log` RENAME TO `realm_signing_log`;
+
+COMMIT;
