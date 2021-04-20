@@ -18,7 +18,10 @@ use fyrkat\oauth\Client;
 use fyrkat\oauth\OAuth;
 use fyrkat\oauth\sealer\JWTSealer;
 use fyrkat\oauth\sealer\PDOSealer;
+use fyrkat\oauth\token\AccessToken;
+use fyrkat\oauth\token\AuthorizationCode;
 use fyrkat\oauth\token\Grant;
+use fyrkat\oauth\token\RefreshToken;
 
 use letswifi\browserauth\BrowserAuthInterface;
 
@@ -113,10 +116,15 @@ class LetsWifiApp
 
 	public function getOAuthHandler( Realm $realm ): OAuth
 	{
-		$oauth = new OAuth( new JWTSealer( $realm->getSecretKey() ) );
-		$sealer = new PDOSealer( $this->getPDO() );
-		$oauth->registerRefreshTokenSealer( $sealer );
-		$oauth->registerAuthorizationCodeSealer( $sealer );
+		$accessTokenSealer = new JWTSealer( AccessToken::class, $realm->getSecretKey() );
+		$authorizationCodeSealer = new JWTSealer( AuthorizationCode::class, $realm->getSecretKey() );
+		$refreshTokenSealer = new PDOSealer( RefreshToken::class, $this->getPDO() );
+
+		$oauth = new OAuth(
+				$accessTokenSealer,
+				$authorizationCodeSealer,
+				$refreshTokenSealer,
+			);
 		foreach ( $this->config->getArray( 'oauth.clients' ) as $client ) {
 			$oauth->registerClient( new Client( $client['clientId'], $client['redirectUris'], $client['scopes'], $client['refresh'] ?? false ) );
 		}
