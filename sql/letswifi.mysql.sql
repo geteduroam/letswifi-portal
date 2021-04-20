@@ -52,7 +52,7 @@ CREATE TABLE `realm_signing_log` (
 		`expires` timestamp NOT NULL,
 		`csr` blob NOT NULL,
 		`x509` blob DEFAULT NULL,
-		`revoked` timestamp DEFAULT NULL,
+		`revoked` timestamp NULL DEFAULT NULL,
 		`usage` enum('client','server') COLLATE utf8mb4_unicode_ci NOT NULL,
 		`client` varchar(127) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
 		`user_agent` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
