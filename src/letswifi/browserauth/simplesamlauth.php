@@ -24,6 +24,9 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 	/** @var array<string> */
 	protected $idpList;
 
+	/** @var bool */
+	protected $verifyAuthenticatingAuthority;
+
 	/** @var array<string> */
 	protected $authzAttributeValue;
 
@@ -53,13 +56,16 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 		$userIdAttribute = \array_key_exists( 'userIdAttribute', $params ) ? $params['userIdAttribute'] : null;
 		$samlIdp = \array_key_exists( 'samlIdp', $params ) ? $params['samlIdp'] : null;
 		$idpList = \array_key_exists( 'idpList', $params ) ? $params['idpList'] : [];
+		$verifyAuthenticatingAuthority = \array_key_exists( 'verifyAuthenticatingAuthority', $params ) ? $params['verifyAuthenticatingAuthority'] : true;
 		$authzAttributeValue = \array_key_exists( 'authzAttributeValue', $params ) ? $params['authzAttributeValue'] : [];
 		\assert( \is_string( $userIdAttribute ), 'userIdAttribute must be string' );
 		\assert( \is_string( $samlIdp ) || null === $samlIdp, 'samlIdp must be string if provided' );
 		\assert( \is_array( $idpList ), 'idpList must be array if provided' );
 		\assert( \is_array( $authzAttributeValue ), 'authzAttributeValue must be array if provided' );
+		\assert( \is_bool( $verifyAuthenticatingAuthority ), 'verifyAuthenticatingAuthority must be a boolean if provided' );
 		$this->samlIdp = $samlIdp;
 		$this->idpList = $idpList;
+		$this->verifyAuthenticatingAuthority = $verifyAuthenticatingAuthority;
 		$this->authzAttributeValue = $authzAttributeValue;
 		$this->as = new \SimpleSAML\Auth\Simple( $authSource );
 		$this->userIdAttribute = $userIdAttribute;
@@ -90,8 +96,8 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 
 		static::checkIdP( $this->samlIdp, $this->as->getAuthData( 'saml:sp:IdP' ) );
 
-		// Also check the saml:AuthenticatingAuthority for the entries in idpList if there is one
-		if ( \count( $this->idpList ) > 0 ) {
+		// Also check the saml:AuthenticatingAuthority for the entries in idpList if there is one and it isn't explicitly disabled
+		if ( \count( $this->idpList ) > 0 && $this->verifyAuthenticatingAuthority ) {
 			static::checkIdPList( $this->idpList, $this->as->getAuthData('saml:AuthenticatingAuthority') );
 		}
 
