@@ -2,8 +2,8 @@
 	# Shell script test application
 	[
 		'clientId' => 'app.geteduroam.sh',
-		// No IPv6 because the nc binary might not support it
-		'redirectUris' => ['http://127.0.0.1/'],
+		// We use mainly IPv4 because the nc binary might not support it
+		'redirectUris' => ['http://[::1]/', 'http://127.0.0.1/'],
 		'scopes' => ['eap-metadata'],
 		'refresh' => true
 	],
@@ -12,7 +12,8 @@
 	# https://github.com/geteduroam/windows-app
 	[
 		'clientId' => 'app.geteduroam.win',
-		'redirectUris' => ['http://[::1]/'],
+		// Windows supports IPv6 just fine, so the IPv4 version might not be needed
+		'redirectUris' => ['http://[::1]/', 'http://127.0.0.1/'],
 		'scopes' => ['eap-metadata'],
 		'refresh' => true
 	],
