@@ -2,7 +2,7 @@
 	# Shell script test application
 	[
 		'clientId' => 'app.geteduroam.sh',
-		// We use mainly IPv4 because the nc binary might not support it
+		// We use mainly IPv4 because the nc binary might not use IPv6 by default
 		'redirectUris' => ['http://[::1]/', 'http://127.0.0.1/'],
 		'scopes' => ['eap-metadata'],
 		'refresh' => true
