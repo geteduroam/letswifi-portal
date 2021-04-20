@@ -18,6 +18,7 @@
 					//	'eduPersonAffiliation' => ['employee','staff'],
 					//	'eduPersonEntitlement' => 'geteduroam-user',
 					//	],
+					//'verifyAuthenticatingAuthority' => false,
 					'idpList' => [
 							'https://example.com'
 						],
