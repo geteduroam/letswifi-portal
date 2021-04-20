@@ -9,8 +9,10 @@
 <p>If you have macOS Big Sur, please go to Profiles in System Preferences to complete installation</p>
 </main>
 
+<?php /* We use a CSP with script-src: none, so this won't work:
 <script>
 	document.getElementById('form-download').submit();
 	document.getElementById('btn-download').remove();
 </script>
+*/ ?>
 <?php $this->stop('content') ?>
