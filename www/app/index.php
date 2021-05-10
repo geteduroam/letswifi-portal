@@ -25,7 +25,7 @@ $app->render( [
 			'name' => 'iOS',
 		],
 		'windows' => [
-			'url' => 'https://geteduroam.no/app/geteduroam.exe',
+			'url' => 'https://geteduroam.app/app/geteduroam.exe',
 			'name' => 'Windows',
 		],
 	],
