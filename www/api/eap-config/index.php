@@ -10,9 +10,10 @@
 
 require \implode(\DIRECTORY_SEPARATOR, [\dirname(__DIR__, 3), 'src', '_autoload.php']);
 
-// The old ionic app uses GET here, so allow for now to keep compatibility
-// The current ionic app does this OK, so no issue link
-$usedGetButShouldHaveUsedPost = 'POST' !== $_SERVER['REQUEST_METHOD'];
+if ( 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
+	\header( 'Content-Type: text/plain', true, 405 );
+	exit( "405 Method Not Allowed\r\n\r\nOnly POST is allowed for this resource\r\n" );
+}
 
 $app = new letswifi\LetsWifiApp();
 $app->registerExceptionHandler();
@@ -20,23 +21,6 @@ $realm = $app->getRealm();
 $oauth = $app->getOAuthHandler( $realm );
 $token = $oauth->getAccessTokenFromRequest( 'eap-metadata' );
 $grant = $token->getGrant();
-
-// Hack, fix clients that GET where they should POST
-if ( \in_array( $grant->getClientId(),
-		[
-			// https://github.com/geteduroam/windows-app/issues/27, fixed in 61127d8
-			// but keep allowing while old clients are still in rotation
-			'app.geteduroam.win',
-		], true )
-) {
-	// These clients GET instead, so it's expected
-	$usedGetButShouldHaveUsedPost = false;
-}
-
-if ( $usedGetButShouldHaveUsedPost ) {
-	\header( 'Content-Type: text/plain', true, 405 );
-	exit( "405 Method Not Allowed\r\n\r\nOnly POST is allowed for this resource\r\n" );
-}
 
 $user = $app->getUserFromGrant( $grant );
 $generator = $realm->getConfigGenerator( \letswifi\profile\generator\EapConfigGenerator::class, $user );
