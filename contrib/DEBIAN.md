@@ -18,11 +18,6 @@ Create database
 	CREATE DATABASE `letswifi` DEFAULT CHARACTER SET = `utf8mb4` DEFAULT COLLATE = `utf8mb4_unicode_ci`;
 
 
-And import the SQL file with the schema
-
-	mysql <sql/letswifi.mysql.sql
-
-
 Install the application
 
 	mkdir -p /opt/geteduroam
@@ -30,6 +25,11 @@ Install the application
 	git clone --recurse-submodules https://github.com/geteduroam/letswifi-ca.git
 	cd letswifi-ca
 	sed -e "/autoloadInclude/ s@dirname.*$@@'/usr/share/simplesamlphp/vendor/autoload.php',@" <etc/letswifi.conf.simplesaml.php >etc/letswifi.conf.php
+
+
+And import the SQL file with the schema
+
+	mysql <sql/letswifi.mysql.sql
 
 
 Use the [lighttpd.debian.conf] file to configure lighttpd
