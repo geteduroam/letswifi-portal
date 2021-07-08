@@ -144,10 +144,11 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 		// if there is an userRealmPrefixValueMap, iterate over its values (order might be important) and return
 		if ( \count( $this->userRealmPrefixValueMap ) > 0 ) {
 			foreach ( $this->userRealmPrefixValueMap as $attribute => $value ) {
-				if ( \in_array( $attribute, $this->attributes[$this->userRealmPrefixAttribute] ) ) {
+				if ( \in_array( $attribute, $this->attributes[$this->userRealmPrefixAttribute], true ) ) {
 					return $value;
 				}
 			}
+
 			return null;
 		}
 

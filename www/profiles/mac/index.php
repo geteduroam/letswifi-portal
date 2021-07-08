@@ -20,7 +20,7 @@ $app->getUserFromBrowserSession( $realm );
 // on this page, which uses a more reliable POST.
 // If the meta_redirect would go through too late (after session expiry),
 // the page being redirected to will also contain an appropriate download button.
-session_start(['cookie_lifetime' => 60]);
+\session_start(['cookie_lifetime' => 60]);
 $_SESSION['mobileconfig-download-token'] = true;
 
 switch ( $_SERVER['REQUEST_METHOD'] ) {
