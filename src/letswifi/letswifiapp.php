@@ -70,8 +70,9 @@ class LetsWifiApp
 	{
 		$auth = $this->getBrowserAuthenticator( $realm );
 		$userId = $auth->requireAuth();
+		$userRealmPrefix = $auth->getUserRealmPrefix();
 
-		return new User( $userId, null, $this->getIP(), $_SERVER['HTTP_USER_AGENT'] );
+		return new User( $userId, null, $this->getIP(), $_SERVER['HTTP_USER_AGENT'], $userRealmPrefix );
 	}
 
 	public function getUserFromGrant( Grant $grant ): User

@@ -19,6 +19,13 @@
 					//	'eduPersonEntitlement' => 'geteduroam-user',
 					//	],
 					//'verifyAuthenticatingAuthority' => false,
+					//'userRealmPrefixAttribute' => 'eduPersonPrimaryAffiliation',
+					//'userRealmPrefixAttribute' => 'eduPersonAffiliation',
+					//'userRealmPrefixValueMap' => [
+					//        'employee' => 'mdw',
+					//        'staff' => null,
+					//        'student' => 'student',
+					//	],
 					'idpList' => [
 							'https://example.com'
 						],

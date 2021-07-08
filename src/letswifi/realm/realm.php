@@ -178,7 +178,12 @@ class Realm
 	protected function generateClientCertificate( User $user, DateTimeInterface $expiry ): PKCS12
 	{
 		$userKey = new PrivateKey( new OpenSSLConfig( OpenSSLConfig::KEY_RSA ) );
-		$commonName = static::createRandomId() . '@' . \rawurlencode( $this->getName() );
+		// empty, because both null === and empty string values should stay out of the realm
+		if ( empty ( $user->getUserAltRealm() ) ) {
+			$commonName = static::createRandomId() . '@' . \rawurlencode( $this->getName() );
+		} else {
+			$commonName = static::createRandomId() . '@' . \rawurlencode( \join ( ".", [ $user->getUserAltRealm(), $this->getName() ] ) );
+		}
 		$dn = new DN( ['CN' => $commonName] );
 		$csr = CSR::generate( $dn, $userKey );
 		$caCert = $this->getSigningCACertificate();
