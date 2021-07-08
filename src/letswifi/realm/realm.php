@@ -180,9 +180,9 @@ class Realm
 		$userKey = new PrivateKey( new OpenSSLConfig( OpenSSLConfig::KEY_RSA ) );
 		// empty, because both null === and empty string values should stay out of the realm
 		if ( empty( $user->getUserAltRealm() ) ) {
-			$commonName = static::createRandomId() . '@' . \rawurlencode( $this->getName() );
+			$commonName = static::createCommonName( '@' . \rawurlencode( $this->getName() ) );
 		} else {
-			$commonName = static::createRandomId() . '@' . \rawurlencode( \implode( '.', [$user->getUserAltRealm(), $this->getName()] ) );
+			$commonName = static::createCommonName( '@' . \rawurlencode( \implode( '.', [$user->getUserAltRealm(), $this->getName()] ) ) );
 		}
 		$dn = new DN( ['CN' => $commonName] );
 		$csr = CSR::generate( $dn, $userKey );
@@ -197,8 +197,8 @@ class Realm
 		return new PKCS12( $userCert, $userKey, [$caCert] );
 	}
 
-	private static function createRandomId(): string
+	private static function createCommonName( string $realm ): string
 	{
-		return \strtolower( \strtr( \base64_encode( \random_bytes( 12 ) ), '/+9876', '012345' ) );
+		return \substr( \strtolower( \strtr( \base64_encode( \random_bytes( 12 ) ), '/+9876', '012345' ) ), 0, 64 - \strlen( $realm ) ) . $realm;
 	}
 }
