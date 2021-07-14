@@ -83,7 +83,11 @@ class LetsWifiApp
 		}
 		$sub_values = \explode( ',', $sub );
 
-		return new User( $sub_values[0], $grant->getClientId(), $this->getIP(), $_SERVER['HTTP_USER_AGENT'], $sub_values[1] );
+		if ( 2 === \count( $sub_values ) ) {
+			return new User( $sub_values[0], $grant->getClientId(), $this->getIP(), $_SERVER['HTTP_USER_AGENT'], $sub_values[1] );
+		}
+
+		return new User( $sub, $grant->getClientId(), $this->getIP(), $_SERVER['HTTP_USER_AGENT'] );
 	}
 
 	public function getIP(): string
