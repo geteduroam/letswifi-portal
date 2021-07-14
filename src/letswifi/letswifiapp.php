@@ -81,8 +81,9 @@ class LetsWifiApp
 		if ( null === $sub ) {
 			throw new DomainException( 'No user subject available' );
 		}
+		$sub_values = \explode( ',', $sub );
 
-		return new User( $sub, $grant->getClientId(), $this->getIP(), $_SERVER['HTTP_USER_AGENT'] );
+		return new User( $sub_values[0], $grant->getClientId(), $this->getIP(), $_SERVER['HTTP_USER_AGENT'], $sub_values[1] );
 	}
 
 	public function getIP(): string
