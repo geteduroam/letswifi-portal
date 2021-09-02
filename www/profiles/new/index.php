@@ -32,12 +32,12 @@ $user = $app->getUserFromBrowserSession( $realm );
 // assuming user came from /profiles/mac,
 // so that's the page that stays in the browser.
 if ( 'GET' === $_SERVER['REQUEST_METHOD'] && isset( $_GET['download'] ) ) {
-	session_start(['cookie_lifetime' => 1]);
-	if ( $_SESSION['mobileconfig-download-token'] ){
+	\session_start(['cookie_lifetime' => 1]);
+	if ( $_SESSION['mobileconfig-download-token'] ) {
 		$_SERVER['REQUEST_METHOD'] = 'POST';
 		$_POST['device'] = $_GET['device'];
 	}
-	session_destroy();
+	\session_destroy();
 }
 
 switch ( $_SERVER['REQUEST_METHOD'] ) {

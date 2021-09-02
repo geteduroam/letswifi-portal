@@ -24,12 +24,16 @@ class User
 	/** @var ?string */
 	private $userAgent;
 
-	public function __construct( string $userId, ?string $clientId = null, ?string $ip = null, ?string $userAgent = null )
+	/** @var ?string */
+	private $userAltRealm;
+
+	public function __construct( string $userId, ?string $clientId = null, ?string $ip = null, ?string $userAgent = null, ?string $userAltRealm = null )
 	{
 		$this->userId = $userId;
 		$this->clientId = $clientId;
 		$this->ip = $ip;
 		$this->userAgent = $userAgent;
+		$this->userAltRealm = $userAltRealm;
 	}
 
 	public function getUserId(): string
@@ -50,5 +54,10 @@ class User
 	public function getUserAgent(): ?string
 	{
 		return $this->userAgent;
+	}
+
+	public function getUserAltRealm(): ?string
+	{
+		return $this->userAltRealm;
 	}
 }

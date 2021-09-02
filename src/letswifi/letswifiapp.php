@@ -70,8 +70,9 @@ class LetsWifiApp
 	{
 		$auth = $this->getBrowserAuthenticator( $realm );
 		$userId = $auth->requireAuth();
+		$userRealmPrefix = $auth->getUserRealmPrefix();
 
-		return new User( $userId, null, $this->getIP(), $_SERVER['HTTP_USER_AGENT'] );
+		return new User( $userId, null, $this->getIP(), $_SERVER['HTTP_USER_AGENT'], $userRealmPrefix );
 	}
 
 	public function getUserFromGrant( Grant $grant ): User
@@ -79,6 +80,11 @@ class LetsWifiApp
 		$sub = $grant->getSub();
 		if ( null === $sub ) {
 			throw new DomainException( 'No user subject available' );
+		}
+		$sub_values = \explode( ',', $sub );
+
+		if ( 2 === \count( $sub_values ) ) {
+			return new User( $sub_values[0], $grant->getClientId(), $this->getIP(), $_SERVER['HTTP_USER_AGENT'], $sub_values[1] );
 		}
 
 		return new User( $sub, $grant->getClientId(), $this->getIP(), $_SERVER['HTTP_USER_AGENT'] );

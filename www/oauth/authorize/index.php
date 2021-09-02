@@ -28,7 +28,11 @@ try {
 	$user = $app->getUserFromBrowserSession( $realm );
 
 	if ( 'POST' === $_SERVER['REQUEST_METHOD'] ) {
-		$oauth->handleAuthorizePostRequest( $user->getUserId(), POST_VALUE === $_POST[POST_FIELD] );
+		if ( null === $browserAuth->getUserRealmPrefix() ) {
+			$oauth->handleAuthorizePostRequest( $user->getUserId(), POST_VALUE === $_POST[POST_FIELD] );
+		} else {
+			$oauth->handleAuthorizePostRequest( $user->getUserId() . ',' . $browserAuth->getUserRealmPrefix(), POST_VALUE === $_POST[POST_FIELD] );
+		}
 
 		// handler should never return, this code should be unreachable
 		\header( 'Content-Type: text/plain' );
