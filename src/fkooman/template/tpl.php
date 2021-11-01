@@ -1,1 +1,1 @@
-../../../lib/git.tuxed.net/fkooman/php-tpl/src/Tpl.php
+../../../lib/git.sr.ht/~eduroam/php-tpl/src/Tpl.php
