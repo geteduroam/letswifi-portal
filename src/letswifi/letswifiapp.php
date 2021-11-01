@@ -35,7 +35,7 @@ use Throwable;
 
 class LetsWifiApp
 {
-	const HTTP_CODES = [
+	public const HTTP_CODES = [
 		400 => 'Bad Request',
 		401 => 'Unauthorized',
 		403 => 'Forbidden',
@@ -129,7 +129,7 @@ class LetsWifiApp
 		$oauth = new OAuth(
 				$accessTokenSealer,
 				$authorizationCodeSealer,
-				$refreshTokenSealer,
+				$refreshTokenSealer
 			);
 		foreach ( $this->config->getArray( 'oauth.clients' ) as $client ) {
 			$oauth->registerClient( new Client( $client['clientId'], $client['redirectUris'], $client['scopes'], $client['refresh'] ?? false ) );

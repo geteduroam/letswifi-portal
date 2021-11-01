@@ -4,6 +4,7 @@
 /fifo
 /phan.phar
 /php-cs-fixer-v2.phar
+/php-cs-fixer-v3.phar
 /phpunit-7.phar
 /psalm.phar
 /simplesamlphp*
@@ -12,4 +13,5 @@
 /www/simplesaml
 /.geteduroam-refresh-*
 /.php_cs.cache
+/.php-cs-fixer.cache
 *.eap-config

@@ -13,7 +13,7 @@ dev: check-php etc/letswifi.conf.php submodule
 .PHONY: dev
 
 clean:
-	rm -rf composer.phar etc/letswifi.conf.php phan.phar php-cs-fixer-v2.phar psalm.phar phpunit-7.phar simplesamlphp* vendor www/simplesaml
+	rm -rf composer.phar etc/letswifi.conf.php phan.phar php-cs-fixer-v2.phar php-cs-fixer-v3.phar psalm.phar phpunit-7.phar simplesamlphp* vendor www/simplesaml
 	git submodule deinit --all
 .PHONY: clean
 
@@ -57,8 +57,8 @@ composer.phar: check-php
 vendor: composer.phar
 	php composer.phar install
 
-php-cs-fixer-v2.phar: check-php
-	curl -sSLO https://cs.symfony.com/download/php-cs-fixer-v2.phar || wget https://cs.symfony.com/download/php-cs-fixer-v2.phar
+php-cs-fixer-v3.phar: check-php
+	curl -sSLO https://cs.symfony.com/download/php-cs-fixer-v3.phar || wget https://cs.symfony.com/download/php-cs-fixer-v3.phar
 
 psalm.phar: check-php
 	curl -sSLO https://github.com/vimeo/psalm/releases/download/4.7.0/psalm.phar || wget https://github.com/vimeo/psalm/releases/download/4.7.0/psalm.phar
@@ -79,8 +79,8 @@ phan: submodule phan.phar
 	php phan.phar --allow-polyfill-parser --no-progress-bar
 .PHONY: phan
 
-codestyle: php-cs-fixer-v2.phar
-	php php-cs-fixer-v2.phar fix
+codestyle: php-cs-fixer-v3.phar
+	php php-cs-fixer-v3.phar fix
 .PHONY: codestyle
 
 phpunit: submodule phpunit-7.phar

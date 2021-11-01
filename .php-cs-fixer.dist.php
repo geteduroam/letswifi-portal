@@ -7,7 +7,7 @@ $finder = PhpCsFixer\Finder::create()
 	->in(__DIR__ . DIRECTORY_SEPARATOR . '.phan')
 	->notName('_autoload.php')
 ;
-return PhpCsFixer\Config::create()
+$config = (new PhpCsFixer\Config())
 	->setRiskyAllowed(true)
 	->setIndent("\t")
 	->setRules([
@@ -57,6 +57,7 @@ EOD
 		'concat_space' => [
 			'spacing' => 'one'
 		],
+		'constant_case' => ['case' => 'lower'], // constants such as true, false, null
 		'date_time_immutable' => true,
 		'declare_strict_types' => true,
 		'dir_constant' => true,
@@ -99,7 +100,6 @@ EOD
 		'linebreak_after_opening_tag' => false, /* declare strict types definition goes here */
 		'logical_operators' => true,
 		'lowercase_cast' => true,
-		'lowercase_constants' => true,
 		'lowercase_keywords' => true,
 		'lowercase_static_reference' => true,
 		'magic_constant_casing' => true,
@@ -168,20 +168,22 @@ EOD
 		'normalize_index_brace' => true,
 		'object_operator_without_whitespace' => true,
 		'ordered_class_elements' => [
-			'use_trait',
-			'constant_public',
-			'constant_protected',
-			'constant_private',
-			'property_public',
-			'property_protected',
-			'property_private',
-			'construct',
-			'destruct',
-			'magic',
-			'phpunit',
-			'method_public',
-			'method_protected',
-			'method_private'
+			'order' => [
+				'use_trait',
+				'constant_public',
+				'constant_protected',
+				'constant_private',
+				'property_public',
+				'property_protected',
+				'property_private',
+				'construct',
+				'destruct',
+				'magic',
+				'phpunit',
+				'method_public',
+				'method_protected',
+				'method_private'
+			],
 		],
 		'ordered_imports' => [
 			'sort_algorithm' => 'alpha'
@@ -193,7 +195,7 @@ EOD
 		],
 		'phpdoc_annotation_without_dot' => true,
 		'phpdoc_indent' => true,
-		'phpdoc_inline_tag' => true,
+		'phpdoc_inline_tag_normalizer' => true,
 		'phpdoc_no_access' => true,
 		'phpdoc_no_empty_return' => false,
 		'phpdoc_no_package' => true,
@@ -202,6 +204,7 @@ EOD
 		'phpdoc_separation' => true,
 		'phpdoc_single_line_var_spacing' => true,
 		'phpdoc_summary' => false,
+		'phpdoc_tag_type' => true,
 		'phpdoc_to_comment' => false, /* converts Psalm suppress to comment, so turn it off */
 		'phpdoc_trim' => true,
 		'phpdoc_trim_consecutive_blank_line_separation' => true,
@@ -212,8 +215,7 @@ EOD
 		],
 		'phpdoc_var_without_name' => true,
 		'pow_to_exponentiation' => true,
-		'psr4' => false, /* PSR4 is in conflict with SPL (Standard Php Library), we use SPL, not PSR4 */
-		'psr_autoloading' => false, /* breaks SPL autoloading */
+		'psr_autoloading' => false, /* PSR4 is in conflict with SPL (Standard Php Library), we use SPL, not PSR4 */
 		'return_assignment' => true,
 		'return_type_declaration' => true,
 		'self_accessor' => true,
@@ -237,10 +239,11 @@ EOD
 		'switch_case_semicolon_to_colon' => true,
 		'ternary_operator_spaces' => true,
 		'ternary_to_null_coalescing' => true,
-		'trailing_comma_in_multiline_array' => true,
+		'trailing_comma_in_multiline' => ['elements' => ['arrays']],
 		'trim_array_spaces' => true,
 		'unary_operator_spaces' => true,
 		'visibility_required' => true,
 	])
 	->setFinder($finder)
 ;
+return $config;
