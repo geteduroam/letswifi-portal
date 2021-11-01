@@ -140,12 +140,13 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 		if ( null === $this->userRealmPrefixAttribute || !\array_key_exists( $this->userRealmPrefixAttribute, $this->attributes ) ) {
 			return null;
 		}
-		\assert( \is_array( $this->attributes[$this->userRealmPrefixAttribute] ), 'SimpleSAMLphp always returns attributes as array' );
+		$userRealmPrefix = $this->attributes[$this->userRealmPrefixAttribute];
+		\assert( \is_array( $userRealmPrefix ), 'SimpleSAMLphp always returns attributes as array' );
 
 		// if there is an userRealmPrefixValueMap, iterate over its values (order might be important) and return
 		if ( \count( $this->userRealmPrefixValueMap ) > 0 ) {
 			foreach ( $this->userRealmPrefixValueMap as $attribute => $value ) {
-				if ( \in_array( $attribute, $this->attributes[$this->userRealmPrefixAttribute], true ) ) {
+				if ( \in_array( $attribute, $userRealmPrefix, true ) ) {
 					return $value;
 				}
 			}
@@ -154,8 +155,8 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 		}
 
 		// if there is no map, we hope there's just one attribute, ie. the eduPersonPrimaryAffiliation
-		if ( 1 === \count( $this->attributes[$this->userRealmPrefixAttribute] ) ) {
-			return \reset( $this->attributes[$this->userRealmPrefixAttribute] );
+		if ( 1 === \count( $userRealmPrefix ) ) {
+			return \reset( $userRealmPrefix );
 		}
 
 		// we're unsure if there is no map, no prefix
@@ -178,11 +179,13 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 			}
 			$key = $shibKey;
 		}
-		\assert( \is_array( $this->attributes[$key] ), 'SimpleSAMLphp always returns attributes as array' );
-		if ( 1 !== \count( $this->attributes[$key] ) ) {
-			throw new OutOfBoundsException( "Attribute ${key} was expected to have exactly 1 value, but has " . \count( $this->attributes[$key] ) );
+
+		$attributeValues = $this->attributes[$key];
+		\assert( \is_array( $attributeValues ), 'SimpleSAMLphp always returns attributes as array' );
+		if ( 1 !== \count( $attributeValues ) ) {
+			throw new OutOfBoundsException( "Attribute ${key} was expected to have exactly 1 value, but has " . \count( $attributeValues ) );
 		}
-		$result = \reset( $this->attributes[$key] );
+		$result = \reset( $attributeValues );
 		\assert( \is_string( $result ), 'Attributes returned by SimpleSAMLphp are always of type string' );
 
 		return $result;
