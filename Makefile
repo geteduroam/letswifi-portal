@@ -61,7 +61,7 @@ php-cs-fixer-v3.phar: check-php
 	curl -sSLO https://cs.symfony.com/download/php-cs-fixer-v3.phar || wget https://cs.symfony.com/download/php-cs-fixer-v3.phar
 
 psalm.phar: check-php
-	curl -sSLO https://github.com/vimeo/psalm/releases/download/4.7.0/psalm.phar || wget https://github.com/vimeo/psalm/releases/download/4.7.0/psalm.phar
+	curl -sSLO https://github.com/vimeo/psalm/releases/download/4.11.2/psalm.phar || wget https://github.com/vimeo/psalm/releases/download/4.11.2/psalm.phar
 
 phpunit-7.phar: check-php
 	curl -sSLO https://phar.phpunit.de/phpunit-7.phar || wget https://phar.phpunit.de/phpunit-7.phar

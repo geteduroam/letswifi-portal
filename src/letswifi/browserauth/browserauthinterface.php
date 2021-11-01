@@ -23,4 +23,15 @@ interface BrowserAuthInterface
 	public function guessRealm( array $params ): ?string;
 
 	public function getLogoutURL( ?string $redirect = null ): ?string;
+
+	/**
+	 * Get a prefix that must be added in front of the realm, compensating for dots
+	 *
+	 * For example, if the realm is example.com and this function returns "student",
+	 * the final realm must be student.example.com; a dot has to be added,
+	 * unless that would cause the realm to contain "@.""
+	 *
+	 * @return ?string The prefix to add to the realm, do not add anything if null
+	 */
+	public function getUserRealmPrefix(): ?string;
 }

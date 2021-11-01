@@ -120,6 +120,9 @@ class LetsWifiApp
 		return $this->config->getStringOrNull( 'signing.cert' );
 	}
 
+	/**
+	 * @psalm-suppress ArgumentTypeCoercion Psalm incorrectly things JWTSealer is parent of Sealer, it's the other way around
+	 */
 	public function getOAuthHandler( Realm $realm ): OAuth
 	{
 		$accessTokenSealer = new JWTSealer( AccessToken::class, $realm->getSecretKey() );

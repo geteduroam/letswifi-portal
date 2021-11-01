@@ -136,7 +136,8 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 			$this->attributes = $this->as->getAttributes();
 			\assert( \is_array( $this->attributes ), 'SimpleSAMLphp always returns an array' );
 		}
-		if ( !\array_key_exists( $this->userRealmPrefixAttribute, $this->attributes ) ) {
+
+		if ( null === $this->userRealmPrefixAttribute || !\array_key_exists( $this->userRealmPrefixAttribute, $this->attributes ) ) {
 			return null;
 		}
 		\assert( \is_array( $this->attributes[$this->userRealmPrefixAttribute] ), 'SimpleSAMLphp always returns attributes as array' );
