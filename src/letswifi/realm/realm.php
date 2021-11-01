@@ -84,7 +84,7 @@ class Realm
 				$ca = $ca->getIssuerCA();
 			} while ( null !== $ca );
 			// Reverse the certificates so we have the same order as CAT
-			for ( $i = \count( $subResult ) - 1; $i >= 0; --$i ) {
+			for ( $i = \count( $subResult ) - 1; 0 <= $i; --$i ) {
 				$result[] = $subResult[$i];
 			}
 		}

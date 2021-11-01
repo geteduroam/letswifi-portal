@@ -209,7 +209,7 @@ class RealmManager extends DatabaseStorage
 		$statement->execute();
 		$last = $this->pdo->lastInsertId();
 		$lastId = (int)$last;
-		if ( $lastId > 0 && (string)$lastId === $last ) {
+		if ( 0 < $lastId && (string)$lastId === $last ) {
 			return $lastId;
 		}
 		throw new DomainException( 'Unable to retrieve last insert ID from database' );

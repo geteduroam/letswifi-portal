@@ -29,7 +29,7 @@ $certificates = \array_map( static function ( string $certificate ) {
 	return new X509( $certificate );
 }, $certificates[0] );
 
-for ( $i = \count( $certificates ) - 1; $i >= 0; --$i ) {
+for ( $i = \count( $certificates ) - 1; 0 <= $i; --$i ) {
 	$x509 = $certificates[$i];
 	$sub = (string)$x509->getSubject();
 	if ( null !== $realmManager->getCA( $sub ) ) {

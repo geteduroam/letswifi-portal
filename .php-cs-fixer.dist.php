@@ -29,6 +29,7 @@ EOD
 			'comment_type' => 'all_multiline'
 		],
 		'array_indentation' => true,
+		'array_push' => true,
 		'array_syntax' => [
 			'syntax' => 'short'
 		],
@@ -53,6 +54,7 @@ EOD
 		'class_keyword_remove' => false,
 		'combine_consecutive_issets' => true,
 		'combine_consecutive_unsets' => true,
+		'combine_nested_dirname' => true,
 		'comment_to_phpdoc' => true,
 		'concat_space' => [
 			'spacing' => 'one'
@@ -80,6 +82,8 @@ EOD
 		],
 		'explicit_indirect_variable' => true,
 		'explicit_string_variable' => true,
+		'fopen_flag_order' => true,
+		'fopen_flags' => ['b_mode' => false],
 		'full_opening_tag' => true,
 		'fully_qualified_strict_types' => true,
 		'function_declaration' => false, /* Would remove spaces in function definitions */
@@ -87,12 +91,14 @@ EOD
 			'functions' => [ /* default */
 				'get_called_class',
 				'get_class',
+				'get_class_this',
 				'php_sapi_name',
 				'phpversion',
 				'pi'
 			],
 		],
 		'function_typehint_space' => true,
+		'implode_call' => true,
 		'include' => true,
 		'indentation_type' => true,
 		'is_null' => true,
@@ -154,6 +160,7 @@ EOD
 		'no_superfluous_phpdoc_tags' => false,
 		'no_trailing_whitespace' => true,
 		'no_trailing_whitespace_in_comment' => true,
+		'no_trailing_whitespace_in_string' => true,
 		'no_unneeded_control_parentheses' => [
 			'statements' => ['break', 'clone', 'continue', 'echo_print', 'return', 'switch_case', 'yield'] /* default */
 		],
@@ -162,9 +169,10 @@ EOD
 		'no_unused_imports' => true,
 		'no_useless_else' => true,
 		'no_useless_return' => true,
+		'no_useless_sprintf' => true,
 		'no_whitespace_before_comma_in_array' => true,
 		'no_whitespace_in_blank_line' => true,
-		'non_printable_character' => true,
+		'non_printable_character' => ['use_escape_sequences_in_strings' => true],
 		'normalize_index_brace' => true,
 		'object_operator_without_whitespace' => true,
 		'ordered_class_elements' => [
@@ -188,6 +196,7 @@ EOD
 		'ordered_imports' => [
 			'sort_algorithm' => 'alpha'
 		],
+		'ordered_traits' => true,
 		'phpdoc_add_missing_param_annotation' => true,
 		'phpdoc_align' => [
 			'align' => 'vertical',
@@ -214,6 +223,10 @@ EOD
 			'sort_algorithm' => 'alpha'
 		],
 		'phpdoc_var_without_name' => true,
+		'php_unit_construct' => true,
+		'php_unit_mock_short_will_return' => true,
+		'php_unit_set_up_tear_down_visibility' => true,
+		'php_unit_test_annotation' => true,
 		'pow_to_exponentiation' => true,
 		'psr_autoloading' => false, /* PSR4 is in conflict with SPL (Standard Php Library), we use SPL, not PSR4 */
 		'return_assignment' => true,
@@ -238,11 +251,13 @@ EOD
 		'string_line_ending' => true,
 		'switch_case_semicolon_to_colon' => true,
 		'ternary_operator_spaces' => true,
+		'ternary_to_elvis_operator' => true,
 		'ternary_to_null_coalescing' => true,
 		'trailing_comma_in_multiline' => ['elements' => ['arrays']],
 		'trim_array_spaces' => true,
 		'unary_operator_spaces' => true,
 		'visibility_required' => true,
+		'yoda_style' => ['equal' => true, 'identical' => true, 'less_and_greater' => true, 'always_move_variable' => true],
 	])
 	->setFinder($finder)
 ;

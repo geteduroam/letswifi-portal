@@ -58,6 +58,7 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 		if ( \array_key_exists( 'autoloadInclude', $params ) ) {
 			require $params['autoloadInclude'];
 		}
+
 		$authSource = \array_key_exists( 'authSource', $params ) ? $params['authSource'] : 'default-sp';
 		$userIdAttribute = \array_key_exists( 'userIdAttribute', $params ) ? $params['userIdAttribute'] : null;
 		$userRealmPrefixAttribute = \array_key_exists( 'userRealmPrefixAttribute', $params ) ? $params['userRealmPrefixAttribute'] : null;
@@ -66,6 +67,7 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 		$idpList = \array_key_exists( 'idpList', $params ) ? $params['idpList'] : [];
 		$verifyAuthenticatingAuthority = \array_key_exists( 'verifyAuthenticatingAuthority', $params ) ? $params['verifyAuthenticatingAuthority'] : true;
 		$authzAttributeValue = \array_key_exists( 'authzAttributeValue', $params ) ? $params['authzAttributeValue'] : [];
+
 		\assert( \is_string( $userIdAttribute ), 'userIdAttribute must be string' );
 		\assert( \is_string( $userRealmPrefixAttribute ), 'userRealmPrefixAttribute must be string' );
 		\assert( \is_array( $userRealmPrefixValueMap ), 'userRealmPrefixValueMap must be array' );
@@ -73,6 +75,7 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 		\assert( \is_array( $idpList ), 'idpList must be array if provided' );
 		\assert( \is_array( $authzAttributeValue ), 'authzAttributeValue must be array if provided' );
 		\assert( \is_bool( $verifyAuthenticatingAuthority ), 'verifyAuthenticatingAuthority must be a boolean if provided' );
+
 		$this->samlIdp = $samlIdp;
 		$this->idpList = $idpList;
 		$this->verifyAuthenticatingAuthority = $verifyAuthenticatingAuthority;
@@ -272,7 +275,7 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 	 */
 	private static function checkIdPList( array $expectedIdPList, array $authenticatingAuthority ): void
 	{
-		if ( $expectedIdPList !== \array_intersect($expectedIdPList, $authenticatingAuthority) ) {
+		if ( \array_intersect( $expectedIdPList, $authenticatingAuthority ) !== $expectedIdPList ) {
 			throw new MismatchIdpException( $expectedIdPList[0], $authenticatingAuthority[0] );
 		}
 	}
