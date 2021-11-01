@@ -24,12 +24,16 @@ Install the application
 	cd /opt/geteduroam
 	git clone --recurse-submodules https://github.com/geteduroam/letswifi-ca.git
 	cd letswifi-ca
-	sed -e "/autoloadInclude/ s@dirname.*$@@'/usr/share/simplesamlphp/vendor/autoload.php',@" <etc/letswifi.conf.simplesaml.php >etc/letswifi.conf.php
+	sed \
+		-e "/autoloadInclude/ s@dirname.*$@@'/usr/share/simplesamlphp/vendor/autoload.php',@" \
+		-e "/pdo\.dsn/ s@sqlite:.*',@mysql:host=localhost;dbname=letswifi@" \
+		\
+		<etc/letswifi.conf.simplesaml.php >etc/letswifi.conf.php
 
 
 And import the SQL file with the schema
 
-	mysql <sql/letswifi.mysql.sql
+	mysql letswifi <sql/letswifi.mysql.sql
 
 
 Use the [lighttpd.debian.conf] file to configure lighttpd
