@@ -15,6 +15,7 @@ use DomainException;
 use fkooman\Template\Tpl;
 
 use fyrkat\oauth\Client;
+use fyrkat\oauth\exception\OAuthInvalidGrantException;
 use fyrkat\oauth\OAuth;
 use fyrkat\oauth\sealer\JWTSealer;
 use fyrkat\oauth\sealer\PDOSealer;
@@ -77,9 +78,10 @@ class LetsWifiApp
 
 	public function getUserFromGrant( Grant $grant ): User
 	{
-		$sub = $grant->getSub();
-		if ( null === $sub ) {
-			throw new DomainException( 'No user subject available' );
+		try {
+			$sub = $grant->getSub();
+		} catch ( OAuthInvalidGrantException $e ) {
+			throw new DomainException( 'No user subject available', 0, $e );
 		}
 		$sub_values = \explode( ',', $sub );
 

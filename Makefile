@@ -67,7 +67,7 @@ phpunit-7.phar: check-php
 	curl -sSLO https://phar.phpunit.de/phpunit-7.phar || wget https://phar.phpunit.de/phpunit-7.phar
 
 phan.phar: check-php
-	curl -sSLO https://github.com/phan/phan/releases/download/4.0.3/phan.phar || wget https://github.com/phan/phan/releases/download/4.0.3/phan.phar
+	curl -sSLO https://github.com/phan/phan/releases/download/5.2.1/phan.phar || wget https://github.com/phan/phan/releases/download/5.2.1/phan.phar
 
 psalm: submodule psalm.phar
 	mkdir -p vendor
