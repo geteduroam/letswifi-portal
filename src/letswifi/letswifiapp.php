@@ -72,7 +72,9 @@ class LetsWifiApp
 		$userId = $auth->requireAuth();
 		$userRealmPrefix = $auth->getUserRealmPrefix();
 
-		return new User( $userId, null, $this->getIP(), $_SERVER['HTTP_USER_AGENT'], $userRealmPrefix );
+		$realm = $userRealmPrefix ?? $this->getRealm()->getName();
+
+		return new User( $userId, $realm, null, $this->getIP(), $_SERVER['HTTP_USER_AGENT'] );
 	}
 
 	public function getUserFromGrant( Grant $grant ): User
@@ -81,13 +83,13 @@ class LetsWifiApp
 		if ( null === $sub ) {
 			throw new DomainException( 'No user subject available' );
 		}
-		$sub_values = \explode( ',', $sub );
 
-		if ( 2 === \count( $sub_values ) ) {
-			return new User( $sub_values[0], $grant->getClientId(), $this->getIP(), $_SERVER['HTTP_USER_AGENT'], $sub_values[1] );
+		$realm = $grant->realm;
+		if ( empty( $realm ) ) {
+			throw new DomainException( 'User has no realm' );
 		}
 
-		return new User( $sub, $grant->getClientId(), $this->getIP(), $_SERVER['HTTP_USER_AGENT'] );
+		return new User( $sub, $realm, $grant->getClientId(), $this->getIP(), $_SERVER['HTTP_USER_AGENT'] );
 	}
 
 	public function getIP(): string
