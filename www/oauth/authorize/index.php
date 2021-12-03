@@ -28,11 +28,13 @@ try {
 	$user = $app->getUserFromBrowserSession( $realm );
 
 	if ( 'POST' === $_SERVER['REQUEST_METHOD'] ) {
-		if ( null === $browserAuth->getUserRealmPrefix() ) {
-			$oauth->handleAuthorizePostRequest( $user->getUserId(), POST_VALUE === $_POST[POST_FIELD] );
-		} else {
-			$oauth->handleAuthorizePostRequest( $user->getUserId() . ',' . $browserAuth->getUserRealmPrefix(), POST_VALUE === $_POST[POST_FIELD] );
-		}
+		$userRealmPrefix = $browserAuth->getUserRealmPrefix();
+		$oauth->handleAuthorizePostRequest( new fyrkat\oauth\token\Grant(
+			[
+				'sub' => $user->getUserId(),
+				'realm' => $userRealmPrefix ?? $realm->getName(),
+			]
+		), POST_VALUE === $_POST[POST_FIELD] );
 
 		// handler should never return, this code should be unreachable
 		\header( 'Content-Type: text/plain' );
