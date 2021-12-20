@@ -14,20 +14,36 @@ use RuntimeException;
 
 class MismatchFeideException extends MismatchIdpException
 {
-	/** @var string */
+	/** @var array<string>|string */
 	private $required;
 
-	/** @var string */
+	/** @var array */
 	private $provided;
 
 	/** @var ?string $ */
 	private $username;
 
-	public function __construct( string $required, string $provided, string $username = null )
+	/**
+	 * @param array<string>|string $required
+	 */
+	public function __construct( $required, array $provided, string $username = null )
 	{
+		if ( \is_array( $required ) && 1 === \count( $required ) ) {
+			$required = \reset( $required );
+		}
+
 		$this->required = $required;
 		$this->provided = $provided;
 		$this->username = $username;
-		RuntimeException::__construct( "Expected Feide org ${required} but got ${provided}" . ( isset( $username ) ? " with username ${username}" : '' ) );
+
+		$requiredStr = \is_string( $required )
+			? \sprintf( "'%s'", $required )
+			: \sprintf( '[%s]', \implode( ', ', $required ) )
+			;
+		$providedStr = 1 === \count( $provided )
+			? \sprintf( "'%s'", \reset( $provided ) )
+			: \sprintf( '[%s]', \implode( ', ', $provided ) )
+			;
+		RuntimeException::__construct( "Cannot reconsiliate ${requiredStr} with ${providedStr}" . ( isset( $username ) ? " with username ${username}" : '' ) );
 	}
 }

@@ -10,12 +10,11 @@
 
 namespace letswifi\browserauth;
 
-use OutOfBoundsException;
 use Throwable;
 
 class SimpleSAMLFeideAuth extends SimpleSAMLAuth
 {
-	/** @var ?string */
+	/** @var array<string>|?string */
 	private $feideHomeOrg;
 
 	/** @var string */
@@ -48,16 +47,7 @@ class SimpleSAMLFeideAuth extends SimpleSAMLAuth
 
 		$username = parent::requireAuth();
 
-		if ( isset( $this->feideHomeOrg ) ) {
-			try {
-				$org = $this->getSingleAttributeValue( $this->feideOrgAttribute );
-			} catch ( OutOfBoundsException $_ ) {
-				$org = \strstr( $username, '@', true ) ?: '';
-			}
-			if ( $org !== $this->feideHomeOrg ) {
-				throw new MismatchFeideException( $this->feideHomeOrg, $org );
-			}
-		}
+		$this->verifyOrganization();
 
 		return $username;
 	}
@@ -77,5 +67,27 @@ class SimpleSAMLFeideAuth extends SimpleSAMLAuth
 		}
 
 		return parent::guessRealm( $params );
+	}
+
+	private function verifyOrganization(): void
+	{
+		if ( isset( $this->feideHomeOrg ) ) {
+			// May throw OutOfBoundsException if attribute doesn't exist
+			$orgs = $this->getMultiAttributeValue( $this->feideOrgAttribute );
+
+			foreach ( $orgs as $org ) {
+				if ( \is_array( $this->feideHomeOrg ) ) {
+					foreach ( $this->feideHomeOrg as $homeOrg ) {
+						if ( $org === $homeOrg ) {
+							return;
+						}
+					}
+				} elseif ( $org === $this->feideHomeOrg ) {
+					return;
+				}
+			}
+
+			throw new MismatchFeideException( $this->feideHomeOrg, $orgs );
+		}
 	}
 }

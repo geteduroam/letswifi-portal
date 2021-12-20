@@ -171,6 +171,22 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 	 */
 	public function getSingleAttributeValue( string $key ): string
 	{
+		$attributeValues = $this->getMultiAttributeValue( $key );
+
+		if ( 1 !== \count( $attributeValues ) ) {
+			throw new OutOfBoundsException( "Attribute ${key} was expected to have exactly 1 value, but has " . \count( $attributeValues ) );
+		}
+
+		return \reset( $attributeValues );
+	}
+
+	/**
+	 * @suppress PhanUndeclaredClassMethod We don't have a dependency on SimpleSAMLphp
+	 *
+	 * @return array<string>
+	 */
+	public function getMultiAttributeValue( string $key ): array
+	{
 		if ( null === $this->attributes ) {
 			$this->attributes = $this->as->getAttributes();
 			\assert( \is_array( $this->attributes ), 'SimpleSAMLphp always returns an array' );
@@ -184,14 +200,11 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 		}
 
 		$attributeValues = $this->attributes[$key];
-		\assert( \is_array( $attributeValues ), 'SimpleSAMLphp always returns attributes as array' );
-		if ( 1 !== \count( $attributeValues ) ) {
-			throw new OutOfBoundsException( "Attribute ${key} was expected to have exactly 1 value, but has " . \count( $attributeValues ) );
-		}
-		$result = \reset( $attributeValues );
-		\assert( \is_string( $result ), 'Attributes returned by SimpleSAMLphp are always of type string' );
 
-		return $result;
+		\assert( \is_array( $attributeValues ), 'SimpleSAMLphp always returns attributes as array' );
+		// TODO: check that attributes are string?
+
+		return $attributeValues;
 	}
 
 	/**
