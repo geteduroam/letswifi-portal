@@ -33,6 +33,9 @@ class Config
 		 * @psalm-suppress UnresolvableInclude
 		 */
 		if ( \is_string( $conf ) ) {
+			if ( !\file_exists( $conf ) ) {
+				throw new DomainException( 'Configuration file missing: ' . $conf );
+			}
 			$conf = require $conf;
 		}
 		if ( !\is_array( $conf ) ) {
