@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block documentClass %}3col{% endblock %}
+
+{% set menu = {
+	'home': {'name':'Info', 'href':'/'},
+	'app': {'name':'Apps', 'href':'/app/'},
+} %}
+
+{% block layout %}
+<nav>
+	<ul>
+{% for tl,menuItem in menu %}
+{% if menuItem.href == href %}
+		<li class="active"><a>
+{% else %}
+		<li><a href="{{ menuItem.href }}">
+{% endif %}
+		{{ menuItem.name }}</a></li>
+{% endfor %}
+	</ul>
+</nav>
+
+{% block content %}
+{% endblock %}
+{% endblock %}

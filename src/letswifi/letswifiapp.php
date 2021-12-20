@@ -12,8 +12,6 @@ namespace letswifi;
 
 use DomainException;
 
-use fkooman\Template\Tpl;
-
 use fyrkat\oauth\Client;
 use fyrkat\oauth\exception\OAuthInvalidGrantException;
 use fyrkat\oauth\OAuth;
@@ -59,8 +57,8 @@ class LetsWifiApp
 	/** @var ?RealmManager */
 	private $realmManager;
 
-	/** @var ?Tpl */
-	private $tpl;
+	/** @var ?\Twig\Environment */
+	private $twig;
 
 	public function __construct( Config $config = null )
 	{
@@ -194,17 +192,23 @@ class LetsWifiApp
 			\header( 'Content-Type: application/json' );
 			exit( \json_encode( $data ) );
 		}
-		exit( $this->getTemplate()->render( $template, $data ) );
+		$template = $this->getTwig()->load( "${template}.html" );
+		exit( $template->render( $data ) );
 	}
 
-	protected function getTemplate(): Tpl
+	protected function getTwig(): \Twig\Environment
 	{
-		if ( null === $this->tpl ) {
-			$dirs = $this->config->getArrayOrNull('tpldir') ?? [\implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 2 ), 'tpl'])];
-			$this->tpl = new Tpl( $dirs );
+		if ( null === $this->twig ) {
+			$loader = new \Twig\Loader\FilesystemLoader(
+				$this->config->getArrayOrNull( 'tpldir' )
+				?? [\implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 2 ), 'tpl'] )]
+			);
+			$this->twig = new \Twig\Environment( $loader, [
+				//'cache' => '/path/to/compilation_cache',
+			] );
 		}
 
-		return $this->tpl;
+		return $this->twig;
 	}
 
 	protected function getPDO(): PDO
