@@ -190,7 +190,7 @@ class LetsWifiApp
 		$accept = \array_key_exists( 'HTTP_ACCEPT', $_SERVER ) ? $_SERVER['HTTP_ACCEPT'] : '';
 		if ( null === $template || \array_key_exists( 'json', $_GET ) || false === \strpos( $accept, 'text/html' ) ) {
 			\header( 'Content-Type: application/json' );
-			exit( \json_encode( $data ) );
+			exit( \json_encode( $data, \JSON_UNESCAPED_SLASHES ) );
 		}
 		$template = $this->getTwig()->load( "${template}.html" );
 		exit( $template->render( $data ) );
