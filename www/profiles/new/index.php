@@ -17,30 +17,50 @@ $user = $app->getUserFromBrowserSession( $realm );
 
 // Workaround for MacOS flow; we want to provide the download through a meta refresh,
 // but the refresh should only work once.
-// Here we load a session, check if it can provide a download and then destroy the session
+// Here we check a session, check if it can provide a download and then destroy the cookie
 // so that the next request would point the user to the download page instead of the
 // actual download.
+//
 // Normally, you'd use a POST to initiate the download, but POST cannot be initiated
 // without user interaction, except with JavaScript which we don't use.
 //
 // CASE: user arrives here without $_GET[download],
 // nothing special happens and we show the normal download page.
-// CASE: user arrives with $_GET[download] but without session,
+// CASE: user arrives with $_GET[download] but without cookie,
 // we ignore the GET parameter and show the normal download page
-// CASE: user arrives with $_GET[download] AND session to allow download,
+// CASE: user arrives with $_GET[download] AND cookie to allow download,
 // we provide the download as if a POST had been done;
-// assuming user came from /profiles/mac,
-// so that's the page that stays in the browser.
+// we're assuming the user came from /profiles/mac,
+// so that's the page they're still looking at.
+//
+// NOTE: This protects against involuntary downloads ONLY,
+// it DOES NOT, and is not intended to, protect against pressing F5 repeatedly
+// It also does not protect against scripted downloads;
+// the cookie is easily guessable, but why would a script do that?
+// It can just POST.
+if ( isset( $_COOKIE['mobileconfig-download-token'] ) ) {
+	\setcookie( 'mobileconfig-download-token', 'delete', 100000 );
+}
 if ( 'GET' === $_SERVER['REQUEST_METHOD'] && isset( $_GET['download'] ) ) {
-	\session_start(['cookie_lifetime' => 1]);
-	if ( $_SESSION['mobileconfig-download-token'] ) {
-		$_SERVER['REQUEST_METHOD'] = 'POST';
-		$_POST['device'] = $_GET['device'];
+	if ( isset( $_COOKIE['mobileconfig-download-token'] ) ) {
+		$cookieTime = (int)$_COOKIE['mobileconfig-download-token'];
+		$earliestOkTime = \time() - 60; // allow cookies up to 60 seconds old
+		if ( \time() >= $cookieTime && $cookieTime >= $earliestOkTime ) {
+			$fakeMethod = 'POST';
+			//$fakeDevice = (string)$_GET['device'];
+			$fakeDevice = 'apple-mobileconfig';
+		}
 	}
-	\session_destroy();
+
+	// If we're not willing to fake a POST,
+	// also remove the GET parameters that attempted this from the URL
+	if ( !isset( $fakeMethod ) ) {
+		\header( 'Location: ' . \strstr( $_SERVER['REQUEST_URI'], '?', true ) );
+		exit;
+	}
 }
 
-switch ( $_SERVER['REQUEST_METHOD'] ) {
+switch ( $fakeMethod ?? $_SERVER['REQUEST_METHOD'] ) {
 	case 'GET': return $app->render(
 		[
 			'href' => '/profiles/new/',
@@ -60,7 +80,7 @@ switch ( $_SERVER['REQUEST_METHOD'] ) {
 			],
 		], 'profiles-new' );
 	case 'POST':
-		switch ( $device = $_POST['device'] ?? '' ) {
+		switch ( $device = $fakeDevice ?? $_POST['device'] ?? '' ) {
 			case 'apple-mobileconfig': $generator = $realm->getConfigGenerator( \letswifi\profile\generator\MobileConfigGenerator::class, $user ); break;
 			case 'eap-config': $generator = $realm->getConfigGenerator( \letswifi\profile\generator\EapConfigGenerator::class, $user ); break;
 			case 'pkcs12': $generator = $realm->getConfigGenerator( \letswifi\profile\generator\PKCS12Generator::class, $user ); break;
