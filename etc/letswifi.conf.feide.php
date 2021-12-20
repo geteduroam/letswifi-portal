@@ -10,8 +10,8 @@
 			'uninett.geteduroam.no' => [
 					'userIdAttribute' => 'eduPersonPrincipalName', // null for NameID
 					'homeOrgAttribute' => 'schacHomeOrganization',
+					'allowedHomeOrg' => 'uninett.no',
 					'samlIdp' => 'https://idp-test.feide.no',
-					'feideHomeOrg' => 'uninett.no',
 					'feideHostname' => 'idp-test.feide.no',
 				],
 			'demo.eduroam.no' => [

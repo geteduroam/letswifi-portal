@@ -30,6 +30,12 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 	/** @var array<string> */
 	protected $authzAttributeValue;
 
+	/** @var array<string>|?string */
+	protected $allowedHomeOrg;
+
+	/** @var string */
+	protected $homeOrgAttribute;
+
 	/**
 	 * The attribute containing the user ID, null for nameID
 	 *
@@ -67,6 +73,8 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 		$idpList = \array_key_exists( 'idpList', $params ) ? $params['idpList'] : [];
 		$verifyAuthenticatingAuthority = \array_key_exists( 'verifyAuthenticatingAuthority', $params ) ? $params['verifyAuthenticatingAuthority'] : true;
 		$authzAttributeValue = \array_key_exists( 'authzAttributeValue', $params ) ? $params['authzAttributeValue'] : [];
+		$allowedHomeOrg = $params['allowedHomeOrg'] ?? $params['feideHomeOrg'] ?? null;
+		$homeOrgAttribute = $params['homeOrgAttribute'] ?? $params['feideOrgAttribute'] ?? 'schacHomeOrganization';
 
 		\assert( \is_string( $userIdAttribute ), 'userIdAttribute must be string' );
 		\assert( \is_string( $userRealmPrefixAttribute ), 'userRealmPrefixAttribute must be string' );
@@ -75,6 +83,8 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 		\assert( \is_array( $idpList ), 'idpList must be array if provided' );
 		\assert( \is_array( $authzAttributeValue ), 'authzAttributeValue must be array if provided' );
 		\assert( \is_bool( $verifyAuthenticatingAuthority ), 'verifyAuthenticatingAuthority must be a boolean if provided' );
+		\assert( \is_string( $allowedHomeOrg ) || \is_array( $allowedHomeOrg ), 'allowedHomeOrg must be string or array if provided' );
+		\assert( \is_string( $homeOrgAttribute ), 'homeOrgAttribute must be string if provided' );
 
 		$this->samlIdp = $samlIdp;
 		$this->idpList = $idpList;
@@ -84,6 +94,8 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 		$this->userIdAttribute = $userIdAttribute;
 		$this->userRealmPrefixAttribute = $userRealmPrefixAttribute;
 		$this->userRealmPrefixValueMap = $userRealmPrefixValueMap;
+		$this->allowedHomeOrg = $allowedHomeOrg;
+		$this->homeOrgAttribute = $homeOrgAttribute;
 	}
 
 	/**
@@ -126,6 +138,8 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 			// in SimpleSAMLphp version 2 ->value should be replaced with ->getValue()
 			return $this->as->getAuthData( 'saml:sp:NameID' )->value;
 		}
+
+		$this->verifyHomeOrganization();
 
 		return $this->getSingleAttributeValue( $this->userIdAttribute );
 	}
@@ -267,6 +281,28 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 		}
 
 		return $result;
+	}
+
+	protected function verifyHomeOrganization(): void
+	{
+		if ( isset( $this->allowedHomeOrg ) ) {
+			// May throw OutOfBoundsException if attribute doesn't exist
+			$orgs = $this->getMultiAttributeValue( $this->homeOrgAttribute );
+
+			foreach ( $orgs as $org ) {
+				if ( \is_array( $this->allowedHomeOrg ) ) {
+					foreach ( $this->allowedHomeOrg as $homeOrg ) {
+						if ( $org === $homeOrg ) {
+							return;
+						}
+					}
+				} elseif ( $org === $this->allowedHomeOrg ) {
+					return;
+				}
+			}
+
+			throw new HomeOrgMismatchException( $this->allowedHomeOrg, $orgs );
+		}
 	}
 
 	/**

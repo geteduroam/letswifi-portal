@@ -14,21 +14,15 @@ use Throwable;
 
 class SimpleSAMLFeideAuth extends SimpleSAMLAuth
 {
-	/** @var array<string>|?string */
-	private $feideHomeOrg;
-
-	/** @var string */
-	private $feideOrgAttribute;
-
 	/** @var string */
 	private $feideHostname;
 
 	public function __construct( array $params )
 	{
 		parent::__construct( $params );
-		$this->feideHomeOrg = \array_key_exists( 'feideHomeOrg', $params ) ? $params['feideHomeOrg'] : null;
-		$this->feideOrgAttribute = \array_key_exists( 'feideOrgAttribute', $params ) ? $params['feideOrgAttribute'] : 'schacHomeOrganization';
-		$this->feideHostname = \array_key_exists( 'feideHostname', $params ) ? $params['feideHostname'] : 'idp.feide.no';
+		$feideHostname = $params['feideHostname'] ?? 'idp.feide.no';
+		\assert( \is_string( $feideHostname ), 'feideHostname must be string' );
+		$this->feideHostname = $feideHostname;
 	}
 
 	/**
@@ -36,28 +30,24 @@ class SimpleSAMLFeideAuth extends SimpleSAMLAuth
 	 */
 	public function requireAuth(): string
 	{
-		if ( null !== $this->feideHomeOrg && !$this->as->isAuthenticated() ) {
+		if ( null !== $this->allowedHomeOrg && !$this->as->isAuthenticated() ) {
 			$loginUrl = $this->as->getLoginURL();
 			if ( null !== $this->samlIdp ) {
 				$loginUrl .= '&saml%3Aidp=' . \urlencode( $this->samlIdp );
 			}
-			\header( 'Location: https://' . $this->feideHostname . '/simplesaml/module.php/feide/preselectOrg.php?' . \http_build_query( ['HomeOrg' => $this->feideHomeOrg, 'ReturnTo' => $loginUrl] ) );
+			\header( 'Location: https://' . $this->feideHostname . '/simplesaml/module.php/feide/preselectOrg.php?' . \http_build_query( ['HomeOrg' => $this->allowedHomeOrg, 'ReturnTo' => $loginUrl] ) );
 			exit;
 		}
 
-		$username = parent::requireAuth();
-
-		$this->verifyOrganization();
-
-		return $username;
+		return parent::requireAuth();
 	}
 
 	public function guessRealm( array $params ): ?string
 	{
 		foreach ( $params as $candidate => $p ) {
 			try {
-				if ( \array_key_exists( 'feideOrgAttribute', $p ) && \array_key_exists( 'feideHomeOrg', $p ) ) {
-					if ( $this->getSingleAttributeValue( $p['feideOrgAttribute'] ) === $p['feideHomeOrg'] ) {
+				if ( \array_key_exists( 'homeOrgAttribute', $p ) && \array_key_exists( 'allowedHomeOrg', $p ) ) {
+					if ( $this->getSingleAttributeValue( $p['homeOrgAttribute'] ) === $p['allowedHomeOrg'] ) {
 						return $candidate;
 					}
 				}
@@ -67,27 +57,5 @@ class SimpleSAMLFeideAuth extends SimpleSAMLAuth
 		}
 
 		return parent::guessRealm( $params );
-	}
-
-	private function verifyOrganization(): void
-	{
-		if ( isset( $this->feideHomeOrg ) ) {
-			// May throw OutOfBoundsException if attribute doesn't exist
-			$orgs = $this->getMultiAttributeValue( $this->feideOrgAttribute );
-
-			foreach ( $orgs as $org ) {
-				if ( \is_array( $this->feideHomeOrg ) ) {
-					foreach ( $this->feideHomeOrg as $homeOrg ) {
-						if ( $org === $homeOrg ) {
-							return;
-						}
-					}
-				} elseif ( $org === $this->feideHomeOrg ) {
-					return;
-				}
-			}
-
-			throw new MismatchFeideException( $this->feideHomeOrg, $orgs );
-		}
 	}
 }

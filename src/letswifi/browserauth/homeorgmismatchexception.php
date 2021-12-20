@@ -12,7 +12,7 @@ namespace letswifi\browserauth;
 
 use RuntimeException;
 
-class MismatchFeideException extends MismatchIdpException
+class HomeOrgMismatchException extends MismatchIdpException
 {
 	/** @var array<string>|string */
 	private $required;
