@@ -18,6 +18,7 @@
 			<errorLevel type="suppress">
 				<directory name="bin"/>
 				<directory name="www"/>
+				<file name="src/_autoload.php"/><!-- because Composer -->
 			</errorLevel>
 		</UnresolvableInclude>
 	</issueHandlers>

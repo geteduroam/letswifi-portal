@@ -6,12 +6,25 @@
 		"classmap": ["src/"]
 	},
 	"require": {
-		"php": ">=7.1"
+		"php": ">=7.1",
+		"fyrkat/openssl": "^1",
+		"fyrkat/oauth-server": "^1"
+	},
+	"require-dev": {
+		"vimeo/psalm": "^4",
+		"phpunit/phpunit": "^7",
+		"friendsofphp/php-cs-fixer": "^3",
+		"phan/phan": "^5"
 	},
 	"authors": [
 		{
 			"name": "Jørn Åne de Jong",
 			"email": "jornane.dejong@surf.nl"
 		}
-	]
+	],
+	"config": {
+		"allow-plugins": {
+			"composer/package-versions-deprecated": true
+		}
+	}
 }

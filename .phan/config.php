@@ -347,6 +347,7 @@ return [
 	// your application should be included in this list.
 	'directory_list' => [
 		'src',
+		'vendor',
 	],
 
 	// A list of individual files to include in analysis

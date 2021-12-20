@@ -39,3 +39,6 @@
 \spl_autoload_extensions( '.php' );
 \spl_autoload_register( 'spl_autoload' );
 \set_include_path( \realpath( __DIR__ ) . \PATH_SEPARATOR . \get_include_path() );
+
+// Load Composer autoloader
+require \realpath( \dirname( __DIR__ ) ) . '/vendor/autoload.php';
