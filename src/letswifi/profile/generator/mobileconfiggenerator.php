@@ -25,8 +25,6 @@ use letswifi\profile\auth\TlsAuth;
 use letswifi\profile\network\HS20Network;
 use letswifi\profile\network\SSIDNetwork;
 
-use RuntimeException;
-
 class MobileConfigGenerator extends AbstractGenerator
 {
 	/**
@@ -247,20 +245,8 @@ class MobileConfigGenerator extends AbstractGenerator
 			. "\n";
 
 		$app = new LetsWifiApp();
-		/** @suppress PhanPossiblyFalseTypeArgumentInternal TODO: Ad-hoc pkcs7 signer is not done yet */
-		if ($sign_cert = $app->getSigningCertificate()) {
-			$unsigned = \tempnam(\sys_get_temp_dir(), 'unsigned');
-			$signed = \tempnam(\sys_get_temp_dir(), 'signed');
-			\file_put_contents($unsigned, $result);
-			\openssl_pkcs7_sign($unsigned, $signed, 'file://' . $sign_cert, 'file://' . $sign_cert, [], 0, $sign_cert);
-			$b64signed = \file_get_contents($signed);
-			$trimmed = \preg_replace('/(.+\n)+\n/', '', $b64signed, 1);
-			$result = \base64_decode($trimmed, true);
-			\unlink($unsigned);
-			\unlink($signed);
-			if ( false === $result ) {
-				throw new RuntimeException( 'Signing of mobileconfig failed' );
-			}
+		if ( $signer = $app->getProfileSigner() ) {
+			$result = $signer->sign( $result );
 		}
 
 		return $result;

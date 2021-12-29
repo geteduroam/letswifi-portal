@@ -13,14 +13,18 @@ namespace letswifi;
 use DomainException;
 
 use fyrkat\oauth\Client;
-use fyrkat\oauth\exception\OAuthInvalidGrantException;
 use fyrkat\oauth\OAuth;
+
 use fyrkat\oauth\sealer\JWTSealer;
 use fyrkat\oauth\sealer\PDOSealer;
 use fyrkat\oauth\token\AccessToken;
 use fyrkat\oauth\token\AuthorizationCode;
 use fyrkat\oauth\token\Grant;
 use fyrkat\oauth\token\RefreshToken;
+
+use fyrkat\openssl\PKCS7;
+use fyrkat\openssl\PrivateKey;
+use fyrkat\openssl\X509;
 
 use letswifi\browserauth\BrowserAuthInterface;
 
@@ -113,9 +117,52 @@ class LetsWifiApp
 		throw new DomainException( 'auth.service must point to a class that implements BrowserAuthInterface' );
 	}
 
-	public function getSigningCertificate(): ?string
+	/**
+	 * Get the signer for signing profiles
+	 *
+	 * This is used for signing mobileconfig files, so that Apple OSes don't show a
+	 * big red "not signed" warning when installing the profile.
+	 *
+	 * This function reads both the signing.cert config setting (expecting a path)
+	 * and the profile.signing.cert setting (expecting a payload),
+	 * the latter is preferred.
+	 *
+	 * A config setting profile.signing.passphrase is also used to decode the private key,
+	 * if it is protected by a passphrase.
+	 *
+	 * @return ?PKCS7 if the signer if configured, otherwise NULL
+	 */
+	public function getProfileSigner(): ?PKCS7
 	{
-		return $this->config->getStringOrNull( 'signing.cert' );
+		$signingCert = $this->config->getStringOrNull( 'signing.cert' );
+		if ( null !== $signingCert ) {
+			// Reading files is a lot of hassle to do correcly,
+			// as demonstrated by the large amount of code in this block.
+			// In a future version, we will remove support for signing.cert,
+			// and only support profile.signing.*
+
+			\error_log( 'signing.cert configuration entry set, please migrate to profile.signing.cert, which takes the raw certificate payload' );
+			if ( \file_exists( $signingCert ) ) {
+				$signingCert = \file_get_contents( $signingCert );
+				if ( false === $signingCert ) {
+					throw new RuntimeException( 'File specified in signing.cert is unreadable, please migrate to profile.signing.cert' );
+				}
+			} else {
+				throw new RuntimeException( 'File specified in signing.cert does not exist, please migrate to profile.signing.cert' );
+			}
+		} else {
+			$signingCert = $this->config->getStringOrNull( 'profile.signing.cert' );
+		}
+		if ( null === $signingCert ) {
+			return null;
+		}
+
+		$passphrase = $this->config->getStringOrNull( 'profile.signing.passphrase' );
+
+		$certificate = new X509( $signingCert );
+		$key = new PrivateKey( $signingCert, $passphrase );
+
+		return new PKCS7( $certificate, $key );
 	}
 
 	/**
