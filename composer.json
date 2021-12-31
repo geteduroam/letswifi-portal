@@ -9,7 +9,7 @@
 		"php": ">=7.1",
 		"twig/twig": "^3",
 		"fyrkat/openssl": "^1",
-		"fyrkat/oauth-server": "^1"
+		"fyrkat/oauth-server": "~1.1"
 	},
 	"require-dev": {
 		"vimeo/psalm": "^4",

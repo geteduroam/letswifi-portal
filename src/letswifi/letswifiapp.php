@@ -180,7 +180,13 @@ class LetsWifiApp
 				$refreshTokenSealer
 			);
 		foreach ( $this->config->getArray( 'oauth.clients' ) as $client ) {
-			$oauth->registerClient( new Client( $client['clientId'], $client['redirectUris'], $client['scopes'], $client['refresh'] ?? false ) );
+			$oauth->registerClient( new Client(
+					$client['clientId'],
+					$client['redirectUris'] ?? [],
+					$client['scopes'],
+					$client['refresh'] ?? false,
+					$client['clientSecret'] ?? null )
+				);
 		}
 
 		return $oauth;

@@ -41,6 +41,8 @@
 				'redirectUris' => ['http://[::1]/callback/'], 
 				'scopes' => ['eap-metadata', 'testscope'],
 				'refresh' => false,
+				// uncomment for client_credentials flow, and remove the "
+				//'clientSecret' => '"s3cret',
 			],
 		],
 ];
