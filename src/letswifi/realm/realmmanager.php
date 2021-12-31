@@ -24,6 +24,8 @@ use PDO;
 
 class RealmManager extends DatabaseStorage
 {
+	public const DATE_FORMAT = 'Y-m-d H:i:s';
+
 	public function __construct( PDO $pdo )
 	{
 		parent::__construct( $pdo );
@@ -200,8 +202,8 @@ class RealmManager extends DatabaseStorage
 		$statement->bindValue( 'requester', $requester->getUserID(), PDO::PARAM_STR );
 		$statement->bindValue( 'usage', $usage, PDO::PARAM_STR );
 		$statement->bindValue( 'sub', $csr->getSubject(), PDO::PARAM_STR );
-		$statement->bindValue( 'issued', \gmdate( 'Y-m-d H:i:s' ), PDO::PARAM_STR );
-		$statement->bindValue( 'expires', \gmdate( 'Y-m-d H:i:s', $expiry->getTimestamp() ), PDO::PARAM_STR );
+		$statement->bindValue( 'issued', \gmdate( static::DATE_FORMAT ), PDO::PARAM_STR );
+		$statement->bindValue( 'expires', \gmdate( static::DATE_FORMAT, $expiry->getTimestamp() ), PDO::PARAM_STR );
 		$statement->bindValue( 'csr', $csrData, PDO::PARAM_STR );
 		$statement->bindValue( 'client', $requester->getClientId(), PDO::PARAM_STR );
 		$statement->bindValue( 'user_agent', $requester->getUserAgent(), PDO::PARAM_STR );
@@ -223,8 +225,8 @@ class RealmManager extends DatabaseStorage
 	public function logCompletedCredential( string $realm, User $user, X509 $userCert, string $usage ): void
 	{
 		$statement = $this->pdo->prepare( 'UPDATE `realm_signing_log` SET `issued` = :issued, `expires` = :expires, `x509` = :x509 WHERE `serial` = :serial AND `realm` = :realm AND `requester` = :requester AND `usage` = :usage AND `ca_sub` = :ca_sub' );
-		$statement->bindValue( 'issued', \gmdate( 'Y-m-d H:i:s', $userCert->getValidFrom()->getTimestamp() ), PDO::PARAM_STR );
-		$statement->bindValue( 'expires', \gmdate( 'Y-m-d H:i:s', $userCert->getValidTo()->getTimestamp() ), PDO::PARAM_STR );
+		$statement->bindValue( 'issued', \gmdate( static::DATE_FORMAT, $userCert->getValidFrom()->getTimestamp() ), PDO::PARAM_STR );
+		$statement->bindValue( 'expires', \gmdate( static::DATE_FORMAT, $userCert->getValidTo()->getTimestamp() ), PDO::PARAM_STR );
 		$statement->bindValue( 'x509', $userCert->getX509Pem(), PDO::PARAM_STR );
 		$statement->bindValue( 'serial', $userCert->getSerialNumber(), PDO::PARAM_INT );
 		$statement->bindValue( 'realm', $realm, PDO::PARAM_STR );
