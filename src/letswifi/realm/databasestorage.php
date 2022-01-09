@@ -139,6 +139,6 @@ class DatabaseStorage
 		$statement = $this->pdo->prepare( $query );
 		$statement->execute( $bind );
 
-		return $statement->fetchAll();
+		return $statement->fetchAll( PDO::FETCH_ASSOC );
 	}
 }

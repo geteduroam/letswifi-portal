@@ -1,0 +1,39 @@
+{% extends "menu.html" %}
+
+{% block title %}Apps{% endblock %}
+
+{% block content %}
+<main>
+	<h1>User {{ user.name }}</h1>
+	<form method="POST" action="{{ form.action }}">
+		<h2>Certificates list</h2>
+		<p>
+			<input type="hidden" name="returnTo" value="{{ href }}">
+			<input type="hidden" name="realm" value="{{ form.realm }}">
+			<button type="submit" name="user" value="{{ user.name }}">Revoke all</button>
+		</p>
+		<table>
+			<tr>
+				<th>Subject</th>
+				<th>Until</th>
+				<th>Client</th>
+				<th>Revocation</th>
+			</tr>
+{% for certificate in certificates %}
+			<tr>
+				<td>{{ certificate.sub }}</td>
+				<td nowrap>{{ certificate.expires }}</td>
+				<td>{{ certificate.client ?? '—' }}</td>
+				<td nowrap>
+{% if certificate.revoked %}
+					{{ certificate.revoked }}
+{% else %}
+					<button type="submit" name="subject" value="{{ certificate.sub }}">Revoke</button>
+{% endif %}
+				</td>
+			</tr>
+{% endfor %}
+		</table>
+	</form>
+</main>
+{% endblock %}

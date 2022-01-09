@@ -92,9 +92,44 @@ class LetsWifiApp
 		return new User( $sub, $realm, $grant->getClientId(), $this->getIP(), $_SERVER['HTTP_USER_AGENT'] );
 	}
 
+	public function isAdmin( string $userName ): bool
+	{
+		$admins = $this->config->getArrayOrEmpty( 'auth.admin' );
+
+		return \in_array( $userName, $admins, true);
+	}
+
 	public function getIP(): string
 	{
 		return $_SERVER['REMOTE_ADDR'];
+	}
+
+	public function isBrowser(): bool
+	{
+		return \substr( $_SERVER['HTTP_ACCEPT'], 0, 9 ) === 'text/html';
+	}
+
+	public function requireAdmin( string $scope ): void
+	{
+		$realm = $this->getRealm();
+
+		if ( $this->isBrowser() ) {
+			$user = $this->getUserFromBrowserSession( $realm )->getUserId();
+		} else {
+			$oauth = $this->getOAuthHandler( $realm );
+			$token = $oauth->getAccessTokenFromRequest( $scope );
+			$grant = $token->getGrant();
+			$user = $grant->sub;
+		}
+
+		if ( null === $user ) {
+			\header( 'Content-Type: text/plain', true, 403 );
+			exit( "403 Forbidden\r\n\r\nUnauthenticated\r\n" );
+		}
+		if ( !$this->isAdmin( $user ) ) {
+			\header( 'Content-Type: text/plain', true, 403 );
+			exit( "403 Forbidden\r\n\r\nNo admin access for ${user}\r\n" );
+		}
 	}
 
 	public function getBrowserAuthenticator( Realm $realm ): BrowserAuthInterface
@@ -240,8 +275,7 @@ class LetsWifiApp
 
 	public function render( array $data, ?string $template = null ): void
 	{
-		$accept = \array_key_exists( 'HTTP_ACCEPT', $_SERVER ) ? $_SERVER['HTTP_ACCEPT'] : '';
-		if ( null === $template || \array_key_exists( 'json', $_GET ) || false === \strpos( $accept, 'text/html' ) ) {
+		if ( null === $template || \array_key_exists( 'json', $_GET ) || !$this->isBrowser() ) {
 			\header( 'Content-Type: application/json' );
 			exit( \json_encode( $data, \JSON_UNESCAPED_SLASHES ) );
 		}

@@ -13,6 +13,7 @@ namespace letswifi\realm;
 use DateInterval;
 use DateTimeImmutable;
 use DateTimeInterface;
+use DateTimeZone;
 use DomainException;
 
 use fyrkat\openssl\CSR;
@@ -39,6 +40,58 @@ class RealmManager extends DatabaseStorage
 		}
 
 		return new Realm( $this, $realm );
+	}
+
+	public function listUserCertificates( string $realm, string $user ): array
+	{
+		return $this->getEntriesFromTableWhere( 'realm_signing_log', [
+			'realm' => $realm,
+			'requester' => $user,
+			'expires' => \gmdate( static::DATE_FORMAT ),
+		] );
+	}
+
+	public function listUsers( string $realm ): array
+	{
+		return $this->getFieldsFromTableWhere( 'realm_signing_log', 'requester', [
+			'realm' => $realm,
+			'expires' => \gmdate( static::DATE_FORMAT ),
+		] );
+	}
+
+	/**
+	 * @internal
+	 *
+	 * @return array<string,?CA>
+	 */
+	public function getAllSignerCAs(): array
+	{
+		$cas = [];
+
+		foreach ( $this->getEntriesFromTableWhere( 'realm_signer', [] ) as $entry ) {
+			$cas[$entry['realm']] = $this->getCA( $entry['signer_ca_sub'] );
+		}
+
+		return $cas;
+	}
+
+	/**
+	 * @suppress PhanPossiblyNonClassMethodCall Phan doesn't understand PDO
+	 */
+	public function getNonexpiredClientCredentials( string $realm, string $caSub, string $usage, ?DateTimeImmutable $now = null ): array
+	{
+		if ( null === $now ) {
+			$now = new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) );
+		}
+		$yesterday = $now->sub( new DateInterval( 'P1D' ) );
+
+		return $this->getEntriesFromTableWhere( 'realm_signing_log', [ // only need serial, sub, expires, revoked
+			'realm' => $realm,
+			'ca_sub' => $caSub,
+			'usage' => $usage,
+			'issued' => $now->format( static::DATE_FORMAT ),
+			'expires' => $yesterday->format( static::DATE_FORMAT ),
+		] );
 	}
 
 	/**
@@ -186,6 +239,42 @@ class RealmManager extends DatabaseStorage
 		}
 
 		return new CA( $this, $entry['pub'], $entry['key'] );
+	}
+
+	/**
+	 * @suppress PhanPossiblyNonClassMethodCall Phan doesn't understand PDO
+	 */
+	public function revokeUser( string $realm, string $userId ): void
+	{
+		$statement = $this->pdo->prepare( 'UPDATE `realm_signing_log` SET `revoked` = :revoked WHERE `realm` = :realm AND `requester` = :requester AND `usage` = :usage AND `revoked` IS NULL AND `expires` > :expires' );
+		$statement->bindValue( 'revoked', \gmdate( static::DATE_FORMAT ), PDO::PARAM_STR );
+		$statement->bindValue( 'realm', $realm, PDO::PARAM_STR );
+		$statement->bindValue( 'requester', $userId, PDO::PARAM_STR );
+		$statement->bindValue( 'usage', 'client', PDO::PARAM_STR );
+		$statement->bindValue( 'expires', \gmdate( static::DATE_FORMAT ), PDO::PARAM_STR );
+		$statement->execute();
+		$rows = $statement->rowCount();
+		if ( 0 === $rows ) {
+			throw new DomainException( "No certificates revoked for user ${userId}" );
+		}
+	}
+
+	/**
+	 * @suppress PhanPossiblyNonClassMethodCall Phan doesn't understand PDO
+	 */
+	public function revokeSubject( string $realm, string $subject ): void
+	{
+		$statement = $this->pdo->prepare( 'UPDATE `realm_signing_log` SET `revoked` = :revoked WHERE `realm` = :realm AND `sub` = :subject AND `usage` = :usage AND `revoked` IS NULL AND `expires` > :expires' );
+		$statement->bindValue( 'revoked', \gmdate( static::DATE_FORMAT ), PDO::PARAM_STR );
+		$statement->bindValue( 'realm', $realm, PDO::PARAM_STR );
+		$statement->bindValue( 'subject', $subject, PDO::PARAM_STR );
+		$statement->bindValue( 'usage', 'client', PDO::PARAM_STR );
+		$statement->bindValue( 'expires', \gmdate( static::DATE_FORMAT ), PDO::PARAM_STR );
+		$statement->execute();
+		$rows = $statement->rowCount();
+		if ( 0 === $rows ) {
+			throw new DomainException( "No certificates revoked for subject ${subject}" );
+		}
 	}
 
 	/**
