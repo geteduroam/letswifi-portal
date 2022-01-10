@@ -1,5 +1,9 @@
 <?php return [
 	'auth.service' => 'BasicAuth',
+	'auth.admin' => [
+		//'eu.letswifi.cli', // A client ID with clientSecret
+		//'jornane', // A NameID or userIdAttribute
+	],
 	'auth.params' => [
 		'admin' => 'admin123ABC',
 	],

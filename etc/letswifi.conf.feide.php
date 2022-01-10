@@ -1,5 +1,9 @@
 <?php return [
 	'auth.service' => 'SimpleSAMLFeideAuth',
+	'auth.admin' => [
+		//'eu.letswifi.cli', // A client ID with clientSecret
+		//'jornane', // A NameID or userIdAttribute
+	],
 	'auth.params' => [
 			'autoloadInclude' => dirname( __DIR__ ) . '/simplesamlphp/lib/_autoload.php',
 			'authSource' => 'default-sp',

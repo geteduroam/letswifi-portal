@@ -1,5 +1,9 @@
 <?php return [
 	'auth.service' => 'DevAuth',
+	'auth.admin' => [
+		//'eu.letswifi.cli', // A client ID with clientSecret
+		//'jornane', // A NameID or userIdAttribute
+	],
 	'realm.selector' => null, // one of null, getparam or httphost
 	'realm.default' => 'example.com', // used when realm.selector = null
 	'realm.auth' => [
