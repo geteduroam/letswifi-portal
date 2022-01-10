@@ -28,7 +28,7 @@ $realm = $app->getRealm();
 if ( $user ) {
 	$certificates = $realmManager->listUserCertificates( $realm->getName(), $user );
 	$queryVars = ['user' => $user];
-} else {
+} elseif ( $subject ) {
 	$certificate = $realmManager->getCertificate( $realm->getName(), $subject );
 	if ( null === $certificate ) {
 		\header( 'Content-Type: text/plain', true, 404 );
@@ -38,6 +38,9 @@ if ( $user ) {
 	$certificates = [$certificate];
 	$userQueryVars = ['user' => $user];
 	$queryVars = ['subject' => $subject];
+} else {
+	\assert( false, 'Neither user or subject provided, this should not be possible' );
+	exit;
 }
 
 $app->render( [
