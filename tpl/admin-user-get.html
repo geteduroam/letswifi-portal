@@ -6,7 +6,7 @@
 <main>
 	<h1>User {{ user.name }}</h1>
 	<form method="POST" action="{{ form.action }}">
-		<h2>Certificates list</h2>
+		<h2>Certificate list</h2>
 		<p>
 			<input type="hidden" name="returnTo" value="{{ href }}">
 			<input type="hidden" name="realm" value="{{ form.realm }}">
@@ -26,9 +26,21 @@
 			</tr>
 {% for certificate in certificates %}
 			<tr>
-				<td>{{ certificate.sub }}</td>
-				<td nowrap>{{ certificate.expires }}</td>
-				<td>{{ certificate.client ?? '—' }}</td>
+				<td>
+					{% if certificate.revoked %}<del>{% endif %}
+					{{ certificate.sub }}
+					{% if certificate.revoked %}</del>{% endif %}
+				</td>
+				<td nowrap>
+					{% if certificate.revoked %}<del>{% endif %}
+					{{ certificate.expires }}
+					{% if certificate.revoked %}</del>{% endif %}
+				</td>
+				<td>
+					{% if certificate.revoked %}<del>{% endif %}
+					{{ certificate.client ?? '—' }}
+					{% if certificate.revoked %}</del>{% endif %}
+				</td>
 				<td nowrap>
 {% if certificate.revoked %}
 					{{ certificate.revoked }}
