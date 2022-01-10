@@ -4,8 +4,8 @@ Install packages
 
 	apt-get install \
 		git \
-		php7.3-mysql \
-		php7.3-xml \
+		php7.4-mysql \
+		php7.4-xml \
 		lighttpd \
 		php-cgi \
 		simplesamlphp \
