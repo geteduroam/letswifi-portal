@@ -22,7 +22,7 @@ $users = \array_unique( $realmManager->listUsers( $realm->getName() ) );
 
 $app->render( [
 	'href' => '/admin/user/list/',
-	'jq' => '.users | map(.name) | .[]',
+	'jq' => '.users | map(.name)',
 	'users' => \array_map( static function ( $user ) {
 		return ['name' => $user, 'href' => '../get/?' . \http_build_query( ['user' => $user] )];
 	}, $users ),
