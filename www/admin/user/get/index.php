@@ -10,8 +10,8 @@
 
 require \implode(\DIRECTORY_SEPARATOR, [\dirname(__DIR__, 4), 'src', '_autoload.php']);
 
-$user = $_POST['user'] ?? $_GET['user'];
-$subject = $_POST['subject'] ?? $_GET['subject'];
+$user = $_POST['user'] ?? $_GET['user'] ?? null;
+$subject = $_POST['subject'] ?? $_GET['subject'] ?? null;
 if ( !\is_string( $user ) && !\is_string( $subject ) ) {
 	\header( 'Content-Type: text/plain', true, 400 );
 	exit( "400 Bad Request\r\n\r\nMissing GET parameter user or subject\r\n" );
