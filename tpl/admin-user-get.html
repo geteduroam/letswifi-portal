@@ -10,7 +10,12 @@
 		<p>
 			<input type="hidden" name="returnTo" value="{{ href }}">
 			<input type="hidden" name="realm" value="{{ form.realm }}">
+{% if revokeAll %}
 			<button type="submit" name="user" value="{{ user.name }}">Revoke all</button>
+{% endif %}
+{% if viewAll %}
+			<a href="{{ viewAll }}">View all</a>
+{% endif %}
 		</p>
 		<table>
 			<tr>

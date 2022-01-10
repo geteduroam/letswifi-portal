@@ -51,6 +51,14 @@ class RealmManager extends DatabaseStorage
 		] );
 	}
 
+	public function getCertificate( string $realm, string $subject ): ?array
+	{
+		return $this->getSingleEntryFromTableWhere( 'realm_signing_log', [
+			'realm' => $realm,
+			'sub' => $subject,
+		] );
+	}
+
 	public function listUsers( string $realm ): array
 	{
 		return $this->getFieldsFromTableWhere( 'realm_signing_log', 'requester', [
