@@ -135,8 +135,17 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 		}
 
 		if ( null === $this->userIdAttribute ) {
-			// in SimpleSAMLphp version 2 ->value should be replaced with ->getValue()
-			return $this->as->getAuthData( 'saml:sp:NameID' )->value;
+			// Earlier, SimpleSAMLphp documented that ->value would disappear in 2.0
+			// However, it's already become a protected field in 1.19.  So that wasn't really correct.
+			// In order to fix this, we have to detect if getValue() exists, and if not
+			// we use the old value field accessor.
+
+			$nameID = $this->as->getAuthData( 'saml:sp:NameID' );
+			if ( \method_exists( $nameID, 'getValue' ) ) {
+				return $nameID->getValue();
+			}
+
+			return $nameID->value;
 		}
 
 		$this->verifyHomeOrganization();
