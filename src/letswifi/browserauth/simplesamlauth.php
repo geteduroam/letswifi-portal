@@ -185,13 +185,13 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 		if ( !\array_key_exists( $realmAttribute, $this->attributes ) ) {
 			return null;
 		}
-		$userRealmPrefix = $this->attributes[$realmAttribute];
-		\assert( \is_array( $userRealmPrefix ), 'SimpleSAMLphp always returns attributes as array' );
+		$realm = $this->attributes[$realmAttribute];
+		\assert( \is_array( $realm ), 'SimpleSAMLphp always returns attributes as array' );
 
 		// if there is an realmMap, iterate over its values (order might be important) and return
 		if ( \count( $this->realmMap ) > 0 ) {
 			foreach ( $this->realmMap as $attribute => $value ) {
-				if ( \in_array( $attribute, $userRealmPrefix, true ) ) {
+				if ( \in_array( $attribute, $realm, true ) ) {
 					return $value;
 				}
 			}
@@ -200,7 +200,7 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 		}
 
 		// if there is no map, we hope there's just one attribute, ie. the eduPersonPrimaryAffiliation
-		if ( 1 === \count( $userRealmPrefix ) ) {
+		if ( 1 === \count( $realm ) ) {
 			return \reset( $userRealmPrefix );
 		}
 
