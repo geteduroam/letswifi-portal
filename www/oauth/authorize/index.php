@@ -28,11 +28,10 @@ try {
 	$user = $app->getUserFromBrowserSession( $realm );
 
 	if ( 'POST' === $_SERVER['REQUEST_METHOD'] ) {
-		$userRealmPrefix = $browserAuth->getUserRealmPrefix();
 		$oauth->handleAuthorizePostRequest( new fyrkat\oauth\token\Grant(
 			[
 				'sub' => $user->getUserId(),
-				'realm' => $userRealmPrefix ?? $realm->getName(),
+				'realm' => $user->getRealm(),
 			]
 		), POST_VALUE === $_POST[POST_FIELD] );
 

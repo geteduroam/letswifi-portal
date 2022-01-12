@@ -44,10 +44,10 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 	private $userIdAttribute;
 
 	/** @var ?string */
-	private $userRealmPrefixAttribute;
+	private $realmAttribute;
 
 	/** @var array<string> */
-	private $userRealmPrefixValueMap;
+	private $realmMap;
 
 	/** @var ?array<string,array<string>> */
 	private $attributes = null;
@@ -67,8 +67,16 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 
 		$authSource = \array_key_exists( 'authSource', $params ) ? $params['authSource'] : 'default-sp';
 		$userIdAttribute = \array_key_exists( 'userIdAttribute', $params ) ? $params['userIdAttribute'] : null;
-		$userRealmPrefixAttribute = \array_key_exists( 'userRealmPrefixAttribute', $params ) ? $params['userRealmPrefixAttribute'] : null;
-		$userRealmPrefixValueMap = \array_key_exists( 'userRealmPrefixValueMap', $params ) ? $params['userRealmPrefixValueMap'] : [];
+		$realmAttribute = \array_key_exists( 'realmAttribute', $params ) ? $params['realmAttribute'] : $params['userRealmPrefixAttribute'] ?? null;
+		$realmMap = \array_key_exists( 'realmMap', $params ) ? $params['realmMap'] : null;
+		if ( null === $realmMap && \array_key_exists( 'userRealmPrefixValueMap', $params ) ) {
+			// Compat with old configuration
+			\assert( \is_array( $params['userRealmPrefixValueMap'] ), 'userRealmPrefixValueMap must be array' );
+			$realmMap = \array_map( static function ( string $r ){ return \rtrim( $r, '.' ) . '.'; }, $params['userRealmPrefixValueMap'] );
+		}
+		if ( null === $realmMap ) {
+			$realmMap = [];
+		}
 		$samlIdp = \array_key_exists( 'samlIdp', $params ) ? $params['samlIdp'] : null;
 		$idpList = \array_key_exists( 'idpList', $params ) ? $params['idpList'] : [];
 		$verifyAuthenticatingAuthority = \array_key_exists( 'verifyAuthenticatingAuthority', $params ) ? $params['verifyAuthenticatingAuthority'] : true;
@@ -77,8 +85,8 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 		$homeOrgAttribute = $params['homeOrgAttribute'] ?? $params['feideOrgAttribute'] ?? 'schacHomeOrganization';
 
 		\assert( \is_string( $userIdAttribute ), 'userIdAttribute must be string' );
-		\assert( \is_string( $userRealmPrefixAttribute ), 'userRealmPrefixAttribute must be string' );
-		\assert( \is_array( $userRealmPrefixValueMap ), 'userRealmPrefixValueMap must be array' );
+		\assert( \is_string( $realmAttribute ), 'realmAttribute must be string' );
+		\assert( \is_array( $realmMap ), 'realmMap must be array' );
 		\assert( \is_string( $samlIdp ) || null === $samlIdp, 'samlIdp must be string if provided' );
 		\assert( \is_array( $idpList ), 'idpList must be array if provided' );
 		\assert( \is_array( $authzAttributeValue ), 'authzAttributeValue must be array if provided' );
@@ -92,8 +100,8 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 		$this->authzAttributeValue = $authzAttributeValue;
 		$this->as = new \SimpleSAML\Auth\Simple( $authSource );
 		$this->userIdAttribute = $userIdAttribute;
-		$this->userRealmPrefixAttribute = $userRealmPrefixAttribute;
-		$this->userRealmPrefixValueMap = $userRealmPrefixValueMap;
+		$this->realmAttribute = $realmAttribute;
+		$this->realmMap = $realmMap;
 		$this->allowedHomeOrg = $allowedHomeOrg;
 		$this->homeOrgAttribute = $homeOrgAttribute;
 	}
@@ -156,22 +164,33 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 	/**
 	 * @suppress PhanUndeclaredClassMethod We don't have a dependency on SimpleSAMLphp
 	 */
-	public function getUserRealmPrefix(): ?string
+	public function getRealm(): ?string
 	{
 		if ( null === $this->attributes ) {
 			$this->attributes = $this->as->getAttributes();
 			\assert( \is_array( $this->attributes ), 'SimpleSAMLphp always returns an array' );
 		}
 
-		if ( null === $this->userRealmPrefixAttribute || !\array_key_exists( $this->userRealmPrefixAttribute, $this->attributes ) ) {
+		$realmAttribute = $this->realmAttribute;
+		if ( null === $realmAttribute ) {
 			return null;
 		}
-		$userRealmPrefix = $this->attributes[$this->userRealmPrefixAttribute];
+
+		if ( !\array_key_exists( $realmAttribute, $this->attributes )
+			&& \array_key_exists( $this->attributeToShib( $realmAttribute ), $this->attributes )
+		) {
+			$realmAttribute = $this->attributeToShib( $realmAttribute );
+		}
+
+		if ( !\array_key_exists( $realmAttribute, $this->attributes ) ) {
+			return null;
+		}
+		$userRealmPrefix = $this->attributes[$realmAttribute];
 		\assert( \is_array( $userRealmPrefix ), 'SimpleSAMLphp always returns attributes as array' );
 
-		// if there is an userRealmPrefixValueMap, iterate over its values (order might be important) and return
-		if ( \count( $this->userRealmPrefixValueMap ) > 0 ) {
-			foreach ( $this->userRealmPrefixValueMap as $attribute => $value ) {
+		// if there is an realmMap, iterate over its values (order might be important) and return
+		if ( \count( $this->realmMap ) > 0 ) {
+			foreach ( $this->realmMap as $attribute => $value ) {
 				if ( \in_array( $attribute, $userRealmPrefix, true ) ) {
 					return $value;
 				}

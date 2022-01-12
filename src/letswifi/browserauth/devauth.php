@@ -50,7 +50,7 @@ class DevAuth implements BrowserAuthInterface
 		return null;
 	}
 
-	public function getUserRealmPrefix(): ?string
+	public function getRealm(): ?string
 	{
 		return null;
 	}
