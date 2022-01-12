@@ -185,17 +185,20 @@ class LetsWifiApp
 			} else {
 				throw new RuntimeException( 'File specified in signing.cert does not exist, please migrate to profile.signing.cert' );
 			}
+
+			$signingKey = $signingCert;
 		} else {
 			$signingCert = $this->config->getStringOrNull( 'profile.signing.cert' );
+			$signingKey = $this->config->getStringOrNull( 'profile.signing.key' ) ?? $signingCert;
 		}
-		if ( null === $signingCert ) {
+		if ( null === $signingKey || null === $signingCert ) {
 			return null;
 		}
 
 		$passphrase = $this->config->getStringOrNull( 'profile.signing.passphrase' );
 
 		$certificate = new X509( $signingCert );
-		$key = new PrivateKey( $signingCert, $passphrase );
+		$key = new PrivateKey( $signingKey, $passphrase );
 
 		return new PKCS7( $certificate, $key );
 	}
