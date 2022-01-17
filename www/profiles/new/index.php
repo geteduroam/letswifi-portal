@@ -3,8 +3,8 @@
 /*
  * This file is part of letswifi; a system for easy eduroam device enrollment
  *
- * Copyright: 2018-2021, Jørn Åne de Jong, Uninett AS <jornane.dejong@surf.nl>
- * Copyright: 2020-2021, Paul Dekkers, SURF <paul.dekkers@surf.nl>
+ * Copyright: 2018-2022, Jørn Åne de Jong <jorn.dejong@letswifi.eu>
+ * Copyright: 2020-2022, Paul Dekkers, SURF <paul.dekkers@surf.nl>
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -62,23 +62,24 @@ if ( 'GET' === $_SERVER['REQUEST_METHOD'] && isset( $_GET['download'] ) ) {
 
 switch ( $fakeMethod ?? $_SERVER['REQUEST_METHOD'] ) {
 	case 'GET': return $app->render(
-		[
-			'href' => '/profiles/new/',
-			'devices' => [
-				'apple-mobileconfig' => [
-					'name' => 'Apple (iOS/MacOS)',
+			[
+				'href' => '/profiles/new/',
+				'devices' => [
+					'apple-mobileconfig' => [
+						'name' => 'Apple (iOS/MacOS)',
+					],
+					'eap-config' => [
+						'name' => 'eap-config',
+					],
+					'pkcs12' => [
+						'name' => 'PKCS12',
+					],
 				],
-				'eap-config' => [
-					'name' => 'eap-config',
+				'app' => [
+					'url' => '../../app/',
 				],
-				'pkcs12' => [
-					'name' => 'PKCS12',
-				],
-			],
-			'app' => [
-				'url' => '../../app/',
-			],
-		], 'profiles-new' );
+			], 'profiles-new',
+		);
 	case 'POST':
 		switch ( $device = $fakeDevice ?? $_POST['device'] ?? '' ) {
 			case 'apple-mobileconfig': $generator = $realm->getConfigGenerator( \letswifi\profile\generator\MobileConfigGenerator::class, $user ); break;

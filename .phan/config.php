@@ -3,8 +3,8 @@
 /*
  * This file is part of letswifi; a system for easy eduroam device enrollment
  *
- * Copyright: 2018-2021, Jørn Åne de Jong, Uninett AS <jornane.dejong@surf.nl>
- * Copyright: 2020-2021, Paul Dekkers, SURF <paul.dekkers@surf.nl>
+ * Copyright: 2018-2022, Jørn Åne de Jong <jorn.dejong@letswifi.eu>
+ * Copyright: 2020-2022, Paul Dekkers, SURF <paul.dekkers@surf.nl>
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -51,7 +51,7 @@ return [
 	// Note that the **only** effect of choosing `'5.6'` is to infer that functions removed in php 7.0 exist.
 	// (See `backward_compatibility_checks` for additional options)
 	// Automatically inferred from composer.json requirement for "php" of ">=7.1"
-	'target_php_version' => '7.1',
+	'target_php_version' => '7.3',
 
 	// If enabled, missing properties will be created when
 	// they are first seen. If false, we'll report an

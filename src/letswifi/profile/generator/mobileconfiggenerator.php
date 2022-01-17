@@ -3,8 +3,8 @@
 /*
  * This file is part of letswifi; a system for easy eduroam device enrollment
  *
- * Copyright: 2018-2021, Jørn Åne de Jong, Uninett AS <jornane.dejong@surf.nl>
- * Copyright: 2020-2021, Paul Dekkers, SURF <paul.dekkers@surf.nl>
+ * Copyright: 2018-2022, Jørn Åne de Jong <jorn.dejong@letswifi.eu>
+ * Copyright: 2020-2022, Paul Dekkers, SURF <paul.dekkers@surf.nl>
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -40,7 +40,7 @@ class MobileConfigGenerator extends AbstractGenerator
 		$caCertificates = [];
 		$tlsAuthMethods = \array_filter(
 				$this->authenticationMethods,
-				static function ( $a ) { return $a instanceof TlsAuth && null !== $a->getPKCS12(); }
+				static function ( $a ) { return $a instanceof TlsAuth && null !== $a->getPKCS12(); },
 			);
 		if ( 1 !== \count( $tlsAuthMethods ) ) {
 			throw new InvalidArgumentException( 'Expected 1 TLS auth method, got ' . \count( $tlsAuthMethods ) );
@@ -118,7 +118,7 @@ class MobileConfigGenerator extends AbstractGenerator
 
 		$uuids = \array_map(
 				static function ( $_ ){ return static::uuidgen(); },
-				\array_fill( 0, \count( $caCertificates ), null )
+				\array_fill( 0, \count( $caCertificates ), null ),
 			);
 		/** @var array<string,\fyrkat\openssl\X509> */
 		$caCertificates = \array_combine( $uuids, $caCertificates );

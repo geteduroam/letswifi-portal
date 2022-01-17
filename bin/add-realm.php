@@ -23,13 +23,13 @@ $realmManager = $app->getRealmManager();
 $caPrivKey = new PrivateKey( new OpenSSLConfig( OpenSSLConfig::KEY_EC ) );
 $caCsr = CSR::generate(
 		new DN( ['CN' => $argv[3] ?? ( $argv[1] . ' Let\'s Wi-Fi CA' )] ), // Subject
-		$caPrivKey // CA key
+		$caPrivKey, // CA key
 	);
 $caCertificate = $caCsr->sign(
 		null, // CA certificate
 		$caPrivKey, // CA key
 		18250, // Validity in days
-		new OpenSSLConfig( OpenSSLConfig::X509_CA ) // EKU
+		new OpenSSLConfig( OpenSSLConfig::X509_CA ), // EKU
 	);
 
 $realmManager->createRealm( $argv[1] );

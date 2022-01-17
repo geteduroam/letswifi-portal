@@ -15,23 +15,23 @@ $config = (new PhpCsFixer\Config())
 			'header' => <<< 'EOD'
 This file is part of letswifi; a system for easy eduroam device enrollment
 
-Copyright: 2018-2021, Jørn Åne de Jong, Uninett AS <jornane.dejong@surf.nl>
-Copyright: 2020-2021, Paul Dekkers, SURF <paul.dekkers@surf.nl>
+Copyright: 2018-2022, Jørn Åne de Jong <jorn.dejong@letswifi.eu>
+Copyright: 2020-2022, Paul Dekkers, SURF <paul.dekkers@surf.nl>
 SPDX-License-Identifier: BSD-3-Clause
 EOD
 		],
 		'@PSR2' => true,
 		'@Symfony' => true,
 		'@Symfony:risky' => true,
-		'@PHP71Migration' => true,
+		'@PHP73Migration' => true,
 		'@PHP71Migration:risky' => true,
 		'align_multiline_comment' => [
-			'comment_type' => 'all_multiline'
+			'comment_type' => 'all_multiline',
 		],
 		'array_indentation' => true,
 		'array_push' => true,
 		'array_syntax' => [
-			'syntax' => 'short'
+			'syntax' => 'short',
 		],
 		'backtick_to_shell_exec' => true,
 		'blank_line_after_namespace' => true,
@@ -43,7 +43,7 @@ EOD
 			'position_after_functions_and_oop_constructs' => 'next',
 		],
 		'cast_spaces' => [
-			'space' => 'none'
+			'space' => 'none',
 		],
 		'class_attributes_separation' => true,
 		'class_definition' => [ /* default */
@@ -57,7 +57,7 @@ EOD
 		'combine_nested_dirname' => true,
 		'comment_to_phpdoc' => true,
 		'concat_space' => [
-			'spacing' => 'one'
+			'spacing' => 'one',
 		],
 		'constant_case' => ['case' => 'lower'], // constants such as true, false, null
 		'date_time_immutable' => true,
@@ -94,7 +94,7 @@ EOD
 				'get_class_this',
 				'php_sapi_name',
 				'phpversion',
-				'pi'
+				'pi',
 			],
 		],
 		'function_typehint_space' => true,
@@ -111,31 +111,32 @@ EOD
 		'magic_constant_casing' => true,
 		'method_argument_space' => [
 			'keep_multiple_spaces_after_comma' => false,
-			'on_multiline' => 'ignore' /* ensure_fully_multiline indents weirdly */
+			'on_multiline' => 'ignore', /* ensure_fully_multiline indents weirdly */
+			'after_heredoc' => true,
 		],
 		'method_chaining_indentation' => true,
 		'modernize_types_casting' => true,
 		'multiline_comment_opening_closing' => true,
 		'multiline_whitespace_before_semicolons' => [
-			'strategy' => 'new_line_for_chained_calls'
+			'strategy' => 'new_line_for_chained_calls',
 		],
 		'native_constant_invocation' => [
 			'exclude' => ['null', 'false', 'true'], /* default */
 			'fix_built_in' => true,
-			'include' => []
+			'include' => [],
 		],
 		'native_function_casing' => true,
 		'native_function_invocation' => [
 			'exclude' => [], /* default */
 			'include' => ['@all'], /* default */
-			'scope' => 'all' /* default */
+			'scope' => 'all', /* default */
 		],
 		'new_with_braces' => true,
 		'no_alias_functions' => true,
 		'no_alternative_syntax' => true,
 		'no_blank_lines_after_phpdoc' => false, /* yes for functions, classes. no for file. Can't choose, so false for now */
 		'no_break_comment' => [
-			'comment_text' => '@todo document implicit fall-through'
+			'comment_text' => '@todo document implicit fall-through',
 		],
 		'no_closing_tag' => true,
 		'no_empty_comment' => true,
@@ -143,13 +144,13 @@ EOD
 		'no_empty_statement' => true,
 		'no_extra_blank_lines' => [
 			'tokens' => [
-				'extra'
-			]
+				'extra',
+			],
 		],
 		'no_homoglyph_names' => true,
 		'no_leading_namespace_whitespace' => true,
 		'no_mixed_echo_print' => [
-			'use' => 'echo'
+			'use' => 'echo',
 		],
 		'no_php4_constructor' => true,
 		'no_short_bool_cast' => true,
@@ -162,7 +163,7 @@ EOD
 		'no_trailing_whitespace_in_comment' => true,
 		'no_trailing_whitespace_in_string' => true,
 		'no_unneeded_control_parentheses' => [
-			'statements' => ['break', 'clone', 'continue', 'echo_print', 'return', 'switch_case', 'yield'] /* default */
+			'statements' => ['break', 'clone', 'continue', 'echo_print', 'return', 'switch_case', 'yield'], /* default */
 		],
 		'no_unneeded_final_method' => true,
 		'no_unreachable_default_argument_value' => true,
@@ -170,9 +171,14 @@ EOD
 		'no_useless_else' => true,
 		'no_useless_return' => true,
 		'no_useless_sprintf' => true,
-		'no_whitespace_before_comma_in_array' => true,
+		'no_whitespace_before_comma_in_array' => [
+			// There's also an implicit rule here, that fixes stuff like array( 1 , 2 ) => array( 1, 2 )
+			'after_heredoc' => true,
+		],
 		'no_whitespace_in_blank_line' => true,
-		'non_printable_character' => ['use_escape_sequences_in_strings' => true],
+		'non_printable_character' => [
+			'use_escape_sequences_in_strings' => true,
+		],
 		'normalize_index_brace' => true,
 		'object_operator_without_whitespace' => true,
 		'ordered_class_elements' => [
@@ -190,17 +196,17 @@ EOD
 				'phpunit',
 				'method_public',
 				'method_protected',
-				'method_private'
+				'method_private',
 			],
 		],
 		'ordered_imports' => [
-			'sort_algorithm' => 'alpha'
+			'sort_algorithm' => 'alpha',
 		],
 		'ordered_traits' => true,
 		'phpdoc_add_missing_param_annotation' => true,
 		'phpdoc_align' => [
 			'align' => 'vertical',
-			'tags' => ['param', 'return', 'throws', 'type', 'var']
+			'tags' => ['param', 'return', 'throws', 'type', 'var'],
 		],
 		'phpdoc_annotation_without_dot' => true,
 		'phpdoc_indent' => true,
@@ -220,7 +226,7 @@ EOD
 		'phpdoc_types' => true,
 		'phpdoc_types_order' => [
 			'null_adjustment' => 'always_first', /* default */
-			'sort_algorithm' => 'alpha'
+			'sort_algorithm' => 'alpha',
 		],
 		'phpdoc_var_without_name' => true,
 		'php_unit_construct' => true,
@@ -241,7 +247,7 @@ EOD
 		'single_import_per_statement' => true,
 		'single_line_after_imports' => true,
 		'space_after_semicolon' => [
-			'remove_in_empty_for_expressions' => true
+			'remove_in_empty_for_expressions' => true,
 		],
 		'standardize_increment' => true,
 		'standardize_not_equals' => true,
@@ -253,7 +259,10 @@ EOD
 		'ternary_operator_spaces' => true,
 		'ternary_to_elvis_operator' => true,
 		'ternary_to_null_coalescing' => true,
-		'trailing_comma_in_multiline' => ['elements' => ['arrays']],
+		'trailing_comma_in_multiline' => [
+			'after_heredoc' => true,
+			'elements' => ['arrays', 'arguments'],
+		],
 		'trim_array_spaces' => true,
 		'unary_operator_spaces' => true,
 		'visibility_required' => true,

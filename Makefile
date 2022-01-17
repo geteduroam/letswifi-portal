@@ -25,7 +25,9 @@ test: syntax phpunit
 vendor: check-php composer.phar
 	php composer.phar install
 	@php -r '$$data=json_decode(file_get_contents("composer.lock"));unset($$data->_readme);file_put_contents("composer.lock",json_encode($$data,JSON_UNESCAPED_SLASHES));'
-composer.lock: vendor
+composer.lock:
+	php composer.phar update
+	@php -r '$$data=json_decode(file_get_contents("composer.lock"));unset($$data->_readme);file_put_contents("composer.lock",json_encode($$data,JSON_UNESCAPED_SLASHES));'
 
 etc/letswifi.conf.php:
 	cp etc/letswifi.conf.dist.php etc/letswifi.conf.php
