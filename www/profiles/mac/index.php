@@ -3,8 +3,8 @@
 /*
  * This file is part of letswifi; a system for easy eduroam device enrollment
  *
- * Copyright: 2018-2021, Jørn Åne de Jong, Uninett AS <jornane.dejong@surf.nl>
- * Copyright: 2020-2021, Paul Dekkers, SURF <paul.dekkers@surf.nl>
+ * Copyright: 2018-2022, Jørn Åne de Jong <jorn.dejong@letswifi.eu>
+ * Copyright: 2020-2022, Paul Dekkers, SURF <paul.dekkers@surf.nl>
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -36,7 +36,7 @@ switch ( $_SERVER['REQUEST_METHOD'] ) {
 				'action' => '/profiles/new/',
 				'device' => 'apple-mobileconfig',
 				'meta_redirect' => '/profiles/new/?' . \http_build_query( ['download' => '1', 'device' => 'apple-mobileconfig'] ),
-			], 'mobileconfig-mac-new'
+			], 'mobileconfig-mac-new',
 		);
 }
 

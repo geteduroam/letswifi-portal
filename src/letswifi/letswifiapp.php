@@ -3,8 +3,8 @@
 /*
  * This file is part of letswifi; a system for easy eduroam device enrollment
  *
- * Copyright: 2018-2021, Jørn Åne de Jong, Uninett AS <jornane.dejong@surf.nl>
- * Copyright: 2020-2021, Paul Dekkers, SURF <paul.dekkers@surf.nl>
+ * Copyright: 2018-2022, Jørn Åne de Jong <jorn.dejong@letswifi.eu>
+ * Copyright: 2020-2022, Paul Dekkers, SURF <paul.dekkers@surf.nl>
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -218,15 +218,16 @@ class LetsWifiApp
 		$oauth = new OAuth(
 				$accessTokenSealer,
 				$authorizationCodeSealer,
-				$refreshTokenSealer
+				$refreshTokenSealer,
 			);
 		foreach ( $this->config->getArray( 'oauth.clients' ) as $client ) {
 			$oauth->registerClient( new Client(
-					$client['clientId'],
-					$client['redirectUris'] ?? [],
-					$client['scopes'],
-					$client['refresh'] ?? false,
-					$client['clientSecret'] ?? null )
+						$client['clientId'],
+						$client['redirectUris'] ?? [],
+						$client['scopes'],
+						$client['refresh'] ?? false,
+						$client['clientSecret'] ?? null,
+					),
 				);
 		}
 
@@ -294,7 +295,7 @@ class LetsWifiApp
 		if ( null === $this->twig ) {
 			$loader = new \Twig\Loader\FilesystemLoader(
 				$this->config->getArrayOrNull( 'tpldir' )
-				?? [\implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 2 ), 'tpl'] )]
+				?? [\implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 2 ), 'tpl'] )],
 			);
 			$this->twig = new \Twig\Environment( $loader, [
 				//'cache' => '/path/to/compilation_cache',
