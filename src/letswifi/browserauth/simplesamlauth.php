@@ -201,7 +201,7 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 
 		// if there is no map, we hope there's just one attribute, ie. the eduPersonPrimaryAffiliation
 		if ( 1 === \count( $realm ) ) {
-			return \reset( $userRealmPrefix );
+			return \reset( $realm );
 		}
 
 		// we're unsure if there is no map, no prefix
