@@ -178,7 +178,7 @@ class Realm
 	protected function generateClientCertificate( User $user, DateTimeInterface $expiry ): PKCS12
 	{
 		$userKey = new PrivateKey( new OpenSSLConfig( OpenSSLConfig::KEY_RSA ) );
-		$commonName = static::createCommonName( '@' . \rawurlencode( $this->getName() ) );
+		$commonName = static::createCommonName( '@' . \rawurlencode( $user->getRealm() ) );
 		$dn = new DN( ['CN' => $commonName] );
 		$csr = CSR::generate( $dn, $userKey );
 		$caCert = $this->getSigningCACertificate();

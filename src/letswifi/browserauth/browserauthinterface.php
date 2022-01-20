@@ -30,7 +30,7 @@ interface BrowserAuthInterface
 	public function getLogoutURL( ?string $redirect = null ): ?string;
 
 	/**
-	 * Get a prefix that must be added in front of the realm, compensating for dots
+	 * Get a custom realm that overrides the default realm. May start with a dot for realm prefix
 	 *
 	 * For example, if the realm is example.com and this function returns "student",
 	 * the final realm must be student.example.com; a dot has to be added,
@@ -38,5 +38,5 @@ interface BrowserAuthInterface
 	 *
 	 * @return ?string The prefix to add to the realm, do not add anything if null
 	 */
-	public function getUserRealmPrefix(): ?string;
+	public function getRealm(): ?string;
 }

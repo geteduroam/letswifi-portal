@@ -44,10 +44,10 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 	private $userIdAttribute;
 
 	/** @var ?string */
-	private $userRealmPrefixAttribute;
+	private $realmSelectorAttribute;
 
 	/** @var array<string> */
-	private $userRealmPrefixValueMap;
+	private $realmMap;
 
 	/** @var ?array<string,array<string>> */
 	private $attributes = null;
@@ -67,8 +67,8 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 
 		$authSource = $params['authSource'] ?? 'default-sp';
 		$userIdAttribute = $params['userIdAttribute'] ?? null;
-		$userRealmPrefixAttribute = $params['userRealmPrefixAttribute'] ?? null;
-		$userRealmPrefixValueMap = $params['userRealmPrefixValueMap'] ?? [];
+		$realmSelectorAttribute = $params['realmSelectorAttribute'] ?? $params['userRealmPrefixAttribute'] ?? null;
+		$realmMap = $params['realmMap'] ?? $params['userRealmPrefixValueMap'] ?? [];
 		$samlIdp = $params['samlIdp'] ?? null;
 		$idpList = $params['idpList'] ?? [];
 		$verifyAuthenticatingAuthority = $params['verifyAuthenticatingAuthority'] ?? true;
@@ -77,8 +77,8 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 		$homeOrgAttribute = $params['homeOrgAttribute'] ?? $params['feideOrgAttribute'] ?? 'schacHomeOrganization';
 
 		\assert( \is_string( $userIdAttribute ), 'userIdAttribute must be string' );
-		\assert( \is_string( $userRealmPrefixAttribute ), 'userRealmPrefixAttribute must be string' );
-		\assert( \is_array( $userRealmPrefixValueMap ), 'userRealmPrefixValueMap must be array' );
+		\assert( \is_string( $realmSelectorAttribute ), 'realmSelectorAttribute must be string' );
+		\assert( \is_array( $realmMap ), 'realmMap must be array' );
 		\assert( \is_string( $samlIdp ) || null === $samlIdp, 'samlIdp must be string if provided' );
 		\assert( \is_array( $idpList ), 'idpList must be array if provided' );
 		\assert( \is_array( $authzAttributeValue ), 'authzAttributeValue must be array if provided' );
@@ -92,8 +92,8 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 		$this->authzAttributeValue = $authzAttributeValue;
 		$this->as = new \SimpleSAML\Auth\Simple( $authSource );
 		$this->userIdAttribute = $userIdAttribute;
-		$this->userRealmPrefixAttribute = $userRealmPrefixAttribute;
-		$this->userRealmPrefixValueMap = $userRealmPrefixValueMap;
+		$this->realmSelectorAttribute = $realmSelectorAttribute;
+		$this->realmMap = $realmMap;
 		$this->allowedHomeOrg = $allowedHomeOrg;
 		$this->homeOrgAttribute = $homeOrgAttribute;
 	}
@@ -156,37 +156,60 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 	/**
 	 * @suppress PhanUndeclaredClassMethod We don't have a dependency on SimpleSAMLphp
 	 */
-	public function getUserRealmPrefix(): ?string
+	public function getRealm(): ?string
 	{
 		if ( null === $this->attributes ) {
 			$this->attributes = $this->as->getAttributes();
 			\assert( \is_array( $this->attributes ), 'SimpleSAMLphp always returns an array' );
 		}
 
-		if ( null === $this->userRealmPrefixAttribute || !\array_key_exists( $this->userRealmPrefixAttribute, $this->attributes ) ) {
+		$realmSelectorAttribute = $this->realmSelectorAttribute;
+		if ( null === $realmSelectorAttribute ) {
 			return null;
 		}
-		$userRealmPrefix = $this->attributes[$this->userRealmPrefixAttribute];
-		\assert( \is_array( $userRealmPrefix ), 'SimpleSAMLphp always returns attributes as array' );
 
-		// if there is an userRealmPrefixValueMap, iterate over its values (order might be important) and return
-		if ( \count( $this->userRealmPrefixValueMap ) > 0 ) {
-			foreach ( $this->userRealmPrefixValueMap as $attribute => $value ) {
-				if ( \in_array( $attribute, $userRealmPrefix, true ) ) {
+		if ( !\array_key_exists( $realmSelectorAttribute, $this->attributes )
+			&& \array_key_exists( $this->attributeToShib( $realmSelectorAttribute ), $this->attributes )
+		) {
+			$realmSelectorAttribute = $this->attributeToShib( $realmSelectorAttribute );
+		}
+
+		if ( !\array_key_exists( $realmSelectorAttribute, $this->attributes ) ) {
+			return null;
+		}
+		$realmSelectors = $this->attributes[$realmSelectorAttribute];
+		\assert( \is_array( $realmSelectors ), 'SimpleSAMLphp always returns attributes as array' );
+
+		// if there is an realmMap, iterate over its values (order might be important) and return
+		if ( \count( $this->realmMap ) > 0 ) {
+			foreach ( $this->realmMap as $attribute => $value ) {
+				if ( \in_array( $attribute, $realmSelectors, true ) ) {
 					return $value;
 				}
 			}
 
-			return null;
+			// No match for the realmMap; if we return null the default realm would be used,
+			// but that might not be what we want.  We will first check if there is a '*' entry in the map,
+			// and use that.  If nothing is available, we throw an exception because we cannot decide on a realm
+			if ( \array_key_exists( '*', $this->realmMap ) ) {
+				// The value of '*' might be null in order to trigger the default realm anyway,
+				// but then the administrator has explicitly decided this, so it's fine
+
+				return $this->realmMap['*'];
+			}
+
+			throw new MismatchRealmSelectorException( $realmSelectors, $realmSelectorAttribute );
 		}
 
-		// if there is no map, we hope there's just one attribute, ie. the eduPersonPrimaryAffiliation
-		if ( 1 === \count( $userRealmPrefix ) ) {
-			return \reset( $userRealmPrefix );
+		// If there is no map, there is only one attribute, we return that as the realm;
+		// this works well for eduPersonPrimaryAffiliation, for example.
+		if ( 1 === \count( $realmSelectors ) ) {
+			return \reset( $realmSelectors );
 		}
 
-		// we're unsure if there is no map, no prefix
-		return null;
+		// The selector attribute is specified, but we didn't get any match anywhere.
+		// We cannot find a realm,
+		throw new MismatchRealmSelectorException( $realmSelectors, $realmSelectorAttribute );
 	}
 
 	/**

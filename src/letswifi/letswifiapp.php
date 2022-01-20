@@ -73,9 +73,15 @@ class LetsWifiApp
 	{
 		$auth = $this->getBrowserAuthenticator( $realm );
 		$userId = $auth->requireAuth();
-		$userRealmPrefix = $auth->getUserRealmPrefix();
+		$userRealm = $auth->getRealm();
 
-		$realm = $userRealmPrefix ?? $this->getRealm()->getName();
+		if ( null !== $userRealm && \strpos( $userRealm, '.' ) === false ) {
+			// There is no . in $userRealm, so we assume it's a subrealm,
+			// and append the current realm to it.
+			$userRealm .= '.' . $this->getRealm()->getName();
+		}
+		$realm = $userRealm ?? $this->getRealm()->getName();
+		\assert( '.' !== $realm[0], 'Realm cannot start with .' );
 
 		return new User( $userId, $realm, null, $this->getIP(), $_SERVER['HTTP_USER_AGENT'] );
 	}

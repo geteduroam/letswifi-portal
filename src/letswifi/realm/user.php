@@ -56,7 +56,7 @@ class User
 		return $this->userAgent;
 	}
 
-	public function getRealm(): ?string
+	public function getRealm(): string
 	{
 		return $this->realm;
 	}
