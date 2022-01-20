@@ -65,14 +65,14 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 			require $params['autoloadInclude'];
 		}
 
-		$authSource = \array_key_exists( 'authSource', $params ) ? $params['authSource'] : 'default-sp';
-		$userIdAttribute = \array_key_exists( 'userIdAttribute', $params ) ? $params['userIdAttribute'] : null;
-		$userRealmPrefixAttribute = \array_key_exists( 'userRealmPrefixAttribute', $params ) ? $params['userRealmPrefixAttribute'] : null;
-		$userRealmPrefixValueMap = \array_key_exists( 'userRealmPrefixValueMap', $params ) ? $params['userRealmPrefixValueMap'] : [];
-		$samlIdp = \array_key_exists( 'samlIdp', $params ) ? $params['samlIdp'] : null;
-		$idpList = \array_key_exists( 'idpList', $params ) ? $params['idpList'] : [];
-		$verifyAuthenticatingAuthority = \array_key_exists( 'verifyAuthenticatingAuthority', $params ) ? $params['verifyAuthenticatingAuthority'] : true;
-		$authzAttributeValue = \array_key_exists( 'authzAttributeValue', $params ) ? $params['authzAttributeValue'] : [];
+		$authSource = $params['authSource'] ?? 'default-sp';
+		$userIdAttribute = $params['userIdAttribute'] ?? null;
+		$userRealmPrefixAttribute = $params['userRealmPrefixAttribute'] ?? null;
+		$userRealmPrefixValueMap = $params['userRealmPrefixValueMap'] ?? [];
+		$samlIdp = $params['samlIdp'] ?? null;
+		$idpList = $params['idpList'] ?? [];
+		$verifyAuthenticatingAuthority = $params['verifyAuthenticatingAuthority'] ?? true;
+		$authzAttributeValue = $params['authzAttributeValue'] ?? [];
 		$allowedHomeOrg = $params['allowedHomeOrg'] ?? $params['feideHomeOrg'] ?? null;
 		$homeOrgAttribute = $params['homeOrgAttribute'] ?? $params['feideOrgAttribute'] ?? 'schacHomeOrganization';
 
