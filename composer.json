@@ -7,7 +7,7 @@
 	},
 	"require": {
 		"php": ">=7.3",
-		"twig/twig": "^3",
+		"twig/twig": ">=3.3.8,<4",
 		"fyrkat/openssl": "~1.1",
 		"fyrkat/oauth-server": "~1.2"
 	},
