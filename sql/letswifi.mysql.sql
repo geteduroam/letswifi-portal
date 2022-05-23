@@ -3,15 +3,6 @@ CREATE TABLE `realm` (
 		PRIMARY KEY (`realm`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE `realm_signer` (
-		`realm` varchar(127) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-		`signer_ca_sub` varchar(127) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-		`default_validity_days` int(11) NOT NULL,
-		PRIMARY KEY (`realm`),
-		FOREIGN KEY(realm) REFERENCES realm(realm)
-		FOREIGN KEY(signer_ca_sub) REFERENCES ca(sub)
-	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 CREATE TABLE `ca` (
 		`sub` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
 		`pub` text COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -19,6 +10,15 @@ CREATE TABLE `ca` (
 		`issuer` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
 		PRIMARY KEY (`sub`),
 		FOREIGN KEY(issuer) REFERENCES ca(sub)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `realm_signer` (
+		`realm` varchar(127) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+		`signer_ca_sub` varchar(127) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+		`default_validity_days` int(11) NOT NULL,
+		PRIMARY KEY (`realm`),
+		FOREIGN KEY(realm) REFERENCES realm(realm),
+		FOREIGN KEY(signer_ca_sub) REFERENCES ca(sub)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `realm_server_name` (
