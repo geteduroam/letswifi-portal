@@ -46,10 +46,6 @@ Copy etc/letswifi.conf.simplesaml.php etc/letswifi.conf.php and change `userIdAt
 
 	cp etc/letswifi.conf.simplesaml.php etc/letswifi.conf.php
 
-Initialize required submodules
-
-	make submodule
-
 Create the realm with a default client certificate validity of one year
 
 	bin/add-realm.php example.com 365
