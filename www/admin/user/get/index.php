@@ -9,6 +9,7 @@
  */
 
 require \implode(\DIRECTORY_SEPARATOR, [\dirname(__DIR__, 4), 'src', '_autoload.php']);
+$basePath = '../../..';
 
 $user = $_POST['user'] ?? $_GET['user'] ?? null;
 $subject = $_POST['subject'] ?? $_GET['subject'] ?? null;
@@ -44,7 +45,7 @@ if ( $user ) {
 }
 
 $app->render( [
-	'href' => '/admin/user/get/?' . \http_build_query( $queryVars ),
+	'href' => "${basePath}/admin/user/get/?" . \http_build_query( $queryVars ),
 	'jq' => '.certificates | map(del(.csr,.x509))',
 	// TSV seems like fun, but it looks like empty columns disappear
 	//'jq' => '.certificates[] | [.serial, .requester, .sub, .issued, .expires, .revoked, .usage, .client] | @tsv',
@@ -56,4 +57,4 @@ $app->render( [
 		'action' => '../../ca/revoke/',
 		'revokeAll' => !$subject,
 	],
-], 'admin-user-get' );
+], 'admin-user-get', $basePath );

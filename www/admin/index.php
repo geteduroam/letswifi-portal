@@ -9,6 +9,7 @@
  */
 
 require \implode(\DIRECTORY_SEPARATOR, [\dirname(__DIR__, 2), 'src', '_autoload.php']);
+$basePath = '..';
 
 $app = new letswifi\LetsWifiApp();
 $app->registerExceptionHandler();
@@ -16,5 +17,5 @@ $app->registerExceptionHandler();
 $app->requireAdmin( 'admin' );
 
 $app->render( [
-	'href' => '/admin/',
-], 'admin' );
+	'href' => "${basePath}/admin/",
+], 'admin', $basePath );

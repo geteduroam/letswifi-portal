@@ -9,6 +9,7 @@
  */
 
 require \implode(\DIRECTORY_SEPARATOR, [\dirname(__DIR__, 3), 'src', '_autoload.php']);
+$basePath = '../..';
 
 const POST_FIELD = 'approve';
 const POST_VALUE = 'yes';
@@ -46,7 +47,7 @@ try {
 		'userId' => $user->getUserID(),
 		'postField' => POST_FIELD,
 		'postValue' => POST_VALUE,
-	], 'authorize' );
+	], 'authorize', $basePath );
 } catch ( letswifi\browserauth\MismatchIdpException $e ) {
 	$guessRealm = $app->guessRealm( $realm );
 

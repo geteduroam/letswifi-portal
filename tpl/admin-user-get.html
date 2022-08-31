@@ -8,7 +8,7 @@
 	<form method="POST" action="{{ form.action }}">
 		<h2>Certificate list</h2>
 		<p>
-			<input type="hidden" name="returnTo" value="{{ href }}">
+			<input type="hidden" name="returnTo" value="{{ _basePah ~ href }}">
 			<input type="hidden" name="realm" value="{{ form.realm }}">
 {% if revokeAll %}
 			<button type="submit" name="user" value="{{ user.name }}">Revoke all</button>

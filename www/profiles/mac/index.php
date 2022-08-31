@@ -9,6 +9,7 @@
  */
 
 require \implode(\DIRECTORY_SEPARATOR, [\dirname(__DIR__, 3), 'src', '_autoload.php']);
+$basePath = '../..';
 
 $app = new letswifi\LetsWifiApp();
 $app->registerExceptionHandler();
@@ -26,18 +27,18 @@ $app->getUserFromBrowserSession( $realm );
 	'expires' => 0, // session cookie
 	'httponly' => true, // not available in JavaScript
 	'secure' => false, // we don't care, this is not for security, and this helps with local devving
-	'path' => '/profiles/', // make it available to /profiles/new as well
+	'path' => '/', // make it available to /profiles/new as well; relative path's don't work here so use "/" for now
+	'samesite' => 'Strict',
 ]);
 
 switch ( $_SERVER['REQUEST_METHOD'] ) {
 	case 'GET': return $app->render(
 			[
-				'href' => '/profiles/mac/',
-				'action' => '/profiles/new/',
+				'href' => "${basePath}/profiles/mac/",
+				'action' => "${basePath}/profiles/new/",
 				'device' => 'apple-mobileconfig',
-				'meta_redirect' => '/profiles/new/?' . \http_build_query( ['download' => '1', 'device' => 'apple-mobileconfig'] ),
-			], 'mobileconfig-mac-new',
-		);
+				'meta_redirect' => "${basePath}/profiles/new/?" . \http_build_query( ['download' => '1', 'device' => 'apple-mobileconfig'] ),
+			], 'mobileconfig-mac-new', $basePath );
 }
 
 \header( 'Content-Type: text/plain', true, 405 );

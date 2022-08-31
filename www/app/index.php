@@ -9,12 +9,13 @@
  */
 
 require \implode(\DIRECTORY_SEPARATOR, [\dirname(__DIR__, 2), 'src', '_autoload.php']);
+$basePath = '..';
 
 $app = new letswifi\LetsWifiApp();
 $app->registerExceptionHandler();
 
 $app->render( [
-	'href' => '/app/',
+	'href' => $basePath . '/app/',
 	'apps' => [
 		'android' => [
 			'url' => 'https://play.google.com/store/apps/details?id=app.eduroam.geteduroam',
@@ -29,7 +30,10 @@ $app->render( [
 			'name' => 'Windows',
 		],
 	],
-	'manual' => [
-		'url' => '../profiles/new/',
+	'mobileconfig' => [
+		'url' => "${basePath}/profiles/mac/",
 	],
-], 'app' );
+	'manual' => [
+		'url' => "${basePath}profiles/new/",
+	],
+], 'app', $basePath );

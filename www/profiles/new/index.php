@@ -9,6 +9,7 @@
  */
 
 require \implode(\DIRECTORY_SEPARATOR, [\dirname(__DIR__, 3), 'src', '_autoload.php']);
+$basePath = '../..';
 
 $app = new letswifi\LetsWifiApp();
 $app->registerExceptionHandler();
@@ -63,7 +64,7 @@ if ( 'GET' === $_SERVER['REQUEST_METHOD'] && isset( $_GET['download'] ) ) {
 switch ( $fakeMethod ?? $_SERVER['REQUEST_METHOD'] ) {
 	case 'GET': return $app->render(
 			[
-				'href' => '/profiles/new/',
+				'href' => "${basePath}/profiles/new/",
 				'devices' => [
 					'apple-mobileconfig' => [
 						'name' => 'Apple (iOS/MacOS)',
@@ -76,10 +77,9 @@ switch ( $fakeMethod ?? $_SERVER['REQUEST_METHOD'] ) {
 					],
 				],
 				'app' => [
-					'url' => '../../app/',
+					'url' => "${basePath}/app/",
 				],
-			], 'profiles-new',
-		);
+			], 'profiles-new', $basePath );
 	case 'POST':
 		switch ( $device = $fakeDevice ?? $_POST['device'] ?? '' ) {
 			case 'apple-mobileconfig': $generator = $realm->getConfigGenerator( \letswifi\profile\generator\MobileConfigGenerator::class, $user ); break;

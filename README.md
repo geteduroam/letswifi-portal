@@ -59,6 +59,12 @@ Write metadata of your SAML IdP to simplesamlphp/metadata/saml20-idp-remote.php
 Navigate to https://example.com/simplesaml/module.php/saml/sp/metadata.php/default-sp?output=xhtml to get the metadata of the service, and register it in your IdP
 
 
+## Running from a subdirectory
+
+For some deployments it can make sense to run this project from a subdirectory.
+All paths inside the application are relative, so this should work without any issues.
+
+
 ## Contributing
 
 Before committing, please run
