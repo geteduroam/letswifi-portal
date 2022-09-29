@@ -22,7 +22,7 @@ $app->render( [
 			'name' => 'Android',
 		],
 		'ios' => [
-			'url' => 'https://apps.apple.com/nl/app/geteduroam/id1504076137?l=en',
+			'url' => 'https://apps.apple.com/app/geteduroam/id1504076137',
 			'name' => 'iOS',
 		],
 		'windows' => [
