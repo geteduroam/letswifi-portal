@@ -11,6 +11,13 @@ This is the reference CA for geteduroam.  It is intended to be used with an app 
 * The server logs the public key material generated
 
 
+## Install dependencies
+
+In order to automatically install dependencies, run:
+
+	make vendor
+
+
 ## Running a development server
 
 	rm -rf etc/letswifi.conf.php var
