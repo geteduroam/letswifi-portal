@@ -26,7 +26,10 @@ composer.phar:
 	stat composer.phar >/dev/null 2>&1 || curl -sSLO https://getcomposer.org/composer.phar || wget https://getcomposer.org/composer.phar
 
 vendor: composer.json check-php composer.phar
-	php composer.phar install
+	# Some dev dependencies have very strict PHP requirements
+	# Allowing running --no-dev to work around this
+	php composer.phar install || php composer.phar install --no-dev
+
 composer.lock: composer.json check-php composer.phar
 	php composer.phar update
 
