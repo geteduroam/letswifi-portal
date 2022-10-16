@@ -29,8 +29,6 @@ class MobileConfigGenerator extends AbstractGenerator
 {
 	/**
 	 * Generate the eap-config profile
-	 *
-	 * @suppress PhanPossiblyFalseTypeArgumentInternal TODO: Ad-hoc pkcs7 signer is not done yet
 	 */
 	public function generate(): string
 	{
@@ -86,11 +84,12 @@ class MobileConfigGenerator extends AbstractGenerator
 		if ( null !== $expiry = $this->getExpiry() ) {
 			$expiry = new DateTimeImmutable( '@' . $expiry->getTimestamp(), new DateTimeZone( 'UTC' ) );
 			$expiryString = $expiry->format( 'Y-m-d\\TH:i:s\\Z' );
-			if ( \is_string( $expiryString ) ) {
-				$result .= '	<key>RemovalDate</key>'
-						. "\n" . '	<date>' . static::e( $expiryString ) . '</date>'
-						. "\n";
-			}
+			// Phan needs an asserts here, Psalm sees it as redundant
+			/** @psalm-suppress RedundantConditionGivenDocblockType */
+			\assert( false !== $expiryString );
+			$result .= '	<key>RemovalDate</key>'
+					. "\n" . '	<date>' . static::e( $expiryString ) . '</date>'
+					. "\n";
 		}
 		$result .= '	<key>PayloadContent</key>'
 			. "\n" . '	<array>'

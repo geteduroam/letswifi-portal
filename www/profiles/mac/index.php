@@ -10,6 +10,7 @@
 
 require \implode(\DIRECTORY_SEPARATOR, [\dirname(__DIR__, 3), 'src', '_autoload.php']);
 $basePath = '../..';
+\assert( \array_key_exists( 'REQUEST_METHOD', $_SERVER ) );
 
 $app = new letswifi\LetsWifiApp();
 $app->registerExceptionHandler();
@@ -22,7 +23,6 @@ $app->getUserFromBrowserSession( $realm );
 // on this page, which uses a more reliable POST.
 // If the meta_redirect would go through too late (after cookie expiry),
 // the page being redirected to will also contain an appropriate download button.
-/** @psalm-suppress InvalidArgument */
 \setcookie('mobileconfig-download-token', (string)\time(), [
 	'expires' => 0, // session cookie
 	'httponly' => true, // not available in JavaScript
@@ -38,7 +38,7 @@ switch ( $_SERVER['REQUEST_METHOD'] ) {
 				'action' => "${basePath}/profiles/new/",
 				'device' => 'apple-mobileconfig',
 				'meta_redirect' => "${basePath}/profiles/new/?" . \http_build_query( ['download' => '1', 'device' => 'apple-mobileconfig'] ),
-			], 'mobileconfig-mac-new', $basePath );
+			], 'mobileconfig-mac-new', $basePath, );
 }
 
 \header( 'Content-Type: text/plain', true, 405 );

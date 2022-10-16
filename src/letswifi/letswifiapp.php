@@ -83,7 +83,7 @@ class LetsWifiApp
 		$realm = $userRealm ?? $this->getRealm()->getName();
 		\assert( '.' !== $realm[0], 'Realm cannot start with .' );
 
-		return new User( $userId, $realm, null, $this->getIP(), $_SERVER['HTTP_USER_AGENT'] );
+		return new User( $userId, $realm, null, $this->getIP(), $_SERVER['HTTP_USER_AGENT'] ?? null );
 	}
 
 	public function getUserFromGrant( Grant $grant ): User
@@ -95,7 +95,7 @@ class LetsWifiApp
 			throw new DomainException( "User ${sub} has no realm" );
 		}
 
-		return new User( $sub, $realm, $grant->getClientId(), $this->getIP(), $_SERVER['HTTP_USER_AGENT'] );
+		return new User( $sub, $realm, $grant->getClientId(), $this->getIP(), $_SERVER['HTTP_USER_AGENT'] ?? null );
 	}
 
 	public function isAdmin( string $userName ): bool
@@ -107,12 +107,14 @@ class LetsWifiApp
 
 	public function getIP(): string
 	{
+		\assert( \array_key_exists( 'REMOTE_ADDR', $_SERVER ) );
+
 		return $_SERVER['REMOTE_ADDR'];
 	}
 
 	public function isBrowser(): bool
 	{
-		return \substr( $_SERVER['HTTP_ACCEPT'], 0, 9 ) === 'text/html';
+		return \substr( $_SERVER['HTTP_ACCEPT'] ?? '', 0, 9 ) === 'text/html';
 	}
 
 	public function requireAdmin( string $scope ): void
@@ -294,6 +296,15 @@ class LetsWifiApp
 		exit( $template->render( ['_basePath' => $basePath] + $data ) );
 	}
 
+	public static function getHttpHost(): string
+	{
+		if ( !\array_key_exists( 'HTTP_HOST', $_SERVER ) ) {
+			throw new RuntimeException( 'No HTTP Host: header provided' );
+		}
+
+		return $_SERVER['HTTP_HOST'];
+	}
+
 	protected function getTwig(): \Twig\Environment
 	{
 		if ( null === $this->twig ) {
@@ -334,7 +345,7 @@ class LetsWifiApp
 
 	private function getCurrentRealmNameFromHttpHost(): string
 	{
-		$httpHost = $_SERVER['HTTP_HOST'];
+		$httpHost = $this->getHttpHost();
 		$realm = $this->getRealmManager()->getRealmNameByHttpHost( $httpHost );
 		if ( null === $realm ) {
 			throw new RuntimeException( "No realm set for HTTP hostname ${httpHost}" );

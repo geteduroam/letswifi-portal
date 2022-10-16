@@ -13,6 +13,7 @@ require \implode(\DIRECTORY_SEPARATOR, [\dirname(__DIR__, 4), 'src', '_autoload.
 $app = new letswifi\LetsWifiApp();
 $app->registerExceptionHandler();
 $realm = $app->getRealm();
+\assert( \array_key_exists( 'REQUEST_METHOD', $_SERVER ) ); // Psalm
 
 $app->requireAdmin( 'admin-ca-revoke' );
 
@@ -22,14 +23,14 @@ if ( 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
 }
 
 $realmManager = $app->getRealmManager();
-if ( \array_key_exists( 'user', $_POST ) ) {
+if ( \array_key_exists( 'user', $_POST ) && \is_string( $_POST['user'] ) ) {
 	$realmManager->revokeUser( $realm->getName(), $_POST['user'] );
 }
-if ( \array_key_exists( 'subject', $_POST ) ) {
+if ( \array_key_exists( 'subject', $_POST ) && \is_string( $_POST['subject'] ) ) {
 	$realmManager->revokeSubject( $realm->getName(), $_POST['subject'] );
 }
 
-if ( $app->isBrowser() && \array_key_exists( 'returnTo', $_POST ) ) {
+if ( $app->isBrowser() && \array_key_exists( 'returnTo', $_POST ) && \is_string( $_POST['returnTo'] ) ) {
 	\header( 'Location: ' . $_POST['returnTo'] );
 } else {
 	\header( 'X-Result: success', false, 204 ); // No Content

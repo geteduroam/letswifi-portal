@@ -10,6 +10,7 @@
 
 require \implode(\DIRECTORY_SEPARATOR, [\dirname(__DIR__, 3), 'src', '_autoload.php']);
 $basePath = '../..';
+\assert( \array_key_exists( 'REQUEST_METHOD', $_SERVER ) );
 
 $app = new letswifi\LetsWifiApp();
 $app->registerExceptionHandler();
@@ -55,7 +56,7 @@ if ( 'GET' === $_SERVER['REQUEST_METHOD'] && isset( $_GET['download'] ) ) {
 
 	// If we're not willing to fake a POST,
 	// also remove the GET parameters that attempted this from the URL
-	if ( !isset( $fakeMethod ) ) {
+	if ( !isset( $fakeMethod ) && \array_key_exists( 'REQUEST_URI', $_SERVER ) ) {
 		\header( 'Location: ' . \strstr( $_SERVER['REQUEST_URI'], '?', true ) );
 		exit;
 	}
@@ -79,7 +80,7 @@ switch ( $fakeMethod ?? $_SERVER['REQUEST_METHOD'] ) {
 				'app' => [
 					'url' => "${basePath}/app/",
 				],
-			], 'profiles-new', $basePath );
+			], 'profiles-new', $basePath, );
 	case 'POST':
 		switch ( $device = $fakeDevice ?? $_POST['device'] ?? '' ) {
 			case 'apple-mobileconfig': $generator = $realm->getConfigGenerator( \letswifi\profile\generator\MobileConfigGenerator::class, $user ); break;
@@ -87,7 +88,11 @@ switch ( $fakeMethod ?? $_SERVER['REQUEST_METHOD'] ) {
 			case 'pkcs12': $generator = $realm->getConfigGenerator( \letswifi\profile\generator\PKCS12Generator::class, $user ); break;
 			default:
 				\header( 'Content-Type: text/plain', true, 400 );
-				exit( "400 Bad Request\r\n\r\nUnknown device ${device}\r\n" );
+				$deviceStr = \is_string( $device )
+					? ": ${device}"
+					: ''
+					;
+				exit( "400 Bad Request\r\n\r\nUnknown device${deviceStr}\r\n" );
 		}
 		$payload = $generator->generate();
 		\header( 'Content-Disposition: attachment; filename="' . $generator->getFilename() . '"' );

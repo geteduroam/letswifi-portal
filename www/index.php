@@ -14,8 +14,8 @@ $basePath = '.';
 $app = new letswifi\LetsWifiApp();
 $app->registerExceptionHandler();
 
-$vhost = $_SERVER['HTTP_HOST'];
-$path = strstr( $_SERVER['REQUEST_URI'], '?', true ) ?: $_SERVER['REQUEST_URI'];
+$vhost = \array_key_exists( 'HTTP_HOST', $_SERVER ) ? $_SERVER['HTTP_HOST'] : null;
+$path = \strstr( $_SERVER['REQUEST_URI'] ?? '', '?', true ) ?: $_SERVER['REQUEST_URI'] ?? '';
 $issuer = \is_string( $vhost ) ? "https://${vhost}${path}" : null;
 $apiConfiguration = \is_string( $issuer ) ? [
 	'authorization_endpoint' => "${issuer}oauth/authorize/",

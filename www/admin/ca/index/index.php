@@ -22,6 +22,7 @@ if ( \PHP_SAPI === 'cli' ) {
 		exit( 1 );
 	}
 } else {
+	\assert( \array_key_exists( 'REQUEST_METHOD', $_SERVER ) ); // Psalm
 	$app->requireAdmin( 'admin-ca-index' );
 
 	if ( 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
@@ -37,7 +38,7 @@ if ( \PHP_SAPI === 'cli' ) {
 	$realmName = $realm->getName();
 }
 
-if ( null === $caName ) {
+if ( !\is_string( $caName ) ) {
 	\header( 'Content-Type: text/plain', true, 400 );
 	exit( "400 Bad Request\r\n\r\nExpected POST parameter \"ca\"\r\n" );
 }

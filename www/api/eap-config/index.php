@@ -9,6 +9,7 @@
  */
 
 require \implode(\DIRECTORY_SEPARATOR, [\dirname(__DIR__, 3), 'src', '_autoload.php']);
+\assert( \array_key_exists( 'REQUEST_METHOD', $_SERVER ) ); // Psalm
 
 if ( 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
 	\header( 'Content-Type: text/plain', true, 405 );

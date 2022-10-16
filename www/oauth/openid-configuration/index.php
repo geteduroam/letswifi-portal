@@ -10,7 +10,7 @@
 
 // Verbatim copy from jornane/php-oauth-server
 
-$vhost = $_SERVER['HTTP_HOST'];
+$vhost = \array_key_exists( 'HTTP_HOST', $_SERVER ) ? $_SERVER['HTTP_HOST'] : null;
 \assert( \is_string( $vhost ), 'HTTP_HOST should be string' );
 $issuer = "https://${vhost}";
 

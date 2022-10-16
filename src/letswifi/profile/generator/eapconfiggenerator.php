@@ -40,11 +40,12 @@ class EapConfigGenerator extends AbstractGenerator
 		if ( null !== $expiry = $this->getExpiry() ) {
 			$expiry = new DateTimeImmutable( '@' . $expiry->getTimestamp(), new DateTimeZone( 'UTC' ) );
 			$expiryString = $expiry->format( 'Y-m-d\\TH:i:s\\Z' );
-			if ( \is_string( $expiryString ) ) {
-				$result .= ''
-					. "\r\n\t\t" . '<ValidUntil>' . static::e( $expiryString ) . '</ValidUntil>'
-					;
-			}
+			// Phan needs an asserts here, Psalm sees it as redundant
+			/** @psalm-suppress RedundantConditionGivenDocblockType */
+			\assert( false !== $expiryString );
+			$result .= ''
+				. "\r\n\t\t" . '<ValidUntil>' . static::e( $expiryString ) . '</ValidUntil>'
+				;
 		}
 		$result .= ''
 			. "\r\n\t\t" . '<AuthenticationMethods>'

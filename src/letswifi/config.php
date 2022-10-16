@@ -29,9 +29,6 @@ class Config
 		if ( null === $conf ) {
 			$conf = \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 2 ), 'etc', 'letswifi.conf.php'] );
 		}
-		/**
-		 * @psalm-suppress UnresolvableInclude
-		 */
 		if ( \is_string( $conf ) ) {
 			if ( !\file_exists( $conf ) ) {
 				throw new DomainException( 'Configuration file missing: ' . $conf );

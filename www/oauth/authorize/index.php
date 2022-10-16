@@ -9,6 +9,7 @@
  */
 
 require \implode(\DIRECTORY_SEPARATOR, [\dirname(__DIR__, 3), 'src', '_autoload.php']);
+\assert( \array_key_exists( 'REQUEST_METHOD', $_SERVER ) ); // Psalm
 $basePath = '../..';
 
 const POST_FIELD = 'approve';

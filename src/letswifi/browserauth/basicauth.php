@@ -25,7 +25,7 @@ class BasicAuth implements BrowserAuthInterface
 		if ( \array_key_exists( 'PHP_AUTH_USER', $_SERVER ) ) {
 			$user = $_SERVER['PHP_AUTH_USER'];
 			if ( \array_key_exists( $user, $this->params ) ) {
-				if ( \hash_equals( $this->params[$user], $_SERVER['PHP_AUTH_PW'] ) ) {
+				if ( \hash_equals( $this->params[$user], $_SERVER['PHP_AUTH_PW'] ?? '' ) ) {
 					return $user;
 				}
 			}
