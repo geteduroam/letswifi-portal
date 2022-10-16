@@ -281,6 +281,7 @@ class LetsWifiApp
 			\header( 'Content-Type: text/plain', true, $code );
 		}
 		echo "${code} ${codeExplain}\r\n\r\n${message}\r\n";
+		exit(1);
 	}
 
 	public function render( array $data, ?string $template = null, ?string $basePath = '/' ): void

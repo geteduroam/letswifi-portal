@@ -1,0 +1,6 @@
+# Configuration file for letswifi-crl
+
+method='local'
+letswifi_basepath="$(dirname "$(dirname "$(pwd)")")"
+realm='example.com'
+ca_sub="CN=example.com Let's Wi-Fi CA"

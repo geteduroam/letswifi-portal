@@ -1,0 +1,5 @@
+# Configuration file for letswifi-crl
+
+method='remote'
+index_url='http://[::1]:1080/api/index.txt/index.php'
+ca_sub="CN=example.com Let's Wi-Fi CA"

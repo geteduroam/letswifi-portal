@@ -1,0 +1,11 @@
+[ca]
+default_ca         = CA_default
+
+[ CA_default ]
+private_key      = key.pem
+certificate      = ca.pem
+crl              = crl.pem
+database         = index.txt
+
+default_md       = sha256
+default_crl_days = 3
