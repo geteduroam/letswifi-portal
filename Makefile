@@ -19,12 +19,15 @@ clean:
 test: syntax phpunit
 .PHONY: test
 
-######################
-### Code dependencies
 
-vendor: check-php composer.phar
+# Code dependencies
+
+composer.phar:
+	stat composer.phar >/dev/null 2>&1 || curl -sSLO https://getcomposer.org/composer.phar || wget https://getcomposer.org/composer.phar
+
+vendor: composer.json check-php composer.phar
 	php composer.phar install
-composer.lock: composer.json
+composer.lock: composer.json check-php composer.phar
 	php composer.phar update
 
 etc/letswifi.conf.php:
@@ -33,8 +36,8 @@ etc/letswifi.conf.php:
 var:
 	mkdir -p var
 
-##############################
-### Getting it up and running
+
+# Getting it up and running quickly
 
 var/letswifi-dev.sqlite: var
 	rm -f var/letswifi-dev.sqlite
@@ -47,15 +50,12 @@ simplesamlphp:
 	ln -s ../simplesamlphp/www/ www/simplesaml || true
 	ln -s simplesamlphp-1.18.8/ simplesamlphp || true
 
-###############################################
-### Code formatters, static code sniffers etc.
+
+# Code formatters, static code sniffers etc.
 
 check-php:
 	@php -r 'exit(json_decode("true") === true ? 0 : 1);'
 .PHONY: check-php
-
-composer.phar:  check-php
-	stat composer.phar >/dev/null 2>&1 || curl -sSLO https://getcomposer.org/composer.phar || wget https://getcomposer.org/composer.phar
 
 psalm: vendor
 	php vendor/bin/psalm --no-cache
