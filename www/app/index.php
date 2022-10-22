@@ -34,6 +34,6 @@ $app->render( [
 		'url' => "${basePath}/profiles/mac/",
 	],
 	'manual' => [
-		'url' => "${basePath}profiles/new/",
+		'url' => "${basePath}/profiles/new/",
 	],
 ], 'app', $basePath );
