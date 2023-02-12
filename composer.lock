@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5b15bef992022c18e4e181ae42bc6083",
+    "content-hash": "c0f6bba0742702bcf9f6a3272960397f",
     "packages": [
         {
             "name": "fyrkat/oauth-server",
@@ -37,11 +37,11 @@
         },
         {
             "name": "fyrkat/openssl",
-            "version": "v1.1.0",
+            "version": "v1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://git.sr.ht/~jornane/php-openssl",
-                "reference": "09dfa757cce6bdb2b5cb649fe093f1a6f9947f4d"
+                "reference": "3adc4fee8589c02e8d243666e4188378b96c51a5"
             },
             "require": {
                 "ext-openssl": "*",
