@@ -8,8 +8,8 @@
 	"require": {
 		"php": ">=7.3",
 		"twig/twig": ">=3.3.8,<4",
-		"fyrkat/openssl": "~1.1",
-		"fyrkat/oauth-server": "~1.2"
+		"fyrkat/openssl": "^1.2.1",
+		"fyrkat/oauth-server": "^1.2"
 	},
 	"require-dev": {
 		"vimeo/psalm": "^4.29",
