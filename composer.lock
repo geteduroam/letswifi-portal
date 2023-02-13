@@ -4,15 +4,15 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c0f6bba0742702bcf9f6a3272960397f",
+    "content-hash": "e7f989b4c7da15c679fb18e6e60a8464",
     "packages": [
         {
             "name": "fyrkat/oauth-server",
-            "version": "1.2.0",
+            "version": "v1.2.1",
             "source": {
                 "type": "git",
                 "url": "https://git.sr.ht/~jornane/php-oauth-server",
-                "reference": "14491c58e54537cae57d296e86030806f53e818f"
+                "reference": "54cc590aaf893d5d2a5c9cef3427b19404056b93"
             },
             "require": {
                 "php": ">=7.1"
@@ -33,15 +33,15 @@
                     "email": "git@jornane.no"
                 }
             ],
-            "time": "2021-12-29T19:17:22+00:00"
+            "time": "2023-02-13T10:36:42+00:00"
         },
         {
             "name": "fyrkat/openssl",
-            "version": "v1.2.0",
+            "version": "v1.2.1",
             "source": {
                 "type": "git",
                 "url": "https://git.sr.ht/~jornane/php-openssl",
-                "reference": "3adc4fee8589c02e8d243666e4188378b96c51a5"
+                "reference": "34ef596055287c72a110e98f0467aeb5f5386c65"
             },
             "require": {
                 "ext-openssl": "*",
@@ -64,7 +64,7 @@
                 }
             ],
             "description": "Class wrappers for PHPs built-in openssl_* functions",
-            "time": "2021-12-29T18:48:48+00:00"
+            "time": "2023-02-12T22:26:12+00:00"
         },
         {
             "name": "symfony/polyfill-ctype",
