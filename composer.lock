@@ -4,15 +4,15 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e5d71f36203671798a98169bbffdc140",
+    "content-hash": "e7f989b4c7da15c679fb18e6e60a8464",
     "packages": [
         {
             "name": "fyrkat/oauth-server",
-            "version": "1.2.0",
+            "version": "v1.2.1",
             "source": {
                 "type": "git",
                 "url": "https://git.sr.ht/~jornane/php-oauth-server",
-                "reference": "14491c58e54537cae57d296e86030806f53e818f"
+                "reference": "54cc590aaf893d5d2a5c9cef3427b19404056b93"
             },
             "require": {
                 "php": ">=7.1"
@@ -33,7 +33,7 @@
                     "email": "git@jornane.no"
                 }
             ],
-            "time": "2021-12-29T19:17:22+00:00"
+            "time": "2023-02-13T10:36:42+00:00"
         },
         {
             "name": "fyrkat/openssl",
