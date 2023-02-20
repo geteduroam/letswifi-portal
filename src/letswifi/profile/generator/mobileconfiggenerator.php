@@ -183,9 +183,9 @@ class MobileConfigGenerator extends AbstractGenerator
 				 * but the code is clearer this way.
 				 */
 				if ( $network instanceof SSIDNetwork ) {
-					$payloadDisplayName = static::e( $network->getSSID() );
+					$payloadDisplayName = static::e( $network->getSSID().'®' );
 				} elseif ( $network instanceof HS20Network ) {
-					$payloadDisplayName = 'roaming via Passpoint';
+					$payloadDisplayName = 'roaming via OpenRoaming®';
 				} else {
 					throw new InvalidArgumentException( 'Only SSID or Hotspot 2.0 networks are supported, got ' . \get_class( $network ) );
 				}
@@ -222,7 +222,7 @@ class MobileConfigGenerator extends AbstractGenerator
 					. "\n" . '			<key>ServiceProviderRoamingEnabled</key>'
 					. "\n" . '			<true/>'
 					. "\n" . '			<key>DisplayedOperatorName</key>'
-					. "\n" . '			<string>' . static::e( $this->profileData->getRealm() ) . ' via Passpoint</string>'
+					. "\n" . '			<string>' . static::e( $this->profileData->getRealm() ) . ' via OpenRoaming®</string>'
 					. "\n" . '			<key>DomainName</key>'
 					. "\n" . '			<string>' . static::e( $this->profileData->getRealm() ) . '</string>'
 					. "\n" . '			<key>RoamingConsortiumOIs</key>'
