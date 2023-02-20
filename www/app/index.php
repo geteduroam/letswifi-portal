@@ -29,6 +29,10 @@ $app->render( [
 			'url' => 'https://dl.eduroam.app/windows/x86_64/geteduroam.exe',
 			'name' => 'Windows',
 		],
+		'huawei' => [
+			'url' => 'https://appgallery.huawei.com/app/C104231893',
+			'name' => 'Huawei',
+		],
 	],
 	'os_config' => [
 		'mobileconfig' => [
