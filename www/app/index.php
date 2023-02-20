@@ -29,6 +29,10 @@ $app->render( [
 			'url' => 'https://geteduroam.app/app/geteduroam.exe',
 			'name' => 'Windows',
 		],
+		'huawei' => [
+			'url' => 'https://appgallery.huawei.com/app/C104231893',
+			'name' => 'Huawei',
+		],
 	],
 	'mobileconfig' => [
 		'url' => "${basePath}/profiles/mac/",

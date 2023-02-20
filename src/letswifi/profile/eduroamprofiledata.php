@@ -28,6 +28,8 @@ class EduroamProfileData extends AbstractProfileData
 	{
 		$result = parent::getNetworks();
 		$result[] = new HS20Network( '001bc50460' );
+		$result[] = new HS20Network( '5a03ba0000' );
+		$result[] = new HS20Network( '5a03ba0800' );
 		$result[] = new SSIDNetwork( 'eduroam' );
 
 		return $result;
