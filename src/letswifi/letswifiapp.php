@@ -205,10 +205,19 @@ class LetsWifiApp
 
 		$passphrase = $this->config->getStringOrNull( 'profile.signing.passphrase' );
 
+		$signingCA = $this->config->getArrayOrEmpty( 'profile.signing.ca' );
+        if ( null !== $signingCA ) {
+            $signingCAChain = [];
+            foreach ( $signingCA as $ca) {
+                $signingCAChain[] = new X509($ca);
+            }
+            $signingCA = $signingCAChain;
+        }
+
 		$certificate = new X509( $signingCert );
 		$key = new PrivateKey( $signingKey, $passphrase );
 
-		return new PKCS7( $certificate, $key );
+		return new PKCS7( $certificate, $key , $signingCA);
 	}
 
 	/**
