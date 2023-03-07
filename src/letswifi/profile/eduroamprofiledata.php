@@ -16,7 +16,7 @@ use letswifi\profile\network\SSIDNetwork;
 
 class EduroamProfileData extends AbstractProfileData
 {
-	public function __construct( string $realm, string $displayName = 'eduroam', array $data = [], string $languageCode = 'en' )
+	public function __construct( string $realm, string $displayName = 'eduroam®', array $data = [], string $languageCode = 'en' )
 	{
 		parent::__construct( $realm, $displayName, $data, $languageCode );
 	}
