@@ -24,7 +24,18 @@ $token = $oauth->getAccessTokenFromRequest( 'eap-metadata' );
 $grant = $token->getGrant();
 
 $user = $app->getUserFromGrant( $grant );
-$generator = $realm->getConfigGenerator( \letswifi\profile\generator\EapConfigGenerator::class, $user );
+$format = \array_key_exists( 'format', $_GET ) ? \is_string( $_GET['format'] ) ? $_GET['format'] : null : null;
+switch ( $format ?? 'eap-config' ) {
+	case 'eap-config':
+		$generator = $realm->getConfigGenerator( \letswifi\profile\generator\EapConfigGenerator::class, $user );
+		break;
+	case 'mobileconfig':
+		$generator = $realm->getConfigGenerator( \letswifi\profile\generator\MobileConfigGenerator::class, $user );
+		break;
+	default:
+		\header( 'Content-Type: text/plain', true, 400 );
+		exit( "400 Bad Request\r\n\r\nUnknown format: {$format}\r\n" );
+}
 $payload = $generator->generate();
 
 \header( 'Content-Type: ' . $generator->getContentType() );
