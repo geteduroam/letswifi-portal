@@ -69,7 +69,8 @@ class ShibbolethAuth implements BrowserAuthInterface
 			\header( 'Location: ' . $this->shibHandlerUrl . '/Login?' . \http_build_query( ['target' => $_SERVER['REQUEST_URI']] ) );
 			exit;
 		}
-		if ( \array_key_exists( $this->userIdAttribute, $_SERVER ) && !empty($_SERVER[$this->userIdAttribute]) ) {
+
+		if ( \array_key_exists( $this->userIdAttribute, $_SERVER ) && \is_string( $_SERVER[$this->userIdAttribute] ) && !empty($_SERVER[$this->userIdAttribute]) ) {
 			$user = \explode(';', $_SERVER[$this->userIdAttribute])[0];
 		}
 
@@ -96,8 +97,8 @@ class ShibbolethAuth implements BrowserAuthInterface
 	public function checkAuthzAttributeValue( array $authzAttributeValue ): void
 	{
 		foreach ( $authzAttributeValue as $attribute => $value ) {
-			if ( !\array_key_exists( $attribute, $_SERVER ) ) {
-				throw new \Exception( "Attribute {$attribute} not present" );
+			if ( !\array_key_exists( $attribute, $_SERVER ) || !\is_string( $_SERVER[$attribute] ) ) {
+				throw new \Exception( "Attribute {$attribute} not present or invalid type" );
 			}
 			if ( \is_array( $value ) ) {
 				if ( !\array_intersect( $value, \explode(';', $_SERVER[$attribute])) ) {
@@ -127,7 +128,7 @@ class ShibbolethAuth implements BrowserAuthInterface
 			return null;
 		}
 
-		if ( !\array_key_exists( $realmSelectorAttribute, $_SERVER ) ) {
+		if ( !\array_key_exists( $realmSelectorAttribute, $_SERVER ) || !\is_string( $_SERVER[$realmSelectorAttribute] ) ) {
 			return null;
 		}
 
