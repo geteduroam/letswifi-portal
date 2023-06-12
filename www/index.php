@@ -21,6 +21,7 @@ $apiConfiguration = \is_string( $issuer ) ? [
 	'authorization_endpoint' => "${issuer}oauth/authorize/",
 	'token_endpoint' => "${issuer}oauth/token/",
 	'eapconfig_endpoint' => "${issuer}api/eap-config/",
+	'mobileconfig_endpoint' => "${issuer}api/eap-config/?format=mobileconfig",
 ] : null;
 
 $app->render( [

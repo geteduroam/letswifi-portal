@@ -26,7 +26,7 @@ $app->render( [
 			'name' => 'iOS',
 		],
 		'windows' => [
-			'url' => 'https://geteduroam.app/app/geteduroam.exe',
+			'url' => 'https://dl.eduroam.app/windows/x86_64/geteduroam.exe',
 			'name' => 'Windows',
 		],
 		'huawei' => [
