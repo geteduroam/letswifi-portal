@@ -26,5 +26,5 @@ $apiConfiguration = \is_string( $issuer ) ? [
 
 $app->render( [
 	'href' => "${basePath}/",
-	'http://letswifi.app/api#v1' => $apiConfiguration,
+	'http://letswifi.app/api#v2' => $apiConfiguration,
 ], 'info', $basePath );
