@@ -13,13 +13,13 @@ namespace letswifi\realm;
 use DateInterval;
 use DateTimeImmutable;
 use DateTimeInterface;
-
 use fyrkat\openssl\CSR;
 use fyrkat\openssl\DN;
 use fyrkat\openssl\OpenSSLConfig;
 use fyrkat\openssl\PKCS12;
 use fyrkat\openssl\PrivateKey;
 use fyrkat\openssl\X509;
+use InvalidArgumentException;
 
 use letswifi\profile\auth\TlsAuth;
 
@@ -96,11 +96,14 @@ class Realm
 
 	/**
 	 * @param User              $requester  User requesting the certificate
-	 * @param string            $commonName Common name of the server certificate
+	 * @param string            $commonName Common name of the server certificate, must be a hostname
 	 * @param DateTimeInterface $expiry     Expiry date
 	 */
 	public function generateServerCertificate( User $requester, string $commonName, DateTimeInterface $expiry ): PKCS12
 	{
+		if ( !\filter_var( $commonName, \FILTER_VALIDATE_DOMAIN | \FILTER_NULL_ON_FAILURE ) ) {
+			throw new InvalidArgumentException( 'Common name for a server certificate must be a hostname' );
+		}
 		$serverKey = new PrivateKey( new OpenSSLConfig( OpenSSLConfig::KEY_EC ) );
 		$dn = new DN( ['CN' => $commonName] );
 		$csr = CSR::generate( $dn, $serverKey );
@@ -108,7 +111,7 @@ class Realm
 		$serial = $this->logPreparedServerCredential( $caCert, $requester, $csr, $expiry );
 
 		$caKey = $this->getSigningCAKey();
-		$conf = new OpenSSLConfig( OpenSSLConfig::X509_SERVER );
+		$conf = new OpenSSLConfig( OpenSSLConfig::X509_SERVER + ['san' => 'DNS:' . $commonName] );
 		$serverCert = $csr->sign( $caCert, $caKey, $expiry, $conf, $serial );
 		$this->logCompletedServerCredential( $requester, $serverCert );
 
