@@ -19,6 +19,7 @@ use letswifi\profile\auth\AbstractAuth;
 use letswifi\profile\auth\Auth;
 
 use letswifi\profile\Helpdesk;
+use letswifi\profile\IProfileData;
 use letswifi\profile\Location;
 
 use letswifi\profile\network\HS20Network;
@@ -27,6 +28,14 @@ use letswifi\profile\network\SSIDNetwork;
 
 class EapConfigGenerator extends AbstractGenerator
 {
+	public function __construct( IProfileData $profileData, array $authenticationMethods, ?string $passphrase = null )
+	{
+		if ( $passphrase ) {
+			throw new InvalidArgumentException( 'eap-config files do not support encryption' );
+		}
+		parent::__construct( $profileData, $authenticationMethods, $passphrase );
+	}
+
 	/**
 	 * Generate the eap-config profile
 	 */

@@ -50,12 +50,14 @@ class Realm
 	 *
 	 * @psalm-param class-string<T> $generator The config generator to return
 	 *
-	 * @param string $generator The config generator class to return
-	 * @param User   $user
+	 * @param string        $generator  The config generator class to return
+	 * @param User          $user
+	 * @param ?string       $passphrase Passphrase to encrypt the profile with
+	 * @param ?DateInterval $validity   Period the profile will be valid for from generation
 	 *
 	 * @psalm-return T
 	 */
-	public function getConfigGenerator( string $generator, User $user, ?DateInterval $validity = null ): Generator
+	public function getConfigGenerator( string $generator, User $user, ?string $passphrase = null, ?DateInterval $validity = null ): Generator
 	{
 		if ( null === $validity ) {
 			$validity = $this->manager->getDefaultValidity( $this->name );
@@ -66,7 +68,7 @@ class Realm
 		// TODO more generic method to get an arbitrary generator
 		$pkcs12 = $this->generateClientCertificate( $user, $expiry );
 
-		return new $generator( $this->getProfileData(), [$this->createAuthenticationMethod( $pkcs12 )] );
+		return new $generator( $this->getProfileData(), [$this->createAuthenticationMethod( $pkcs12 )], $passphrase );
 	}
 
 	/**

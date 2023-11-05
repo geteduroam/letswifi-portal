@@ -22,11 +22,21 @@ use letswifi\LetsWifiApp;
 use letswifi\profile\auth\AbstractAuth;
 use letswifi\profile\auth\TlsAuth;
 
+use letswifi\profile\IProfileData;
+
 use letswifi\profile\network\HS20Network;
 use letswifi\profile\network\SSIDNetwork;
 
 class MobileConfigGenerator extends AbstractGenerator
 {
+	public function __construct( IProfileData $profileData, array $authenticationMethods, ?string $passphrase = null )
+	{
+		if ( $passphrase ) {
+			throw new InvalidArgumentException( 'eap-config files do not support encryption' );
+		}
+		parent::__construct( $profileData, $authenticationMethods, $passphrase );
+	}
+
 	/**
 	 * Generate the eap-config profile
 	 */
