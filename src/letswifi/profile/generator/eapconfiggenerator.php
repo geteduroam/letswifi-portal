@@ -184,7 +184,7 @@ class EapConfigGenerator extends AbstractGenerator
 	{
 		$identity = $authenticationMethod->getIdentity();
 		$pkcs12 = $authenticationMethod->getPKCS12();
-		$passphrase = $authenticationMethod->getPassphrase();
+		$passphrase = 'pkcs12';
 
 		$result = '';
 		$result .= ''

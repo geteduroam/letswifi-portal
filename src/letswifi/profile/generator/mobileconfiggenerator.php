@@ -29,14 +29,6 @@ use letswifi\profile\network\SSIDNetwork;
 
 class MobileConfigGenerator extends AbstractGenerator
 {
-	public function __construct( IProfileData $profileData, array $authenticationMethods, ?string $passphrase = null )
-	{
-		if ( $passphrase ) {
-			throw new InvalidArgumentException( 'eap-config files do not support encryption' );
-		}
-		parent::__construct( $profileData, $authenticationMethods, $passphrase );
-	}
-
 	/**
 	 * Generate the eap-config profile
 	 */
@@ -59,7 +51,7 @@ class MobileConfigGenerator extends AbstractGenerator
 		\assert( $tlsAuthMethod instanceof TlsAuth );
 
 		$tlsAuthMethodUuid = static::uuidgen();
-		$passphrase = $tlsAuthMethod->getPassphrase();
+		$defaultPassphrase = 'pkcs12';
 		if ( $pkcs12 = $tlsAuthMethod->getPKCS12() ) {
 			// Remove the CA from the PKCS12 object,
 			// because otherwise MacOS would trust that CA for HTTPS traffic
@@ -104,9 +96,13 @@ class MobileConfigGenerator extends AbstractGenerator
 		$result .= '	<key>PayloadContent</key>'
 			. "\n" . '	<array>'
 			. "\n" . '		<dict>'
-			. "\n" . '			<key>Password</key>'
-			. "\n" . '			<string>' . static::e( $passphrase ) . '</string>'
-			. "\n" . '			<key>PayloadUUID</key>'
+			. "\n";
+		if ( !$this->passphrase ) {
+			$result .= '			<key>Password</key>'
+				. "\n" . '			<string>' . static::e( $defaultPassphrase ) . '</string>'
+				. "\n";
+		}
+		$result .= '			<key>PayloadUUID</key>'
 			. "\n" . '			<string>' . static::e( $tlsAuthMethodUuid ) . '</string>'
 			. "\n" . '			<key>PayloadIdentifier</key>'
 			. "\n" . '			<string>' . static::e( $identifier . '.' . $tlsAuthMethodUuid ) . '</string>'
@@ -116,7 +112,7 @@ class MobileConfigGenerator extends AbstractGenerator
 			. "\n" . '			<string>' . static::e( $pkcs12->getX509()->getSubject()->getCommonName() ) . '</string>'
 			. "\n" . '			<key>PayloadContent</key>'
 			. "\n" . '			<data>'
-			. "\n" . '				' . static::e( static::columnFormat( \base64_encode( $pkcs12->getPKCS12Bytes( $passphrase ) ), 52, 4 ) )
+			. "\n" . '				' . static::e( static::columnFormat( \base64_encode( $pkcs12->getPKCS12Bytes( $this->passphrase ?: $defaultPassphrase ) ), 52, 4 ) )
 			. "\n" . '			</data>'
 			. "\n" . '			<key>PayloadType</key>'
 			. "\n" . '			<string>com.apple.security.pkcs12</string>'
