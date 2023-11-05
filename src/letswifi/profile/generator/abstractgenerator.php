@@ -1,18 +1,18 @@
-<?php declare(strict_types=1);
+<?php declare( strict_types=1 );
 
 /*
  * This file is part of letswifi; a system for easy eduroam device enrollment
  *
- * Copyright: 2018-2022, Jørn Åne de Jong <jorn.dejong@letswifi.eu>
- * Copyright: 2020-2022, Paul Dekkers, SURF <paul.dekkers@surf.nl>
+ * Copyright: 2018-2023, Jørn Åne de Jong <jorn.dejong@letswifi.eu>
+ * Copyright: 2020-2023, Paul Dekkers, SURF <paul.dekkers@surf.nl>
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
 namespace letswifi\profile\generator;
 
 use DateTimeInterface;
-use letswifi\profile\auth\Auth;
 use letswifi\profile\IProfileData;
+use letswifi\profile\auth\Auth;
 
 abstract class AbstractGenerator implements Generator
 {
@@ -55,7 +55,7 @@ abstract class AbstractGenerator implements Generator
 		$datetime = \date( 'YmdHis' );
 		$extension = $this->getFileExtension();
 
-		return "${identifier}.${datetime}.${extension}";
+		return "{$identifier}.{$datetime}.{$extension}";
 	}
 
 	abstract public function getFileExtension(): string;
@@ -84,15 +84,15 @@ abstract class AbstractGenerator implements Generator
 		return \htmlspecialchars( $s, \ENT_QUOTES, 'UTF-8' );
 	}
 
-	protected static function columnFormat( string $data, int $length = null, int $indentation = 0 ): string
+	protected static function columnFormat( string $data, ?int $length = null, int $indentation = 0 ): string
 	{
 		$length = $length ?: \strlen( $data ) * 4;
 		\assert( 0 < $length, 'Cannot format columns with width less than 1' );
 
 		return \implode(
-				"\n" . \str_repeat( "\t", $indentation ),
-				\str_split( $data, $length ),
-			);
+			"\n" . \str_repeat( "\t", $indentation ),
+			\str_split( $data, $length ),
+		);
 	}
 
 	protected static function uuidgen(): string

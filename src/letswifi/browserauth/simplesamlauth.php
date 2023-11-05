@@ -1,10 +1,10 @@
-<?php declare(strict_types=1);
+<?php declare( strict_types=1 );
 
 /*
  * This file is part of letswifi; a system for easy eduroam device enrollment
  *
- * Copyright: 2018-2022, Jørn Åne de Jong <jorn.dejong@letswifi.eu>
- * Copyright: 2020-2022, Paul Dekkers, SURF <paul.dekkers@surf.nl>
+ * Copyright: 2018-2023, Jørn Åne de Jong <jorn.dejong@letswifi.eu>
+ * Copyright: 2020-2023, Paul Dekkers, SURF <paul.dekkers@surf.nl>
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -50,11 +50,12 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 	private $realmMap;
 
 	/** @var ?array<string,array<string>> */
-	private $attributes = null;
+	private $attributes;
 
 	/**
 	 * @psalm-suppress UndefinedClass We don't have a dependency on SimpleSAMLphp
 	 * @psalm-suppress UnresolvableInclude We don't know where SimpleSAMLphp is
+	 *
 	 * @suppress PhanUndeclaredClassMethod We don't have a dependency on SimpleSAMLphp
 	 *
 	 * @param array<string,array<string>|string> $params
@@ -125,11 +126,11 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 
 		// Also check the saml:AuthenticatingAuthority for the entries in idpList if there is one and it isn't explicitly disabled
 		if ( \count( $this->idpList ) > 0 && $this->verifyAuthenticatingAuthority ) {
-			static::checkIdPList( $this->idpList, $this->as->getAuthData('saml:AuthenticatingAuthority') );
+			static::checkIdPList( $this->idpList, $this->as->getAuthData( 'saml:AuthenticatingAuthority' ) );
 		}
 
 		// authzAttributeValue validates SAML attributes against the attribute-value map for additional authorization
-		if ( \count( $this->authzAttributeValue) > 0 ) {
+		if ( \count( $this->authzAttributeValue ) > 0 ) {
 			// can wrap this around try {} / catch {} if we need nicer error handling
 			static::checkAuthzAttributeValue( $this->authzAttributeValue );
 		}
@@ -220,7 +221,7 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 		$attributeValues = $this->getMultiAttributeValue( $key );
 
 		if ( 1 !== \count( $attributeValues ) ) {
-			throw new OutOfBoundsException( "Attribute ${key} was expected to have exactly 1 value, but has " . \count( $attributeValues ) );
+			throw new OutOfBoundsException( "Attribute {$key} was expected to have exactly 1 value, but has " . \count( $attributeValues ) );
 		}
 
 		return \reset( $attributeValues );
@@ -240,7 +241,7 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 		if ( !\array_key_exists( $key, $this->attributes ) ) {
 			$shibKey = $this->attributeToShib( $key );
 			if ( !\array_key_exists( $shibKey, $this->attributes ) ) {
-				throw new OutOfBoundsException( "Attribute ${key} not present in SAML assertion" );
+				throw new OutOfBoundsException( "Attribute {$key} not present in SAML assertion" );
 			}
 			$key = $shibKey;
 		}
@@ -266,16 +267,16 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 		}
 		foreach ( $authzAttributeValue as $attribute => $value ) {
 			if ( !\array_key_exists( $attribute, $this->attributes ) ) {
-				throw new Exception( "Attribute ${attribute} not present in SAML assertion" );
+				throw new Exception( "Attribute {$attribute} not present in SAML assertion" );
 			}
 			if ( \is_array( $value ) ) {
-				if ( !\array_intersect( $value, $this->attributes[$attribute]) ) {
-					throw new Exception( "Attribute ${attribute} does not have one of the permitted values" );
+				if ( !\array_intersect( $value, $this->attributes[$attribute] ) ) {
+					throw new Exception( "Attribute {$attribute} does not have one of the permitted values" );
 				}
 			}
 			if ( \is_string( $value ) ) {
-				if ( !\array_intersect( [$value], $this->attributes[$attribute]) ) {
-					throw new Exception( "Attribute ${attribute} does not have the permitted value of ${value}" );
+				if ( !\array_intersect( [$value], $this->attributes[$attribute] ) ) {
+					throw new Exception( "Attribute {$attribute} does not have the permitted value of {$value}" );
 				}
 			}
 		}

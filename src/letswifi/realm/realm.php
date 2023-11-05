@@ -1,10 +1,10 @@
-<?php declare(strict_types=1);
+<?php declare( strict_types=1 );
 
 /*
  * This file is part of letswifi; a system for easy eduroam device enrollment
  *
- * Copyright: 2018-2022, Jørn Åne de Jong <jorn.dejong@letswifi.eu>
- * Copyright: 2020-2022, Paul Dekkers, SURF <paul.dekkers@surf.nl>
+ * Copyright: 2018-2023, Jørn Åne de Jong <jorn.dejong@letswifi.eu>
+ * Copyright: 2020-2023, Paul Dekkers, SURF <paul.dekkers@surf.nl>
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -13,20 +13,17 @@ namespace letswifi\realm;
 use DateInterval;
 use DateTimeImmutable;
 use DateTimeInterface;
+use InvalidArgumentException;
 use fyrkat\openssl\CSR;
 use fyrkat\openssl\DN;
 use fyrkat\openssl\OpenSSLConfig;
 use fyrkat\openssl\PKCS12;
 use fyrkat\openssl\PrivateKey;
 use fyrkat\openssl\X509;
-use InvalidArgumentException;
-
-use letswifi\profile\auth\TlsAuth;
-
 use letswifi\profile\EduroamProfileData;
-use letswifi\profile\generator\Generator;
-
 use letswifi\profile\IProfileData;
+use letswifi\profile\auth\TlsAuth;
+use letswifi\profile\generator\Generator;
 
 class Realm
 {

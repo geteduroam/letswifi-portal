@@ -1,14 +1,16 @@
-<?php declare(strict_types=1);
+<?php declare( strict_types=1 );
 
 /*
  * This file is part of letswifi; a system for easy eduroam device enrollment
  *
- * Copyright: 2018-2022, Jørn Åne de Jong <jorn.dejong@letswifi.eu>
- * Copyright: 2020-2022, Paul Dekkers, SURF <paul.dekkers@surf.nl>
+ * Copyright: 2018-2023, Jørn Åne de Jong <jorn.dejong@letswifi.eu>
+ * Copyright: 2020-2023, Paul Dekkers, SURF <paul.dekkers@surf.nl>
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
 namespace letswifi\profile\generator;
+
+use Exception;
 
 class UUID
 {
@@ -22,15 +24,15 @@ class UUID
 	 */
 	public function __construct( $uuid = null )
 	{
-		if (null === $uuid ) {
+		if ( null === $uuid ) {
 			// Generate 16 bytes of random data (128 bits )
 			$bytes = \random_bytes( 16 );
-		} elseif (16 === \strlen( $uuid ) ) {
+		} elseif ( 16 === \strlen( $uuid ) ) {
 			$bytes = $uuid;
-		} elseif (\preg_match( '/[0-9a-f]{8}(\\-[0-9a-f]{4}){2}\\-[0-9a-f]{12}/', $uuid ) ) {
+		} elseif ( \preg_match( '/[0-9a-f]{8}(\\-[0-9a-f]{4}){2}\\-[0-9a-f]{12}/', $uuid ) ) {
 			$bytes = \hex2bin( \str_replace( '-', '', $uuid ) );
 		} else {
-			throw new \Exception( 'Invalid UUID' );
+			throw new Exception( 'Invalid UUID' );
 		}
 
 		// Set bits required for a valid UUIDv4
@@ -49,6 +51,7 @@ class UUID
 	{
 		// Convert bytes to hex and split in 4-char strings (hex, so 2 bytes per string )
 		$parts = \str_split( \bin2hex( $this->bytes ), 4 );
+
 		// Add dashes where UUIDs should have dashes
 		return \implode(
 			'-',

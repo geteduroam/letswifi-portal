@@ -1,10 +1,10 @@
-<?php declare(strict_types=1);
+<?php declare( strict_types=1 );
 
 /*
  * This file is part of letswifi; a system for easy eduroam device enrollment
  *
- * Copyright: 2018-2022, Jørn Åne de Jong <jorn.dejong@letswifi.eu>
- * Copyright: 2020-2022, Paul Dekkers, SURF <paul.dekkers@surf.nl>
+ * Copyright: 2018-2023, Jørn Åne de Jong <jorn.dejong@letswifi.eu>
+ * Copyright: 2020-2023, Paul Dekkers, SURF <paul.dekkers@surf.nl>
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -28,8 +28,8 @@ class DevAuth implements BrowserAuthInterface
 	{
 		// Returns owner of this PHP file
 		$user = \get_current_user();
-		\assert( false === \strpos( $user, 'SYSTEM' ), 'File is owned by Windows SYSTEM user' );
-		\assert( false === \strpos( $user, 'root' ), 'File is owned by unix root' );
+		\assert( !\str_contains( $user, 'SYSTEM' ), 'File is owned by Windows SYSTEM user' );
+		\assert( !\str_contains( $user, 'root' ), 'File is owned by unix root' );
 
 		return $user;
 	}
@@ -45,7 +45,7 @@ class DevAuth implements BrowserAuthInterface
 	/**
 	 * @param ?string $redirect @unused-param
 	 */
-	public function getLogoutURL( string $redirect = null ): ?string
+	public function getLogoutURL( ?string $redirect = null ): ?string
 	{
 		return null;
 	}

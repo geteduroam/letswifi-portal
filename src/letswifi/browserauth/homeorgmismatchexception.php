@@ -1,10 +1,10 @@
-<?php declare(strict_types=1);
+<?php declare( strict_types=1 );
 
 /*
  * This file is part of letswifi; a system for easy eduroam device enrollment
  *
- * Copyright: 2018-2022, Jørn Åne de Jong <jorn.dejong@letswifi.eu>
- * Copyright: 2020-2022, Paul Dekkers, SURF <paul.dekkers@surf.nl>
+ * Copyright: 2018-2023, Jørn Åne de Jong <jorn.dejong@letswifi.eu>
+ * Copyright: 2020-2023, Paul Dekkers, SURF <paul.dekkers@surf.nl>
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -26,7 +26,7 @@ class HomeOrgMismatchException extends MismatchIdpException
 	/**
 	 * @param array<string>|string $required
 	 */
-	public function __construct( $required, array $provided, string $username = null )
+	public function __construct( $required, array $provided, ?string $username = null )
 	{
 		if ( \is_array( $required ) && 1 === \count( $required ) ) {
 			$required = \reset( $required );
@@ -38,12 +38,10 @@ class HomeOrgMismatchException extends MismatchIdpException
 
 		$requiredStr = \is_string( $required )
 			? \sprintf( "'%s'", $required )
-			: \sprintf( '[%s]', \implode( ', ', $required ) )
-			;
+			: \sprintf( '[%s]', \implode( ', ', $required ) );
 		$providedStr = 1 === \count( $provided )
 			? \sprintf( "'%s'", \reset( $provided ) )
-			: \sprintf( '[%s]', \implode( ', ', $provided ) )
-			;
-		RuntimeException::__construct( "Cannot reconsiliate ${requiredStr} with ${providedStr}" . ( isset( $username ) ? " with username ${username}" : '' ) );
+			: \sprintf( '[%s]', \implode( ', ', $provided ) );
+		RuntimeException::__construct( "Cannot reconsiliate {$requiredStr} with {$providedStr}" . ( isset( $username ) ? " with username {$username}" : '' ) );
 	}
 }

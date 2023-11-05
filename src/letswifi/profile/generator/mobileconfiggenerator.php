@@ -1,10 +1,10 @@
-<?php declare(strict_types=1);
+<?php declare( strict_types=1 );
 
 /*
  * This file is part of letswifi; a system for easy eduroam device enrollment
  *
- * Copyright: 2018-2022, Jørn Åne de Jong <jorn.dejong@letswifi.eu>
- * Copyright: 2020-2022, Paul Dekkers, SURF <paul.dekkers@surf.nl>
+ * Copyright: 2018-2023, Jørn Åne de Jong <jorn.dejong@letswifi.eu>
+ * Copyright: 2020-2023, Paul Dekkers, SURF <paul.dekkers@surf.nl>
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -12,18 +12,11 @@ namespace letswifi\profile\generator;
 
 use DateTimeImmutable;
 use DateTimeZone;
-
-use fyrkat\openssl\PKCS12;
-
 use InvalidArgumentException;
-
+use fyrkat\openssl\PKCS12;
 use letswifi\LetsWifiApp;
-
 use letswifi\profile\auth\AbstractAuth;
 use letswifi\profile\auth\TlsAuth;
-
-use letswifi\profile\IProfileData;
-
 use letswifi\profile\network\HS20Network;
 use letswifi\profile\network\SSIDNetwork;
 
@@ -39,9 +32,9 @@ class MobileConfigGenerator extends AbstractGenerator
 		/** @var array<TlsAuth> */
 		$caCertificates = [];
 		$tlsAuthMethods = \array_filter(
-				$this->authenticationMethods,
-				static function ( $a ) { return $a instanceof TlsAuth && null !== $a->getPKCS12(); },
-			);
+			$this->authenticationMethods,
+			static function ( $a ) { return $a instanceof TlsAuth && null !== $a->getPKCS12(); },
+		);
 		if ( 1 !== \count( $tlsAuthMethods ) ) {
 			throw new InvalidArgumentException( 'Expected 1 TLS auth method, got ' . \count( $tlsAuthMethods ) );
 		}
@@ -122,9 +115,9 @@ class MobileConfigGenerator extends AbstractGenerator
 			. "\n";
 
 		$uuids = \array_map(
-				static function ( $_ ){ return static::uuidgen(); },
-				\array_fill( 0, \count( $caCertificates ), null ),
-			);
+			static function ( $_ ) { return static::uuidgen(); },
+			\array_fill( 0, \count( $caCertificates ), null ),
+		);
 		/** @var array<string,\fyrkat\openssl\X509> */
 		$caCertificates = \array_combine( $uuids, $caCertificates );
 		foreach ( $caCertificates as $uuid => $ca ) {
@@ -151,7 +144,7 @@ class MobileConfigGenerator extends AbstractGenerator
 		}
 		$payloadNetworkCount = 0;
 		foreach ( $this->profileData->getNetworks() as $network ) {
-			if ( $network instanceof SSIDNetwork || $network instanceof HS20Network) {
+			if ( $network instanceof SSIDNetwork || $network instanceof HS20Network ) {
 				// TODO assumes TLSAuth, it's the only option currently
 				$result .= '		<dict>'
 					. "\n" . '			<key>AutoJoin</key>'

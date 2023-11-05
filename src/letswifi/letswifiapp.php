@@ -1,38 +1,32 @@
-<?php declare(strict_types=1);
+<?php declare( strict_types=1 );
 
 /*
  * This file is part of letswifi; a system for easy eduroam device enrollment
  *
- * Copyright: 2018-2022, Jørn Åne de Jong <jorn.dejong@letswifi.eu>
- * Copyright: 2020-2022, Paul Dekkers, SURF <paul.dekkers@surf.nl>
+ * Copyright: 2018-2023, Jørn Åne de Jong <jorn.dejong@letswifi.eu>
+ * Copyright: 2020-2023, Paul Dekkers, SURF <paul.dekkers@surf.nl>
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
 namespace letswifi;
 
 use DomainException;
-
+use PDO;
+use RuntimeException;
+use Throwable;
 use fyrkat\oauth\Client;
 use fyrkat\oauth\OAuth;
-
 use fyrkat\oauth\sealer\JWTSealer;
 use fyrkat\oauth\sealer\PDOSealer;
 use fyrkat\oauth\token\AccessToken;
 use fyrkat\oauth\token\AuthorizationCode;
 use fyrkat\oauth\token\Grant;
 use fyrkat\oauth\token\RefreshToken;
-
 use fyrkat\openssl\PKCS7;
-
 use letswifi\browserauth\BrowserAuthInterface;
-
 use letswifi\realm\Realm;
 use letswifi\realm\RealmManager;
 use letswifi\realm\User;
-
-use PDO;
-use RuntimeException;
-use Throwable;
 
 class LetsWifiApp
 {
@@ -62,7 +56,7 @@ class LetsWifiApp
 	/** @var ?\Twig\Environment */
 	private $twig;
 
-	public function __construct( Config $config = null )
+	public function __construct( ?Config $config = null )
 	{
 		$this->config = $config ?? new Config();
 	}
@@ -73,7 +67,7 @@ class LetsWifiApp
 		$userId = $auth->requireAuth();
 		$userRealm = $auth->getRealm();
 
-		if ( null !== $userRealm && \strpos( $userRealm, '.' ) === false ) {
+		if ( null !== $userRealm && !\str_contains( $userRealm, '.' ) ) {
 			// There is no . in $userRealm, so we assume it's a subrealm,
 			// and append the current realm to it.
 			$userRealm .= '.' . $this->getRealm()->getName();
@@ -90,7 +84,7 @@ class LetsWifiApp
 
 		$realm = $grant->realm;
 		if ( empty( $realm ) ) {
-			throw new DomainException( "User ${sub} has no realm" );
+			throw new DomainException( "User {$sub} has no realm" );
 		}
 
 		return new User( $sub, $realm, $grant->getClientId(), $this->getIP(), $_SERVER['HTTP_USER_AGENT'] ?? null );
@@ -100,7 +94,7 @@ class LetsWifiApp
 	{
 		$admins = $this->config->getArrayOrEmpty( 'auth.admin' );
 
-		return \in_array( $userName, $admins, true);
+		return \in_array( $userName, $admins, true );
 	}
 
 	public function getIP(): string
@@ -134,7 +128,7 @@ class LetsWifiApp
 		}
 		if ( !$this->isAdmin( $user ) ) {
 			\header( 'Content-Type: text/plain', true, 403 );
-			exit( "403 Forbidden\r\n\r\nNo admin access for ${user}\r\n" );
+			exit( "403 Forbidden\r\n\r\nNo admin access for {$user}\r\n" );
 		}
 	}
 
@@ -195,7 +189,7 @@ class LetsWifiApp
 			$signingCert = $this->config->getStringOrNull( 'profile.signing.cert' );
 			$signingKey = $this->config->getStringOrNull( 'profile.signing.key' );
 			if ( null !== $signingCert && null !== $signingKey ) {
-				$signingCert .= "\n${signingKey}";
+				$signingCert .= "\n{$signingKey}";
 			}
 		}
 		if ( null === $signingCert ) {
@@ -217,25 +211,25 @@ class LetsWifiApp
 		$refreshTokenSealer = new PDOSealer( RefreshToken::class, $this->getPDO() );
 
 		$oauth = new OAuth(
-				$accessTokenSealer,
-				$authorizationCodeSealer,
-				$refreshTokenSealer,
-			);
+			$accessTokenSealer,
+			$authorizationCodeSealer,
+			$refreshTokenSealer,
+		);
 		foreach ( $this->config->getArray( 'oauth.clients' ) as $client ) {
 			$oauth->registerClient( new Client(
-						$client['clientId'],
-						$client['redirectUris'] ?? [],
-						$client['scopes'],
-						$client['refresh'] ?? false,
-						$client['clientSecret'] ?? null,
-					),
-				);
+				$client['clientId'],
+				$client['redirectUris'] ?? [],
+				$client['scopes'],
+				$client['refresh'] ?? false,
+				$client['clientSecret'] ?? null,
+			),
+			);
 		}
 
 		return $oauth;
 	}
 
-	public function getRealm( string $realmName = null ): Realm
+	public function getRealm( ?string $realmName = null ): Realm
 	{
 		if ( null === $realmName ) {
 			$realmName = $this->getCurrentRealmName();
@@ -278,8 +272,8 @@ class LetsWifiApp
 		if ( \PHP_SAPI !== 'cli' ) {
 			\header( 'Content-Type: text/plain', true, $code );
 		}
-		echo "${code} ${codeExplain}\r\n\r\n${message}\r\n";
-		exit(1);
+		echo "{$code} {$codeExplain}\r\n\r\n{$message}\r\n";
+		exit( 1 );
 	}
 
 	public function render( array $data, ?string $template = null, ?string $basePath = '/' ): void
@@ -288,7 +282,7 @@ class LetsWifiApp
 			\header( 'Content-Type: application/json' );
 			exit( \json_encode( $data, \JSON_UNESCAPED_SLASHES ) );
 		}
-		$template = $this->getTwig()->load( "${template}.html" );
+		$template = $this->getTwig()->load( "{$template}.html" );
 		exit( $template->render( ['_basePath' => $basePath] + $data ) );
 	}
 
@@ -309,7 +303,7 @@ class LetsWifiApp
 				?? [\implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 2 ), 'tpl'] )],
 			);
 			$this->twig = new \Twig\Environment( $loader, [
-				//'cache' => '/path/to/compilation_cache',
+				// 'cache' => '/path/to/compilation_cache',
 			] );
 		}
 
@@ -344,7 +338,7 @@ class LetsWifiApp
 		$httpHost = $this->getHttpHost();
 		$realm = $this->getRealmManager()->getRealmNameByHttpHost( $httpHost );
 		if ( null === $realm ) {
-			throw new RuntimeException( "No realm set for HTTP hostname ${httpHost}" );
+			throw new RuntimeException( "No realm set for HTTP hostname {$httpHost}" );
 		}
 
 		return $realm;

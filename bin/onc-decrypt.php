@@ -1,8 +1,17 @@
 #!/usr/bin/env php
 <?php
+
+/*
+ * This file is part of letswifi; a system for easy eduroam device enrollment
+ *
+ * Copyright: 2018-2023, Jørn Åne de Jong <jorn.dejong@letswifi.eu>
+ * Copyright: 2020-2023, Paul Dekkers, SURF <paul.dekkers@surf.nl>
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
 if ( 2 !== $argc ) {
 	\printf( "Usage: %s pin <input.onc >output.onc\n", $argv[0] );
-	exit(1);
+	exit( 1 );
 }
 
 $input = \file_get_contents( 'php://stdin' );
@@ -11,9 +20,9 @@ $salt = \base64_decode( $parsed['Salt'], true );
 $initVector = \base64_decode( $parsed['IV'], true );
 
 $password = $argv[1];
-$encryptionKey = \hash_pbkdf2( 'sha1', $password, $salt, $parsed['Iterations'], 32, true);
+$encryptionKey = \hash_pbkdf2( 'sha1', $password, $salt, $parsed['Iterations'], 32, true );
 $data = \openssl_decrypt( \base64_decode( $parsed['Ciphertext'], true ), 'AES-256-CBC', $encryptionKey, \OPENSSL_RAW_DATA, $initVector );
 
 if ( $data ) {
-	echo "${data}\n";
+	echo "{$data}\n";
 }

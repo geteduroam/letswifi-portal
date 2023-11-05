@@ -1,25 +1,22 @@
-<?php declare(strict_types=1);
+<?php declare( strict_types=1 );
 
 /*
  * This file is part of letswifi; a system for easy eduroam device enrollment
  *
- * Copyright: 2018-2022, Jørn Åne de Jong <jorn.dejong@letswifi.eu>
- * Copyright: 2020-2022, Paul Dekkers, SURF <paul.dekkers@surf.nl>
+ * Copyright: 2018-2023, Jørn Åne de Jong <jorn.dejong@letswifi.eu>
+ * Copyright: 2020-2023, Paul Dekkers, SURF <paul.dekkers@surf.nl>
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
 namespace letswifi\profile\generator;
 
+use InvalidArgumentException;
+use RuntimeException;
 use fyrkat\openssl\PKCS12;
 use fyrkat\openssl\X509;
-
-use InvalidArgumentException;
-
 use letswifi\profile\auth\TlsAuth;
 use letswifi\profile\network\Network;
 use letswifi\profile\network\SSIDNetwork;
-
-use RuntimeException;
 
 class ONCGenerator extends AbstractGenerator
 {
@@ -31,7 +28,7 @@ class ONCGenerator extends AbstractGenerator
 	public function generate(): string
 	{
 		$payload = $this->generatePayload();
-		if ($this->passphrase) {
+		if ( $this->passphrase ) {
 			$payload = \json_encode(
 				$payload,
 				\JSON_UNESCAPED_SLASHES | \JSON_THROW_ON_ERROR,
@@ -60,23 +57,23 @@ class ONCGenerator extends AbstractGenerator
 		// TODO see if hmac can use something stronger than SHA1
 
 		$salt = \random_bytes( 12 );
-		$key = \hash_pbkdf2('sha1', $passphrase, $salt, self::PBKDF2_ITERATIONS, 32, true);
-		$iv = \random_bytes(16);
-		$cipherText = \openssl_encrypt($clearText, 'AES-256-CBC', $key, \OPENSSL_RAW_DATA, $iv);
+		$key = \hash_pbkdf2( 'sha1', $passphrase, $salt, self::PBKDF2_ITERATIONS, 32, true );
+		$iv = \random_bytes( 16 );
+		$cipherText = \openssl_encrypt( $clearText, 'AES-256-CBC', $key, \OPENSSL_RAW_DATA, $iv );
 		if ( false === $cipherText ) {
 			throw new RuntimeException( 'Unable to encrypt profile' );
 		}
-		$hmac = \hash_hmac('sha1', $cipherText, $key, true);
+		$hmac = \hash_hmac( 'sha1', $cipherText, $key, true );
 
 		return [
 			'Cipher' => 'AES256',
 			'Ciphertext' => \base64_encode( $cipherText ),
-			'HMAC' => \base64_encode($hmac),
+			'HMAC' => \base64_encode( $hmac ),
 			'HMACMethod' => 'SHA1',
-			'Salt' => \base64_encode($salt),
+			'Salt' => \base64_encode( $salt ),
 			'Stretch' => 'PBKDF2',
 			'Iterations' => self::PBKDF2_ITERATIONS,
-			'IV' => \base64_encode($iv),
+			'IV' => \base64_encode( $iv ),
 			'Type' => 'EncryptedConfiguration',
 		];
 	}
@@ -87,9 +84,9 @@ class ONCGenerator extends AbstractGenerator
 	protected function generatePayload(): array
 	{
 		$tlsAuthMethods = \array_filter(
-				$this->authenticationMethods,
-				static function ($a): bool { return $a instanceof TlsAuth && null !== $a->getPKCS12(); },
-			);
+			$this->authenticationMethods,
+			static function ( $a ): bool { return $a instanceof TlsAuth && null !== $a->getPKCS12(); },
+		);
 		if ( 1 !== \count( $tlsAuthMethods ) ) {
 			throw new InvalidArgumentException( 'Expected 1 TLS auth method, got ' . \count( $tlsAuthMethods ) );
 		}
@@ -102,14 +99,14 @@ class ONCGenerator extends AbstractGenerator
 		$caCertificates = $this->getCAPayloadFromAuthMethod( $tlsAuthMethod );
 		$clientCertificate = $this->getClientCredentialPayloadFromAuthMethod( $pkcs12 );
 
-		$caIDs = \array_map( static function ( $certData ){return $certData['GUID']; }, $caCertificates );
+		$caIDs = \array_map( static function ( $certData ) {return $certData['GUID']; }, $caCertificates );
 		$clientCertID = $clientCertificate['GUID'];
 		$serverNames = $tlsAuthMethod->getServerNames();
 		$serverSubjectMatch = $this->getLongestSuffix( ...$serverNames );
 
 		$clientCertCN = $pkcs12->getX509()->getSubject()->getCommonName();
 
-		$networkConfigurations = \array_filter( \array_map( function ( Network $network ) use ($clientCertID, $clientCertCN, $caIDs, $serverSubjectMatch) {
+		$networkConfigurations = \array_filter( \array_map( function ( Network $network ) use ( $clientCertID, $clientCertCN, $caIDs, $serverSubjectMatch ) {
 			return $this->generateNetworkConfiguration( $network, $clientCertID, $clientCertCN, $caIDs, $serverSubjectMatch );
 		}, $this->profileData->getNetworks() ) );
 
@@ -127,7 +124,7 @@ class ONCGenerator extends AbstractGenerator
 	 */
 	protected static function generateNetworkConfiguration( Network $network, string $clientCertID, string $clientCertCN, array $caIDs, string $serverSubjectMatch ): ?array
 	{
-		if (!($network instanceof SSIDNetwork )) {
+		if ( !( $network instanceof SSIDNetwork ) ) {
 			return null;
 		}
 
@@ -165,7 +162,7 @@ class ONCGenerator extends AbstractGenerator
 	 */
 	protected static function getCAPayloadFromAuthMethod( TlsAuth $authMethod ): array
 	{
-		return \array_map( static function (X509 $x509 ): array {
+		return \array_map( static function ( X509 $x509 ): array {
 			$uuid = static::uuidgen();
 
 			// writing as "\{$uuid\}" makes php-cs-fixer crash
@@ -188,7 +185,7 @@ class ONCGenerator extends AbstractGenerator
 		$uuid = static::uuidgen();
 
 		return [
-			'GUID' => "[${uuid}]",
+			'GUID' => "[{$uuid}]",
 			'Remove' => false,
 			'Type' => 'Client',
 			'PKCS12' => \base64_encode( $pkcs12->getPKCS12Bytes( '' ) ),
@@ -207,7 +204,7 @@ class ONCGenerator extends AbstractGenerator
 		if ( empty( $hostnames ) ) {
 			return '';
 		}
-		if ( \count( $hostnames ) === 1) {
+		if ( \count( $hostnames ) === 1 ) {
 			return \reset( $hostnames );
 		}
 		$longest = $hostnames[0];
@@ -215,7 +212,7 @@ class ONCGenerator extends AbstractGenerator
 			$pos = \strlen( $candidate );
 			do {
 				$pos = (int)\strrpos( $candidate, '.', -1 * \strlen( $candidate ) + $pos - 1 );
-				echo "'${longest}' ends with " . \substr( $candidate, $pos ) . "?\n";
+				echo "'{$longest}' ends with " . \substr( $candidate, $pos ) . "?\n";
 			} while ( 0 < $pos && \str_ends_with( $longest, (string)\substr( $candidate, $pos ) ) );
 			if ( !\str_ends_with( $longest, (string)\substr( $candidate, $pos ) ) ) {
 				$pos = \strpos( $candidate, '.', $pos + 1 );

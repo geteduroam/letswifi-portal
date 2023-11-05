@@ -1,21 +1,19 @@
-<?php declare(strict_types=1);
+<?php declare( strict_types=1 );
 
 /*
  * This file is part of letswifi; a system for easy eduroam device enrollment
  *
- * Copyright: 2018-2022, Jørn Åne de Jong <jorn.dejong@letswifi.eu>
- * Copyright: 2020-2022, Paul Dekkers, SURF <paul.dekkers@surf.nl>
+ * Copyright: 2018-2023, Jørn Åne de Jong <jorn.dejong@letswifi.eu>
+ * Copyright: 2020-2023, Paul Dekkers, SURF <paul.dekkers@surf.nl>
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
 namespace letswifi\profile\generator;
 
 use InvalidArgumentException;
-
+use UnexpectedValueException;
 use letswifi\profile\auth\Auth;
 use letswifi\profile\auth\TlsAuth;
-
-use UnexpectedValueException;
 
 class PKCS12Generator extends AbstractGenerator
 {
@@ -25,9 +23,9 @@ class PKCS12Generator extends AbstractGenerator
 	public function generate(): string
 	{
 		$tlsAuthMethods = \array_filter(
-				$this->authenticationMethods,
-				static function ( Auth $a ): bool { return $a instanceof TlsAuth && null !== $a->getPKCS12(); },
-			);
+			$this->authenticationMethods,
+			static function ( Auth $a ): bool { return $a instanceof TlsAuth && null !== $a->getPKCS12(); },
+		);
 		if ( 1 !== \count( $tlsAuthMethods ) ) {
 			throw new InvalidArgumentException( 'Expected 1 TLS auth method, got ' . \count( $tlsAuthMethods ) );
 		}
