@@ -33,6 +33,7 @@ class ONCGenerator extends AbstractGenerator
 				$payload,
 				\JSON_UNESCAPED_SLASHES | \JSON_THROW_ON_ERROR,
 			);
+			/** @phan-suppress-next-line PhanPossiblyFalseTypeArgument */
 			$payload = $this->encrypt( $payload, $this->passphrase );
 		}
 
