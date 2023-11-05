@@ -245,7 +245,7 @@ class MobileConfigGenerator extends AbstractGenerator
 
 		$app = new LetsWifiApp();
 		if ( $signer = $app->getProfileSigner() ) {
-			$result = $signer->binarySign( $result );
+			$result = $signer->sign( $result );
 		}
 
 		return $result;
