@@ -30,8 +30,15 @@ $app->render( [
 			'name' => 'Windows',
 		],
 	],
-	'mobileconfig' => [
-		'url' => "${basePath}/profiles/mac/",
+	'os_config' => [
+		'mobileconfig' => [
+			'url' => "${basePath}/profiles/mac/",
+			'name' => 'macOS',
+		],
+		'onc' => [
+			'url' => "${basePath}/profiles/onc/",
+			'name' => 'ChromeOS',
+		],
 	],
 	'manual' => [
 		'url' => "${basePath}/profiles/new/",

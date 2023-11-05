@@ -1,0 +1,37 @@
+{% extends "menu.html" %}
+
+{% block title %}New configuration profile{% endblock %}
+
+{% block content %}
+<main>
+	<h1>geteduroam<small>– eduroam authentication made easy</small></h1>
+	<p>For most users, the easiest way to use geteduroam is to use one of the official apps.</p>
+	<ul class="apps buttons">
+		<li><a class="btn btn-default" href="{{ app.url }}">Download the apps</a></li>
+	</ul>
+	<hr>
+	<form method="post">
+		<p>For advanced users, and for using eduroam on a device where no app is yet available,
+			it is also possible to download a configuration profile.
+		<details id="profile-encrypt">
+			<summary>Encrypt my profile (advanced)</summary>
+			<p>
+				Encrypting your profile requires you to enter the passphrase once when installing the profile.
+				Since the profile is usually installed rightaway after downloading it,
+				this will typically not lead to better security.
+			<p>
+				However, there are some systems, usually aimed at professional users,
+				that will refuse to import a profile unless it has a passphrase.
+				Setting the passphrase here will thus make it easier to install
+				the profile on such systems.
+			<p><label for="passphrase">Enter a passphrase to be used during installation</label><br>
+				<input id="passphrase" name="passphrase" type="password" size="6"></p>
+		</details>
+		<ul class="apps devices buttons">
+{% for deviceName, deviceData in devices %}
+			<li><button type="submit" name="device" value="{{ deviceName }}" class="btn btn-default">{{ deviceData.name }}</button></li>
+{% endfor %}
+		</ul>
+	</form>
+</main>
+{% endblock %}

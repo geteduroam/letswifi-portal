@@ -133,7 +133,7 @@ hr {
 }
 
 #loginform *:focus {
-    outline: none;
+	outline: none;
 }
 
 body{
@@ -190,7 +190,6 @@ main h1:first-child {
 ul.apps {
 	padding: 0;
 	margin: 0 auto;
-	max-width: 26em;
 }
 ul.apps li a.btn {
 	min-width: 6em;
@@ -202,6 +201,12 @@ ul.buttons li {
 	margin-bottom: .5em;
 }
 
+#profile-encrypt {
+	margin-bottom: 2em;
+}
+#profile-encrypt input, #passphrase-show {
+	font-size: 2em;
+}
 
 
 @media (prefers-color-scheme: dark) {
@@ -282,8 +287,8 @@ ul.buttons li {
 	}
 
 	.apps {
-		text-align: justify;
-		text-align-last: justify;
+		text-align: center;
+		text-align-last: center;
 	}
 	ul.apps li {
 		display: inline;

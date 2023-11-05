@@ -12,7 +12,8 @@ require \implode(\DIRECTORY_SEPARATOR, [\dirname(__DIR__, 3), 'src', '_autoload.
 $basePath = '../..';
 \assert( \array_key_exists( 'REQUEST_METHOD', $_SERVER ) );
 
-$downloadKind = 'apple-mobileconfig';
-$href = "${basePath}/profiles/mac/";
+$downloadKind = 'google-onc';
+$href = "${basePath}/profiles/onc/";
+$passphrase = $_COOKIE["${downloadKind}-download-passphrase"] ?: \substr( '000' . \random_int( 0, 9999 ), -4 );
 
 require \implode(\DIRECTORY_SEPARATOR, [\dirname(__DIR__), 'new', '_download.php']);
