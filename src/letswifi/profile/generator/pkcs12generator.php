@@ -14,11 +14,25 @@ use InvalidArgumentException;
 
 use letswifi\profile\auth\Auth;
 use letswifi\profile\auth\TlsAuth;
+use letswifi\profile\IProfileData;
 
 use UnexpectedValueException;
 
 class PKCS12Generator extends AbstractGenerator
 {
+	/** @var string */
+	protected $password;
+
+	public function __construct( IProfileData $profileData, array $authenticationMethods, string $password = '' )
+	{
+		parent::__construct( $profileData, $authenticationMethods );
+		if ( empty($password) ) {
+			$this->password = 'pkcs12';
+		} else {
+			$this->password = $password;
+		}
+	}
+
 	/**
 	 * Generate the eap-config profile
 	 */
@@ -37,8 +51,7 @@ class PKCS12Generator extends AbstractGenerator
 		\assert( $tlsAuthMethod instanceof TlsAuth );
 
 		if ( $pkcs12 = $tlsAuthMethod->getPKCS12() ) {
-			// We need 3DES support, since some of our supported clients support nothing else
-			return $pkcs12->use3des()->getPKCS12Bytes( $this->passphrase ?: '' );
+			return $pkcs12->getPKCS12Bytes( $this->password );
 		}
 
 		throw new UnexpectedValueException( 'Reached unreachable code; PKCS12 was null unexpectedly' );

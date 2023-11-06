@@ -11,15 +11,12 @@
 		<li><a class="btn btn-default" href="{{ app.url }}">{{ app.name }}</a></li>
 {% endfor %}
 	</ul>
-{% if os_config %}
-	<hr>
-	<p>For some platforms there are no apps available. For these platforms, you can download a configuration profile that you can install directly using the operating systems facilities.</p>
+	<!-- this section isn't pretty, but can be removed once the macOS App is released -->
+	<p>For macOS, the current option is to install a .mobileconfig profile.</p>
 	<ul class="apps buttons devices">
-{% for id,conf in os_config %}
-		<li><a href="{{ conf.url }}" class="btn btn-default">{{ conf.name }}</a></li>
-{% endfor %}
+		<li><a href="{{ mobileconfig.url }}" class="btn btn-default">macOS</a></li>
 	</ul>
-{% endif %}
+	<!-- end of to be removed section -->
 	<hr>
 	<details>
 		<summary>Options for other platforms and professional users</summary>

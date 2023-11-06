@@ -34,15 +34,8 @@ $app->render( [
 			'name' => 'Huawei',
 		],
 	],
-	'os_config' => [
-		'mobileconfig' => [
-			'url' => "${basePath}/profiles/mac/",
-			'name' => 'macOS',
-		],
-		'onc' => [
-			'url' => "${basePath}/profiles/onc/",
-			'name' => 'ChromeOS',
-		],
+	'mobileconfig' => [
+		'url' => "${basePath}/profiles/mac/",
 	],
 	'manual' => [
 		'url' => "${basePath}/profiles/new/",

@@ -10,7 +10,6 @@
 
 namespace letswifi\browserauth;
 
-use DomainException;
 use Exception;
 use OutOfBoundsException;
 use Throwable;
@@ -142,9 +141,6 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 			// we use the old value field accessor.
 
 			$nameID = $this->as->getAuthData( 'saml:sp:NameID' );
-			if ( null === $nameID ) {
-				throw new DomainException( 'NameID not present in SAML assertion' );
-			}
 			if ( \method_exists( $nameID, 'getValue' ) ) {
 				return $nameID->getValue();
 			}
