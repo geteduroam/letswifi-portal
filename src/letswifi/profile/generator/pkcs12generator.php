@@ -37,7 +37,8 @@ class PKCS12Generator extends AbstractGenerator
 		\assert( $tlsAuthMethod instanceof TlsAuth );
 
 		if ( $pkcs12 = $tlsAuthMethod->getPKCS12() ) {
-			return $pkcs12->getPKCS12Bytes( $this->passphrase ?: '' );
+			// We need 3DES support, since some of our supported clients support nothing else
+			return $pkcs12->use3des()->getPKCS12Bytes( $this->passphrase ?: '' );
 		}
 
 		throw new UnexpectedValueException( 'Reached unreachable code; PKCS12 was null unexpectedly' );

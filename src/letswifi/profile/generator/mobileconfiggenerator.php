@@ -55,6 +55,11 @@ class MobileConfigGenerator extends AbstractGenerator
 			// because otherwise MacOS would trust that CA for HTTPS traffic
 			$pkcs12 = new PKCS12( $pkcs12->getX509(), $pkcs12->getPrivateKey() );
 		}
+		if ( null !== $pkcs12 ) {
+			// We need 3DES support, since some of our supported clients support nothing else
+			$pkcs12 = $pkcs12->use3des();
+		}
+
 		/** @var array<\fyrkat\openssl\X509> */
 		$caCertificates = \array_merge( $caCertificates, $tlsAuthMethod->getServerCACertificates() );
 		\assert( null !== $pkcs12 );

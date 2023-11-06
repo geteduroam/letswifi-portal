@@ -97,8 +97,11 @@ class ONCGenerator extends AbstractGenerator
 		$tlsAuthMethod = \reset( $tlsAuthMethods );
 		/** @psalm-suppress RedundantCondition */
 		\assert( $tlsAuthMethod instanceof TlsAuth );
+
 		$pkcs12 = $tlsAuthMethod->getPKCS12();
-		\assert( null !== $pkcs12 );
+		\assert( null !== $pkcs12 ); // we already checked this when we created $tlsAuthMethods
+		// We need 3DES support, since some of our supported clients support nothing else
+		$pkcs12 = $pkcs12->use3des();
 
 		$caCertificates = $this->getCAPayloadFromAuthMethod( $tlsAuthMethod );
 		$clientCertificate = $this->getClientCredentialPayloadFromAuthMethod( $pkcs12 );

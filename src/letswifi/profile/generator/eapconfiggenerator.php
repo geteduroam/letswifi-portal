@@ -163,6 +163,11 @@ class EapConfigGenerator extends AbstractGenerator
 		$pkcs12 = $authenticationMethod->getPKCS12();
 		$defaultPassphrase = 'pkcs12';
 
+		if ( null !== $pkcs12 ) {
+			// We need 3DES support, since some of our supported clients support nothing else
+			$pkcs12 = $pkcs12->use3des();
+		}
+
 		$result = '';
 		$result .= ''
 			. "\r\n\t\t\t" . '<AuthenticationMethod>'
