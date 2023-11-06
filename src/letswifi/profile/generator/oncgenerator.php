@@ -61,23 +61,23 @@ class ONCGenerator extends AbstractGenerator
 		// TODO see if hmac can use something stronger than SHA1
 
 		$salt = \random_bytes( 12 );
-		$key = \hash_pbkdf2( 'sha1', $passphrase, $salt, self::PBKDF2_ITERATIONS, 32, true );
-		$iv = \random_bytes( 16);
-		$cipherText = \openssl_encrypt( $clearText, 'AES-256-CBC', $key, \OPENSSL_RAW_DATA, $iv );
+		$key = \hash_pbkdf2('sha1', $passphrase, $salt, self::PBKDF2_ITERATIONS, 32, true);
+		$iv = \random_bytes(16);
+		$cipherText = \openssl_encrypt($clearText, 'AES-256-CBC', $key, \OPENSSL_RAW_DATA, $iv);
 		if ( false === $cipherText ) {
 			throw new RuntimeException( 'Unable to encrypt profile' );
 		}
-		$hmac = \hash_hmac( 'sha1', $cipherText, $key, true );
+		$hmac = \hash_hmac('sha1', $cipherText, $key, true);
 
 		return [
 			'Cipher' => 'AES256',
 			'Ciphertext' => \base64_encode( $cipherText ),
-			'HMAC' => \base64_encode( $hmac ),
+			'HMAC' => \base64_encode($hmac),
 			'HMACMethod' => 'SHA1',
-			'Salt' => \base64_encode( $salt ),
+			'Salt' => \base64_encode($salt),
 			'Stretch' => 'PBKDF2',
 			'Iterations' => self::PBKDF2_ITERATIONS,
-			'IV' => \base64_encode( $iv ),
+			'IV' => \base64_encode($iv),
 			'Type' => 'EncryptedConfiguration',
 		];
 	}
@@ -120,7 +120,7 @@ class ONCGenerator extends AbstractGenerator
 		return [
 			'Type' => 'UnencryptedConfiguration',
 			'Certificates' => \array_merge( $caCertificates, [$clientCertificate] ),
-			'NetworkConfigurations' => \array_values( $networkConfigurations ),
+			'NetworkConfigurations' => $networkConfigurations,
 		];
 	}
 
@@ -153,7 +153,7 @@ class ONCGenerator extends AbstractGenerator
 					'Identity' => $clientCertCN,
 					'Outer' => 'EAP-TLS',
 					'SaveCredentials' => true,
-					'ServerCARefs' => \array_values( $caIDs ),
+					'ServerCARefs' => $caIDs,
 					'SubjectMatch' => $serverSubjectMatch,
 					'UseSystemCAs' => false,
 				],

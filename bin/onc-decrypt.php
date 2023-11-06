@@ -11,18 +11,8 @@ $salt = \base64_decode( $parsed['Salt'], true );
 $initVector = \base64_decode( $parsed['IV'], true );
 
 $password = $argv[1];
-$encryptionKey = \hash_pbkdf2( 'sha1', $password, $salt, $parsed['Iterations'], 32, true );
+$encryptionKey = \hash_pbkdf2( 'sha1', $password, $salt, $parsed['Iterations'], 32, true);
 $data = \openssl_decrypt( \base64_decode( $parsed['Ciphertext'], true ), 'AES-256-CBC', $encryptionKey, \OPENSSL_RAW_DATA, $initVector );
-$hmac = \hash_hmac( 'sha1', \base64_decode( $parsed['Ciphertext'], true ), $encryptionKey, true );
-
-if ( 'SHA1' !== $parsed['HMACMethod'] ) {
-	echo "Invalid HMAC algo\n";
-	exit(2);
-}
-if ( \base64_decode( $parsed['HMAC'], true ) !== $hmac ) {
-	echo "Invalid HMAC\n";
-	exit(2);
-}
 
 if ( $data ) {
 	echo "${data}\n";
