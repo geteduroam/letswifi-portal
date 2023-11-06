@@ -14,5 +14,6 @@ $basePath = '../..';
 
 $downloadKind = 'google-onc';
 $href = "${basePath}/profiles/onc/";
+$passphrase = $_COOKIE["${downloadKind}-download-passphrase"] ?: \substr( '000' . \random_int( 0, 9999 ), -4 );
 
 require \implode(\DIRECTORY_SEPARATOR, [\dirname(__DIR__), 'new', '_download.php']);
