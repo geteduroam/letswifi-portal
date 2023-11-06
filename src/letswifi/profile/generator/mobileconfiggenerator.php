@@ -49,17 +49,12 @@ class MobileConfigGenerator extends AbstractGenerator
 		\assert( $tlsAuthMethod instanceof TlsAuth );
 
 		$tlsAuthMethodUuid = static::uuidgen();
-		$defaultPassphrase = 'pkcs12';
+		$passphrase = $tlsAuthMethod->getPassphrase();
 		if ( $pkcs12 = $tlsAuthMethod->getPKCS12() ) {
 			// Remove the CA from the PKCS12 object,
 			// because otherwise MacOS would trust that CA for HTTPS traffic
 			$pkcs12 = new PKCS12( $pkcs12->getX509(), $pkcs12->getPrivateKey() );
 		}
-		if ( null !== $pkcs12 ) {
-			// We need 3DES support, since some of our supported clients support nothing else
-			$pkcs12 = $pkcs12->use3des();
-		}
-
 		/** @var array<\fyrkat\openssl\X509> */
 		$caCertificates = \array_merge( $caCertificates, $tlsAuthMethod->getServerCACertificates() );
 		\assert( null !== $pkcs12 );
@@ -99,13 +94,9 @@ class MobileConfigGenerator extends AbstractGenerator
 		$result .= '	<key>PayloadContent</key>'
 			. "\n" . '	<array>'
 			. "\n" . '		<dict>'
-			. "\n";
-		if ( !$this->passphrase ) {
-			$result .= '			<key>Password</key>'
-				. "\n" . '			<string>' . static::e( $defaultPassphrase ) . '</string>'
-				. "\n";
-		}
-		$result .= '			<key>PayloadUUID</key>'
+			. "\n" . '			<key>Password</key>'
+			. "\n" . '			<string>' . static::e( $passphrase ) . '</string>'
+			. "\n" . '			<key>PayloadUUID</key>'
 			. "\n" . '			<string>' . static::e( $tlsAuthMethodUuid ) . '</string>'
 			. "\n" . '			<key>PayloadIdentifier</key>'
 			. "\n" . '			<string>' . static::e( $identifier . '.' . $tlsAuthMethodUuid ) . '</string>'
@@ -115,7 +106,7 @@ class MobileConfigGenerator extends AbstractGenerator
 			. "\n" . '			<string>' . static::e( $pkcs12->getX509()->getSubject()->getCommonName() ) . '</string>'
 			. "\n" . '			<key>PayloadContent</key>'
 			. "\n" . '			<data>'
-			. "\n" . '				' . static::e( static::columnFormat( \base64_encode( $pkcs12->getPKCS12Bytes( $this->passphrase ?: $defaultPassphrase ) ), 52, 4 ) )
+			. "\n" . '				' . static::e( static::columnFormat( \base64_encode( $pkcs12->getPKCS12Bytes( $passphrase ) ), 52, 4 ) )
 			. "\n" . '			</data>'
 			. "\n" . '			<key>PayloadType</key>'
 			. "\n" . '			<string>com.apple.security.pkcs12</string>'
@@ -192,9 +183,9 @@ class MobileConfigGenerator extends AbstractGenerator
 				 * but the code is clearer this way.
 				 */
 				if ( $network instanceof SSIDNetwork ) {
-					$payloadDisplayName = static::e( $network->getSSID() );
+					$payloadDisplayName = static::e( $network->getSSID().'®' );
 				} elseif ( $network instanceof HS20Network ) {
-					$payloadDisplayName = 'roaming via Passpoint';
+					$payloadDisplayName = 'roaming via OpenRoaming®';
 				} else {
 					throw new InvalidArgumentException( 'Only SSID or Hotspot 2.0 networks are supported, got ' . \get_class( $network ) );
 				}
@@ -231,7 +222,7 @@ class MobileConfigGenerator extends AbstractGenerator
 					. "\n" . '			<key>ServiceProviderRoamingEnabled</key>'
 					. "\n" . '			<true/>'
 					. "\n" . '			<key>DisplayedOperatorName</key>'
-					. "\n" . '			<string>' . static::e( $this->profileData->getRealm() ) . ' via Passpoint</string>'
+					. "\n" . '			<string>' . static::e( $this->profileData->getRealm() ) . ' via OpenRoaming®</string>'
 					. "\n" . '			<key>DomainName</key>'
 					. "\n" . '			<string>' . static::e( $this->profileData->getRealm() ) . '</string>'
 					. "\n" . '			<key>RoamingConsortiumOIs</key>'
@@ -254,7 +245,7 @@ class MobileConfigGenerator extends AbstractGenerator
 
 		$app = new LetsWifiApp();
 		if ( $signer = $app->getProfileSigner() ) {
-			$result = $signer->sign( $result );
+			$result = $signer->binarySign( $result );
 		}
 
 		return $result;

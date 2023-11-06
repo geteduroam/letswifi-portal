@@ -16,7 +16,7 @@ use letswifi\profile\network\SSIDNetwork;
 
 class EduroamProfileData extends AbstractProfileData
 {
-	public function __construct( string $realm, string $displayName = 'eduroam', array $data = [], string $languageCode = 'en' )
+	public function __construct( string $realm, string $displayName = 'eduroam®', array $data = [], string $languageCode = 'en' )
 	{
 		parent::__construct( $realm, $displayName, $data, $languageCode );
 	}
@@ -27,7 +27,9 @@ class EduroamProfileData extends AbstractProfileData
 	public function getNetworks(): array
 	{
 		$result = parent::getNetworks();
-		$result[] = new HS20Network( '001bc50460' );
+		$result[] = new HS20Network( '001BC50460' );
+		$result[] = new HS20Network( '5A03BA0000' );
+		$result[] = new HS20Network( '5A03BA0800' );
 		$result[] = new SSIDNetwork( 'eduroam' );
 
 		return $result;
