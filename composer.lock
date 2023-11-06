@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f2bc3041a5e8eb58207f898f38b2cee2",
+    "content-hash": "ec722fb651f422c40425601f31655d69",
     "packages": [
         {
             "name": "fyrkat/oauth-server",
@@ -37,11 +37,11 @@
         },
         {
             "name": "fyrkat/openssl",
-            "version": "v1.3.0",
+            "version": "v1.3.1",
             "source": {
                 "type": "git",
                 "url": "https://git.sr.ht/~jornane/php-openssl",
-                "reference": "892ac6326f4a8b9f98d0f23bad551bdbe244e698"
+                "reference": "4ba36f2e080b7374ef50ce721beaa502021ef02c"
             },
             "require": {
                 "ext-openssl": "*",
@@ -64,7 +64,7 @@
                 }
             ],
             "description": "Class wrappers for PHPs built-in openssl_* functions",
-            "time": "2023-11-05T21:46:21+00:00"
+            "time": "2023-11-06T09:19:12+00:00"
         },
         {
             "name": "symfony/polyfill-ctype",
