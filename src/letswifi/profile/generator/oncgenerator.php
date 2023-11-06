@@ -36,6 +36,7 @@ class ONCGenerator extends AbstractGenerator
 				$payload,
 				\JSON_UNESCAPED_SLASHES | \JSON_THROW_ON_ERROR,
 			);
+			\assert( \is_string( $payload ) );
 			$payload = $this->encrypt( $payload, $this->passphrase );
 		}
 

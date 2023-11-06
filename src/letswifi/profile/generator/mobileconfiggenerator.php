@@ -22,8 +22,6 @@ use letswifi\LetsWifiApp;
 use letswifi\profile\auth\AbstractAuth;
 use letswifi\profile\auth\TlsAuth;
 
-use letswifi\profile\IProfileData;
-
 use letswifi\profile\network\HS20Network;
 use letswifi\profile\network\SSIDNetwork;
 
