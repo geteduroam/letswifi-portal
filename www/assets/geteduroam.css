@@ -196,6 +196,7 @@ ul.apps li a.btn {
 }
 ul.buttons {
 	list-style: none;
+	line-height: 2.4em;
 }
 ul.buttons li {
 	margin-bottom: .5em;
