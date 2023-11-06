@@ -23,8 +23,6 @@ use fyrkat\oauth\token\Grant;
 use fyrkat\oauth\token\RefreshToken;
 
 use fyrkat\openssl\PKCS7;
-use fyrkat\openssl\PrivateKey;
-use fyrkat\openssl\X509;
 
 use letswifi\browserauth\BrowserAuthInterface;
 
@@ -193,31 +191,20 @@ class LetsWifiApp
 			} else {
 				throw new RuntimeException( 'File specified in signing.cert does not exist, please migrate to profile.signing.cert' );
 			}
-
-			$signingKey = $signingCert;
 		} else {
 			$signingCert = $this->config->getStringOrNull( 'profile.signing.cert' );
-			$signingKey = $this->config->getStringOrNull( 'profile.signing.key' ) ?? $signingCert;
+			$signingKey = $this->config->getStringOrNull( 'profile.signing.key' );
+			if ( null !== $signingCert && null !== $signingKey ) {
+				$signingCert .= "\n${signingKey}";
+			}
 		}
-		if ( null === $signingKey || null === $signingCert ) {
+		if ( null === $signingCert ) {
 			return null;
 		}
 
 		$passphrase = $this->config->getStringOrNull( 'profile.signing.passphrase' );
 
-		$signingCA = $this->config->getArrayOrEmpty( 'profile.signing.ca' );
-        if ( null !== $signingCA ) {
-            $signingCAChain = [];
-            foreach ( $signingCA as $ca) {
-                $signingCAChain[] = new X509($ca);
-            }
-            $signingCA = $signingCAChain;
-        }
-
-		$certificate = new X509( $signingCert );
-		$key = new PrivateKey( $signingKey, $passphrase );
-
-		return new PKCS7( $certificate, $key , $signingCA);
+		return PKCS7::readChainPEM( $signingCert, $passphrase );
 	}
 
 	/**

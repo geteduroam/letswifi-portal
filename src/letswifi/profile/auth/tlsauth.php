@@ -20,20 +20,15 @@ class TlsAuth extends AbstractAuth
 	/** @var ?PKCS12 */
 	private $pkcs12;
 
-	/** @var string */
-	private $passphrase;
-
 	/**
 	 * @param array<X509>   $caCertificates Trusted CA certificates
 	 * @param array<string> $serverNames    Accepted server names
 	 * @param ?PKCS12       $pkcs12         Certificate for user/device authentication
-	 * @param ?string       $passphrase     Transient password to be used for encrypting the PKCS12 payload
 	 */
-	public function __construct( array $caCertificates, array $serverNames, ?PKCS12 $pkcs12, ?string $passphrase = null )
+	public function __construct( array $caCertificates, array $serverNames, ?PKCS12 $pkcs12 )
 	{
 		parent::__construct( $caCertificates, $serverNames );
 		$this->pkcs12 = $pkcs12;
-		$this->passphrase = $passphrase ?? 'pkcs12';
 	}
 
 	public function getExpiry(): ?DateTimeInterface
@@ -44,11 +39,6 @@ class TlsAuth extends AbstractAuth
 	public function getPKCS12(): ?PKCS12
 	{
 		return $this->pkcs12;
-	}
-
-	public function getPassphrase(): string
-	{
-		return $this->passphrase;
 	}
 
 	public function getIdentity(): ?string

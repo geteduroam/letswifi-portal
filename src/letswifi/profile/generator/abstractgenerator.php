@@ -31,15 +31,22 @@ abstract class AbstractGenerator implements Generator
 	protected $authenticationMethods;
 
 	/**
+	 * Passphrase to encrypt the profile with
+	 *
+	 * @var ?string */
+	protected $passphrase;
+
+	/**
 	 * Create a new generator.
 	 *
 	 * @param IProfileData $profileData           Profile data
 	 * @param array<Auth>  $authenticationMethods Authentication methods
 	 */
-	public function __construct( IProfileData $profileData, array $authenticationMethods )
+	public function __construct( IProfileData $profileData, array $authenticationMethods, ?string $passphrase = null )
 	{
 		$this->profileData = $profileData;
 		$this->authenticationMethods = $authenticationMethods;
+		$this->passphrase = $passphrase;
 	}
 
 	public function getFilename(): string

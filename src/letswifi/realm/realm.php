@@ -13,13 +13,13 @@ namespace letswifi\realm;
 use DateInterval;
 use DateTimeImmutable;
 use DateTimeInterface;
-
 use fyrkat\openssl\CSR;
 use fyrkat\openssl\DN;
 use fyrkat\openssl\OpenSSLConfig;
 use fyrkat\openssl\PKCS12;
 use fyrkat\openssl\PrivateKey;
 use fyrkat\openssl\X509;
+use InvalidArgumentException;
 
 use letswifi\profile\auth\TlsAuth;
 
@@ -50,12 +50,14 @@ class Realm
 	 *
 	 * @psalm-param class-string<T> $generator The config generator to return
 	 *
-	 * @param string $generator The config generator class to return
-	 * @param User   $user
+	 * @param string        $generator  The config generator class to return
+	 * @param User          $user
+	 * @param ?string       $passphrase Passphrase to encrypt the profile with
+	 * @param ?DateInterval $validity   Period the profile will be valid for from generation
 	 *
 	 * @psalm-return T
 	 */
-	public function getConfigGenerator( string $generator, User $user, ?DateInterval $validity = null ): Generator
+	public function getConfigGenerator( string $generator, User $user, ?string $passphrase = null, ?DateInterval $validity = null ): Generator
 	{
 		if ( null === $validity ) {
 			$validity = $this->manager->getDefaultValidity( $this->name );
@@ -66,7 +68,7 @@ class Realm
 		// TODO more generic method to get an arbitrary generator
 		$pkcs12 = $this->generateClientCertificate( $user, $expiry );
 
-		return new $generator( $this->getProfileData(), [$this->createAuthenticationMethod( $pkcs12 )] );
+		return new $generator( $this->getProfileData(), [$this->createAuthenticationMethod( $pkcs12 )], $passphrase );
 	}
 
 	/**
@@ -94,11 +96,14 @@ class Realm
 
 	/**
 	 * @param User              $requester  User requesting the certificate
-	 * @param string            $commonName Common name of the server certificate
+	 * @param string            $commonName Common name of the server certificate, must be a hostname
 	 * @param DateTimeInterface $expiry     Expiry date
 	 */
 	public function generateServerCertificate( User $requester, string $commonName, DateTimeInterface $expiry ): PKCS12
 	{
+		if ( !\filter_var( $commonName, \FILTER_VALIDATE_DOMAIN | \FILTER_NULL_ON_FAILURE ) ) {
+			throw new InvalidArgumentException( 'Common name for a server certificate must be a hostname' );
+		}
 		$serverKey = new PrivateKey( new OpenSSLConfig( OpenSSLConfig::KEY_EC ) );
 		$dn = new DN( ['CN' => $commonName] );
 		$csr = CSR::generate( $dn, $serverKey );
@@ -106,7 +111,7 @@ class Realm
 		$serial = $this->logPreparedServerCredential( $caCert, $requester, $csr, $expiry );
 
 		$caKey = $this->getSigningCAKey();
-		$conf = new OpenSSLConfig( OpenSSLConfig::X509_SERVER );
+		$conf = new OpenSSLConfig( OpenSSLConfig::X509_SERVER + ['san' => 'DNS:' . $commonName] );
 		$serverCert = $csr->sign( $caCert, $caKey, $expiry, $conf, $serial );
 		$this->logCompletedServerCredential( $requester, $serverCert );
 
