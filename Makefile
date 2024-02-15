@@ -1,6 +1,6 @@
 
 REALM := example.com
-SIMPLESAMLPHP_VERSION := 2.1.1
+SIMPLESAMLPHP_VERSION := 2.1.3
 
 camera-ready-dev: camera-ready dev
 .PHONY: camera-ready-dev
