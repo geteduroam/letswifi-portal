@@ -5,7 +5,7 @@
 		//'jornane', // A NameID or userIdAttribute
 	],
 	'auth.params' => [
-			'autoloadInclude' => dirname( __DIR__ ) . '/simplesamlphp/lib/_autoload.php',
+			'autoloadInclude' => dirname( __DIR__ ) . '/simplesamlphp/src/_autoload.php',
 			'authSource' => 'default-sp',
 		],
 	'realm.selector' => 'getparam', // one of null, getparam or httphost

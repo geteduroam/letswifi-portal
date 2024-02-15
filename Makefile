@@ -1,5 +1,6 @@
 
 REALM := example.com
+SIMPLESAMLPHP_VERSION := 2.1.3
 
 camera-ready-dev: camera-ready dev
 .PHONY: camera-ready-dev
@@ -49,9 +50,9 @@ var/letswifi-dev.sqlite: var
 
 simplesamlphp:
 	cp -n etc/letswifi.conf.simplesaml.php etc/letswifi.conf.php
-	curl -sSL https://github.com/simplesamlphp/simplesamlphp/releases/download/v1.18.8/simplesamlphp-1.18.8.tar.gz | tar xz
-	ln -s ../simplesamlphp/www/ www/simplesaml || true
-	ln -s simplesamlphp-1.18.8/ simplesamlphp || true
+	curl -sSL https://github.com/simplesamlphp/simplesamlphp/releases/download/v$(SIMPLESAMLPHP_VERSION)/simplesamlphp-$(SIMPLESAMLPHP_VERSION).tar.gz | tar xz
+	ln -sf simplesamlphp-$(SIMPLESAMLPHP_VERSION)/ simplesamlphp || true
+	ln -sf ../simplesamlphp/public/ www/simplesaml || true
 
 
 # Code formatters, static code sniffers etc.
