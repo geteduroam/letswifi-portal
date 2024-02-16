@@ -1,0 +1,30 @@
+{% apply spaceless %}
+{# try to work out the _basePath used in other templates #}
+{% set _basePath = baseurlpath | replace({'simplesaml/': ''}) %}
+<!DOCTYPE html>
+<html lang="{{ currentLanguage }}" dir="{{ isRTL ? 'rtl' : 'ltr' }}">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <title>{{ pagetitle }}</title>
+    <link rel="stylesheet" href="{{ asset("css/stylesheet.css", 'themegeteduroam') }}">
+    <link rel="stylesheet" href="{{ _basePath }}/assets/geteduroam.css">
+    <link rel="icon" href="{{ _basePath }}/assets/geteduroam.ico" type="image/x-icon">
+    <meta name="robots" content="noindex, nofollow">
+    {{ include('_head.twig', ignore_missing = true) }}
+    {% block preload %}{% endblock %}
+  </head>
+  <body id="{{ templateId }}">
+    {% block header %}{% include "_header.twig" %}{% endblock %}
+      <main>
+      {% block contentwrapper %}{% block content %}{% endblock %}{% endblock contentwrapper %}
+      </main>
+    <div id="foot">
+      {% block footer %}{% include "_footer.twig" %}{% endblock %}
+    </div>
+    <script src="{{ asset('js/bundle.js') }}"></script>
+    {% block postload %}{% endblock %}
+  </body>
+</html>
+{% endapply %}
