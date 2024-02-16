@@ -37,11 +37,11 @@
         },
         {
             "name": "fyrkat/openssl",
-            "version": "v1.3.1",
+            "version": "v1.3.2",
             "source": {
                 "type": "git",
                 "url": "https://git.sr.ht/~jornane/php-openssl",
-                "reference": "4ba36f2e080b7374ef50ce721beaa502021ef02c"
+                "reference": "9c9926f0954e7e2bcc4ac88140917be18b3ccc05"
             },
             "require": {
                 "ext-openssl": "*",
@@ -64,7 +64,7 @@
                 }
             ],
             "description": "Class wrappers for PHPs built-in openssl_* functions",
-            "time": "2023-11-06T09:19:12+00:00"
+            "time": "2024-02-16T09:52:48+00:00"
         },
         {
             "name": "symfony/polyfill-ctype",
