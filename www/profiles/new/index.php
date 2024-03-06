@@ -96,7 +96,8 @@ switch ( $overrideMethod ?? $_SERVER['REQUEST_METHOD'] ) {
 				],
 			], 'profile-advanced', $basePath, );
 	case 'POST':
-		$passphrase = $overridePassphrase ?? $_POST['passphrase'] ?? null;
+		$passphrase = $overridePassphrase ?? $_POST['passphrase'] ?? null ?: null;
+		\assert( '' !== $passphrase );
 		if ( \is_array( $passphrase ) ) {
 			\header( 'Content-Type: text/plain', true, 400 );
 			exit( "400 Bad Request\r\n\r\nInvalid passphrase\r\n" );
