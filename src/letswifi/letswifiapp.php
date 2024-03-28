@@ -278,7 +278,7 @@ class LetsWifiApp
 	{
 		if ( null === $template || \array_key_exists( 'json', $_GET ) || !$this->isBrowser() ) {
 			\header( 'Content-Type: application/json' );
-			exit( \json_encode( $data, \JSON_UNESCAPED_SLASHES ) );
+			exit( \json_encode( $data, \JSON_UNESCAPED_SLASHES ) . "\r\n" );
 		}
 		$template = $this->getTwig()->load( "${template}.html" );
 		exit( $template->render( ['_basePath' => $basePath] + $data ) );
