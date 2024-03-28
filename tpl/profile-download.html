@@ -21,7 +21,13 @@
 {% endif %}
 
 {% if device == 'apple-mobileconfig' %}
-<p>If you have macOS Big Sur or newer, please go to Profiles in System Preferences to complete installation.</p>
+<p>After opening the file on MacOS, install it by going to <strong>System Settings</strong> → <strong>Privacy & Security</strong> → <strong>Profiles</strong>.</p>
+<p aria-hidden="true">
+	<picture class="screenshot mac">
+	<source srcset="{{ _basePath }}/assets/mac/sonoma-dark.png" media="(prefers-color-scheme: dark)">
+	<img src="{{ _basePath }}/assets/mac/sonoma.png">
+</picture>
+</p>
 {% endif %}
 
 {% if device == 'google-onc' %}

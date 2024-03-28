@@ -59,6 +59,15 @@ p {
 p.text-center {
 	text-align: center
 }
+p picture img {
+	max-width: 100%;
+}
+picture.screenshot img {
+	opacity: 0.8;
+}
+picture.screenshot.mac img {
+	filter: drop-shadow(0 .6em .6em rgba(0,0,0,.5));
+}
 details {
 	font-size: .8rem;
 }
