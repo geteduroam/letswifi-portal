@@ -257,6 +257,11 @@ return [
 		// Phan has been a bit too strict regarding PHP 8.
 		// It should be okay for closures I think.
 		'PhanParamNameIndicatingUnusedInClosure',
+
+		// Sometimes Phan doesn't see that we handle a possible false
+		// through a flag to the function.  We rely on Psalm for finding those.
+		'PhanPossiblyFalseTypeArgument',
+
 	],
 
 	// A regular expression to match files to be excluded

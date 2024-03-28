@@ -92,8 +92,8 @@ class RealmManager extends DatabaseStorage
 			$now = new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) );
 		}
 		$yesterday = $now->sub( new DateInterval( 'P1D' ) );
-		\assert( false !== $yesterday );
 
+		/** @psalm-suppress PossiblyFalseReference $yesterday is not false */
 		return $this->getEntriesFromTableWhere( 'realm_signing_log', [ // only need serial, sub, expires, revoked
 			'realm' => $realm,
 			'ca_sub' => $caSub,
