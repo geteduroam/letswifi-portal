@@ -23,46 +23,82 @@ use RuntimeException;
 
 class ONCGenerator extends AbstractGenerator
 {
+	/**
+	 * Amount of iterations, must be between 20000 (according to documentation)
+	 * and 500000 (according to source)
+	 *
+	 * @see https://github.com/chromium/chromium/blob/97efa54eb2/components/onc/docs/onc_spec.md#encryptedconfiguration-type
+	 * @see https://github.com/chromium/chromium/blob/97efa54eb2/chromeos/components/onc/onc_utils.cc#L386
+	 */
 	public const PBKDF2_ITERATIONS = 20000;
 
 	/**
 	 * Generate the onc profile
+	 *
+	 * @return string JSON ONC payload
 	 */
 	public function generate(): string
 	{
 		$payload = $this->generatePayload();
-		if ($this->passphrase) {
-			$payload = \json_encode(
-				$payload,
-				\JSON_UNESCAPED_SLASHES | \JSON_THROW_ON_ERROR,
-			);
-			\assert( \is_string( $payload ) );
+
+		if ( $this->passphrase ) {
 			$payload = $this->encrypt( $payload, $this->passphrase );
 		}
 
-		return \json_encode(
-			$payload,
-			\JSON_UNESCAPED_SLASHES | \JSON_PRETTY_PRINT | \JSON_THROW_ON_ERROR,
-		) . "\n";
+		$payload = \json_encode(
+				$payload,
+				\JSON_UNESCAPED_SLASHES | \JSON_PRETTY_PRINT | \JSON_THROW_ON_ERROR,
+			) . "\n";
+
+		return static::spacesToTabs( $payload );
 	}
 
+	/**
+	 * @see https://github.com/chromium/chromium/blob/97efa54eb2/components/onc/docs/onc_spec.md#detection
+	 */
 	public function getContentType(): string
 	{
 		return 'application/x-onc';
 	}
 
+	/**
+	 * @see https://github.com/chromium/chromium/blob/97efa54eb2/components/onc/docs/onc_spec.md#detection
+	 */
 	public function getFileExtension(): string
 	{
 		return 'onc';
 	}
 
-	protected static function encrypt( string $clearText, string $passphrase ): array
+	/**
+	 * Encrypt ONC configuration
+	 *
+	 * @param array  $unencryptedONC UnencryptedConfiguration ONC, unserialized
+	 * @param string $passphrase     Passphrase to encrypt the configuration with
+	 *
+	 * @return array{Cipher:'AES256',Ciphertext:string,HMAC:string,HMACMethod:'SHA1',Salt:string,Stretch:'PBKDF2',Iterations:int,IV:string,Type:'EncryptedConfiguration'} EncryptedConfiguration ONC, unserialized
+	 *
+	 * @see https://github.com/chromium/chromium/blob/97efa54eb2/chromeos/components/onc/onc_utils.cc#L383-L479
+	 * @see https://github.com/chromium/chromium/blob/97efa54eb2/components/onc/docs/onc_spec.md#encryptedconfiguration-type
+	 * @see https://github.com/chromium/chromium/blob/97efa54eb2/components/onc/docs/onc_spec.md#encrypted-format-example
+	 */
+	protected static function encrypt( array $unencryptedONC, string $passphrase ): array
 	{
-		// TODO see if hmac can use something stronger than SHA1
+		if ( !\array_key_exists( 'Type', $unencryptedONC ) ) {
+			throw new InvalidArgumentException( 'ONC payload to be encrypted is not a valid ONC' );
+		}
+		if ( 'UnencryptedConfiguration' !== $unencryptedONC['Type']) {
+			throw new InvalidArgumentException( "Can only encrypt UnencryptedConfiguration, got '{$unencryptedONC['Type']}'" );
+		}
 
-		$salt = \random_bytes( 12 );
+		$clearText = \json_encode(
+			$unencryptedONC,
+			\JSON_UNESCAPED_SLASHES | \JSON_THROW_ON_ERROR,
+		);
+		\assert( \is_string( $clearText ), 'json_encode can only generate string when JSON_THROW_ON_ERROR is set' );
+
+		$salt = \random_bytes( 8 );
 		$key = \hash_pbkdf2( 'sha1', $passphrase, $salt, self::PBKDF2_ITERATIONS, 32, true );
-		$iv = \random_bytes( 16);
+		$iv = \random_bytes( 16 );
 		$cipherText = \openssl_encrypt( $clearText, 'AES-256-CBC', $key, \OPENSSL_RAW_DATA, $iv );
 		if ( false === $cipherText ) {
 			throw new RuntimeException( 'Unable to encrypt profile' );
@@ -83,7 +119,9 @@ class ONCGenerator extends AbstractGenerator
 	}
 
 	/**
-	 * @return array
+	 * Generate ONC configuration with network and certificate payload
+	 *
+	 * @return array{Type:'UnencryptedConfiguration',Certificates:list<array{GUID:string,Remove:false,Type:string,X509?:string,PKCS12?:string}>,NetworkConfigurations:list<mixed>} Unencrypted ONC data structure with certificates and network configuration
 	 */
 	protected function generatePayload(): array
 	{
@@ -119,19 +157,23 @@ class ONCGenerator extends AbstractGenerator
 
 		return [
 			'Type' => 'UnencryptedConfiguration',
-			'Certificates' => \array_merge( $caCertificates, [$clientCertificate] ),
+			'Certificates' => \array_values( \array_merge( $caCertificates, [$clientCertificate] ) ),
 			'NetworkConfigurations' => \array_values( $networkConfigurations ),
 		];
 	}
 
 	/**
-	 * @param array<string> $caIDs
+	 * @param Network       $network
+	 * @param string        $clientCertID       ID of client certificate
+	 * @param string        $clientCertCN       Common name of client certificate
+	 * @param array<string> $caIDs              IDs of server CA certificates
+	 * @param string        $serverSubjectMatch Substring certificate subject name must match
 	 *
-	 * @return ?array
+	 * @return ?array ONC NetworkConfiguration struct
 	 */
 	protected static function generateNetworkConfiguration( Network $network, string $clientCertID, string $clientCertCN, array $caIDs, string $serverSubjectMatch ): ?array
 	{
-		if (!($network instanceof SSIDNetwork )) {
+		if ( !($network instanceof SSIDNetwork ) ) {
 			return null;
 		}
 
@@ -165,16 +207,17 @@ class ONCGenerator extends AbstractGenerator
 	}
 
 	/**
-	 * @return array<array{GUID: string, Remove: false, Type: string, X509: string}>
+	 * @param TlsAuth $authMethod Authentication method
+	 *
+	 * @return array<array{GUID: string, Remove: false, Type: string, X509: string}> ONC Certificate payload
 	 */
 	protected static function getCAPayloadFromAuthMethod( TlsAuth $authMethod ): array
 	{
-		return \array_map( static function (X509 $x509 ): array {
+		return \array_map( static function ( X509 $x509 ): array {
 			$uuid = static::uuidgen();
 
-			// writing as "\{$uuid\}" makes php-cs-fixer crash
 			return [
-				'GUID' => '{' . $uuid . '}',
+				'GUID' => "\\{{$uuid}\\}",
 				'Remove' => false,
 				'Type' => 'Authority',
 				'X509' => \base64_encode( $x509->getX509Der() ),
@@ -183,7 +226,9 @@ class ONCGenerator extends AbstractGenerator
 	}
 
 	/**
-	 * @return array{GUID: string, Remove: false, Type: string, PKCS12: string}
+	 * @param PKCS12 $pkcs12 Client certificate
+	 *
+	 * @return array{GUID: string, Remove: false, Type: string, PKCS12: string} ONC Certificate payload
 	 */
 	protected static function getClientCredentialPayloadFromAuthMethod( PKCS12 $pkcs12 ): array
 	{
@@ -219,7 +264,6 @@ class ONCGenerator extends AbstractGenerator
 			$pos = \strlen( $candidate );
 			do {
 				$pos = (int)\strrpos( $candidate, '.', -1 * \strlen( $candidate ) + $pos - 1 );
-				echo "'${longest}' ends with " . \substr( $candidate, $pos ) . "?\n";
 			} while ( 0 < $pos && \str_ends_with( $longest, (string)\substr( $candidate, $pos ) ) );
 			if ( !\str_ends_with( $longest, (string)\substr( $candidate, $pos ) ) ) {
 				$pos = \strpos( $candidate, '.', $pos + 1 );
@@ -234,5 +278,24 @@ class ONCGenerator extends AbstractGenerator
 		}
 
 		return $longest;
+	}
+
+	/**
+	 * Convert spaces to tabs
+	 *
+	 * @param $document Document to convert
+	 * @param $indentSize Amount of spaces used for indentation in document
+	 *
+	 * @return string Document indented with tabs
+	 */
+	private static function spacesToTabs( string $document, int $indentSize = 4 ): string
+	{
+		return \preg_replace_callback(
+			'/^\s+/m',
+			static function ( array $match ) use ( $indentSize ): string {
+				return \str_replace( \str_repeat( ' ', $indentSize ), "\t", $match[0] );
+			},
+			$document,
+		);
 	}
 }
