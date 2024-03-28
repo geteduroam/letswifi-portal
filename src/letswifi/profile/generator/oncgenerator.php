@@ -94,6 +94,7 @@ class ONCGenerator extends AbstractGenerator
 			$unencryptedONC,
 			\JSON_UNESCAPED_SLASHES | \JSON_THROW_ON_ERROR,
 		);
+		/** @psalm-suppress RedundantConditionGivenDocblockType phan is not so sure about json_encode not returning false */
 		\assert( \is_string( $clearText ), 'json_encode can only generate string when JSON_THROW_ON_ERROR is set' );
 
 		$salt = \random_bytes( 8 );

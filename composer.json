@@ -12,7 +12,7 @@
 		"fyrkat/oauth-server": "^1"
 	},
 	"require-dev": {
-		"vimeo/psalm": "^4.29",
+		"vimeo/psalm": "^5.13",
 		"phpunit/phpunit": "^9.5",
 		"friendsofphp/php-cs-fixer": "^3",
 		"phan/phan": "^5.4"
