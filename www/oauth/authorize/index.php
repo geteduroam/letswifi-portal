@@ -26,9 +26,8 @@ $oauth = $app->getOAuthHandler( $realm );
 $oauth->assertAuthorizeRequest();
 $browserAuth = $app->getBrowserAuthenticator( $realm );
 
+$user = $app->getUserFromBrowserSession( $realm );
 try {
-	$user = $app->getUserFromBrowserSession( $realm );
-
 	if ( 'POST' === $_SERVER['REQUEST_METHOD'] ) {
 		$oauth->handleAuthorizePostRequest( new fyrkat\oauth\token\Grant(
 			[
@@ -50,28 +49,7 @@ try {
 		'postValue' => POST_VALUE,
 	], 'authorize', $basePath );
 } catch ( letswifi\browserauth\MismatchIdpException $e ) {
-	$guessRealm = $app->guessRealm( $realm );
-
-	$switchRealmParams = null === $guessRealm
-		? $_GET
-		: $_GET + ['realm' => $guessRealm->getName()]
-		;
-
-	try {
-		$guessUser = $guessRealm ? $app->getUserFromBrowserSession( $guessRealm ) : null;
-	} catch ( letswifi\browserauth\MismatchIdpException $e ) {
-		$guessUser = null;
-	}
-
-	$app->render( [
-		'realmName' => $realm->getName(),
-		'guessRealmName' => $guessRealm ? $guessRealm->getName() : null,
-		'guessUserId' => $guessUser ? $guessUser->getUserId() : null,
-		'logoutUrl' => $browserAuth->getLogoutUrl(),
-
-		'switchRealmLink' => $guessRealm ? '?' . \http_build_query( $switchRealmParams ) : null,
-		'switchUserLink' => $browserAuth->getLogoutUrl(),
-		'refuseRequestLink' => $oauth->getRedirectUrlForRefusedAuthorizeRequest(),
-	], 'realmchooser' );
+	\header( 'Content-Type: text/plain' );
+	\printf( "403 Forbidden\r\n\r\nRealm %s is not valid for user %s", $realm->getName(), $user->getUserID() );
 	exit;
 }
