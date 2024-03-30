@@ -1,18 +1,22 @@
 #!/bin/sh
 set -e
 
-LETSWIFI_PATH=/usr/share/letswifi-portal
+APPLICATION_DIR=/usr/share/letswifi-portal
 #LETSWIFI_REPO=https://git.sr.ht/~eduroam/letswifi-portal
 LETSWIFI_REPO=https://github.com/geteduroam/letswifi-portal.git
 SIMPLESAMLPHP_PATH=/usr/share/simplesamlphp
-SETTINGS_PATH=/var/lib/letswifi/answers.sh
 
-test -f /var/lib/letswifi/answers.sh && . /var/lib/letswifi/answers.sh
+WORKING_DIR=/var/lib/letswifi
+
+SETTINGS_DIR=/etc/letswifi
+SETTINGS_FILE="$SETTINGS_DIR/install-answers.sh"
+
+test -f "$SETTINGS_FILE" && . "$SETTINGS_FILE"
 fqdn="${fqdn:-$(hostname -f)}"
 
-if test -d $LETSWIFI_PATH
+if test -d "$APPLICATION_DIR"
 then
-	dialog --backtitle "Let's Wi-Fi installation" --yesno "Let's Wi-Fi appears to be installed already, in the following directory:\n\n$LETSWIFI_PATH\n\nThis script will not touch the existing installation.\n\nHowever, you may continue running this script,\nso it can refresh Apache and SimpleSAMLphp settings.\nDo you want to do that instead?" 0 0 >&2
+	dialog --backtitle "Let's Wi-Fi installation" --yesno "Let's Wi-Fi appears to be installed already, in the following directory:\n\n$APPLICATION_DIR\n\nThis script will not touch the existing installation.\n\nHowever, you may continue running this script,\nso it can refresh Apache and SimpleSAMLphp settings.\nDo you want to do that instead?" 0 0 >&2
 	skip_letswifi_install=1
 else
 	if command -v dialog >/dev/null
@@ -29,65 +33,49 @@ else
 fi
 
 command -v dialog >/dev/null || apt-get install -y dialog || apt-get update && apt-get install -y dialog
-mkdir -p /var/lib/letswifi
+mkdir -p "$WORKING_DIR"
+mkdir -p "$SETTINGS_DIR"
 
 fqdn="$(dialog --backtitle "Let's Wi-Fi installation" --title 'Hostname' --inputbox 'Domain name for the webserver' 0 80 "$fqdn" 3>&1 1>&2 2>&3 3>&-)"
-printf 'fqdn=%s\n' "$fqdn" >>/var/lib/letswifi/answers.sh
+printf 'fqdn=%s\n' "$fqdn" >>"$SETTINGS_FILE"
 if [ "${skip_letswifi_install:-0}" = "0" ]
 then
 	default_realm="$(dialog --backtitle "Let's Wi-Fi installation" --title 'Default realm selection' --inputbox 'Enter the domain name that is used for the realm' 0 80 "$default_realm" 3>&1 1>&2 2>&3 3>&-)"
-	printf 'default_realm=%s\n' "$default_realm" >>/var/lib/letswifi/answers.sh
+	printf 'default_realm=%s\n' "$default_realm" >>"$SETTINGS_FILE"
 fi
 metadata_url="$(dialog --backtitle "Let's Wi-Fi installation" --title 'SimpleSAMLphp configuration' --inputbox 'Enter URL to SAML-IdP metadata' 0 80 "$metadata_url" 3>&1 1>&2 2>&3 3>&-)"
-printf 'metadata_url=%s\n' "$metadata_url" >>/var/lib/letswifi/answers.sh
+printf 'metadata_url=%s\n' "$metadata_url" >>"$SETTINGS_FILE"
 
 apt-get install -y ca-certificates git php-fpm php-dom php-sqlite3 php-curl sqlite3 simplesamlphp apache2 composer
 a2enconf simplesamlphp "$(basename /etc/apache2/conf-available/php*-fpm.conf)"
 a2dismod status
 
-wget --output-document /var/lib/letswifi/saml-idp.xml "$metadata_url"
 
-php << EOF > /etc/simplesamlphp/metadata/saml20-idp-remote.php
-<?php
-# Copying SimpleSAMLphp's code from www/admin/metadata-converter.php
-# There doesn't seem to be a standard way to do this automated
-require '/usr/share/simplesamlphp/vendor/autoload.php';
-\$xmldata = file_get_contents('/var/lib/letswifi/saml-idp.xml');
-if (empty(\$xmldata)) exit(1);
-\\SimpleSAML\\Utils\\XML::checkSAMLMessage(\$xmldata, 'saml-meta');
-\$entities = \\SimpleSAML\\Metadata\\SAMLParser::parseDescriptorsString(\$xmldata);
-foreach (\$entities as &\$entity) {
-	\$entity = [
-		'shib13-sp-remote'  => \$entity->getMetadata1xSP(),
-		'shib13-idp-remote' => \$entity->getMetadata1xIdP(),
-		'saml20-sp-remote'  => \$entity->getMetadata20SP(),
-		'saml20-idp-remote' => \$entity->getMetadata20IdP(),
-	];
-}
-\$output = \\SimpleSAML\\Utils\\Arrays::transpose(\$entities);
-echo "<?php\\n";
-foreach (\$output as \$type => &\$entities) {
-	foreach (\$entities as \$entityId => \$entityMetadata) {
-		if (\$entityMetadata === null) {
-			continue;
-		}
-		unset(\$entityMetadata['entityDescriptor']);
-		echo '\$metadata[' . var_export(\$entityId, true) . '] = ' .
-			var_export(\$entityMetadata, true) . ";\\n";
-	}
-}
-EOF
+
+fgrep "'metarefresh' => " /etc/simplesamlphp/config.php || \
+	sed -e "/^ *'module\\.enable' =>/a\\"	\
+		-e "         'metarefresh' => true,\\"	\
+		/etc/simplesamlphp/config.php
+fgrep "'cron' => true" /etc/simplesamlphp/config.php || \
+	sed -e "/^ *'module\\.enable' =>/a\\"	\
+		-e "         'cron' => true,\\"	\
+		/etc/simplesamlphp/config.php
 
 if [ "${skip_letswifi_install:-0}" = "0" ]
 then
-	git clone "$LETSWIFI_REPO" "$LETSWIFI_PATH"
-	( cd "$LETSWIFI_PATH"; COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev; )
+	git clone "$LETSWIFI_REPO" "$APPLICATION_DIR"
+	( cd "$APPLICATION_DIR"; COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev; )
 	mkdir -p /var/lib/letswifi/database
 	chmod 700 /var/lib/letswifi/database
-	sqlite3 /var/lib/letswifi/database/letswifi.sqlite <"$LETSWIFI_PATH/sql/letswifi.sqlite.sql"
+	sqlite3 /var/lib/letswifi/database/letswifi.sqlite <"$APPLICATION_DIR/sql/letswifi.sqlite.sql"
 	chown -Rh www-data /var/lib/letswifi/database
 
-	tee "$LETSWIFI_PATH/etc/letswifi.conf.php" << EOF >/dev/null
+	tee "$APPLICATION_DIR/etc/letswifi.conf.php" << EOF >/dev/null
+<?php
+require '$SETTINGS_DIR/letswifi.conf.php';
+EOF
+
+	tee "$SETTINGS_DIR/letswifi.conf.php" << EOF >/dev/null
 <?php return [
 	'auth.service' => 'SimpleSAMLAuth',
 	'auth.params' => [
@@ -108,13 +96,15 @@ then
 	'oauth.clients' => (require __DIR__ . DIRECTORY_SEPARATOR . 'clients.php'),
 ];
 EOF
-	"$LETSWIFI_PATH"/bin/add-realm.php "$default_realm" 3650
+	"$APPLICATION_DIR"/bin/add-realm.php "$default_realm" 3650
+else
+	( cd "$APPLICATION_DIR"; test "$(git branch)" = '* main' && git pull; )
 fi
 
 tee /etc/apache2/sites-available/letswifi-portal.conf << EOF >/dev/null
 <VirtualHost *:443>
 	ServerName	$fqdn
-	DocumentRoot $LETSWIFI_PATH/www
+	DocumentRoot $APPLICATION_DIR/www
 	Alias /.well-known/acme-challenge /var/www/html/.well-known/acme-challenge
 	SSLCertificateFile /var/lib/acme/certs/$fqdn/$fqdn.cer
 	SSLCertificateKeyFile /var/lib/acme/certs/$fqdn/$fqdn.key
@@ -134,11 +124,11 @@ a2dissite 000-default default-ssl
 a2ensite letswifi-portal
 a2enmod ssl proxy_fcgi
 service apache2 restart
-:>/var/www/html/index.html
+>/var/www/html/index.html
 
 # First fix own account for ACME
 #acme_email="$(dialog --backtitle "Let's Wi-Fi installation" --title 'ACME configuration' --ok-label Yes --cancel-label No --inputbox 'A self signed certificate has been created.\n\nDo you want to obtain a certificate for $fqdn using ACME now?\n\nThen enter e-mail address for registering an ACME account' 0 0 3>&1 1>&2 2>&3 3>&- || true)"
-#printf 'acme_email=%s\n' "$acme_email" >>/var/lib/letswifi/answers.sh
+#printf 'acme_email=%s\n' "$acme_email" >>"$SETTINGS_FILE"
 
 if [ -n "$acme_email" ]
 then
