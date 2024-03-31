@@ -35,14 +35,6 @@ class DevAuth implements BrowserAuthInterface
 	}
 
 	/**
-	 * @param array $params @unused-param
-	 */
-	public function guessRealm( array $params ): ?string
-	{
-		return null;
-	}
-
-	/**
 	 * @param ?string $redirect @unused-param
 	 */
 	public function getLogoutURL( string $redirect = null ): ?string

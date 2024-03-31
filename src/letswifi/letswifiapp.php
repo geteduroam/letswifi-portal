@@ -253,14 +253,6 @@ class LetsWifiApp
 		return $this->realmManager;
 	}
 
-	public function guessRealm( Realm $baseRealm ): ?Realm
-	{
-		$auth = $this->getBrowserAuthenticator( $baseRealm );
-		$guess = $auth->guessRealm( $this->config->getArrayOrEmpty( 'realm.auth' ) );
-
-		return $guess ? $this->getRealm( $guess ) : null;
-	}
-
 	public function registerExceptionHandler(): void
 	{
 		\set_exception_handler( [$this, 'handleException'] );
