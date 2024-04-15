@@ -20,13 +20,6 @@ interface BrowserAuthInterface
 	 */
 	public function requireAuth(): string;
 
-	/**
-	 * Guess current realm from all configured realms
-	 *
-	 * @param array<string,array> $params realm.auth setting from config
-	 */
-	public function guessRealm( array $params ): ?string;
-
 	public function getLogoutURL( ?string $redirect = null ): ?string;
 
 	/**

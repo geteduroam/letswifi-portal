@@ -94,7 +94,7 @@ then
 		'autoloadInclude' => '$SIMPLESAMLPHP_PATH/lib/_autoload.php',
 		'authSource' => 'default-sp',
 	],
-	'realm.selector' => null, // one of null, getparam or httphost
+	'realm.selector' => null, // one of null or httphost
 	'realm.default' => '$default_realm', // used when realm.selector = null
 	'realm.auth' => [
 		'$default_realm' => [

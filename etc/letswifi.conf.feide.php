@@ -8,7 +8,7 @@
 			'autoloadInclude' => dirname( __DIR__ ) . '/simplesamlphp/lib/_autoload.php',
 			'authSource' => 'default-sp',
 		],
-	'realm.selector' => 'getparam', // one of null, getparam or httphost
+	'realm.selector' => null, // one of null or httphost
 	'realm.default' => 'demo.eduroam.no', // used when realm.selector = null
 	'realm.auth' => [
 			'uninett.geteduroam.no' => [

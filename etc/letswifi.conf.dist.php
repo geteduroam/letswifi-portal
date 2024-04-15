@@ -4,7 +4,7 @@
 		//'eu.letswifi.cli', // A client ID with clientSecret
 		//'jornane', // A NameID or userIdAttribute
 	],
-	'realm.selector' => null, // one of null, getparam or httphost
+	'realm.selector' => null, // one of null or httphost
 	'realm.default' => 'example.com', // used when realm.selector = null
 	'realm.auth' => [
 			'demo.eduroam.no' => [], // No settings needed
