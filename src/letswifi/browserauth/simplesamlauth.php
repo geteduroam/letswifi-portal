@@ -30,7 +30,7 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 	/** @var array<string> */
 	protected $authzAttributeValue;
 
-	/** @var array<string>|?string */
+	/** @var ?array<string> */
 	protected $allowedHomeOrg;
 
 	/** @var string */
@@ -77,13 +77,19 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 		$homeOrgAttribute = $params['homeOrgAttribute'] ?? 'schacHomeOrganization';
 
 		\assert( \is_string( $userIdAttribute ), 'userIdAttribute must be string' );
-		\assert( \is_string( $realmSelectorAttribute ), 'realmSelectorAttribute must be string' );
+		\assert(
+			\is_string( $realmSelectorAttribute ) || null === $realmSelectorAttribute,
+			'realmSelectorAttribute must be string if provided',
+		);
 		\assert( \is_array( $realmMap ), 'realmMap must be array' );
 		\assert( \is_string( $samlIdp ) || null === $samlIdp, 'samlIdp must be string if provided' );
 		\assert( \is_array( $idpList ), 'idpList must be array if provided' );
 		\assert( \is_array( $authzAttributeValue ), 'authzAttributeValue must be array if provided' );
 		\assert( \is_bool( $verifyAuthenticatingAuthority ), 'verifyAuthenticatingAuthority must be a boolean if provided' );
-		\assert( \is_string( $allowedHomeOrg ) || \is_array( $allowedHomeOrg ), 'allowedHomeOrg must be string or array if provided' );
+		\assert(
+			\is_string( $allowedHomeOrg ) || \is_array( $allowedHomeOrg ) || null === $allowedHomeOrg,
+			'allowedHomeOrg must be string or array if provided',
+		);
 		\assert( \is_string( $homeOrgAttribute ), 'homeOrgAttribute must be string if provided' );
 
 		$this->samlIdp = $samlIdp;
@@ -94,7 +100,7 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 		$this->userIdAttribute = $userIdAttribute;
 		$this->realmSelectorAttribute = $realmSelectorAttribute;
 		$this->realmMap = $realmMap;
-		$this->allowedHomeOrg = $allowedHomeOrg;
+		$this->allowedHomeOrg = \is_string( $allowedHomeOrg ) ? [$allowedHomeOrg] : $allowedHomeOrg;
 		$this->homeOrgAttribute = $homeOrgAttribute;
 	}
 
@@ -299,14 +305,10 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 			$orgs = $this->getMultiAttributeValue( $this->homeOrgAttribute );
 
 			foreach ( $orgs as $org ) {
-				if ( \is_array( $this->allowedHomeOrg ) ) {
-					foreach ( $this->allowedHomeOrg as $homeOrg ) {
-						if ( $org === $homeOrg ) {
-							return;
-						}
+				foreach ( $this->allowedHomeOrg as $homeOrg ) {
+					if ( $org === $homeOrg ) {
+						return;
 					}
-				} elseif ( $org === $this->allowedHomeOrg ) {
-					return;
 				}
 			}
 
