@@ -147,7 +147,7 @@ class LetsWifiApp
 			$params = \array_merge( $params, $realmParams[$realm->getName()] );
 		}
 
-		if ( !\preg_match( '/[A-Z][A-Za-z0-9]+/', $service ) ) {
+		if ( !\preg_match( '/^[A-Z][A-Za-z0-9]+$/', $service ) ) {
 			throw new DomainException( 'Illegal auth.service specified in config' );
 		}
 		$service = 'letswifi\\browserauth\\' . $service;
