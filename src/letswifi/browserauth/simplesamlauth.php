@@ -73,8 +73,8 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 		$idpList = $params['idpList'] ?? [];
 		$verifyAuthenticatingAuthority = $params['verifyAuthenticatingAuthority'] ?? true;
 		$authzAttributeValue = $params['authzAttributeValue'] ?? [];
-		$allowedHomeOrg = $params['allowedHomeOrg'] ?? $params['feideHomeOrg'] ?? null;
-		$homeOrgAttribute = $params['homeOrgAttribute'] ?? $params['feideOrgAttribute'] ?? 'schacHomeOrganization';
+		$allowedHomeOrg = $params['allowedHomeOrg'] ?? null;
+		$homeOrgAttribute = $params['homeOrgAttribute'] ?? 'schacHomeOrganization';
 
 		\assert( \is_string( $userIdAttribute ), 'userIdAttribute must be string' );
 		\assert( \is_string( $realmSelectorAttribute ), 'realmSelectorAttribute must be string' );

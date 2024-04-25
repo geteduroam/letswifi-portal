@@ -17,6 +17,12 @@ class SimpleSAMLFeideAuth extends SimpleSAMLAuth
 
 	public function __construct( array $params )
 	{
+		if ( \array_key_exists( 'feideHomeOrg', $params ) && !\array_key_exists( 'allowedHomeOrg', $params ) ) {
+			$params['allowedHomeOrg'] = $params['feideHomeOrg'];
+		}
+		if ( \array_key_exists( 'feideOrgAttribute', $params ) && !\array_key_exists( 'homeOrgAttribute', $params ) ) {
+			$params['homeOrgAttribute'] = $params['feideOrgAttribute'];
+		}
 		parent::__construct( $params );
 		$feideHostname = $params['feideHostname'] ?? 'idp.feide.no';
 		\assert( \is_string( $feideHostname ), 'feideHostname must be string' );
