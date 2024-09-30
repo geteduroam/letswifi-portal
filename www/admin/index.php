@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-require \implode(\DIRECTORY_SEPARATOR, [\dirname(__DIR__, 2), 'src', '_autoload.php']);
+require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 2 ), 'src', '_autoload.php'] );
 $basePath = '..';
 
 $app = new letswifi\LetsWifiApp();
@@ -17,5 +17,5 @@ $app->registerExceptionHandler();
 $app->requireAdmin( 'admin' );
 
 $app->render( [
-	'href' => "${basePath}/admin/",
+	'href' => "{$basePath}/admin/",
 ], 'admin', $basePath );

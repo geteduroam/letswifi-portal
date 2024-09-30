@@ -15,13 +15,11 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
 use DomainException;
-
+use InvalidArgumentException;
+use PDO;
 use fyrkat\openssl\CSR;
 use fyrkat\openssl\PrivateKey;
 use fyrkat\openssl\X509;
-
-use InvalidArgumentException;
-use PDO;
 
 class RealmManager extends DatabaseStorage
 {
@@ -36,7 +34,7 @@ class RealmManager extends DatabaseStorage
 	{
 		// Guarantee that realm exists
 		if ( null === $this->getSingleFieldFromTableWhere( 'realm', 'realm', ['realm' => $realm] ) ) {
-			throw new InvalidArgumentException( "Realm ${realm} does not exist" );
+			throw new InvalidArgumentException( "Realm {$realm} does not exist" );
 		}
 
 		return new Realm( $this, $realm );
@@ -113,9 +111,9 @@ class RealmManager extends DatabaseStorage
 	public function getRealmsByServerName( array $serverNames ): array
 	{
 		return \array_map(
-				function ( $r ) { return new Realm( $this, $r ); },
-				\array_unique( $this->getFieldsFromTableWhere( 'realm_server_name', 'realm', ['server_name' => $serverNames] ) ),
-			);
+			function ( $r ) { return new Realm( $this, $r ); },
+			\array_unique( $this->getFieldsFromTableWhere( 'realm_server_name', 'realm', ['server_name' => $serverNames] ) ),
+		);
 	}
 
 	/**
@@ -182,7 +180,7 @@ class RealmManager extends DatabaseStorage
 	{
 		$validity = $this->getSingleFieldFromTableWhere( 'realm_signer', 'default_validity_days', ['realm' => $realm] );
 
-		return new DateInterval( "P${validity}D" );
+		return new DateInterval( "P{$validity}D" );
 	}
 
 	/**
@@ -206,15 +204,15 @@ class RealmManager extends DatabaseStorage
 	{
 		$entries = $this->getValidOAuthKeys( $realm, $now );
 		\usort(
-				$entries,
-				static function ( array $a, array $b ): int {
-					return (int)( $a['issued'] - $b['issued'] );
-				},
-			);
+			$entries,
+			static function ( array $a, array $b ): int {
+				return (int)( $a['issued'] - $b['issued'] );
+			},
+		);
 
 		$key = \end( $entries )['key'];
 		if ( null === $key ) {
-			throw new DomainException( "Missing OAuth key for realm ${realm}" );
+			throw new DomainException( "Missing OAuth key for realm {$realm}" );
 		}
 		$result = \base64_decode( $key, true );
 		if ( false === $result ) {
@@ -237,7 +235,7 @@ class RealmManager extends DatabaseStorage
 			$now = \time();
 		}
 
-		return $this->getEntriesFromTableWhere( 'realm_key', ['realm' => $realm, 'issued' => $now, 'expires' => $now]);
+		return $this->getEntriesFromTableWhere( 'realm_key', ['realm' => $realm, 'issued' => $now, 'expires' => $now] );
 	}
 
 	public function getCA( string $sub ): ?CA
@@ -264,7 +262,7 @@ class RealmManager extends DatabaseStorage
 		$statement->execute();
 		$rows = $statement->rowCount();
 		if ( 0 === $rows ) {
-			throw new DomainException( "No certificates revoked for user ${userId}" );
+			throw new DomainException( "No certificates revoked for user {$userId}" );
 		}
 	}
 
@@ -282,12 +280,13 @@ class RealmManager extends DatabaseStorage
 		$statement->execute();
 		$rows = $statement->rowCount();
 		if ( 0 === $rows ) {
-			throw new DomainException( "No certificates revoked for subject ${subject}" );
+			throw new DomainException( "No certificates revoked for subject {$subject}" );
 		}
 	}
 
 	/**
 	 * @internal
+	 *
 	 * @suppress PhanPossiblyNonClassMethodCall Phan doesn't understand PDO
 	 * @suppress PhanPossiblyFalseTypeArgumentInternal Assume getTimestamp() doesn't return false
 	 */
@@ -317,6 +316,7 @@ class RealmManager extends DatabaseStorage
 
 	/**
 	 * @internal
+	 *
 	 * @suppress PhanPossiblyNonClassMethodCall Phan doesn't understand PDO
 	 * @suppress PhanPossiblyFalseTypeArgumentInternal Assume getTimestamp() doesn't return false
 	 */
@@ -334,7 +334,7 @@ class RealmManager extends DatabaseStorage
 		$statement->execute();
 		$rows = $statement->rowCount();
 		if ( 1 !== $rows ) {
-			throw new DomainException( "Unable to log signed certificate; expected 1 rows to be updated but got ${rows}" );
+			throw new DomainException( "Unable to log signed certificate; expected 1 rows to be updated but got {$rows}" );
 		}
 	}
 
@@ -354,7 +354,7 @@ class RealmManager extends DatabaseStorage
 	/**
 	 * @suppress PhanPossiblyNonClassMethodCall Phan doesn't understand PDO
 	 */
-	public function rotateOAuthKey( string $realm, int $grace = 3600, int $now = null ): void
+	public function rotateOAuthKey( string $realm, int $grace = 3600, ?int $now = null ): void
 	{
 		if ( null === $now ) {
 			$now = \time();
@@ -365,7 +365,7 @@ class RealmManager extends DatabaseStorage
 		$statement1->bindValue( 'realm', $realm );
 		$statement1->bindValue( 'expires', $now + $grace );
 
-		$statement2 = $this->pdo->prepare( 'INSERT INTO `realm_key` (`realm`, `key`, `issued`) VALUES (:realm, :key, :issued)');
+		$statement2 = $this->pdo->prepare( 'INSERT INTO `realm_key` (`realm`, `key`, `issued`) VALUES (:realm, :key, :issued)' );
 		$statement2->bindValue( 'realm', $realm );
 		$statement2->bindValue( 'key', \base64_encode( \random_bytes( 32 ) ) );
 		$statement2->bindValue( 'issued', $now );
@@ -407,7 +407,7 @@ class RealmManager extends DatabaseStorage
 	public function addTrustedCa( string $realm, string $sub ): void
 	{
 		if ( null === $this->getCA( $sub ) ) {
-			throw new InvalidArgumentException( "Attempted to trust CA ${sub}, but it is not known" );
+			throw new InvalidArgumentException( "Attempted to trust CA {$sub}, but it is not known" );
 		}
 
 		$statement = $this->pdo->prepare( 'INSERT INTO `realm_trust` (`realm`, `trusted_ca_sub`) VALUES (:realm, :sub)' );
@@ -433,7 +433,7 @@ class RealmManager extends DatabaseStorage
 	public function setSignerCa( string $realm, string $sub, DateInterval $defaultValidity ): void
 	{
 		if ( null === $this->getCA( $sub ) ) {
-			throw new InvalidArgumentException( "Attempted to trust CA ${sub}, but it is not known" );
+			throw new InvalidArgumentException( "Attempted to trust CA {$sub}, but it is not known" );
 		}
 
 		$epoch = new DateTimeImmutable( '@0' );

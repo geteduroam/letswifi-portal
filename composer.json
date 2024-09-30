@@ -6,9 +6,9 @@
 		"classmap": ["src/"]
 	},
 	"require": {
-		"php": ">=7.3",
+		"php": ">=8.1",
 		"twig/twig": "^3.3.8",
-		"fyrkat/openssl": "^1",
+		"fyrkat/openssl": "^2",
 		"fyrkat/oauth-server": "^1"
 	},
 	"require-dev": {

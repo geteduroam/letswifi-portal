@@ -12,12 +12,12 @@
 
 $vhost = \array_key_exists( 'HTTP_HOST', $_SERVER ) ? $_SERVER['HTTP_HOST'] : null;
 \assert( \is_string( $vhost ), 'HTTP_HOST should be string' );
-$issuer = "https://${vhost}";
+$issuer = "https://{$vhost}";
 
 $openIDConfiguration = [
 	'issuer' => $issuer,
-	'authorization_endpoint' => "${issuer}/oauth/authorize/",
-	'token_endpoint' => "${issuer}/oauth/token/",
+	'authorization_endpoint' => "{$issuer}/oauth/authorize/",
+	'token_endpoint' => "{$issuer}/oauth/token/",
 	'response_types_supported' => ['code'],
 	'grant_types_supported' => [
 		'authorization_code',

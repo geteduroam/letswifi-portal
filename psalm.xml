@@ -24,6 +24,12 @@
 				<file name="src/letswifi/browserauth/simplesamlauth.php"/>
 			</errorLevel>
 		</MissingPropertyType>
+		<RiskyTruthyFalsyComparison>
+			<errorLevel type="suppress">
+				<directory name="src"/>
+				<directory name="www"/>
+			</errorLevel>
+		</RiskyTruthyFalsyComparison>
 		<UnresolvableInclude>
 			<errorLevel type="suppress">
 				<directory name="bin"/>

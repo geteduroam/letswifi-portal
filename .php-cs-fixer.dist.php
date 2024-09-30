@@ -98,6 +98,11 @@ EOD
 			],
 		],
 		'function_typehint_space' => true,
+		'global_namespace_import' => [
+			'import_classes' => true,
+			'import_constants' => false,
+			'import_functions' => false,
+		],
 		'implode_call' => true,
 		'include' => true,
 		'indentation_type' => true,
@@ -201,6 +206,7 @@ EOD
 		],
 		'ordered_imports' => [
 			'sort_algorithm' => 'alpha',
+			'case_sensitive' => true,
 		],
 		'ordered_traits' => true,
 		'phpdoc_add_missing_param_annotation' => true,
@@ -248,6 +254,9 @@ EOD
 		'single_line_after_imports' => true,
 		'space_after_semicolon' => [
 			'remove_in_empty_for_expressions' => true,
+		],
+		'spaces_inside_parentheses' => [
+			'space' => 'single',
 		],
 		'standardize_increment' => true,
 		'standardize_not_equals' => true,

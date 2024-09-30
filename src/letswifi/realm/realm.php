@@ -13,20 +13,18 @@ namespace letswifi\realm;
 use DateInterval;
 use DateTimeImmutable;
 use DateTimeInterface;
+use InvalidArgumentException;
 use fyrkat\openssl\CSR;
 use fyrkat\openssl\DN;
 use fyrkat\openssl\OpenSSLConfig;
+use fyrkat\openssl\OpenSSLKey;
 use fyrkat\openssl\PKCS12;
 use fyrkat\openssl\PrivateKey;
 use fyrkat\openssl\X509;
-use InvalidArgumentException;
-
-use letswifi\profile\auth\TlsAuth;
-
 use letswifi\profile\EduroamProfileData;
-use letswifi\profile\generator\Generator;
-
 use letswifi\profile\IProfileData;
+use letswifi\profile\auth\TlsAuth;
+use letswifi\profile\generator\Generator;
 
 class Realm
 {
@@ -62,7 +60,7 @@ class Realm
 		if ( null === $validity ) {
 			$validity = $this->manager->getDefaultValidity( $this->name );
 		}
-		$expiry = (new DateTimeImmutable())->add( $validity );
+		$expiry = ( new DateTimeImmutable() )->add( $validity );
 		// TODO check that $expiry is not too far in the future,
 		//	during some test we ended up with 88363-05-14 and MySQL didn't like
 		// TODO more generic method to get an arbitrary generator
@@ -101,17 +99,17 @@ class Realm
 	 */
 	public function generateServerCertificate( User $requester, string $commonName, DateTimeInterface $expiry ): PKCS12
 	{
-		if ( !\filter_var( $commonName, \FILTER_VALIDATE_DOMAIN | \FILTER_NULL_ON_FAILURE ) ) {
+		if ( null === \filter_var( $commonName, \FILTER_VALIDATE_DOMAIN, \FILTER_NULL_ON_FAILURE ) ) {
 			throw new InvalidArgumentException( 'Common name for a server certificate must be a hostname' );
 		}
-		$serverKey = new PrivateKey( new OpenSSLConfig( OpenSSLConfig::KEY_EC ) );
+		$serverKey = new PrivateKey( new OpenSSLConfig( privateKeyType: OpenSSLKey::KEYTYPE_RSA ) );
 		$dn = new DN( ['CN' => $commonName] );
 		$csr = CSR::generate( $dn, $serverKey );
 		$caCert = $this->getSigningCACertificate();
 		$serial = $this->logPreparedServerCredential( $caCert, $requester, $csr, $expiry );
 
 		$caKey = $this->getSigningCAKey();
-		$conf = new OpenSSLConfig( OpenSSLConfig::X509_SERVER + ['san' => 'DNS:' . $commonName] );
+		$conf = new OpenSSLConfig( x509Extensions: OpenSSLConfig::X509_EXTENSION_SERVER, san: 'DNS:' . $commonName );
 		$serverCert = $csr->sign( $caCert, $caKey, $expiry, $conf, $serial );
 		$this->logCompletedServerCredential( $requester, $serverCert );
 
@@ -182,7 +180,7 @@ class Realm
 
 	protected function generateClientCertificate( User $user, DateTimeInterface $expiry ): PKCS12
 	{
-		$userKey = new PrivateKey( new OpenSSLConfig( OpenSSLConfig::KEY_RSA ) );
+		$userKey = new PrivateKey( new OpenSSLConfig( privateKeyType: OpenSSLKey::KEYTYPE_RSA ) );
 		$commonName = static::createCommonName( '@' . \rawurlencode( $user->getRealm() ) );
 		$dn = new DN( ['CN' => $commonName] );
 		$csr = CSR::generate( $dn, $userKey );
@@ -190,7 +188,7 @@ class Realm
 		$serial = $this->logPreparedUserCredential( $caCert, $user, $csr, $expiry );
 
 		$caKey = $this->getSigningCAKey();
-		$conf = new OpenSSLConfig( OpenSSLConfig::X509_CLIENT );
+		$conf = new OpenSSLConfig( x509Extensions: OpenSSLConfig::X509_EXTENSION_CLIENT );
 		$userCert = $csr->sign( $caCert, $caKey, $expiry, $conf, $serial );
 		$this->logCompletedUserCredential( $user, $userCert );
 

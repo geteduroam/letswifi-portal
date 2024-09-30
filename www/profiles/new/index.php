@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-require \implode(\DIRECTORY_SEPARATOR, [\dirname(__DIR__, 3), 'src', '_autoload.php']);
+require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'src', '_autoload.php'] );
 $basePath = '../..';
 \assert( \array_key_exists( 'REQUEST_METHOD', $_SERVER ) );
 
@@ -44,23 +44,23 @@ if ( 'GET' === $_SERVER['REQUEST_METHOD'] && isset( $_GET['download'] ) ) {
 	foreach ( ['apple-mobileconfig', 'google-onc', 'pkcs12'] as $kind ) {
 		// Ensure this request can only be served one time
 		// Does not affect the current $_COOKIE variable
-		\setcookie("${kind}-download-token", '', [
+		\setcookie( "{$kind}-download-token", '', [
 			'expires' => 0,
 			'httponly' => true,
 			'secure' => false,
 			'path' => '/',
 			'samesite' => 'Strict',
-		]);
+		] );
 
-		if ( $_GET['device'] === $kind && isset( $_COOKIE["${kind}-download-token"] ) ) {
-			$cookieTime = (int)$_COOKIE["${kind}-download-token"];
+		if ( $_GET['device'] === $kind && isset( $_COOKIE["{$kind}-download-token"] ) ) {
+			$cookieTime = (int)$_COOKIE["{$kind}-download-token"];
 			$earliestOkTime = \time() - 60; // allow cookies up to 60 seconds old
 			if ( \time() >= $cookieTime && $cookieTime >= $earliestOkTime ) {
 				$overrideMethod = 'POST';
 				$overrideDevice = $kind;
 			}
-			if ( isset( $_COOKIE["${kind}-download-passphrase"] ) ) {
-				$overridePassphrase = $_COOKIE["${kind}-download-passphrase"] ?: null;
+			if ( isset( $_COOKIE["{$kind}-download-passphrase"] ) ) {
+				$overridePassphrase = $_COOKIE["{$kind}-download-passphrase"] ?: null;
 			}
 		}
 	}
@@ -75,26 +75,26 @@ if ( 'GET' === $_SERVER['REQUEST_METHOD'] && isset( $_GET['download'] ) ) {
 
 switch ( $overrideMethod ?? $_SERVER['REQUEST_METHOD'] ) {
 	case 'GET': return $app->render(
-			[
-				'href' => "${basePath}/profiles/new/",
-				'devices' => [
-					'apple-mobileconfig' => [
-						'name' => 'Apple (iOS/MacOS)',
-					],
-					'eap-config' => [
-						'name' => 'eap-config',
-					],
-					'google-onc' => [
-						'name' => 'ChromeOS',
-					],
-					'pkcs12' => [
-						'name' => 'PKCS12',
-					],
+		[
+			'href' => "{$basePath}/profiles/new/",
+			'devices' => [
+				'apple-mobileconfig' => [
+					'name' => 'Apple (iOS/MacOS)',
 				],
-				'app' => [
-					'url' => "${basePath}/app/",
+				'eap-config' => [
+					'name' => 'eap-config',
 				],
-			], 'profile-advanced', $basePath, );
+				'google-onc' => [
+					'name' => 'ChromeOS',
+				],
+				'pkcs12' => [
+					'name' => 'PKCS12',
+				],
+			],
+			'app' => [
+				'url' => "{$basePath}/app/",
+			],
+		], 'profile-advanced', $basePath, );
 	case 'POST':
 		$passphrase = $overridePassphrase ?? $_POST['passphrase'] ?? null ?: null;
 		\assert( '' !== $passphrase );
@@ -103,18 +103,21 @@ switch ( $overrideMethod ?? $_SERVER['REQUEST_METHOD'] ) {
 			exit( "400 Bad Request\r\n\r\nInvalid passphrase\r\n" );
 		}
 		switch ( $device = $overrideDevice ?? $_POST['device'] ?? '' ) {
-			case 'apple-mobileconfig': $generator = $realm->getConfigGenerator( \letswifi\profile\generator\MobileConfigGenerator::class, $user, $passphrase ); break;
-			case 'eap-config': $generator = $realm->getConfigGenerator( \letswifi\profile\generator\EapConfigGenerator::class, $user, $passphrase ); break;
-			case 'pkcs12': $generator = $realm->getConfigGenerator( \letswifi\profile\generator\PKCS12Generator::class, $user, $passphrase ); break;
-			case 'google-onc': $generator = $realm->getConfigGenerator( \letswifi\profile\generator\ONCGenerator::class, $user, $passphrase ); break;
+			case 'apple-mobileconfig': $generator = $realm->getConfigGenerator( letswifi\profile\generator\MobileConfigGenerator::class, $user, $passphrase );
+				break;
+			case 'eap-config': $generator = $realm->getConfigGenerator( letswifi\profile\generator\EapConfigGenerator::class, $user, $passphrase );
+				break;
+			case 'pkcs12': $generator = $realm->getConfigGenerator( letswifi\profile\generator\PKCS12Generator::class, $user, $passphrase );
+				break;
+			case 'google-onc': $generator = $realm->getConfigGenerator( letswifi\profile\generator\ONCGenerator::class, $user, $passphrase );
+				break;
 
 			default:
 				\header( 'Content-Type: text/plain', true, 400 );
 				$deviceStr = \is_string( $device )
-					? ": ${device}"
-					: ''
-					;
-				exit( "400 Bad Request\r\n\r\nUnknown device${deviceStr}\r\n" );
+					? ": {$device}"
+					: '';
+				exit( "400 Bad Request\r\n\r\nUnknown device{$deviceStr}\r\n" );
 		}
 		$payload = $generator->generate();
 		\header( 'Content-Disposition: attachment; filename="' . $generator->getFilename() . '"' );

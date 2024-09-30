@@ -23,23 +23,23 @@ class MismatchIdpException extends RuntimeException
 	/** @var ?string $ */
 	private $username;
 
-	public function __construct( string $required, ?string $provided, string $username = null )
+	public function __construct( string $required, ?string $provided, ?string $username = null )
 	{
 		$this->required = $required;
 		$this->provided = $provided;
 		$this->username = $username;
 		parent::__construct(
-			"Expected IdP \"${required}\" but got " .
+			"Expected IdP \"{$required}\" but got " .
 				(
 					null === $provided
 						? 'nothing'
-						: "\"${provided}\""
+						: "\"{$provided}\""
 				) . (
 					isset( $username )
 						?
-						" with username \"${username}\""
+						" with username \"{$username}\""
 						: ''
 				),
-			);
+		);
 	}
 }

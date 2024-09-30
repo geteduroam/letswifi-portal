@@ -28,8 +28,8 @@ class DevAuth implements BrowserAuthInterface
 	{
 		// Returns owner of this PHP file
 		$user = \get_current_user();
-		\assert( false === \strpos( $user, 'SYSTEM' ), 'File is owned by Windows SYSTEM user' );
-		\assert( false === \strpos( $user, 'root' ), 'File is owned by unix root' );
+		\assert( !\str_contains( $user, 'SYSTEM' ), 'File is owned by Windows SYSTEM user' );
+		\assert( !\str_contains( $user, 'root' ), 'File is owned by unix root' );
 
 		return $user;
 	}
@@ -37,7 +37,7 @@ class DevAuth implements BrowserAuthInterface
 	/**
 	 * @param ?string $redirect @unused-param
 	 */
-	public function getLogoutURL( string $redirect = null ): ?string
+	public function getLogoutURL( ?string $redirect = null ): ?string
 	{
 		return null;
 	}

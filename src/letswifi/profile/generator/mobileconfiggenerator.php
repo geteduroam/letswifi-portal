@@ -12,16 +12,11 @@ namespace letswifi\profile\generator;
 
 use DateTimeImmutable;
 use DateTimeZone;
-
-use fyrkat\openssl\PKCS12;
-
 use InvalidArgumentException;
-
+use fyrkat\openssl\PKCS12;
 use letswifi\LetsWifiApp;
-
 use letswifi\profile\auth\AbstractAuth;
 use letswifi\profile\auth\TlsAuth;
-
 use letswifi\profile\network\HS20Network;
 use letswifi\profile\network\SSIDNetwork;
 
@@ -37,9 +32,9 @@ class MobileConfigGenerator extends AbstractGenerator
 		/** @var array<TlsAuth> */
 		$caCertificates = [];
 		$tlsAuthMethods = \array_filter(
-				$this->authenticationMethods,
-				static function ( $a ) { return $a instanceof TlsAuth && null !== $a->getPKCS12(); },
-			);
+			$this->authenticationMethods,
+			static function ( $a ) { return $a instanceof TlsAuth && null !== $a->getPKCS12(); },
+		);
 		if ( 1 !== \count( $tlsAuthMethods ) ) {
 			throw new InvalidArgumentException( 'Expected 1 TLS auth method, got ' . \count( $tlsAuthMethods ) );
 		}
@@ -53,7 +48,7 @@ class MobileConfigGenerator extends AbstractGenerator
 		if ( $pkcs12 = $tlsAuthMethod->getPKCS12() ) {
 			// Remove the CA from the PKCS12 object,
 			// because otherwise MacOS would trust that CA for HTTPS traffic
-			$pkcs12 = new PKCS12( $pkcs12->getX509(), $pkcs12->getPrivateKey() );
+			$pkcs12 = new PKCS12( $pkcs12->x509, $pkcs12->privateKey );
 		}
 		if ( null !== $pkcs12 ) {
 			// We need 3DES support, since some of our supported clients support nothing else
@@ -107,9 +102,9 @@ class MobileConfigGenerator extends AbstractGenerator
 			. "\n" . '			<key>PayloadIdentifier</key>'
 			. "\n" . '			<string>' . static::e( $identifier . '.' . $tlsAuthMethodUuid ) . '</string>'
 			. "\n" . '			<key>PayloadCertificateFileName</key>'
-			. "\n" . '			<string>' . static::e( $pkcs12->getX509()->getSubject()->getCommonName() ) . '.p12</string>'
+			. "\n" . '			<string>' . static::e( $pkcs12->x509->getSubject()->getCommonName() ) . '.p12</string>'
 			. "\n" . '			<key>PayloadDisplayName</key>'
-			. "\n" . '			<string>' . static::e( $pkcs12->getX509()->getSubject()->getCommonName() ) . '</string>'
+			. "\n" . '			<string>' . static::e( $pkcs12->x509->getSubject()->getCommonName() ) . '</string>'
 			. "\n" . '			<key>PayloadContent</key>'
 			. "\n" . '			<data>'
 			. "\n" . '				' . static::e( static::columnFormat( \base64_encode( $pkcs12->getPKCS12Bytes( $this->passphrase ?: $defaultPassphrase ) ), 52, 4 ) )
@@ -122,9 +117,9 @@ class MobileConfigGenerator extends AbstractGenerator
 			. "\n";
 
 		$uuids = \array_map(
-				static function ( $_ ){ return static::uuidgen(); },
-				\array_fill( 0, \count( $caCertificates ), null ),
-			);
+			static function ( $_ ) { return static::uuidgen(); },
+			\array_fill( 0, \count( $caCertificates ), null ),
+		);
 		/** @var array<string,\fyrkat\openssl\X509> */
 		$caCertificates = \array_combine( $uuids, $caCertificates );
 		foreach ( $caCertificates as $uuid => $ca ) {
@@ -151,7 +146,7 @@ class MobileConfigGenerator extends AbstractGenerator
 		}
 		$payloadNetworkCount = 0;
 		foreach ( $this->profileData->getNetworks() as $network ) {
-			if ( $network instanceof SSIDNetwork || $network instanceof HS20Network) {
+			if ( $network instanceof SSIDNetwork || $network instanceof HS20Network ) {
 				// TODO assumes TLSAuth, it's the only option currently
 				$result .= '		<dict>'
 					. "\n" . '			<key>AutoJoin</key>'
@@ -193,7 +188,7 @@ class MobileConfigGenerator extends AbstractGenerator
 				} elseif ( $network instanceof HS20Network ) {
 					$payloadDisplayName = 'roaming via Passpoint';
 				} else {
-					throw new InvalidArgumentException( 'Only SSID or Hotspot 2.0 networks are supported, got ' . \get_class( $network ) );
+					throw new InvalidArgumentException( 'Only SSID or Hotspot 2.0 networks are supported, got ' . $network::class );
 				}
 				$result .= '				</array>'
 					. "\n" . '			</dict>'
@@ -240,7 +235,7 @@ class MobileConfigGenerator extends AbstractGenerator
 					. "\n" . '		</dict>'
 					. "\n";
 			} else {
-				throw new InvalidArgumentException( 'Only SSID or Hotspot 2.0 networks are supported, got ' . \get_class( $network ) );
+				throw new InvalidArgumentException( 'Only SSID or Hotspot 2.0 networks are supported, got ' . $network::class );
 			}
 			++$payloadNetworkCount;
 		}

@@ -25,7 +25,7 @@ $app->getUserFromBrowserSession( $realm );
 // on this page, which uses a more reliable POST.
 // If the meta_redirect would go through too late (after cookie expiry),
 // the page being redirected to will also contain an appropriate download button.
-\setcookie( "${downloadKind}-download-token", (string)\time(), [
+\setcookie( "{$downloadKind}-download-token", (string)\time(), [
 	'expires' => 0, // session cookie
 	'httponly' => true, // not available in JavaScript
 	'secure' => false, // we don't care, this is not for security, and this helps with local devving
@@ -33,7 +33,7 @@ $app->getUserFromBrowserSession( $realm );
 	'samesite' => 'Strict',
 ] );
 if ( isset( $passphrase ) ) {
-	\setcookie( "${downloadKind}-download-passphrase", $passphrase, [
+	\setcookie( "{$downloadKind}-download-passphrase", $passphrase, [
 		'expires' => 0, // session cookie
 		'httponly' => true, // not available in JavaScript
 		'secure' => false, // we don't care, this is not for security, and this helps with local devving
@@ -44,13 +44,13 @@ if ( isset( $passphrase ) ) {
 
 switch ( $_SERVER['REQUEST_METHOD'] ) {
 	case 'GET': return $app->render(
-			[
-				'href' => $href,
-				'passphrase' => ( $passphrase ?? null ) ?: null,
-				'action' => "${basePath}/profiles/new/",
-				'device' => $downloadKind,
-				'meta_redirect' => "${basePath}/profiles/new/?" . \http_build_query( ['download' => '1', 'device' => $downloadKind] ),
-			], 'profile-download', $basePath, );
+		[
+			'href' => $href,
+			'passphrase' => ( $passphrase ?? null ) ?: null,
+			'action' => "{$basePath}/profiles/new/",
+			'device' => $downloadKind,
+			'meta_redirect' => "{$basePath}/profiles/new/?" . \http_build_query( ['download' => '1', 'device' => $downloadKind] ),
+		], 'profile-download', $basePath, );
 }
 
 \header( 'Content-Type: text/plain', true, 405 );

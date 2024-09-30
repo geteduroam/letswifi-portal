@@ -10,16 +10,13 @@
 
 namespace letswifi\profile\generator;
 
+use InvalidArgumentException;
+use RuntimeException;
 use fyrkat\openssl\PKCS12;
 use fyrkat\openssl\X509;
-
-use InvalidArgumentException;
-
 use letswifi\profile\auth\TlsAuth;
 use letswifi\profile\network\Network;
 use letswifi\profile\network\SSIDNetwork;
-
-use RuntimeException;
 
 class ONCGenerator extends AbstractGenerator
 {
@@ -46,9 +43,9 @@ class ONCGenerator extends AbstractGenerator
 		}
 
 		$payload = \json_encode(
-				$payload,
-				\JSON_UNESCAPED_SLASHES | \JSON_PRETTY_PRINT | \JSON_THROW_ON_ERROR,
-			) . "\n";
+			$payload,
+			\JSON_UNESCAPED_SLASHES | \JSON_PRETTY_PRINT | \JSON_THROW_ON_ERROR,
+		) . "\n";
 
 		return static::spacesToTabs( $payload );
 	}
@@ -86,7 +83,7 @@ class ONCGenerator extends AbstractGenerator
 		if ( !\array_key_exists( 'Type', $unencryptedONC ) ) {
 			throw new InvalidArgumentException( 'ONC payload to be encrypted is not a valid ONC' );
 		}
-		if ( 'UnencryptedConfiguration' !== $unencryptedONC['Type']) {
+		if ( 'UnencryptedConfiguration' !== $unencryptedONC['Type'] ) {
 			throw new InvalidArgumentException( "Can only encrypt UnencryptedConfiguration, got '{$unencryptedONC['Type']}'" );
 		}
 
@@ -127,9 +124,9 @@ class ONCGenerator extends AbstractGenerator
 	protected function generatePayload(): array
 	{
 		$tlsAuthMethods = \array_filter(
-				$this->authenticationMethods,
-				static function ($a): bool { return $a instanceof TlsAuth && null !== $a->getPKCS12(); },
-			);
+			$this->authenticationMethods,
+			static function ( $a ): bool { return $a instanceof TlsAuth && null !== $a->getPKCS12(); },
+		);
 		if ( 1 !== \count( $tlsAuthMethods ) ) {
 			throw new InvalidArgumentException( 'Expected 1 TLS auth method, got ' . \count( $tlsAuthMethods ) );
 		}
@@ -145,14 +142,14 @@ class ONCGenerator extends AbstractGenerator
 		$caCertificates = $this->getCAPayloadFromAuthMethod( $tlsAuthMethod );
 		$clientCertificate = $this->getClientCredentialPayloadFromAuthMethod( $pkcs12 );
 
-		$caIDs = \array_map( static function ( $certData ){return $certData['GUID']; }, $caCertificates );
+		$caIDs = \array_map( static function ( $certData ) {return $certData['GUID']; }, $caCertificates );
 		$clientCertID = $clientCertificate['GUID'];
 		$serverNames = $tlsAuthMethod->getServerNames();
 		$serverSubjectMatch = $this->getLongestSuffix( ...$serverNames );
 
-		$clientCertCN = $pkcs12->getX509()->getSubject()->getCommonName();
+		$clientCertCN = $pkcs12->x509->getSubject()->getCommonName();
 
-		$networkConfigurations = \array_filter( \array_map( function ( Network $network ) use ($clientCertID, $clientCertCN, $caIDs, $serverSubjectMatch) {
+		$networkConfigurations = \array_filter( \array_map( function ( Network $network ) use ( $clientCertID, $clientCertCN, $caIDs, $serverSubjectMatch ) {
 			return $this->generateNetworkConfiguration( $network, $clientCertID, $clientCertCN, $caIDs, $serverSubjectMatch );
 		}, $this->profileData->getNetworks() ) );
 
@@ -174,7 +171,7 @@ class ONCGenerator extends AbstractGenerator
 	 */
 	protected static function generateNetworkConfiguration( Network $network, string $clientCertID, string $clientCertCN, array $caIDs, string $serverSubjectMatch ): ?array
 	{
-		if ( !($network instanceof SSIDNetwork ) ) {
+		if ( !( $network instanceof SSIDNetwork ) ) {
 			return null;
 		}
 
@@ -238,7 +235,7 @@ class ONCGenerator extends AbstractGenerator
 		$uuid = static::uuidgen();
 
 		return [
-			'GUID' => "[${uuid}]",
+			'GUID' => "[{$uuid}]",
 			'Remove' => false,
 			'Type' => 'Client',
 			'PKCS12' => \base64_encode( $pkcs12->getPKCS12Bytes( '' ) ),
@@ -257,7 +254,7 @@ class ONCGenerator extends AbstractGenerator
 		if ( empty( $hostnames ) ) {
 			return '';
 		}
-		if ( \count( $hostnames ) === 1) {
+		if ( \count( $hostnames ) === 1 ) {
 			return \reset( $hostnames );
 		}
 		$longest = $hostnames[0];
@@ -265,16 +262,16 @@ class ONCGenerator extends AbstractGenerator
 			$pos = \strlen( $candidate );
 			do {
 				$pos = (int)\strrpos( $candidate, '.', -1 * \strlen( $candidate ) + $pos - 1 );
-			} while ( 0 < $pos && \str_ends_with( $longest, (string)\substr( $candidate, $pos ) ) );
-			if ( !\str_ends_with( $longest, (string)\substr( $candidate, $pos ) ) ) {
+			} while ( 0 < $pos && \str_ends_with( $longest, \substr( $candidate, $pos ) ) );
+			if ( !\str_ends_with( $longest, \substr( $candidate, $pos ) ) ) {
 				$pos = \strpos( $candidate, '.', $pos + 1 );
 			}
 			if ( false === $pos ) {
 				$longest = '';
 				break;
 			}
-			if ( \str_ends_with( $longest, (string)\substr( $candidate, $pos ) ) ) {
-				$longest = (string)\substr( $candidate, 0 === $pos ? 0 : $pos + 1 );
+			if ( \str_ends_with( $longest, \substr( $candidate, $pos ) ) ) {
+				$longest = \substr( $candidate, 0 === $pos ? 0 : $pos + 1 );
 			}
 		}
 
@@ -284,7 +281,7 @@ class ONCGenerator extends AbstractGenerator
 	/**
 	 * Convert spaces to tabs
 	 *
-	 * @param $document Document to convert
+	 * @param $document   Document to convert
 	 * @param $indentSize Amount of spaces used for indentation in document
 	 *
 	 * @return string Document indented with tabs

@@ -28,12 +28,12 @@ class MismatchRealmSelectorException extends RuntimeException
 		$this->realmSelectors = $realmSelectors;
 		$this->attribute = $attribute;
 		parent::__construct(
-			'Realm selectors " ' . \implode('", "', $realmSelectors ) . ' " ' .
+			'Realm selectors " ' . \implode( '", "', $realmSelectors ) . ' " ' .
 				(
 					null !== $attribute
-						? "(from attribute \"${attribute}\") "
+						? "(from attribute \"{$attribute}\") "
 						: ''
 				) . 'are unknown',
-			);
+		);
 	}
 }

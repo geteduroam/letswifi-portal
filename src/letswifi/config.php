@@ -44,11 +44,11 @@ class Config
 	public function getString( string $key ): string
 	{
 		if ( !\array_key_exists( $key, $this->conf ) ) {
-			throw new DomainException( "Expecting config key ${key} to be string, but does not exist" );
+			throw new DomainException( "Expecting config key {$key} to be string, but does not exist" );
 		}
 		$data = $this->conf[$key];
 		if ( !\is_string( $data ) ) {
-			throw new DomainException( "Expecting config key ${key} to be string, but is " . \gettype( $data ) );
+			throw new DomainException( "Expecting config key {$key} to be string, but is " . \gettype( $data ) );
 		}
 
 		return $data;
@@ -57,11 +57,11 @@ class Config
 	public function getArray( string $key ): array
 	{
 		if ( !\array_key_exists( $key, $this->conf ) ) {
-			throw new DomainException( "Expecting config key ${key} to be string, but does not exist" );
+			throw new DomainException( "Expecting config key {$key} to be string, but does not exist" );
 		}
 		$data = $this->conf[$key];
 		if ( !\is_array( $data ) ) {
-			throw new DomainException( "Expecting config key ${key} to be string, but is " . \gettype( $data ) );
+			throw new DomainException( "Expecting config key {$key} to be string, but is " . \gettype( $data ) );
 		}
 
 		return $data;
@@ -79,7 +79,7 @@ class Config
 		}
 		$data = $this->conf[$key];
 		if ( !\is_array( $data ) ) {
-			throw new DomainException( "Expecting config key ${key} to be string, but is " . \gettype( $data ) );
+			throw new DomainException( "Expecting config key {$key} to be string, but is " . \gettype( $data ) );
 		}
 
 		return $data;
@@ -92,7 +92,7 @@ class Config
 		}
 		$data = $this->conf[$key];
 		if ( !\is_string( $data ) ) {
-			throw new DomainException( "Expecting config key ${key} to be string, but is " . \gettype( $data ) );
+			throw new DomainException( "Expecting config key {$key} to be string, but is " . \gettype( $data ) );
 		}
 
 		return $data;

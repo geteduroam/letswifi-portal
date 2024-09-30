@@ -8,11 +8,11 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-require \implode(\DIRECTORY_SEPARATOR, [\dirname(__DIR__, 3), 'src', '_autoload.php']);
+require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'src', '_autoload.php'] );
 $basePath = '../..';
 \assert( \array_key_exists( 'REQUEST_METHOD', $_SERVER ) );
 
 $downloadKind = 'apple-mobileconfig';
-$href = "${basePath}/profiles/mac/";
+$href = "{$basePath}/profiles/mac/";
 
-require \implode(\DIRECTORY_SEPARATOR, [\dirname(__DIR__), 'new', '_download.php']);
+require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__ ), 'new', '_download.php'] );

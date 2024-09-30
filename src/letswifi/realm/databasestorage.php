@@ -30,7 +30,7 @@ class DatabaseStorage
 	protected static function safeString( string $string, string $type = '' ): void
 	{
 		if ( !\preg_match( '@^([a-z0-9_-])+$@i', $string ) ) {
-			throw new InvalidArgumentException( "Illegal ${type} string: ${string}" );
+			throw new InvalidArgumentException( "Illegal {$type} string: {$string}" );
 		}
 	}
 
@@ -48,7 +48,7 @@ class DatabaseStorage
 			return;
 		}
 		if ( !\array_key_exists( $field, $entry ) ) {
-			throw new LogicException( "Database entry did not return field ${field} in table ${table}" );
+			throw new LogicException( "Database entry did not return field {$field} in table {$table}" );
 		}
 
 		return $entry[$field];
@@ -90,7 +90,7 @@ class DatabaseStorage
 		$result = [];
 		foreach ( $entries as $entry ) {
 			if ( !\array_key_exists( $field, $entry ) ) {
-				throw new LogicException( "Database entry did not return field ${field} in table ${table}" );
+				throw new LogicException( "Database entry did not return field {$field} in table {$table}" );
 			}
 			$result[] = $entry[$field];
 		}
@@ -111,7 +111,7 @@ class DatabaseStorage
 	protected function getEntriesFromTableWhere( string $table, array $where ): array
 	{
 		static::safeString( $table, 'SQL table' );
-		$query = "SELECT * FROM `${table}`";
+		$query = "SELECT * FROM `{$table}`";
 		$first = true;
 		$bind = [];
 		foreach ( $where as $key => $value ) {
@@ -126,12 +126,13 @@ class DatabaseStorage
 			$query .= $first ? ' WHERE ' : ' AND ';
 			$first = false;
 			switch ( $key ) {
-				case 'issued': $query .= '`issued` < :issued'; break;
-				case 'expires': $query .= '(`expires` > :expires OR `expires` IS NULL)'; break;
+				case 'issued': $query .= '`issued` < :issued';
+					break;
+				case 'expires': $query .= '(`expires` > :expires OR `expires` IS NULL)';
+					break;
 				default: $query .= \is_array( $value )
-					? "`${key}` IN (:" . $key . \implode( ",:${key}", \array_keys( $value ) ) . ')'
-					: "`${key}` = :${key}"
-					;
+					? "`{$key}` IN (:" . $key . \implode( ",:{$key}", \array_keys( $value ) ) . ')'
+					: "`{$key}` = :{$key}";
 			}
 		}
 

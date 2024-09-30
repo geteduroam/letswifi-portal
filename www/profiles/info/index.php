@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-require \implode(\DIRECTORY_SEPARATOR, [\dirname(__DIR__, 3), 'src', '_autoload.php']);
+require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'src', '_autoload.php'] );
 $basePath = '../..';
 
 $app = new letswifi\LetsWifiApp();
@@ -18,6 +18,6 @@ $profileData = $realm->getProfileData();
 
 return $app->render(
 	[
-		'href' => "${basePath}/profiles/new/",
+		'href' => "{$basePath}/profiles/new/",
 		'http://letswifi.app/profile#v2' => $profileData,
 	], null, $basePath, );

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-require \implode(\DIRECTORY_SEPARATOR, [\dirname(__DIR__, 4), 'src', '_autoload.php']);
+require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 4 ), 'src', '_autoload.php'] );
 
 $app = new letswifi\LetsWifiApp();
 $app->registerExceptionHandler();
@@ -52,8 +52,7 @@ $credentials = $realmManager->getNonexpiredClientCredentials( $realmName, $caNam
 foreach ( $credentials as $log ) {
 	$revoked = null === $log['revoked']
 		? null
-		: DateTimeImmutable::createFromFormat( 'Y-m-d H:i:s', $log['revoked'], $utc )
-		;
+		: DateTimeImmutable::createFromFormat( 'Y-m-d H:i:s', $log['revoked'], $utc );
 	$expires = DateTimeImmutable::createFromFormat( 'Y-m-d H:i:s', $log['expires'], $utc );
 
 	\assert( false !== $revoked, 'revocation date is well-formed' );
@@ -65,16 +64,16 @@ foreach ( $credentials as $log ) {
 	}
 	if ( null !== $revoked ) {
 		\assert(
-				$now->getTimestamp() >= $revoked->getTimestamp(),
-				'Don\'t know what to do with a certificate that is revoked in the future',
-			);
+			$now->getTimestamp() >= $revoked->getTimestamp(),
+			'Don\'t know what to do with a certificate that is revoked in the future',
+		);
 		$entryType = 'R'; // Revoked
 	}
 
 	$serial = $log['serial'];
 	if ( \strlen( $serial ) % 2 ) {
 		// Serials must have an even length according to OpenSSL
-		$serial = "0${serial}";
+		$serial = "0{$serial}";
 	}
 
 	// Create an OpenSSL-style index.txt listing

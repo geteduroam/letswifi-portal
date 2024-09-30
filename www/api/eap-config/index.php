@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-require \implode(\DIRECTORY_SEPARATOR, [\dirname(__DIR__, 3), 'src', '_autoload.php']);
+require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'src', '_autoload.php'] );
 \assert( \array_key_exists( 'REQUEST_METHOD', $_SERVER ) ); // Psalm
 
 if ( 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
@@ -27,10 +27,10 @@ $user = $app->getUserFromGrant( $grant );
 $format = \array_key_exists( 'format', $_GET ) ? \is_string( $_GET['format'] ) ? $_GET['format'] : null : null;
 switch ( $format ?? 'eap-config' ) {
 	case 'eap-config':
-		$generator = $realm->getConfigGenerator( \letswifi\profile\generator\EapConfigGenerator::class, $user );
+		$generator = $realm->getConfigGenerator( letswifi\profile\generator\EapConfigGenerator::class, $user );
 		break;
 	case 'mobileconfig':
-		$generator = $realm->getConfigGenerator( \letswifi\profile\generator\MobileConfigGenerator::class, $user );
+		$generator = $realm->getConfigGenerator( letswifi\profile\generator\MobileConfigGenerator::class, $user );
 		break;
 	default:
 		\header( 'Content-Type: text/plain', true, 400 );

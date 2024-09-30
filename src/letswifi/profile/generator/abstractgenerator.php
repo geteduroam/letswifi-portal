@@ -11,8 +11,8 @@
 namespace letswifi\profile\generator;
 
 use DateTimeInterface;
-use letswifi\profile\auth\Auth;
 use letswifi\profile\IProfileData;
+use letswifi\profile\auth\Auth;
 
 abstract class AbstractGenerator implements Generator
 {
@@ -55,7 +55,7 @@ abstract class AbstractGenerator implements Generator
 		$datetime = \date( 'YmdHis' );
 		$extension = $this->getFileExtension();
 
-		return "${identifier}.${datetime}.${extension}";
+		return "{$identifier}.{$datetime}.{$extension}";
 	}
 
 	abstract public function getFileExtension(): string;
@@ -84,15 +84,14 @@ abstract class AbstractGenerator implements Generator
 		return \htmlspecialchars( $s, \ENT_QUOTES, 'UTF-8' );
 	}
 
-	protected static function columnFormat( string $data, int $length = null, int $indentation = 0 ): string
+	protected static function columnFormat( string $data, int $length = 52, int $indentation = 0 ): string
 	{
-		$length = $length ?: \strlen( $data ) * 4;
-		\assert( 0 < $length, 'Cannot format columns with width less than 1' );
+		\assert( 0 < $length, '$length must be at least 1' );
 
 		return \implode(
-				"\n" . \str_repeat( "\t", $indentation ),
-				\str_split( $data, $length ),
-			);
+			"\n" . \str_repeat( "\t", $indentation ),
+			\str_split( $data, $length ),
+		);
 	}
 
 	protected static function uuidgen(): string

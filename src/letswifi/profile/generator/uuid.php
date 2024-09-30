@@ -10,6 +10,8 @@
 
 namespace letswifi\profile\generator;
 
+use Exception;
+
 class UUID
 {
 	/** @var string Bytestring */
@@ -22,15 +24,15 @@ class UUID
 	 */
 	public function __construct( $uuid = null )
 	{
-		if (null === $uuid ) {
+		if ( null === $uuid ) {
 			// Generate 16 bytes of random data (128 bits )
 			$bytes = \random_bytes( 16 );
-		} elseif (16 === \strlen( $uuid ) ) {
+		} elseif ( 16 === \strlen( $uuid ) ) {
 			$bytes = $uuid;
-		} elseif (\preg_match( '/[0-9a-f]{8}(\\-[0-9a-f]{4}){2}\\-[0-9a-f]{12}/', $uuid ) ) {
+		} elseif ( \preg_match( '/[0-9a-f]{8}(\\-[0-9a-f]{4}){2}\\-[0-9a-f]{12}/', $uuid ) ) {
 			$bytes = \hex2bin( \str_replace( '-', '', $uuid ) );
 		} else {
-			throw new \Exception( 'Invalid UUID' );
+			throw new Exception( 'Invalid UUID' );
 		}
 
 		// Set bits required for a valid UUIDv4
@@ -49,6 +51,7 @@ class UUID
 	{
 		// Convert bytes to hex and split in 4-char strings (hex, so 2 bytes per string )
 		$parts = \str_split( \bin2hex( $this->bytes ), 4 );
+
 		// Add dashes where UUIDs should have dashes
 		return \implode(
 			'-',

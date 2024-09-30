@@ -80,5 +80,5 @@ phpunit: vendor
 .PHONY: phpunit
 
 syntax: check-php
-	find . ! -path './vendor/*' ! -path './simplesaml*' ! -path './lib/*' -type f -name \*.php -print0 | xargs -0 -n1 -P50 $(PHP) -l
+	find . ! -path './vendor/*' ! -path './simplesaml*' ! -path './lib/*' ! -path './var/*' -type f -name \*.php -print0 | xargs -0 -n1 -P50 $(PHP) -l
 .PHONY: syntax

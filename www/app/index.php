@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-require \implode(\DIRECTORY_SEPARATOR, [\dirname(__DIR__, 2), 'src', '_autoload.php']);
+require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 2 ), 'src', '_autoload.php'] );
 $basePath = '..';
 
 $app = new letswifi\LetsWifiApp();
@@ -36,15 +36,15 @@ $app->render( [
 	],
 	'os_config' => [
 		'mobileconfig' => [
-			'url' => "${basePath}/profiles/mac/",
+			'url' => "{$basePath}/profiles/mac/",
 			'name' => 'macOS',
 		],
 		'onc' => [
-			'url' => "${basePath}/profiles/onc/",
+			'url' => "{$basePath}/profiles/onc/",
 			'name' => 'ChromeOS',
 		],
 	],
 	'manual' => [
-		'url' => "${basePath}/profiles/new/",
+		'url' => "{$basePath}/profiles/new/",
 	],
 ], 'app', $basePath );

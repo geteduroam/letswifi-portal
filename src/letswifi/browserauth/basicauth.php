@@ -37,7 +37,7 @@ class BasicAuth implements BrowserAuthInterface
 	/**
 	 * @param ?string $redirect @unused-param
 	 */
-	public function getLogoutURL( string $redirect = null ): ?string
+	public function getLogoutURL( ?string $redirect = null ): ?string
 	{
 		return null;
 	}

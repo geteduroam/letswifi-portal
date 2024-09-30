@@ -11,7 +11,6 @@
 namespace letswifi\profile\auth;
 
 use DateTimeInterface;
-
 use fyrkat\openssl\PKCS12;
 use fyrkat\openssl\X509;
 
@@ -33,7 +32,7 @@ class TlsAuth extends AbstractAuth
 
 	public function getExpiry(): ?DateTimeInterface
 	{
-		return null === $this->pkcs12 ? null : $this->pkcs12->getX509()->getValidTo();
+		return null === $this->pkcs12 ? null : $this->pkcs12->x509->getValidTo();
 	}
 
 	public function getPKCS12(): ?PKCS12
@@ -47,7 +46,6 @@ class TlsAuth extends AbstractAuth
 
 		return null === $pkcs12
 			? null
-			: $pkcs12->getX509()->getSubject()->getCommonName()
-			;
+			: $pkcs12->x509->getSubject()->getCommonName();
 	}
 }
