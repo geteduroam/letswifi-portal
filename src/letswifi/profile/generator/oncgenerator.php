@@ -125,7 +125,7 @@ class ONCGenerator extends AbstractGenerator
 	{
 		$tlsAuthMethods = \array_filter(
 			$this->authenticationMethods,
-			static function ( $a ): bool { return $a instanceof TlsAuth && null !== $a->getPKCS12(); },
+			static fn ( $a ): bool => $a instanceof TlsAuth && null !== $a->getPKCS12(),
 		);
 		if ( 1 !== \count( $tlsAuthMethods ) ) {
 			throw new InvalidArgumentException( 'Expected 1 TLS auth method, got ' . \count( $tlsAuthMethods ) );
@@ -142,16 +142,14 @@ class ONCGenerator extends AbstractGenerator
 		$caCertificates = $this->getCAPayloadFromAuthMethod( $tlsAuthMethod );
 		$clientCertificate = $this->getClientCredentialPayloadFromAuthMethod( $pkcs12 );
 
-		$caIDs = \array_map( static function ( $certData ) {return $certData['GUID']; }, $caCertificates );
+		$caIDs = \array_map( static fn ( $certData ) => $certData['GUID'], $caCertificates );
 		$clientCertID = $clientCertificate['GUID'];
 		$serverNames = $tlsAuthMethod->getServerNames();
 		$serverSubjectMatch = $this->getLongestSuffix( ...$serverNames );
 
 		$clientCertCN = $pkcs12->x509->getSubject()->getCommonName();
 
-		$networkConfigurations = \array_filter( \array_map( function ( Network $network ) use ( $clientCertID, $clientCertCN, $caIDs, $serverSubjectMatch ) {
-			return $this->generateNetworkConfiguration( $network, $clientCertID, $clientCertCN, $caIDs, $serverSubjectMatch );
-		}, $this->profileData->getNetworks() ) );
+		$networkConfigurations = \array_filter( \array_map( fn ( Network $network ) => $this->generateNetworkConfiguration( $network, $clientCertID, $clientCertCN, $caIDs, $serverSubjectMatch ), $this->profileData->getNetworks() ) );
 
 		return [
 			'Type' => 'UnencryptedConfiguration',
@@ -289,10 +287,8 @@ class ONCGenerator extends AbstractGenerator
 	private static function spacesToTabs( string $document, int $indentSize = 4 ): string
 	{
 		return \preg_replace_callback(
-			'/^\s+/m',
-			static function ( array $match ) use ( $indentSize ): string {
-				return \str_replace( \str_repeat( ' ', $indentSize ), "\t", $match[0] );
-			},
+			'/^\\s+/m',
+			static fn ( array $match ): string => \str_replace( \str_repeat( ' ', $indentSize ), "\t", $match[0] ),
 			$document,
 		);
 	}

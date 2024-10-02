@@ -17,15 +17,16 @@ use Phan\Issue;
  *
  * - Go through this file and verify that there are no missing/unnecessary files/directories.
  *   (E.g. this only includes direct composer dependencies - You may have to manually add indirect composer dependencies to 'directory_list')
- * - Look at 'plugins' and add or remove plugins if appropriate (see https://github.com/phan/phan/tree/master/.phan/plugins#plugins)
+ * - Look at 'plugins' and add or remove plugins if appropriate (see https://github.com/phan/phan/tree/v5/.phan/plugins#plugins)
  * - Add global suppressions for pre-existing issues to suppress_issue_types (https://github.com/phan/phan/wiki/Tutorial-for-Analyzing-a-Large-Sloppy-Code-Base)
+ *   - Consider setting up a baseline if there are a large number of pre-existing issues (see `phan --extended-help`)
  *
  * This configuration will be read and overlaid on top of the
  * default configuration. Command line arguments will be applied
  * after this file is read.
  *
- * @see src/Phan/Config.php
- * See Config for all configurable options.
+ * @see https://github.com/phan/phan/wiki/Phan-Config-Settings for all configurable options
+ * @see https://github.com/phan/phan/tree/v5/src/Phan/Config.php
  *
  * A Note About Paths
  * ==================
@@ -43,14 +44,20 @@ use Phan\Issue;
  */
 return [
 
-	// Supported values: `'5.6'`, `'7.0'`, `'7.1'`, `'7.2'`, `'7.3'`, `'7.4'`, `null`.
+	// The PHP version that the codebase will be checked for compatibility against.
+	// For best results, the PHP binary used to run Phan should have the same PHP version.
+	// (Phan relies on Reflection for some types, param counts,
+	// and checks for undefined classes/methods/functions)
+	//
+	// Supported values: `'5.6'`, `'7.0'`, `'7.1'`, `'7.2'`, `'7.3'`, `'7.4'`,
+	// `'8.0'`, `'8.1'`, `null`.
 	// If this is set to `null`,
 	// then Phan assumes the PHP version which is closest to the minor version
 	// of the php executable used to execute Phan.
 	//
 	// Note that the **only** effect of choosing `'5.6'` is to infer that functions removed in php 7.0 exist.
 	// (See `backward_compatibility_checks` for additional options)
-	// Automatically inferred from composer.json requirement for "php" of ">=7.1"
+	// Automatically inferred from composer.json requirement for "php" of ">=8.1"
 	'target_php_version' => '8.1',
 
 	// If enabled, missing properties will be created when
@@ -152,6 +159,11 @@ return [
 	// [php7cc (no longer maintained)](https://github.com/sstalle/php7cc)
 	// and [php7mar](https://github.com/Alexia/php7mar),
 	// which have different backwards compatibility checks.
+	//
+	// If you are still using versions of php older than 5.6,
+	// `PHP53CompatibilityPlugin` may be worth looking into if you are not running
+	// syntax checks for php 5.3 through another method such as
+	// `InvokePHPNativeSyntaxCheckPlugin` (see .phan/plugins/README.md).
 	'backward_compatibility_checks' => false,
 
 	// If true, check to make sure the return type declared
@@ -186,6 +198,9 @@ return [
 	// as variables (like `$class->$property` or
 	// `$class->$method()`) in ways that we're unable
 	// to make sense of.
+	//
+	// To more aggressively detect dead code,
+	// you may want to set `dead_code_detection_prefer_false_negative` to `false`.
 	'dead_code_detection' => false,
 
 	// Set to true in order to attempt to detect unused variables.
@@ -252,7 +267,7 @@ return [
 	'minimum_severity' => Issue::SEVERITY_LOW,
 
 	// Add any issue types (such as `'PhanUndeclaredMethod'`)
-	// to this black-list to inhibit them from being reported.
+	// to this list to inhibit them from being reported.
 	'suppress_issue_types' => [
 		// Phan has been a bit too strict regarding PHP 8.
 		// It should be okay for closures I think.
@@ -326,7 +341,7 @@ return [
 	//
 	// Plugins which are bundled with Phan can be added here by providing their name (e.g. `'AlwaysReturnPlugin'`)
 	//
-	// Documentation about available bundled plugins can be found [here](https://github.com/phan/phan/tree/master/.phan/plugins).
+	// Documentation about available bundled plugins can be found [here](https://github.com/phan/phan/tree/v5/.phan/plugins).
 	//
 	// Alternately, you can pass in the full path to a PHP file with the plugin's implementation (e.g. `'vendor/phan/phan/.phan/plugins/AlwaysReturnPlugin.php'`)
 	'plugins' => [

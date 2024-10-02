@@ -25,7 +25,7 @@ $app->registerExceptionHandler();
 $realmManager = $app->getRealmManager();
 
 $certificates = \array_unique( \array_map(
-	static function ( $r ) { return $r->getSigningCACertificate(); },
+	static fn ( $r ) => $r->getSigningCACertificate(),
 	$realmManager->getRealmsByServerName( \array_slice( $argv, 1 ) ),
 ) );
 echo \implode( '', $certificates );

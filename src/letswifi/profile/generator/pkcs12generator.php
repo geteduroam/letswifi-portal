@@ -24,7 +24,7 @@ class PKCS12Generator extends AbstractGenerator
 	{
 		$tlsAuthMethods = \array_filter(
 			$this->authenticationMethods,
-			static function ( Auth $a ): bool { return $a instanceof TlsAuth && null !== $a->getPKCS12(); },
+			static fn ( Auth $a ): bool => $a instanceof TlsAuth && null !== $a->getPKCS12(),
 		);
 		if ( 1 !== \count( $tlsAuthMethods ) ) {
 			throw new InvalidArgumentException( 'Expected 1 TLS auth method, got ' . \count( $tlsAuthMethods ) );

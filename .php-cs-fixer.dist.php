@@ -23,8 +23,8 @@ EOD
 		'@PSR2' => true,
 		'@Symfony' => true,
 		'@Symfony:risky' => true,
-		'@PHP73Migration' => true,
-		'@PHP71Migration:risky' => true,
+		'@PHP81Migration' => true,
+		'@PHP80Migration:risky' => true,
 		'align_multiline_comment' => [
 			'comment_type' => 'all_multiline',
 		],
@@ -36,12 +36,6 @@ EOD
 		'backtick_to_shell_exec' => true,
 		'blank_line_after_namespace' => true,
 		'blank_line_after_opening_tag' => false, /* declare strict types definition goes here */
-		'braces' => [ /* Does screw up the declare( strict_types=1 ); definition :'( */
-			'allow_single_line_closure' => true,
-			'position_after_anonymous_constructs' => 'same',
-			'position_after_control_structures' => 'same',
-			'position_after_functions_and_oop_constructs' => 'next',
-		],
 		'cast_spaces' => [
 			'space' => 'none',
 		],
@@ -51,7 +45,6 @@ EOD
 			'single_item_single_line' => false,
 			'single_line' => false,
 		],
-		'class_keyword_remove' => false,
 		'combine_consecutive_issets' => true,
 		'combine_consecutive_unsets' => true,
 		'combine_nested_dirname' => true,
@@ -60,10 +53,15 @@ EOD
 			'spacing' => 'one',
 		],
 		'constant_case' => ['case' => 'lower'], // constants such as true, false, null
+		'control_structure_braces' => true,
+		'control_structure_continuation_position' => true,
 		'date_time_immutable' => true,
 		'declare_strict_types' => true,
 		'dir_constant' => true,
 		'elseif' => true,
+		'empty_loop_body' => [
+			'style' => 'semicolon',
+		],
 		'encoding' => true,
 		'ereg_to_preg' => true,
 		'error_suppression' => [
@@ -74,11 +72,6 @@ EOD
 				'openssl_x509_fingerprint',
 				'openssl_x509_read',
 			]
-		],
-		'escape_implicit_backslashes' => [
-			'double_quoted' => true,
-			'heredoc_syntax' => true,
-			'single_quoted' => false,
 		],
 		'explicit_indirect_variable' => true,
 		'explicit_string_variable' => true,
@@ -97,7 +90,6 @@ EOD
 				'pi',
 			],
 		],
-		'function_typehint_space' => true,
 		'global_namespace_import' => [
 			'import_classes' => true,
 			'import_constants' => false,
@@ -136,7 +128,10 @@ EOD
 			'include' => ['@all'], /* default */
 			'scope' => 'all', /* default */
 		],
-		'new_with_braces' => true,
+		'new_with_parentheses' => [
+			'anonymous_class' => true,
+			'named_class' => true,
+		],
 		'no_alias_functions' => true,
 		'no_alternative_syntax' => true,
 		'no_blank_lines_after_phpdoc' => false, /* yes for functions, classes. no for file. Can't choose, so false for now */
@@ -157,11 +152,11 @@ EOD
 		'no_mixed_echo_print' => [
 			'use' => 'echo',
 		],
+		'no_multiple_statements_per_line' => true,
 		'no_php4_constructor' => true,
 		'no_short_bool_cast' => true,
 		'no_singleline_whitespace_before_semicolons' => true,
 		'no_spaces_after_function_name' => true,
-		'no_spaces_inside_parenthesis' => false, /* we can't force these using php_cs, but at least don't remove them */
 		'no_superfluous_elseif' => true,
 		'no_superfluous_phpdoc_tags' => false,
 		'no_trailing_whitespace' => true,
@@ -205,8 +200,8 @@ EOD
 			],
 		],
 		'ordered_imports' => [
-			'sort_algorithm' => 'alpha',
 			'case_sensitive' => true,
+			'sort_algorithm' => 'alpha',
 		],
 		'ordered_traits' => true,
 		'phpdoc_add_missing_param_annotation' => true,
@@ -247,9 +242,11 @@ EOD
 		'semicolon_after_instruction' => true,
 		'set_type_to_cast' => true,
 		'short_scalar_cast' => true,
+		'simple_to_complex_string_variable' => true,
 		'simplified_null_return' => true,
 		'single_blank_line_at_eof' => true,
 		'single_class_element_per_statement' => true,
+		'single_line_comment_spacing' => false,
 		'single_import_per_statement' => true,
 		'single_line_after_imports' => true,
 		'space_after_semicolon' => [
@@ -260,9 +257,15 @@ EOD
 		],
 		'standardize_increment' => true,
 		'standardize_not_equals' => true,
+		'statement_indentation' => true,
 		'static_lambda' => true,
 		'strict_comparison' => true,
 		'strict_param' => true,
+		'string_implicit_backslashes' => [
+			'double_quoted' => 'escape',
+			'heredoc' => 'escape',
+			'single_quoted' => 'escape',
+		],
 		'string_line_ending' => true,
 		'switch_case_semicolon_to_colon' => true,
 		'ternary_operator_spaces' => true,
@@ -273,6 +276,9 @@ EOD
 			'elements' => ['arrays', 'arguments'],
 		],
 		'trim_array_spaces' => true,
+		'type_declaration_spaces' => [
+			'elements' => ['function', 'property'],
+		],
 		'unary_operator_spaces' => true,
 		'visibility_required' => true,
 		'yoda_style' => ['equal' => true, 'identical' => true, 'less_and_greater' => true, 'always_move_variable' => true],

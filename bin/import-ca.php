@@ -28,15 +28,11 @@ $app->registerExceptionHandler();
 $realmManager = $app->getRealmManager();
 
 $stdin = \file_get_contents( 'php://stdin' );
-\preg_match_all( '/(^|\n)-----BEGIN( EC)? PRIVATE KEY-----\n.*?\n-----END\1 PRIVATE KEY-----($|\n)/sm', $stdin, $keys );
-\preg_match_all( '/(^|\n)-----BEGIN CERTIFICATE-----\n.*?\n-----END CERTIFICATE-----($|\n)/sm', $stdin, $certificates );
+\preg_match_all( '/(^|\\n)-----BEGIN( EC)? PRIVATE KEY-----\\n.*?\\n-----END\\1 PRIVATE KEY-----($|\\n)/sm', $stdin, $keys );
+\preg_match_all( '/(^|\\n)-----BEGIN CERTIFICATE-----\\n.*?\\n-----END CERTIFICATE-----($|\\n)/sm', $stdin, $certificates );
 
-$keys = \array_map( static function ( string $key ) {
-	return new PrivateKey( $key );
-}, $keys[0] );
-$certificates = \array_map( static function ( string $certificate ) {
-	return new X509( $certificate );
-}, $certificates[0] );
+$keys = \array_map( static fn ( string $key ) => new PrivateKey( $key ), $keys[0] );
+$certificates = \array_map( static fn ( string $certificate ) => new X509( $certificate ), $certificates[0] );
 
 for ( $i = \count( $certificates ) - 1; 0 <= $i; --$i ) {
 	$x509 = $certificates[$i];

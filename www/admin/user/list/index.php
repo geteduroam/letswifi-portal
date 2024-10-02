@@ -24,7 +24,5 @@ $users = \array_unique( $realmManager->listUsers( $realm->getName() ) );
 $app->render( [
 	'href' => "{$basePath}/admin/user/list/",
 	'jq' => '.users | map(.name)',
-	'users' => \array_map( static function ( $user ) {
-		return ['name' => $user, 'href' => '../get/?' . \http_build_query( ['user' => $user] )];
-	}, $users ),
+	'users' => \array_map( static fn ( $user ) => ['name' => $user, 'href' => '../get/?' . \http_build_query( ['user' => $user] )], $users ),
 ], 'admin-user-list', $basePath );
