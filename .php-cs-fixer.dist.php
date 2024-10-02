@@ -15,8 +15,8 @@ $config = (new PhpCsFixer\Config())
 			'header' => <<< 'EOD'
 This file is part of letswifi; a system for easy eduroam device enrollment
 
-Copyright: 2018-2022, Jørn Åne de Jong <jorn.dejong@letswifi.eu>
-Copyright: 2020-2022, Paul Dekkers, SURF <paul.dekkers@surf.nl>
+Copyright: Jørn Åne de Jong <jorn.dejong@letswifi.eu>
+Copyright: Paul Dekkers, SURF <paul.dekkers@surf.nl>
 SPDX-License-Identifier: BSD-3-Clause
 EOD
 		],
@@ -56,6 +56,7 @@ EOD
 		'control_structure_braces' => true,
 		'control_structure_continuation_position' => true,
 		'date_time_immutable' => true,
+		'declare_parentheses' => false, /* fix declare( strict_types=1 ); */
 		'declare_strict_types' => true,
 		'dir_constant' => true,
 		'elseif' => true,
