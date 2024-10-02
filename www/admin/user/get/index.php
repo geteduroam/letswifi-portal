@@ -17,6 +17,7 @@ $subject = $_POST['subject'] ?? $_GET['subject'] ?? null;
 $subject = \is_array( $subject ) ? null : $subject;
 if ( !\is_string( $user ) && !\is_string( $subject ) ) {
 	\header( 'Content-Type: text/plain', true, 400 );
+
 	exit( "400 Bad Request\r\n\r\nMissing GET parameter user or subject\r\n" );
 }
 
@@ -35,6 +36,7 @@ if ( $user ) {
 	$certificate = $realmManager->getCertificate( $realm->getName(), $subject );
 	if ( null === $certificate ) {
 		\header( 'Content-Type: text/plain', true, 404 );
+
 		exit( "404 Not Found\r\n\r\nNo certificate found with subject {$subject}\r\n" );
 	}
 	$user = $certificate['requester'];
@@ -43,6 +45,7 @@ if ( $user ) {
 	$queryVars = ['subject' => $subject];
 } else {
 	\assert( false, 'Neither user or subject provided, this should not be possible' );
+
 	exit;
 }
 

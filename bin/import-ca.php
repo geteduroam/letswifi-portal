@@ -11,13 +11,16 @@
 
 if ( \PHP_SAPI !== 'cli' ) {
 	\header( 'Content-Type: text/plain', true, 403 );
+
 	exit( "403 Forbidden\r\n\r\nThis script is intended to be run from the commandline only\r\n" );
 }
 if ( 1 !== \count( $argv ) ) {
 	// TODO make validity configurable
 	echo 'cat key.pem cert.pem ca.pem | ' . $argv[0] . "\n";
+
 	exit( 2 );
 }
+
 require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 1 ), 'src', '_autoload.php'] );
 
 use fyrkat\openssl\PrivateKey;
@@ -39,12 +42,14 @@ for ( $i = \count( $certificates ) - 1; 0 <= $i; --$i ) {
 	$sub = (string)$x509->getSubject();
 	if ( null !== $realmManager->getCA( $sub ) ) {
 		echo "Skipping {$sub} (already imported)\n";
+
 		continue;
 	}
 	$key = null;
 	foreach ( $keys as $candidateKey ) {
 		if ( $x509->checkPrivateKey( $candidateKey ) ) {
 			$key = $candidateKey;
+
 			break;
 		}
 	}
@@ -55,6 +60,7 @@ for ( $i = \count( $certificates ) - 1; 0 <= $i; --$i ) {
 	echo ":\n";
 	echo 'i: ' . $x509->getIssuerSubject() . "\n";
 	echo 's: ' . $sub . "\n";
+
 	try {
 		$realmManager->importCA( $x509, $key );
 	} catch ( Exception $e ) {

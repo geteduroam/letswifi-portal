@@ -427,6 +427,7 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 			case 'street': return 'urn:oid::2.5.4.9';
 			case 'pairwise-id': return 'urn:oasis:names:tc:SAML:attribute:pairwise-id';
 			case 'subject-id': return 'urn:oasis:names:tc:SAML:attribute:subject-id';
+
 			default: return $attr;
 		}
 	}

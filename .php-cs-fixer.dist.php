@@ -36,6 +36,27 @@ EOD
 		'backtick_to_shell_exec' => true,
 		'blank_line_after_namespace' => true,
 		'blank_line_after_opening_tag' => false, /* declare strict types definition goes here */
+		'blank_line_before_statement' => [
+				'statements' => [
+					'break',
+					'continue',
+					'declare',
+					'default',
+					'exit',
+					'goto',
+					'include',
+					'include_once',
+					'phpdoc',
+					'require',
+					'require_once',
+					'return',
+					'switch',
+					'throw',
+					'try',
+					'yield',
+					'yield_from',
+			],
+		],
 		'cast_spaces' => [
 			'space' => 'none',
 		],
@@ -45,6 +66,8 @@ EOD
 			'single_item_single_line' => false,
 			'single_line' => false,
 		],
+		'class_keyword_remove' => false,
+		'class_reference_name_casing' => true,
 		'combine_consecutive_issets' => true,
 		'combine_consecutive_unsets' => true,
 		'combine_nested_dirname' => true,
@@ -57,6 +80,7 @@ EOD
 		'control_structure_continuation_position' => true,
 		'date_time_immutable' => true,
 		'declare_parentheses' => false, /* fix declare( strict_types=1 ); */
+		'date_time_create_from_format_call' => true,
 		'declare_strict_types' => true,
 		'dir_constant' => true,
 		'elseif' => true,
@@ -160,16 +184,32 @@ EOD
 		'no_spaces_after_function_name' => true,
 		'no_superfluous_elseif' => true,
 		'no_superfluous_phpdoc_tags' => false,
+		'no_trailing_comma_in_singleline' => true,
 		'no_trailing_whitespace' => true,
 		'no_trailing_whitespace_in_comment' => true,
 		'no_trailing_whitespace_in_string' => true,
 		'no_unneeded_control_parentheses' => [
-			'statements' => ['break', 'clone', 'continue', 'echo_print', 'return', 'switch_case', 'yield'], /* default */
+			'statements' => [
+				'break',
+				'clone',
+				'continue',
+				'echo_print',
+				'negative_instanceof',
+				'others',
+				'return',
+				'switch_case',
+				'yield',
+				'yield_from',
+			], /* all */
 		],
 		'no_unneeded_final_method' => true,
 		'no_unreachable_default_argument_value' => true,
 		'no_unused_imports' => true,
+		'no_useless_concat_operator' => [
+			'juggle_simple_strings' => true,
+		],
 		'no_useless_else' => true,
+		'no_useless_nullsafe_operator' => true,
 		'no_useless_return' => true,
 		'no_useless_sprintf' => true,
 		'no_whitespace_before_comma_in_array' => [
@@ -250,6 +290,7 @@ EOD
 		'single_line_comment_spacing' => false,
 		'single_import_per_statement' => true,
 		'single_line_after_imports' => true,
+		'single_line_comment_spacing' => true,
 		'space_after_semicolon' => [
 			'remove_in_empty_for_expressions' => true,
 		],
@@ -274,15 +315,25 @@ EOD
 		'ternary_to_null_coalescing' => true,
 		'trailing_comma_in_multiline' => [
 			'after_heredoc' => true,
-			'elements' => ['arrays', 'arguments'],
+			'elements' => ['arrays', 'arguments', 'parameters', 'match'],
 		],
 		'trim_array_spaces' => true,
 		'type_declaration_spaces' => [
 			'elements' => ['function', 'property'],
 		],
+		'types_spaces' => [
+			'space' => 'single',
+			'space_multiple_catch' => 'single',
+		],
 		'unary_operator_spaces' => true,
 		'visibility_required' => true,
-		'yoda_style' => ['equal' => true, 'identical' => true, 'less_and_greater' => true, 'always_move_variable' => true],
+		'whitespace_after_comma_in_array' => true,
+		'yoda_style' => [
+			'equal' => true,
+			'identical' => true,
+			'less_and_greater' => true,
+			'always_move_variable' => true,
+		],
 	])
 	->setFinder($finder)
 ;

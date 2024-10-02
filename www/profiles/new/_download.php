@@ -10,6 +10,7 @@
 
 if ( !isset( $downloadKind ) || !isset( $href ) || !isset( $basePath ) ) {
 	\header( 'Content-Type: text/plain', true, 400 );
+
 	exit( "400 Bad Request\r\n\r\nInvalid request\r\n" );
 }
 \assert( \array_key_exists( 'REQUEST_METHOD', $_SERVER ) );
@@ -54,4 +55,5 @@ switch ( $_SERVER['REQUEST_METHOD'] ) {
 }
 
 \header( 'Content-Type: text/plain', true, 405 );
+
 exit( "405 Method Not Allowed\r\n" );

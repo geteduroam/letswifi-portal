@@ -69,6 +69,7 @@ if ( 'GET' === $_SERVER['REQUEST_METHOD'] && isset( $_GET['download'] ) ) {
 	// also remove the GET parameters that attempted this from the URL
 	if ( !isset( $overrideMethod ) && \array_key_exists( 'REQUEST_URI', $_SERVER ) ) {
 		\header( 'Location: ' . \strstr( $_SERVER['REQUEST_URI'], '?', true ) );
+
 		exit;
 	}
 }
@@ -100,16 +101,22 @@ switch ( $overrideMethod ?? $_SERVER['REQUEST_METHOD'] ) {
 		\assert( '' !== $passphrase );
 		if ( \is_array( $passphrase ) ) {
 			\header( 'Content-Type: text/plain', true, 400 );
+
 			exit( "400 Bad Request\r\n\r\nInvalid passphrase\r\n" );
 		}
+
 		switch ( $device = $overrideDevice ?? $_POST['device'] ?? '' ) {
 			case 'apple-mobileconfig': $generator = $realm->getConfigGenerator( letswifi\profile\generator\MobileConfigGenerator::class, $user, $passphrase );
+
 				break;
 			case 'eap-config': $generator = $realm->getConfigGenerator( letswifi\profile\generator\EapConfigGenerator::class, $user, $passphrase );
+
 				break;
 			case 'pkcs12': $generator = $realm->getConfigGenerator( letswifi\profile\generator\PKCS12Generator::class, $user, $passphrase );
+
 				break;
 			case 'google-onc': $generator = $realm->getConfigGenerator( letswifi\profile\generator\ONCGenerator::class, $user, $passphrase );
+
 				break;
 
 			default:
@@ -117,13 +124,17 @@ switch ( $overrideMethod ?? $_SERVER['REQUEST_METHOD'] ) {
 				$deviceStr = \is_string( $device )
 					? ": {$device}"
 					: '';
+
 				exit( "400 Bad Request\r\n\r\nUnknown device{$deviceStr}\r\n" );
 		}
 		$payload = $generator->generate();
 		\header( 'Content-Disposition: attachment; filename="' . $generator->getFilename() . '"' );
 		\header( 'Content-Type: ' . $generator->getContentType() );
+
 		exit( $payload );
+
 	default:
 		\header( 'Content-Type: text/plain', true, 405 );
+
 		exit( "405 Method Not Allowed\r\n" );
 }

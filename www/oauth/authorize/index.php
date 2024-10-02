@@ -27,6 +27,7 @@ $oauth->assertAuthorizeRequest();
 $browserAuth = $app->getBrowserAuthenticator( $realm );
 
 $user = $app->getUserFromBrowserSession( $realm );
+
 try {
 	if ( 'POST' === $_SERVER['REQUEST_METHOD'] ) {
 		$oauth->handleAuthorizePostRequest( new fyrkat\oauth\token\Grant(
@@ -38,6 +39,7 @@ try {
 
 		// handler should never return, this code should be unreachable
 		\header( 'Content-Type: text/plain' );
+
 		exit( "500 Internal Server Error\r\n\r\nServer error: OAuth POST request was not handled\r\n" );
 	}
 
@@ -51,5 +53,6 @@ try {
 } catch ( letswifi\browserauth\MismatchIdpException $e ) {
 	\header( 'Content-Type: text/plain' );
 	\printf( "403 Forbidden\r\n\r\nRealm %s is not valid for user %s", $realm->getName(), $user->getUserID() );
+
 	exit;
 }

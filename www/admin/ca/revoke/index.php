@@ -19,6 +19,7 @@ $app->requireAdmin( 'admin-ca-revoke' );
 
 if ( 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
 	\header( 'Content-Type: text/plain', true, 405 );
+
 	exit( "405 Method Not Allowed\r\n\r\nOnly POST is allowed for this resource\r\n" );
 }
 

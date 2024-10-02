@@ -91,6 +91,7 @@ class ONCGenerator extends AbstractGenerator
 			$unencryptedONC,
 			\JSON_UNESCAPED_SLASHES | \JSON_THROW_ON_ERROR,
 		);
+
 		/** @psalm-suppress RedundantConditionGivenDocblockType phan is not so sure about json_encode not returning false */
 		\assert( \is_string( $clearText ), 'json_encode can only generate string when JSON_THROW_ON_ERROR is set' );
 
@@ -131,6 +132,7 @@ class ONCGenerator extends AbstractGenerator
 			throw new InvalidArgumentException( 'Expected 1 TLS auth method, got ' . \count( $tlsAuthMethods ) );
 		}
 		$tlsAuthMethod = \reset( $tlsAuthMethods );
+
 		/** @psalm-suppress RedundantCondition */
 		\assert( $tlsAuthMethod instanceof TlsAuth );
 
@@ -169,7 +171,7 @@ class ONCGenerator extends AbstractGenerator
 	 */
 	protected static function generateNetworkConfiguration( Network $network, string $clientCertID, string $clientCertCN, array $caIDs, string $serverSubjectMatch ): ?array
 	{
-		if ( !( $network instanceof SSIDNetwork ) ) {
+		if ( !$network instanceof SSIDNetwork ) {
 			return null;
 		}
 
@@ -266,6 +268,7 @@ class ONCGenerator extends AbstractGenerator
 			}
 			if ( false === $pos ) {
 				$longest = '';
+
 				break;
 			}
 			if ( \str_ends_with( $longest, \substr( $candidate, $pos ) ) ) {

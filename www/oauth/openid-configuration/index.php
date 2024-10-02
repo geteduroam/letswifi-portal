@@ -26,4 +26,5 @@ $openIDConfiguration = [
 ];
 
 \header( 'Content-Type: application/json' );
+
 exit( \json_encode( $openIDConfiguration, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_THROW_ON_ERROR ) . \PHP_EOL );

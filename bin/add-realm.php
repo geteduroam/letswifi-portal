@@ -11,13 +11,16 @@
 
 if ( \PHP_SAPI !== 'cli' ) {
 	\header( 'Content-Type: text/plain', true, 403 );
+
 	exit( "403 Forbidden\r\n\r\nThis script is intended to be run from the commandline only\r\n" );
 }
 if ( 3 !== \count( $argv ) && 4 !== \count( $argv ) ) {
 	// TODO make validity configurable
 	echo $argv[0] . " realm client_cert_validity_days [common_name]\n";
+
 	exit( 2 );
 }
+
 require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 1 ), 'src', '_autoload.php'] );
 
 use fyrkat\openssl\CSR;

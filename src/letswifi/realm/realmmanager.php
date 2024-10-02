@@ -309,6 +309,7 @@ class RealmManager extends DatabaseStorage
 		if ( 0 < $lastId && (string)$lastId === $last ) {
 			return $lastId;
 		}
+
 		throw new DomainException( 'Unable to retrieve last insert ID from database' );
 	}
 

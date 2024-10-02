@@ -40,6 +40,7 @@ class SimpleSAMLFeideAuth extends SimpleSAMLAuth
 				$loginUrl .= '&saml%3Aidp=' . \urlencode( $this->samlIdp );
 			}
 			\header( 'Location: https://' . $this->feideHostname . '/simplesaml/module.php/feide/preselectOrg.php?' . \http_build_query( ['HomeOrg' => $this->allowedHomeOrg, 'ReturnTo' => $loginUrl] ) );
+
 			exit;
 		}
 

@@ -125,11 +125,15 @@ class DatabaseStorage
 			}
 			$query .= $first ? ' WHERE ' : ' AND ';
 			$first = false;
+
 			switch ( $key ) {
 				case 'issued': $query .= '`issued` < :issued';
+
 					break;
 				case 'expires': $query .= '(`expires` > :expires OR `expires` IS NULL)';
+
 					break;
+
 				default: $query .= \is_array( $value )
 					? "`{$key}` IN (:" . $key . \implode( ",:{$key}", \array_keys( $value ) ) . ')'
 					: "`{$key}` = :{$key}";

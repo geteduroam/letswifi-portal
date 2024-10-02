@@ -31,6 +31,7 @@ class BasicAuth implements BrowserAuthInterface
 			}
 		}
 		\header( 'WWW-Authenticate: Basic realm="letswifi-ca"', true, 401 );
+
 		exit( "401 Unauthorized\r\n" );
 	}
 

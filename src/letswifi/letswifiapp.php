@@ -124,10 +124,12 @@ class LetsWifiApp
 
 		if ( null === $user ) {
 			\header( 'Content-Type: text/plain', true, 403 );
+
 			exit( "403 Forbidden\r\n\r\nUnauthenticated\r\n" );
 		}
 		if ( !$this->isAdmin( $user ) ) {
 			\header( 'Content-Type: text/plain', true, 403 );
+
 			exit( "403 Forbidden\r\n\r\nNo admin access for {$user}\r\n" );
 		}
 	}
@@ -149,6 +151,7 @@ class LetsWifiApp
 		if ( $result instanceof BrowserAuthInterface ) {
 			return $result;
 		}
+
 		throw new DomainException( 'auth.service must point to a class that implements BrowserAuthInterface' );
 	}
 
@@ -265,6 +268,7 @@ class LetsWifiApp
 			\header( 'Content-Type: text/plain', true, $code );
 		}
 		echo "{$code} {$codeExplain}\r\n\r\n{$message}\r\n";
+
 		exit( 1 );
 	}
 
@@ -272,9 +276,11 @@ class LetsWifiApp
 	{
 		if ( null === $template || \array_key_exists( 'json', $_GET ) || !$this->isBrowser() ) {
 			\header( 'Content-Type: application/json' );
+
 			exit( \json_encode( $data, \JSON_UNESCAPED_SLASHES ) . "\r\n" );
 		}
 		$template = $this->getTwig()->load( "{$template}.html" );
+
 		exit( $template->render( ['_basePath' => $basePath] + $data ) );
 	}
 
@@ -320,6 +326,7 @@ class LetsWifiApp
 	{
 		switch ( $this->config->getStringOrNull( 'realm.selector' ) ) {
 			case 'httphost': return $this->getCurrentRealmNameFromHttpHost();
+
 			default: return $this->config->getString( 'realm.default' );
 		}
 	}

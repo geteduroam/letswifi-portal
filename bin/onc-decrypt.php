@@ -11,6 +11,7 @@
 
 if ( 2 !== $argc ) {
 	\printf( "Usage: %s pin <input.onc >output.onc\n", $argv[0] );
+
 	exit( 1 );
 }
 
@@ -26,15 +27,18 @@ $hmac = \hash_hmac( 'sha1', \base64_decode( $parsed['Ciphertext'], true ), $encr
 
 if ( 'SHA1' !== $parsed['HMACMethod'] ) {
 	echo "Invalid HMAC algo\n";
+
 	exit( 2 );
 }
 if ( \base64_decode( $parsed['HMAC'], true ) !== $hmac ) {
 	echo "Invalid HMAC\n";
+
 	exit( 2 );
 }
 
 if ( false === $data ) {
 	echo "Decrypt failed\n";
+
 	exit( 2 );
 }
 

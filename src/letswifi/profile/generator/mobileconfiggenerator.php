@@ -26,6 +26,7 @@ class MobileConfigGenerator extends AbstractGenerator
 	{
 		$uuid = static::uuidgen();
 		$identifier = \implode( '.', \array_reverse( \explode( '.', $this->profileData->getRealm() ) ) );
+
 		/** @var array<TlsAuth> */
 		$caCertificates = [];
 		$tlsAuthMethods = \array_filter(
@@ -59,84 +60,85 @@ class MobileConfigGenerator extends AbstractGenerator
 		$result = '<?xml version="1.0" encoding="UTF-8"?>'
 			. "\n" . '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">'
 			. "\n" . '<plist version="1.0">'
-			. "\n" . '<dict>'
-			. "\n" . '	<key>PayloadDisplayName</key>'
-			. "\n" . '	<string>' . static::e( $this->profileData->getDisplayName() ) . '</string>'
-			. "\n" . '	<key>PayloadIdentifier</key>'
-			. "\n" . '	<string>' . static::e( $identifier ) . '</string>'
-			. "\n" . '	<key>PayloadUUID</key>'
-			. "\n" . '	<string>' . static::e( $uuid ) . '</string>'
-			. "\n" . '	<key>PayloadRemovalDisallowed</key>'
-			. "\n" . '	<false/>'
-			. "\n" . '	<key>PayloadType</key>'
-			. "\n" . '	<string>Configuration</string>'
-			. "\n" . '	<key>PayloadVersion</key>'
-			. "\n" . '	<integer>1</integer>'
+			. "\n<dict>"
+			. "\n	<key>PayloadDisplayName</key>"
+			. "\n	<string>" . static::e( $this->profileData->getDisplayName() ) . '</string>'
+			. "\n	<key>PayloadIdentifier</key>"
+			. "\n	<string>" . static::e( $identifier ) . '</string>'
+			. "\n	<key>PayloadUUID</key>"
+			. "\n	<string>" . static::e( $uuid ) . '</string>'
+			. "\n	<key>PayloadRemovalDisallowed</key>"
+			. "\n	<false/>"
+			. "\n	<key>PayloadType</key>"
+			. "\n	<string>Configuration</string>"
+			. "\n	<key>PayloadVersion</key>"
+			. "\n	<integer>1</integer>"
 			. "\n";
 		if ( null !== $description = $this->profileData->getDescription() ) {
 			$result .= '	<key>PayloadDescription</key>'
-				. "\n" . '	<string>' . static::e( $description ) . '</string>'
+				. "\n	<string>" . static::e( $description ) . '</string>'
 				. "\n";
 		}
 		if ( null !== $expiry = $this->getExpiry() ) {
 			$result .= '	<key>RemovalDate</key>'
-					. "\n" . '	<date>' . static::e( \gmdate( 'Y-m-d\\TH:i:s\\Z', $expiry->getTimestamp() ) ) . '</date>'
+					. "\n	<date>" . static::e( \gmdate( 'Y-m-d\\TH:i:s\\Z', $expiry->getTimestamp() ) ) . '</date>'
 					. "\n";
 		}
 		$result .= '	<key>PayloadContent</key>'
-			. "\n" . '	<array>'
-			. "\n" . '		<dict>'
+			. "\n	<array>"
+			. "\n		<dict>"
 			. "\n";
 		if ( !$this->passphrase ) {
 			$result .= '			<key>Password</key>'
-				. "\n" . '			<string>' . static::e( $defaultPassphrase ) . '</string>'
+				. "\n			<string>" . static::e( $defaultPassphrase ) . '</string>'
 				. "\n";
 		}
 		$result .= '			<key>PayloadUUID</key>'
-			. "\n" . '			<string>' . static::e( $tlsAuthMethodUuid ) . '</string>'
-			. "\n" . '			<key>PayloadIdentifier</key>'
-			. "\n" . '			<string>' . static::e( $identifier . '.' . $tlsAuthMethodUuid ) . '</string>'
-			. "\n" . '			<key>PayloadCertificateFileName</key>'
-			. "\n" . '			<string>' . static::e( $pkcs12->x509->getSubject()->getCommonName() ) . '.p12</string>'
-			. "\n" . '			<key>PayloadDisplayName</key>'
-			. "\n" . '			<string>' . static::e( $pkcs12->x509->getSubject()->getCommonName() ) . '</string>'
-			. "\n" . '			<key>PayloadContent</key>'
-			. "\n" . '			<data>'
-			. "\n" . '				' . static::e( static::columnFormat( \base64_encode( $pkcs12->getPKCS12Bytes( $this->passphrase ?: $defaultPassphrase ) ), 52, 4 ) )
-			. "\n" . '			</data>'
-			. "\n" . '			<key>PayloadType</key>'
-			. "\n" . '			<string>com.apple.security.pkcs12</string>'
-			. "\n" . '			<key>PayloadVersion</key>'
-			. "\n" . '			<integer>1</integer>'
-			. "\n" . '		</dict>'
+			. "\n			<string>" . static::e( $tlsAuthMethodUuid ) . '</string>'
+			. "\n			<key>PayloadIdentifier</key>"
+			. "\n			<string>" . static::e( $identifier . '.' . $tlsAuthMethodUuid ) . '</string>'
+			. "\n			<key>PayloadCertificateFileName</key>"
+			. "\n			<string>" . static::e( $pkcs12->x509->getSubject()->getCommonName() ) . '.p12</string>'
+			. "\n			<key>PayloadDisplayName</key>"
+			. "\n			<string>" . static::e( $pkcs12->x509->getSubject()->getCommonName() ) . '</string>'
+			. "\n			<key>PayloadContent</key>"
+			. "\n			<data>"
+			. "\n				" . static::e( static::columnFormat( \base64_encode( $pkcs12->getPKCS12Bytes( $this->passphrase ?: $defaultPassphrase ) ), 52, 4 ) )
+			. "\n			</data>"
+			. "\n			<key>PayloadType</key>"
+			. "\n			<string>com.apple.security.pkcs12</string>"
+			. "\n			<key>PayloadVersion</key>"
+			. "\n			<integer>1</integer>"
+			. "\n		</dict>"
 			. "\n";
 
 		$uuids = \array_map(
 			static fn ( $_ ) => static::uuidgen(),
 			\array_fill( 0, \count( $caCertificates ), null ),
 		);
+
 		/** @var array<string,\fyrkat\openssl\X509> */
 		$caCertificates = \array_combine( $uuids, $caCertificates );
 		foreach ( $caCertificates as $uuid => $ca ) {
 			$result .= ''
-				. "\n" . '		<dict>'
-				. "\n" . '			<key>PayloadCertificateFileName</key>'
-				. "\n" . '			<string>' . static::e( $ca->getSubject()->getCommonName() ) . '.cer</string>'
-				. "\n" . '			<key>PayloadContent</key>'
-				. "\n" . '			<data>'
-				. "\n" . '				' . static::e( static::columnFormat( \base64_encode( $ca->getX509Der() ), 52, 4 ) )
-				. "\n" . '			</data>'
-				. "\n" . '			<key>PayloadDisplayName</key>'
-				. "\n" . '			<string>' . static::e( $ca->getSubject()->getCommonName() ) . '</string>'
-				. "\n" . '			<key>PayloadIdentifier</key>'
-				. "\n" . '			<string>' . static::e( $identifier . '.' . $uuid ) . '</string>'
-				. "\n" . '			<key>PayloadType</key>'
-				. "\n" . '			<string>com.apple.security.root</string>'
-				. "\n" . '			<key>PayloadUUID</key>'
-				. "\n" . '			<string>' . static::e( $uuid ) . '</string>'
-				. "\n" . '			<key>PayloadVersion</key>'
-				. "\n" . '			<integer>1</integer>'
-				. "\n" . '		</dict>'
+				. "\n		<dict>"
+				. "\n			<key>PayloadCertificateFileName</key>"
+				. "\n			<string>" . static::e( $ca->getSubject()->getCommonName() ) . '.cer</string>'
+				. "\n			<key>PayloadContent</key>"
+				. "\n			<data>"
+				. "\n				" . static::e( static::columnFormat( \base64_encode( $ca->getX509Der() ), 52, 4 ) )
+				. "\n			</data>"
+				. "\n			<key>PayloadDisplayName</key>"
+				. "\n			<string>" . static::e( $ca->getSubject()->getCommonName() ) . '</string>'
+				. "\n			<key>PayloadIdentifier</key>"
+				. "\n			<string>" . static::e( $identifier . '.' . $uuid ) . '</string>'
+				. "\n			<key>PayloadType</key>"
+				. "\n			<string>com.apple.security.root</string>"
+				. "\n			<key>PayloadUUID</key>"
+				. "\n			<string>" . static::e( $uuid ) . '</string>'
+				. "\n			<key>PayloadVersion</key>"
+				. "\n			<integer>1</integer>"
+				. "\n		</dict>"
 				. "\n";
 		}
 		$payloadNetworkCount = 0;
@@ -144,35 +146,36 @@ class MobileConfigGenerator extends AbstractGenerator
 			if ( $network instanceof SSIDNetwork || $network instanceof HS20Network ) {
 				// TODO assumes TLSAuth, it's the only option currently
 				$result .= '		<dict>'
-					. "\n" . '			<key>AutoJoin</key>'
-					. "\n" . '			<true/>'
-					. "\n" . '			<key>EAPClientConfiguration</key>'
-					. "\n" . '			<dict>'
-					. "\n" . '				<key>AcceptEAPTypes</key>'
-					. "\n" . '				<array>'
-					. "\n" . '					<integer>13</integer>'
-					. "\n" . '				</array>'
-					. "\n" . '				<key>EAPFASTProvisionPAC</key>'
-					. "\n" . '				<false/>'
-					. "\n" . '				<key>EAPFASTProvisionPACAnonymously</key>'
-					. "\n" . '				<false/>'
-					. "\n" . '				<key>EAPFASTUsePAC</key>'
-					. "\n" . '				<false/>'
-					. "\n" . '				<key>PayloadCertificateAnchorUUID</key>'
-					. "\n" . '				<array>'
+					. "\n			<key>AutoJoin</key>"
+					. "\n			<true/>"
+					. "\n			<key>EAPClientConfiguration</key>"
+					. "\n			<dict>"
+					. "\n				<key>AcceptEAPTypes</key>"
+					. "\n				<array>"
+					. "\n					<integer>13</integer>"
+					. "\n				</array>"
+					. "\n				<key>EAPFASTProvisionPAC</key>"
+					. "\n				<false/>"
+					. "\n				<key>EAPFASTProvisionPACAnonymously</key>"
+					. "\n				<false/>"
+					. "\n				<key>EAPFASTUsePAC</key>"
+					. "\n				<false/>"
+					. "\n				<key>PayloadCertificateAnchorUUID</key>"
+					. "\n				<array>"
 					. "\n";
 				foreach ( $caCertificates as $uuid => $_ ) {
 					$result .= '					<string>' . static::e( $uuid ) . '</string>'
 						. "\n";
 				}
 				$result .= '				</array>'
-					. "\n" . '				<key>TLSTrustedServerNames</key>'
-					. "\n" . '				<array>'
+					. "\n				<key>TLSTrustedServerNames</key>"
+					. "\n				<array>"
 					. "\n";
 				foreach ( $tlsAuthMethod->getServerNames() as $serverName ) {
 					$result .= '					<string>' . static::e( $serverName ) . '</string>'
 						. "\n";
 				}
+
 				/**
 				 *@psalm-suppress RedundantCondition
 				 * We know $network is one of SSIDNetwork or HS20Network,
@@ -186,48 +189,48 @@ class MobileConfigGenerator extends AbstractGenerator
 					throw new InvalidArgumentException( 'Only SSID or Hotspot 2.0 networks are supported, got ' . $network::class );
 				}
 				$result .= '				</array>'
-					. "\n" . '			</dict>'
-					. "\n" . '			<key>EncryptionType</key>'
-					. "\n" . '			<string>WPA</string>'
-					. "\n" . '			<key>HIDDEN_NETWORK</key>'
-					. "\n" . '			<false/>'
-					. "\n" . '			<key>PayloadCertificateUUID</key>'
-					. "\n" . '			<string>' . static::e( $tlsAuthMethodUuid ) . '</string>'
-					. "\n" . '			<key>PayloadDisplayName</key>'
-					. "\n" . '			<string>Wi-Fi (' . static::e( $payloadDisplayName ) . ')</string>'
-					. "\n" . '			<key>PayloadIdentifier</key>'
-					. "\n" . '			<string>' . static::e( $identifier ) . '.wifi.' . $payloadNetworkCount . '</string>'
-					. "\n" . '			<key>PayloadType</key>'
-					. "\n" . '			<string>com.apple.wifi.managed</string>'
-					. "\n" . '			<key>PayloadUUID</key>'
-					. "\n" . '			<string>' . static::uuidgen() . '</string>'
-					. "\n" . '			<key>PayloadVersion</key>'
-					. "\n" . '			<integer>1</integer>'
-					. "\n" . '			<key>ProxyType</key>'
-					. "\n" . '			<string>None</string>'
+					. "\n			</dict>"
+					. "\n			<key>EncryptionType</key>"
+					. "\n			<string>WPA</string>"
+					. "\n			<key>HIDDEN_NETWORK</key>"
+					. "\n			<false/>"
+					. "\n			<key>PayloadCertificateUUID</key>"
+					. "\n			<string>" . static::e( $tlsAuthMethodUuid ) . '</string>'
+					. "\n			<key>PayloadDisplayName</key>"
+					. "\n			<string>Wi-Fi (" . static::e( $payloadDisplayName ) . ')</string>'
+					. "\n			<key>PayloadIdentifier</key>"
+					. "\n			<string>" . static::e( $identifier ) . '.wifi.' . $payloadNetworkCount . '</string>'
+					. "\n			<key>PayloadType</key>"
+					. "\n			<string>com.apple.wifi.managed</string>"
+					. "\n			<key>PayloadUUID</key>"
+					. "\n			<string>" . static::uuidgen() . '</string>'
+					. "\n			<key>PayloadVersion</key>"
+					. "\n			<integer>1</integer>"
+					. "\n			<key>ProxyType</key>"
+					. "\n			<string>None</string>"
 					. "\n";
 			}
 			if ( $network instanceof SSIDNetwork ) {
 				$result .= '			<key>SSID_STR</key>'
-					. "\n" . '			<string>' . static::e( $network->getSSID() ) . '</string>'
-					. "\n" . '		</dict>'
+					. "\n			<string>" . static::e( $network->getSSID() ) . '</string>'
+					. "\n		</dict>"
 					. "\n";
 			} elseif ( $network instanceof HS20Network ) {
 				$result .= '			<key>IsHotspot</key>'
-					. "\n" . '			<true/>'
-					. "\n" . '			<key>ServiceProviderRoamingEnabled</key>'
-					. "\n" . '			<true/>'
-					. "\n" . '			<key>DisplayedOperatorName</key>'
-					. "\n" . '			<string>' . static::e( $this->profileData->getRealm() ) . ' via Passpoint</string>'
-					. "\n" . '			<key>DomainName</key>'
-					. "\n" . '			<string>' . static::e( $this->profileData->getRealm() ) . '</string>'
-					. "\n" . '			<key>RoamingConsortiumOIs</key>'
-					. "\n" . '			<array>'
-					. "\n" . '				<string>' . \strtoupper( static::e( $network->getConsortiumOID() ) ) . '</string>'
-					. "\n" . '			</array>'
-					. "\n" . '			<key>_UsingHotspot20</key>'
-					. "\n" . '			<true/>'
-					. "\n" . '		</dict>'
+					. "\n			<true/>"
+					. "\n			<key>ServiceProviderRoamingEnabled</key>"
+					. "\n			<true/>"
+					. "\n			<key>DisplayedOperatorName</key>"
+					. "\n			<string>" . static::e( $this->profileData->getRealm() ) . ' via Passpoint</string>'
+					. "\n			<key>DomainName</key>"
+					. "\n			<string>" . static::e( $this->profileData->getRealm() ) . '</string>'
+					. "\n			<key>RoamingConsortiumOIs</key>"
+					. "\n			<array>"
+					. "\n				<string>" . \strtoupper( static::e( $network->getConsortiumOID() ) ) . '</string>'
+					. "\n			</array>"
+					. "\n			<key>_UsingHotspot20</key>"
+					. "\n			<true/>"
+					. "\n		</dict>"
 					. "\n";
 			} else {
 				throw new InvalidArgumentException( 'Only SSID or Hotspot 2.0 networks are supported, got ' . $network::class );
@@ -235,8 +238,8 @@ class MobileConfigGenerator extends AbstractGenerator
 			++$payloadNetworkCount;
 		}
 		$result .= '	</array>'
-			. "\n" . '</dict>'
-			. "\n" . '</plist>'
+			. "\n</dict>"
+			. "\n</plist>"
 			. "\n";
 
 		$app = new LetsWifiApp();

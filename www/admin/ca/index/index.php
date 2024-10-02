@@ -19,6 +19,7 @@ if ( \PHP_SAPI === 'cli' ) {
 	$caName = $argv[2];
 	if ( !$caName ) {
 		echo "Usage: {$argv[0]} realm ca-name\n";
+
 		exit( 1 );
 	}
 } else {
@@ -27,6 +28,7 @@ if ( \PHP_SAPI === 'cli' ) {
 
 	if ( 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
 		\header( 'Content-Type: text/plain', true, 405 );
+
 		exit( "405 Method Not Allowed\r\n\r\nOnly POST is allowed for this resource\r\n" );
 	}
 
@@ -40,6 +42,7 @@ if ( \PHP_SAPI === 'cli' ) {
 
 if ( !\is_string( $caName ) ) {
 	\header( 'Content-Type: text/plain', true, 400 );
+
 	exit( "400 Bad Request\r\n\r\nExpected POST parameter \"ca\"\r\n" );
 }
 
