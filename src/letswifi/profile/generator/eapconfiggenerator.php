@@ -10,13 +10,10 @@
 
 namespace letswifi\profile\generator;
 
-use DateTimeImmutable;
 use DateTimeInterface;
-use DateTimeZone;
 use InvalidArgumentException;
 use letswifi\profile\Helpdesk;
 use letswifi\profile\Location;
-use letswifi\profile\auth\AbstractAuth;
 use letswifi\profile\auth\Auth;
 use letswifi\profile\network\HS20Network;
 use letswifi\profile\network\Network;
@@ -34,11 +31,8 @@ class EapConfigGenerator extends AbstractGenerator
 			. "\r\n" . '<EAPIdentityProviderList xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="eap-metadata.xsd">'
 			. "\r\n\t" . '<EAPIdentityProvider ID="' . static::e( $this->profileData->getRealm() ) . '" namespace="urn:RFC4282:realm" lang="' . static::e( $this->profileData->getLanguageCode() ) . '" version="1">';
 		if ( null !== $expiry = $this->getExpiry() ) {
-			$expiry = new DateTimeImmutable( '@' . $expiry->getTimestamp(), new DateTimeZone( 'UTC' ) );
-			$expiryString = $expiry->format( 'Y-m-d\\TH:i:s\\Z' );
-
 			$result .= ''
-				. "\r\n\t\t" . '<ValidUntil>' . static::e( $expiryString ) . '</ValidUntil>';
+				. "\r\n\t\t" . '<ValidUntil>' . static::e( \gmdate( 'Y-m-d\\TH:i:s\\Z', $expiry->getTimestamp() ) ) . '</ValidUntil>';
 		}
 		$result .= ''
 			. "\r\n\t\t" . '<AuthenticationMethods>';
@@ -175,7 +169,7 @@ class EapConfigGenerator extends AbstractGenerator
 			. "\r\n\t\t\t\t" . '<ServerSideCredential>';
 		foreach ( $authenticationMethod->getServerCACertificates() as $ca ) {
 			$result .= ''
-				. "\r\n\t\t\t\t\t" . '<CA format="X.509" encoding="base64">' . AbstractAuth::pemToBase64Der( $ca->getX509Pem() ) . '</CA>';
+				. "\r\n\t\t\t\t\t" . '<CA format="X.509" encoding="base64">' . \base64_encode( $ca->getX509Der() ) . '</CA>';
 		}
 		foreach ( $authenticationMethod->getServerNames() as $serverName ) {
 			$result .= ''

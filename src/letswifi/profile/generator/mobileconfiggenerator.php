@@ -10,12 +10,9 @@
 
 namespace letswifi\profile\generator;
 
-use DateTimeImmutable;
-use DateTimeZone;
 use InvalidArgumentException;
 use fyrkat\openssl\PKCS12;
 use letswifi\LetsWifiApp;
-use letswifi\profile\auth\AbstractAuth;
 use letswifi\profile\auth\TlsAuth;
 use letswifi\profile\network\HS20Network;
 use letswifi\profile\network\SSIDNetwork;
@@ -82,10 +79,8 @@ class MobileConfigGenerator extends AbstractGenerator
 				. "\n";
 		}
 		if ( null !== $expiry = $this->getExpiry() ) {
-			$expiry = new DateTimeImmutable( '@' . $expiry->getTimestamp(), new DateTimeZone( 'UTC' ) );
-			$expiryString = $expiry->format( 'Y-m-d\\TH:i:s\\Z' );
 			$result .= '	<key>RemovalDate</key>'
-					. "\n" . '	<date>' . static::e( $expiryString ) . '</date>'
+					. "\n" . '	<date>' . static::e( \gmdate( 'Y-m-d\\TH:i:s\\Z', $expiry->getTimestamp() ) ) . '</date>'
 					. "\n";
 		}
 		$result .= '	<key>PayloadContent</key>'
@@ -129,7 +124,7 @@ class MobileConfigGenerator extends AbstractGenerator
 				. "\n" . '			<string>' . static::e( $ca->getSubject()->getCommonName() ) . '.cer</string>'
 				. "\n" . '			<key>PayloadContent</key>'
 				. "\n" . '			<data>'
-				. "\n" . '				' . static::e( static::columnFormat( AbstractAuth::pemToBase64Der( $ca->getX509Pem() ), 52, 4 ) )
+				. "\n" . '				' . static::e( static::columnFormat( \base64_encode( $ca->getX509Der() ), 52, 4 ) )
 				. "\n" . '			</data>'
 				. "\n" . '			<key>PayloadDisplayName</key>'
 				. "\n" . '			<string>' . static::e( $ca->getSubject()->getCommonName() ) . '</string>'
