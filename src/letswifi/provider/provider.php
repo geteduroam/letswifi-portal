@@ -141,12 +141,34 @@ class Provider implements JsonSerializable
 		return $this->constructUser( $this->auth->requireAuth() );
 	}
 
+	/**
+	 * @return array<string,Realm>
+	 */
+	public function getRealmsForUser( array $affiliations ): array
+	{
+		// TODO: Move this part to its own class, this is too tight a coupling
+		$result = [];
+		foreach ( $this->realmMap as $affiliation => $realms ) {
+			if ( '*' === $affiliation || \in_array( $affiliation, $affiliations, true ) ) {
+				if ( empty( $realms ) ) {
+					// Stop evaluating more affiliations
+					break;
+				}
+				foreach ( $realms as $realm ) {
+					$result[$realm] = $this->tenantConfig->getRealm( $realm );
+				}
+			}
+		}
+
+		return $result;
+	}
+
 	private function constructUser( string $userId ): User
 	{
 		return new User(
-			tenantConfig: $this->tenantConfig,
 			provider: $this,
 			userId: $userId,
+			realms: $this->getRealmsForUser( $this->auth->getAffiliations() ),
 			affiliations: $this->auth->getAffiliations(),
 			clientId: null,
 			ip: $_SERVER['REMOTE_ADDR'] ?? null,

@@ -14,10 +14,14 @@ use DomainException;
 
 class User
 {
+	/**
+	 * @param array<string,Realm> $realms
+	 * @param array<string>       $affiliations
+	 */
 	public function __construct(
-		private readonly TenantConfig $tenantConfig,
 		private readonly Provider $provider,
 		public readonly string $userId,
+		public readonly array $realms,
 		public readonly array $affiliations,
 		public readonly ?string $clientId = null,
 		public readonly ?string $ip = null,
@@ -25,23 +29,10 @@ class User
 	) {
 	}
 
-	/** @return array<Realm>*/
+	/** @return array<string,Realm>*/
 	public function getRealms(): array
 	{
-		$result = [];
-		foreach ( $this->provider->realmMap as $affiliation => $realms ) {
-			if ( '*' === $affiliation || \in_array( $affiliation, $this->affiliations, true ) ) {
-				if ( empty( $realms ) ) {
-					// Stop evaluating more affiliations
-					break;
-				}
-				foreach ( $realms as $realm ) {
-					$result[] = $this->tenantConfig->getRealm( $realm );
-				}
-			}
-		}
-
-		return $result;
+		return $this->realms;
 	}
 
 	public function hasAffiliation( string $affiliation ): bool
@@ -67,7 +58,7 @@ class User
 		foreach ( $this->provider->realmMap as $affiliation => $realms ) {
 			foreach ( $realms as $realm ) {
 				if ( '*' === $affiliation || $realm === $realmId && \in_array( $affiliation, $this->affiliations, true ) ) {
-					return $this->tenantConfig->getRealm( $realmId );
+					return $this->realms[$realmId];
 				}
 			}
 		}

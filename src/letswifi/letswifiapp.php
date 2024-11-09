@@ -73,12 +73,13 @@ final class LetsWifiApp
 		if ( null === $realm ) {
 			throw new DomainException( "Realm {$grant->realm} is not available at this provider" );
 		}
+		$affiliations = \explode( ',', $grant->__get( 'affiliations' ) ?? '' );
 
 		$user = new User(
-			tenantConfig: $this->tenantConfig,
 			provider: $provider,
 			userId: $sub,
-			affiliations: \explode( ',', $grant->__get( 'affiliations' ) ?? '' ),
+			affiliations: $affiliations,
+			realms: $provider->getRealmsForUser( $affiliations ),
 			clientId: null,
 			ip: $_SERVER['REMOTE_ADDR'] ?? null,
 			userAgent: $_SERVER['HTTP_USER_AGENT'] ?? null,
