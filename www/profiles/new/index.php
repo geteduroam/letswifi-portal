@@ -20,6 +20,7 @@ $app = new LetsWifiApp( basePath: $basePath );
 $app->registerExceptionHandler();
 $provider = $app->getProvider();
 $user = $provider->getUser( scope: 'eap-metadata' ) ?? $provider->requireAuth();
+
 // Workaround for MacOS/ChromeOS flow; we want to provide the download through a meta refresh,
 // but the refresh should only work once.
 // Here we check a session, check if it can provide a download and then destroy the cookie

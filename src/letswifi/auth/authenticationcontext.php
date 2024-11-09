@@ -16,7 +16,7 @@ use JsonSerializable;
 use PDO;
 use fyrkat\oauth\Client;
 use fyrkat\oauth\OAuth;
-use fyrkat\oauth\exception\OAuthException;
+use fyrkat\oauth\exception\BearerException;
 use fyrkat\oauth\sealer\JWTSealer;
 use fyrkat\oauth\sealer\PDOSealer;
 use fyrkat\oauth\token\AccessToken;
@@ -88,21 +88,23 @@ class AuthenticationContext implements JsonSerializable
 		return $this->oauth ?? throw new DomainException( 'Cannot register client before OAuth has been registered' );
 	}
 
-	public function getUser( Provider $provider, ?string $scope = null ): ?User
+	public function getUser( Provider $provider, ?string $scope = null, bool $force = false ): ?User
 	{
-		$userId = $this->browserAuth->getUserId();
-		if ( null === $userId && null !== $this->oauth && null !== $scope ) {
-			try {
-				$token = $this->oauth->getAccessTokenFromRequest( $scope );
-				$grant = $token->getGrant();
+		if ( null !== $scope ) {
+			if ( null !== $this->oauth ) {
+				try {
+					$token = $this->oauth->getAccessTokenFromRequest( $scope );
+					$grant = $token->getGrant();
 
-				return $this->getUserFromGrant( $provider, $grant );
-			} catch ( OAuthException $_ ) {
-				return null;
+					return $this->getUserFromGrant( $provider, $grant );
+				} catch ( BearerException $e ) {
+					return $force ? throw $e : null;
+				}
 			}
-		}
-		if ( null !== $userId && null === $scope ) {
-			return $this->constructUser( $provider, $userId );
+		} else {
+			$userId = $force ? $this->browserAuth->getUserId() : $this->browserAuth->requireAuth();
+
+			return null !== $userId ? $this->constructUser( $provider, $userId ) : null;
 		}
 
 		return null;
@@ -110,14 +112,11 @@ class AuthenticationContext implements JsonSerializable
 
 	public function requireAuth( Provider $provider, ?string $scope = null ): User
 	{
-		if ( $user = $this->getUser( $provider, $scope ) ) {
+		if ( $user = $this->getUser( provider: $provider, scope: $scope, force: true ) ) {
 			return $user;
 		}
-		if ( null !== $scope ) {
-			throw new DomainException( 'No valid access token provided, not attempting browser auth because a scope was requested' );
-		}
 
-		return $this->constructUser( $provider, $this->browserAuth->requireAuth() );
+		throw new DomainException( 'Exhausted all available authentication methods without success' );
 	}
 
 	public function registerClient( Client $client ): void
@@ -138,7 +137,13 @@ class AuthenticationContext implements JsonSerializable
 		}
 		$affiliations = \explode( ',', $grant->__get( 'affiliations' ) ?? '' );
 
-		return $this->constructUser( $provider, $sub, $grant->clientId );
+		return $this->constructUser(
+			provider: $provider,
+			userId: $sub,
+			clientId: $grant->clientId,
+			affiliations: $affiliations,
+			realm: $realm,
+		);
 	}
 
 	private function constructUser( Provider $provider, string $userId, ?string $clientId = null, ?array $affiliations = null, ?Realm $realm = null ): User

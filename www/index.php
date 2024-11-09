@@ -22,8 +22,8 @@ $issuer = \is_string( $vhost ) ? "https://{$vhost}{$path}" : null;
 $apiConfiguration = \is_string( $issuer ) ? [
 	'authorization_endpoint' => "{$issuer}oauth/authorize/",
 	'token_endpoint' => "{$issuer}oauth/token/",
-	'eapconfig_endpoint' => "{$issuer}api/eap-config/",
-	'mobileconfig_endpoint' => "{$issuer}api/eap-config/?format=mobileconfig",
+	'eapconfig_endpoint' => "{$issuer}profiles/new/?format=eap-config",
+	'mobileconfig_endpoint' => "{$issuer}profiles/new/?format=apple-mobileconfig",
 	'profile_info_endpoint' => "{$issuer}profiles/info/",
 ] : null;
 
