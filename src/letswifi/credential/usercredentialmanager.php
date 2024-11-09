@@ -22,9 +22,9 @@ use fyrkat\openssl\PKCS12;
 use fyrkat\openssl\PrivateKey;
 use fyrkat\openssl\X509;
 use letswifi\LetsWifiConfig;
+use letswifi\auth\User;
 use letswifi\provider\Provider;
 use letswifi\provider\Realm;
-use letswifi\provider\User;
 
 class UserCredentialManager
 {

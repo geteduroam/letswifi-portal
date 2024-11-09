@@ -10,8 +10,6 @@
 
 namespace letswifi;
 
-use DateTimeImmutable;
-use DomainException;
 use PDO;
 use RuntimeException;
 use Throwable;
@@ -20,13 +18,12 @@ use Twig\Error\LoaderError;
 use Twig\Loader\FilesystemLoader;
 use fyrkat\oauth\Client;
 use fyrkat\oauth\OAuth;
-use fyrkat\oauth\token\Grant;
 use fyrkat\openssl\PKCS7;
+use letswifi\auth\User;
 use letswifi\credential\UserCredentialManager;
 use letswifi\provider\Provider;
 use letswifi\provider\Realm;
 use letswifi\provider\TenantConfig;
-use letswifi\provider\User;
 
 final class LetsWifiApp
 {
@@ -61,43 +58,6 @@ final class LetsWifiApp
 		$this->tenantConfig = new TenantConfig( $this->config );
 	}
 
-	public function getUserFromGrant( Grant $grant ): User
-	{
-		$sub = $grant->getSub();
-		if ( null === $grant->realm ) {
-			throw new DomainException( "User {$sub} has no realm" );
-		}
-
-		$provider = $this->getProvider();
-		$realm = $provider->getRealm( $grant->realm );
-		if ( null === $realm ) {
-			throw new DomainException( "Realm {$grant->realm} is not available at this provider" );
-		}
-		$affiliations = \explode( ',', $grant->__get( 'affiliations' ) ?? '' );
-
-		$user = new User(
-			provider: $provider,
-			userId: $sub,
-			affiliations: $affiliations,
-			realms: $provider->getRealmsForUser( $affiliations ),
-			clientId: null,
-			ip: $_SERVER['REMOTE_ADDR'] ?? null,
-			userAgent: $_SERVER['HTTP_USER_AGENT'] ?? null,
-		);
-		if ( !$user->canUseRealm( $realm ) ) {
-			throw new DomainException( "User {$sub} cannot use realm {$realm->realmId}" );
-		}
-
-		return $user;
-	}
-
-	public function isAdmin( User $user ): bool
-	{
-		$admins = $this->config->getArrayOrEmpty( 'auth.admin' );
-
-		return \in_array( $user->userId, $admins, true );
-	}
-
 	public function getIP(): string
 	{
 		\assert( \array_key_exists( 'REMOTE_ADDR', $_SERVER ) );
@@ -108,47 +68,6 @@ final class LetsWifiApp
 	public function isBrowser(): bool
 	{
 		return \substr( $_SERVER['HTTP_ACCEPT'] ?? '', 0, 9 ) === 'text/html';
-	}
-
-	public function requireAdmin( string $scope ): void
-	{
-		$provider = $this->getProvider();
-		if ( $this->isBrowser() ) {
-			$user = $provider->getUser();
-		} else {
-			$oauth = $this->getOAuthHandler( $provider );
-			$token = $oauth->getAccessTokenFromRequest( $scope );
-			$grant = $token->getGrant();
-			$user = $this->getUserFromGrant( $grant );
-		}
-
-		if ( null === $user ) {
-			\header( 'Content-Type: text/plain', true, 403 );
-
-			exit( "403 Forbidden\r\n\r\nUnauthenticated\r\n" );
-		}
-		if ( !$this->isAdmin( $user ) ) {
-			\header( 'Content-Type: text/plain', true, 403 );
-
-			exit( "403 Forbidden\r\n\r\nNo admin access for {$user->userId}\r\n" );
-		}
-	}
-
-	public function getOAuthHandler( Provider $provider ): OAuth
-	{
-		// TODO allow per-provider PDO?
-		$oauth = $provider->getOAuthHandler( $this->getPDO(), new DateTimeImmutable() );
-		foreach ( $this->config->getArray( 'oauth.clients' ) as $client ) {
-			$oauth->registerClient( new Client(
-				$client['clientId'],
-				$client['redirectUris'] ?? [],
-				$client['scopes'],
-				$client['refresh'] ?? false,
-				$client['clientSecret'] ?? null,
-			) );
-		}
-
-		return $oauth;
 	}
 
 	public function registerExceptionHandler(): void
@@ -229,7 +148,22 @@ final class LetsWifiApp
 
 	public function getProvider(): Provider
 	{
-		return $this->tenantConfig->getProvider( $this->getHttpHost() );
+		$provider = $this->tenantConfig->getProvider( $this->getHttpHost() );
+
+		// Provider contains an authentication context,
+		// we'll populate the OAuth settings here
+		$provider->auth->registerOAuthPDO( $this->getPDO() );
+		foreach ( $this->config->getArray( 'oauth.clients' ) as $client ) {
+			$provider->auth->registerClient( new Client(
+				$client['clientId'],
+				$client['redirectUris'] ?? [],
+				$client['scopes'],
+				$client['refresh'] ?? false,
+				$client['clientSecret'] ?? null,
+			) );
+		}
+
+		return $provider;
 	}
 
 	public function getPDO(): PDO

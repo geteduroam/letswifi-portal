@@ -22,5 +22,4 @@ return $app->render(
 	[
 		'href' => "{$basePath}/me/",
 		'user' => $user,
-		'realms' => $user->getRealms(),
 	], null, $basePath );

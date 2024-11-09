@@ -10,17 +10,10 @@
 
 namespace letswifi\provider;
 
-use DateTimeImmutable;
 use DomainException;
 use JsonSerializable;
-use PDO;
-use fyrkat\oauth\OAuth;
-use fyrkat\oauth\sealer\JWTSealer;
-use fyrkat\oauth\sealer\PDOSealer;
-use fyrkat\oauth\token\AccessToken;
-use fyrkat\oauth\token\AuthorizationCode;
-use fyrkat\oauth\token\RefreshToken;
-use letswifi\auth\browser\BrowserAuthInterface;
+use letswifi\auth\AuthenticationContext;
+use letswifi\auth\User;
 
 class Provider implements JsonSerializable
 {
@@ -28,9 +21,8 @@ class Provider implements JsonSerializable
 		private readonly TenantConfig $tenantConfig,
 		public readonly string $host,
 		public readonly string $displayName,
-		public readonly BrowserAuthInterface $auth,
+		public readonly AuthenticationContext $auth,
 		public readonly array $realmMap,
-		private readonly array $oauth,
 		public readonly ?string $contactId = null,
 		public readonly ?string $description = null,
 	) {
@@ -53,18 +45,17 @@ class Provider implements JsonSerializable
 		$oauth = null;
 		if ( \array_key_exists( 'auth', $data ) ) {
 			$authService = $data['auth']['service'] ?? null;
-			$authParam = $data['auth']['param'] ?? [];
-			if ( \is_string( $authService ) && \is_array( $authParam ) ) {
-				if ( !\preg_match( '/^[A-Z][A-Za-z0-9]+$/', $authService ) ) {
-					throw new DomainException( 'Illegal auth.service specified in config' );
-				}
-				$authService = "letswifi\\browserauth\\{$authService}";
-				$auth = new $authService( ...$authParam );
-				\assert( $auth instanceof BrowserAuthInterface );
+			if ( null === $authService ) {
+				throw new DomainException( 'No auth service is set for the provider' );
 			}
+			$authServiceParams = $data['auth']['param'] ?? [];
 			$oauth = $data['auth']['oauth'];
+			if ( null === $oauth ) {
+				throw new DomainException( 'Provider oauth settings not specified' );
+			}
+			$auth = new AuthenticationContext( $authService, $authServiceParams, $oauth );
 		}
-		if ( null === $auth || null === $oauth ) {
+		if ( null === $auth ) {
 			throw new DomainException( 'Provider auth not specified' );
 		}
 
@@ -74,33 +65,9 @@ class Provider implements JsonSerializable
 			displayName: $data['display_name'],
 			auth: $auth,
 			realmMap: $data['realm'],
-			oauth: $oauth,
 			contactId: $data['contact'],
 			description: $data['description'],
 		);
-	}
-
-	/**
-	 * @psalm-suppress ArgumentTypeCoercion Psalm incorrectly things JWTSealer is parent of Sealer, it's the other way around (PSALMBUG)
-	 */
-	public function getOAuthHandler( PDO $pdo, DateTimeImmutable $now ): OAuth
-	{
-		// TODO: Move this part to its own class, this is too tight a coupling
-		foreach ( $this->oauth as $oauth ) {
-			// Use kid, issued and expiry fields in a better way
-			if ( $now->getTimestamp() > $oauth['iss'] ) {
-				$secret = \base64_decode( $oauth['key'], true );
-				break;
-			}
-		}
-		if ( !isset( $secret ) || !\is_string( $secret ) ) {
-			throw new DomainException( 'No appropriate oauth key available' );
-		}
-		$accessTokenSealer = new JWTSealer( AccessToken::class, $secret );
-		$authorizationCodeSealer = new JWTSealer( AuthorizationCode::class, $secret );
-		$refreshTokenSealer = new PDOSealer( RefreshToken::class, $pdo );
-
-		return new OAuth( $accessTokenSealer, $authorizationCodeSealer, $refreshTokenSealer );
 	}
 
 	public function hasRealm( string|Realm $realm ): bool
@@ -129,22 +96,22 @@ class Provider implements JsonSerializable
 		return null === $this->contactId ? null : $this->tenantConfig->getContact( $this->contactId );
 	}
 
-	public function getUser(): ?User
+	public function getUser( ?string $scope = null ): ?User
 	{
-		$userId = $this->auth->getUserId();
-
-		return null === $userId ? null : $this->constructUser( $userId );
+		return $this->auth->getUser( provider: $this, scope: $scope );
 	}
 
-	public function requireAuth(): User
+	public function requireAuth( ?string $scope = null ): User
 	{
-		return $this->constructUser( $this->auth->requireAuth() );
+		return $this->auth->requireAuth( provider: $this, scope: $scope );
 	}
 
 	/**
+	 * @param array<string> $affiliations
+	 *
 	 * @return array<string,Realm>
 	 */
-	public function getRealmsForUser( array $affiliations ): array
+	public function getRealmsByAffiliations( array $affiliations ): array
 	{
 		// TODO: Move this part to its own class, this is too tight a coupling
 		$result = [];
@@ -161,18 +128,5 @@ class Provider implements JsonSerializable
 		}
 
 		return $result;
-	}
-
-	private function constructUser( string $userId ): User
-	{
-		return new User(
-			provider: $this,
-			userId: $userId,
-			realms: $this->getRealmsForUser( $this->auth->getAffiliations() ),
-			affiliations: $this->auth->getAffiliations(),
-			clientId: null,
-			ip: $_SERVER['REMOTE_ADDR'] ?? null,
-			userAgent: $_SERVER['HTTP_USER_AGENT'] ?? null,
-		);
 	}
 }

@@ -11,9 +11,9 @@
 namespace letswifi\credential;
 
 use DateTimeInterface;
+use letswifi\auth\User;
 use letswifi\provider\Provider;
 use letswifi\provider\Realm;
-use letswifi\provider\User;
 
 abstract class Credential
 {

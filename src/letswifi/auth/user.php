@@ -8,9 +8,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-namespace letswifi\provider;
+namespace letswifi\auth;
 
 use DomainException;
+use letswifi\provider\Realm;
 
 class User
 {
@@ -19,7 +20,6 @@ class User
 	 * @param array<string>       $affiliations
 	 */
 	public function __construct(
-		private readonly Provider $provider,
 		public readonly string $userId,
 		public readonly array $realms,
 		public readonly array $affiliations,
@@ -48,19 +48,16 @@ class User
 	public function getRealm( ?string $realmId = null ): Realm
 	{
 		if ( null === $realmId ) {
-			$realms = $this->getRealms();
-			if ( \count( $realms ) === 1 ) {
-				return \reset( $realms );
+			if ( \count( $this->realms ) === 1 ) {
+				foreach ( $this->realms as $realm ) {
+					return $realm;
+				}
 			}
 
 			throw new DomainException( 'No default realm is available for the current user' );
 		}
-		foreach ( $this->provider->realmMap as $affiliation => $realms ) {
-			foreach ( $realms as $realm ) {
-				if ( '*' === $affiliation || $realm === $realmId && \in_array( $affiliation, $this->affiliations, true ) ) {
-					return $this->realms[$realmId];
-				}
-			}
+		if ( \array_key_exists( $realmId, $this->realms ) ) {
+			return $this->realms[$realmId];
 		}
 
 		throw new DomainException( "Realm {$realmId} is not available for the current user" );

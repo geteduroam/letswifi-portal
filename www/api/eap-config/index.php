@@ -25,12 +25,8 @@ if ( 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
 $app = new LetsWifiApp( basePath: $basePath );
 $app->registerExceptionHandler();
 $provider = $app->getProvider();
-$oauth = $app->getOAuthHandler( $provider );
-$token = $oauth->getAccessTokenFromRequest( 'eap-metadata' );
-$grant = $token->getGrant();
-
-$user = $app->getUserFromGrant( $grant );
-$realm = $user->getRealm( $grant->realm ); // If NULL, will return default realm, that's probably okay right?
+$user = $provider->requireAuth( scope: 'eap-metadata' );
+$realm = $user->getRealm();
 $format = \array_key_exists( 'format', $_GET ) ? \is_string( $_GET['format'] ) ? $_GET['format'] : null : null;
 
 $credentialManager = $app->getUserCredentialManager( user: $user, realm: $realm );

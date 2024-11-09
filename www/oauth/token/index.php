@@ -20,6 +20,6 @@ $basePath = '../..';
 $app = new LetsWifiApp( basePath: $basePath );
 $app->registerExceptionHandler();
 $provider = $app->getProvider();
-$oauth = $app->getOAuthHandler( $provider );
+$oauth = $provider->auth->getOAuthHandler();
 
 $oauth->handleTokenPostRequest();
