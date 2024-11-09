@@ -12,7 +12,7 @@ require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'src', '_autolo
 $basePath = '../..';
 \assert( \array_key_exists( 'REQUEST_METHOD', $_SERVER ) );
 
-$downloadKind = 'apple-mobileconfig';
+$downloadFormat = 'apple-mobileconfig';
 $href = "{$basePath}/profiles/mac/";
 
 require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__ ), 'new', '_download.php'] );

@@ -7,13 +7,13 @@
 <h1>geteduroam<small>– eduroam authentication made easy</small></h1>
 <form method="POST" action="{{ action }}" id="form-download">
 {% if realms|length == 1 %}
-<p>Your download will begin shortly<input type="hidden" name="device" value="{{ device }}"></p>
+<p>Your download will begin shortly</p>
 <details>
 	<summary>Download not starting?</summary>
 {% else %}
 {% include 'realm-picker.html' %}
 {% endif %}
-	<p><button type="submit" class="btn btn-default" id="btn-download">Start download</button></p>
+	<p><input type="hidden" name="format" value="{{ format }}"><button type="submit" class="btn btn-default" id="btn-download">Start download</button></p>
 </form>
 {% if realms|length == 1 %}
 </details>
@@ -26,7 +26,7 @@
 <hr>
 {% endif %}
 
-{% if device == 'apple-mobileconfig' %}
+{% if format == 'apple-mobileconfig' %}
 <p>After opening the file on MacOS, install it by going to <strong>System Settings</strong> → <strong>Privacy & Security</strong> → <strong>Profiles</strong>.</p>
 <p aria-hidden="true">
 	<picture class="screenshot mac">
@@ -36,16 +36,18 @@
 </p>
 {% endif %}
 
-{% if device == 'google-onc' %}
+{% if format == 'google-onc' %}
 <p>After downloading the file, open the Chrome browser and browse to this URL: <a href="chrome://network">chrome://network</a>. Then, use the <strong>Import ONC file</strong> button. The import is silent; the new network definitions will be added to the preferred networks.</p>
 {% endif %}
 
 </main>
 
+{% if realms|length != 1 %}
 {# We use a CSP with script-src: none, so this won't work:
 <script>
 	document.getElementById('form-download').submit();
 	document.getElementById('btn-download').remove();
 </script>
 #}
+{% endif %}
 {% endblock %}

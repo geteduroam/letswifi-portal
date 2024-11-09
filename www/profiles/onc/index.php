@@ -12,7 +12,7 @@ require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'src', '_autolo
 $basePath = '../..';
 \assert( \array_key_exists( 'REQUEST_METHOD', $_SERVER ) );
 
-$downloadKind = 'google-onc';
+$downloadFormat = 'google-onc';
 $href = "{$basePath}/profiles/onc/";
 
 require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__ ), 'new', '_download.php'] );

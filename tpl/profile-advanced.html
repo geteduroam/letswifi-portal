@@ -29,8 +29,8 @@
 				</fieldset>
 			</div>
 			<ul class="apps devices buttons">
-{% for deviceName, deviceData in devices %}
-				<li><button type="submit" name="device" value="{{ deviceName }}" class="btn btn-default">{{ deviceData.name }}</button></li>
+{% for formatName, formatData in formats %}
+				<li><button type="submit" name="format" value="{{ formatName }}" class="btn btn-default">{{ formatData.name }}</button></li>
 {% endfor %}
 			</ul>
 		</form>

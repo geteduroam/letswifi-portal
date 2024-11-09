@@ -10,7 +10,7 @@
 
 use letswifi\LetsWifiApp;
 
-if ( !isset( $downloadKind ) || !isset( $href ) || !isset( $basePath ) ) {
+if ( !isset( $downloadFormat ) || !isset( $href ) || !isset( $basePath ) ) {
 	\header( 'Content-Type: text/plain', true, 400 );
 
 	exit( "400 Bad Request\r\n\r\nInvalid request\r\n" );
@@ -27,7 +27,7 @@ $user = $provider->requireAuth();
 // on this page, which uses a more reliable POST.
 // If the meta_redirect would go through too late (after cookie expiry),
 // the page being redirected to will also contain an appropriate download button.
-\setcookie( "{$downloadKind}-download-token", (string)\time(), [
+\setcookie( "{$downloadFormat}-download-token", (string)\time(), [
 	'expires' => 0, // session cookie
 	'httponly' => true, // not available in JavaScript
 	'secure' => false, // we don't care, this is not for security, and this helps with local devving
@@ -35,7 +35,7 @@ $user = $provider->requireAuth();
 	'samesite' => 'Strict',
 ] );
 if ( isset( $passphrase ) ) {
-	\setcookie( "{$downloadKind}-download-passphrase", $passphrase, [
+	\setcookie( "{$downloadFormat}-download-passphrase", $passphrase, [
 		'expires' => 0, // session cookie
 		'httponly' => true, // not available in JavaScript
 		'secure' => false, // we don't care, this is not for security, and this helps with local devving
@@ -50,10 +50,10 @@ switch ( $_SERVER['REQUEST_METHOD'] ) {
 			'href' => $href,
 			'passphrase' => ( $passphrase ?? null ) ?: null,
 			'action' => "{$basePath}/profiles/new/",
-			'device' => $downloadKind,
+			'format' => $downloadFormat,
 			'user' => $user,
 			'realms' => $user->getRealms(),
-			'meta_redirect' => \count( $user->getRealms() ) === 1 ? "{$basePath}/profiles/new/?" . \http_build_query( ['download' => '1', 'device' => $downloadKind] ) : null,
+			'meta_redirect' => \count( $user->getRealms() ) === 1 ? "{$basePath}/profiles/new/?" . \http_build_query( ['download' => '1', 'format' => $downloadFormat] ) : null,
 		], 'profile-download', $basePath, );
 }
 

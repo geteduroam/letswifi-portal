@@ -19,7 +19,7 @@ $basePath = '../..';
 $app = new LetsWifiApp( basePath: $basePath );
 $app->registerExceptionHandler();
 $provider = $app->getProvider();
-$user = $provider->requireAuth();
+$user = $provider->getUser( scope: 'eap-metadata' ) ?? $provider->requireAuth();
 // Workaround for MacOS/ChromeOS flow; we want to provide the download through a meta refresh,
 // but the refresh should only work once.
 // Here we check a session, check if it can provide a download and then destroy the cookie
@@ -43,10 +43,11 @@ $user = $provider->requireAuth();
 // It also does not protect against scripted downloads;
 // the cookie is easily guessable, but why would a script do that if it can just POST.
 if ( 'GET' === $_SERVER['REQUEST_METHOD'] && isset( $_GET['download'] ) ) {
-	foreach ( ['apple-mobileconfig', 'google-onc', 'pkcs12'] as $kind ) {
+	foreach ( ['apple-mobileconfig', 'google-onc', 'pkcs12'] as $formatCandidate ) {
+		// Remove the cookie
 		// Ensure this request can only be served one time
 		// Does not affect the current $_COOKIE variable
-		\setcookie( "{$kind}-download-token", '', [
+		\setcookie( "{$formatCandidate}-download-token", '', [
 			'expires' => 0,
 			'httponly' => true,
 			'secure' => false,
@@ -54,15 +55,15 @@ if ( 'GET' === $_SERVER['REQUEST_METHOD'] && isset( $_GET['download'] ) ) {
 			'samesite' => 'Strict',
 		] );
 
-		if ( $_GET['device'] === $kind && isset( $_COOKIE["{$kind}-download-token"] ) ) {
-			$cookieTime = (int)$_COOKIE["{$kind}-download-token"];
+		if ( $_GET['format'] === $formatCandidate && isset( $_COOKIE["{$formatCandidate}-download-token"] ) ) {
+			$cookieTime = (int)$_COOKIE["{$formatCandidate}-download-token"];
 			$earliestOkTime = \time() - 60; // allow cookies up to 60 seconds old
 			if ( \time() >= $cookieTime && $cookieTime >= $earliestOkTime ) {
 				$overrideMethod = 'POST';
-				$overrideDevice = $kind;
+				$overrideFormat = $formatCandidate;
 			}
-			if ( isset( $_COOKIE["{$kind}-download-passphrase"] ) ) {
-				$overridePassphrase = $_COOKIE["{$kind}-download-passphrase"] ?: null;
+			if ( isset( $_COOKIE["{$formatCandidate}-download-passphrase"] ) ) {
+				$overridePassphrase = $_COOKIE["{$formatCandidate}-download-passphrase"] ?: null;
 			}
 		}
 	}
@@ -80,7 +81,7 @@ switch ( $overrideMethod ?? $_SERVER['REQUEST_METHOD'] ) {
 	case 'GET': return $app->render(
 		[
 			'href' => "{$basePath}/profiles/new/",
-			'devices' => [
+			'formats' => [
 				'apple-mobileconfig' => ['name' => 'Apple (iOS/MacOS)'],
 				'eap-config' => ['name' => 'eap-config'],
 				'google-onc' => ['name' => 'ChromeOS'],
@@ -110,7 +111,13 @@ switch ( $overrideMethod ?? $_SERVER['REQUEST_METHOD'] ) {
 		$credentialManager = $app->getUserCredentialManager( user: $user, realm: $realm );
 		// TODO fix hardcoded credential type
 		$credential = $credentialManager->issue( CertificateCredential::class );
-		$formatter = Format::getFormatter( $overrideDevice ?? ( \is_string( $_POST['device'] ) ? $_POST['device'] : '' ),
+		$format = $overrideFormat ?? null;
+		foreach ( [$_POST, $_GET] as $candidate ) {
+			if ( null === $format && \array_key_exists( 'format', $candidate ) && \is_string( $candidate['format'] ) ) {
+				$format = $candidate['format'];
+			}
+		}
+		$formatter = Format::getFormatter( $format ?? 'NULL',
 			credential: $credential,
 			profileSigner: $app->getProfileSigner(),
 			passphrase: $passphrase,
