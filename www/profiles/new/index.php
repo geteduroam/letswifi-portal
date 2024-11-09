@@ -8,15 +8,18 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+use letswifi\LetsWifiApp;
+use letswifi\credential\CertificateCredential;
+use letswifi\format\Format;
+
 require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'src', '_autoload.php'] );
 $basePath = '../..';
 \assert( \array_key_exists( 'REQUEST_METHOD', $_SERVER ) );
 
-$app = new letswifi\LetsWifiApp();
+$app = new LetsWifiApp( basePath: $basePath );
 $app->registerExceptionHandler();
-$realm = $app->getRealm();
-$user = $app->getUserFromBrowserSession( $realm );
-
+$provider = $app->getProvider();
+$user = $provider->requireAuth();
 // Workaround for MacOS/ChromeOS flow; we want to provide the download through a meta refresh,
 // but the refresh should only work once.
 // Here we check a session, check if it can provide a download and then destroy the cookie
@@ -38,8 +41,7 @@ $user = $app->getUserFromBrowserSession( $realm );
 // NOTE: This protects against involuntary downloads ONLY,
 // it DOES NOT, and is not intended to, protect against pressing F5 repeatedly
 // It also does not protect against scripted downloads;
-// the cookie is easily guessable, but why would a script do that?
-// It can just POST.
+// the cookie is easily guessable, but why would a script do that if it can just POST.
 if ( 'GET' === $_SERVER['REQUEST_METHOD'] && isset( $_GET['download'] ) ) {
 	foreach ( ['apple-mobileconfig', 'google-onc', 'pkcs12'] as $kind ) {
 		// Ensure this request can only be served one time
@@ -79,24 +81,25 @@ switch ( $overrideMethod ?? $_SERVER['REQUEST_METHOD'] ) {
 		[
 			'href' => "{$basePath}/profiles/new/",
 			'devices' => [
-				'apple-mobileconfig' => [
-					'name' => 'Apple (iOS/MacOS)',
-				],
-				'eap-config' => [
-					'name' => 'eap-config',
-				],
-				'google-onc' => [
-					'name' => 'ChromeOS',
-				],
-				'pkcs12' => [
-					'name' => 'PKCS12',
-				],
+				'apple-mobileconfig' => ['name' => 'Apple (iOS/MacOS)'],
+				'eap-config' => ['name' => 'eap-config'],
+				'google-onc' => ['name' => 'ChromeOS'],
+				'pkcs12' => ['name' => 'PKCS12'],
 			],
+			'user' => $user,
+			'realms' => $user->getRealms(),
 			'app' => [
 				'url' => "{$basePath}/app/",
 			],
 		], 'profile-advanced', $basePath, );
+
 	case 'POST':
+		if ( \array_key_exists( 'realm', $_POST ) ) {
+			$realm = $_POST['realm'];
+			$realm = $user->getRealm( \is_string( $realm ) ? $realm : null );
+		} else {
+			$realm = $user->getRealm();
+		}
 		$passphrase = $overridePassphrase ?? $_POST['passphrase'] ?? null ?: null;
 		\assert( '' !== $passphrase );
 		if ( \is_array( $passphrase ) ) {
@@ -104,34 +107,17 @@ switch ( $overrideMethod ?? $_SERVER['REQUEST_METHOD'] ) {
 
 			exit( "400 Bad Request\r\n\r\nInvalid passphrase\r\n" );
 		}
+		$credentialManager = $app->getUserCredentialManager( user: $user, realm: $realm );
+		// TODO fix hardcoded credential type
+		$credential = $credentialManager->issue( CertificateCredential::class );
+		$formatter = Format::getFormatter( $overrideDevice ?? ( \is_string( $_POST['device'] ) ? $_POST['device'] : '' ),
+			credential: $credential,
+			profileSigner: $app->getProfileSigner(),
+			passphrase: $passphrase,
+		);
+		$formatter->emit();
 
-		switch ( $device = $overrideDevice ?? $_POST['device'] ?? '' ) {
-			case 'apple-mobileconfig': $generator = $realm->getConfigGenerator( letswifi\profile\generator\MobileConfigGenerator::class, $user, $passphrase );
-
-				break;
-			case 'eap-config': $generator = $realm->getConfigGenerator( letswifi\profile\generator\EapConfigGenerator::class, $user, $passphrase );
-
-				break;
-			case 'pkcs12': $generator = $realm->getConfigGenerator( letswifi\profile\generator\PKCS12Generator::class, $user, $passphrase );
-
-				break;
-			case 'google-onc': $generator = $realm->getConfigGenerator( letswifi\profile\generator\ONCGenerator::class, $user, $passphrase );
-
-				break;
-
-			default:
-				\header( 'Content-Type: text/plain', true, 400 );
-				$deviceStr = \is_string( $device )
-					? ": {$device}"
-					: '';
-
-				exit( "400 Bad Request\r\n\r\nUnknown device{$deviceStr}\r\n" );
-		}
-		$payload = $generator->generate();
-		\header( 'Content-Disposition: attachment; filename="' . $generator->getFilename() . '"' );
-		\header( 'Content-Type: ' . $generator->getContentType() );
-
-		exit( $payload );
+		exit; // should not be reached
 
 	default:
 		\header( 'Content-Type: text/plain', true, 405 );

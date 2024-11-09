@@ -8,10 +8,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+use letswifi\LetsWifiApp;
+
 require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 1 ), 'src', '_autoload.php'] );
 $basePath = '.';
 
-$app = new letswifi\LetsWifiApp();
+$app = new LetsWifiApp( basePath: $basePath );
 $app->registerExceptionHandler();
 
 $vhost = \array_key_exists( 'HTTP_HOST', $_SERVER ) ? $_SERVER['HTTP_HOST'] : null;
@@ -22,6 +24,7 @@ $apiConfiguration = \is_string( $issuer ) ? [
 	'token_endpoint' => "{$issuer}oauth/token/",
 	'eapconfig_endpoint' => "{$issuer}api/eap-config/",
 	'mobileconfig_endpoint' => "{$issuer}api/eap-config/?format=mobileconfig",
+	'profile_info_endpoint' => "{$issuer}profiles/info/",
 ] : null;
 
 $app->render( [

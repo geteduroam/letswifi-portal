@@ -1,17 +1,23 @@
 {% extends "dialog.html" %}
 
-{% block title %}Apple mobileconfig{% endblock %}
+{% block title %}Profile download{% endblock %}
 
 {% block content %}
 <main>
 <h1>geteduroam<small>– eduroam authentication made easy</small></h1>
 <form method="POST" action="{{ action }}" id="form-download">
+{% if realms|length == 1 %}
 <p>Your download will begin shortly<input type="hidden" name="device" value="{{ device }}"></p>
 <details>
 	<summary>Download not starting?</summary>
+{% else %}
+{% include 'realm-picker.html' %}
+{% endif %}
 	<p><button type="submit" class="btn btn-default" id="btn-download">Start download</button></p>
 </form>
+{% if realms|length == 1 %}
 </details>
+{% endif %}
 <hr>
 
 {% if passphrase %}

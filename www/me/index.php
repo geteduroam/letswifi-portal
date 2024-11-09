@@ -10,18 +10,17 @@
 
 use letswifi\LetsWifiApp;
 
-require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'src', '_autoload.php'] );
-$basePath = '../..';
+require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 2 ), 'src', '_autoload.php'] );
+$basePath = '..';
 
 $app = new LetsWifiApp( basePath: $basePath );
 $app->registerExceptionHandler();
 $provider = $app->getProvider();
-$profileInfo = (array)$provider->getContact();
-$profileInfo['displayName'] = $provider->displayName;
-$profileInfo['description'] = $provider->description;
+$user = $provider->requireAuth();
 
 return $app->render(
 	[
-		'href' => "{$basePath}/profiles/info/",
-		'http://letswifi.app/profile#v2' => $profileInfo,
+		'href' => "{$basePath}/me/",
+		'user' => $user,
+		'realms' => $user->getRealms(),
 	], null, $basePath );

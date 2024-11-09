@@ -1,0 +1,17 @@
+{% if realms|length > 1 %}
+			<fieldset id="realm-picker">
+				<legend accesskey="r">Realm</legend>
+				<ul>
+
+{% for realm in realms %}
+					<li>
+						<input type="radio" name="realm" value="{{ realm.realmId }}" id="realm_{{ realm.realmId }}" required>
+						<label for="realm_{{ realm.realmId }}"><strong>{{ realm.displayName }}</strong> <small>{{ realm.realmId }}</small>
+{% if realm.description %}
+							<br>{{ realm.description }}
+{% endif %}
+						</label>
+{% endfor %}
+				</ul>
+			</fieldset>
+{% endif %}

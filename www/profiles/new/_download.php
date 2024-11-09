@@ -8,6 +8,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+use letswifi\LetsWifiApp;
+
 if ( !isset( $downloadKind ) || !isset( $href ) || !isset( $basePath ) ) {
 	\header( 'Content-Type: text/plain', true, 400 );
 
@@ -15,11 +17,10 @@ if ( !isset( $downloadKind ) || !isset( $href ) || !isset( $basePath ) ) {
 }
 \assert( \array_key_exists( 'REQUEST_METHOD', $_SERVER ) );
 
-$app = new letswifi\LetsWifiApp();
+$app = new LetsWifiApp( basePath: $basePath );
 $app->registerExceptionHandler();
-$realm = $app->getRealm();
-// just trigger a login
-$app->getUserFromBrowserSession( $realm );
+$provider = $app->getProvider();
+$user = $provider->requireAuth();
 
 // Create a short-lived cookie to allow the user ONE download without using POST
 // If the download would fail, the user is still presented with a download button
@@ -50,7 +51,9 @@ switch ( $_SERVER['REQUEST_METHOD'] ) {
 			'passphrase' => ( $passphrase ?? null ) ?: null,
 			'action' => "{$basePath}/profiles/new/",
 			'device' => $downloadKind,
-			'meta_redirect' => "{$basePath}/profiles/new/?" . \http_build_query( ['download' => '1', 'device' => $downloadKind] ),
+			'user' => $user,
+			'realms' => $user->getRealms(),
+			'meta_redirect' => \count( $user->getRealms() ) === 1 ? "{$basePath}/profiles/new/?" . \http_build_query( ['download' => '1', 'device' => $downloadKind] ) : null,
 		], 'profile-download', $basePath, );
 }
 

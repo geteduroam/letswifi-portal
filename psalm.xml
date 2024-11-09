@@ -21,7 +21,7 @@
 	<issueHandlers>
 		<MissingPropertyType>
 			<errorLevel type="suppress">
-				<file name="src/letswifi/browserauth/simplesamlauth.php"/>
+				<file name="src/letswifi/auth/browser/simplesamlauth.php"/>
 			</errorLevel>
 		</MissingPropertyType>
 		<RiskyTruthyFalsyComparison>

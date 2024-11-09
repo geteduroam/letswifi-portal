@@ -13,7 +13,7 @@ namespace letswifi;
 use DomainException;
 use PDO;
 
-class Config
+abstract class Config
 {
 	/** @var array<string,mixed> */
 	private $conf;
@@ -41,6 +41,12 @@ class Config
 		$this->conf = $conf;
 	}
 
+	/** Prevent leaking data via var_dump*/
+	public function __debugInfo(): array
+	{
+		return [];
+	}
+
 	public function getString( string $key ): string
 	{
 		if ( !\array_key_exists( $key, $this->conf ) ) {
@@ -57,7 +63,7 @@ class Config
 	public function getArray( string $key ): array
 	{
 		if ( !\array_key_exists( $key, $this->conf ) ) {
-			throw new DomainException( "Expecting config key {$key} to be string, but does not exist" );
+			throw new DomainException( "Expecting config key {$key} to be array, but does not exist" );
 		}
 		$data = $this->conf[$key];
 		if ( !\is_array( $data ) ) {

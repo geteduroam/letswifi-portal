@@ -53,6 +53,9 @@ main {
 	box-shadow: rgba(0,0,0,.1) 0 .1em .3em;
 	min-height: 17em;
 }
+pre {
+	overflow-x: scroll;
+}
 p {
 	font-size: .95em;
 }
@@ -79,6 +82,61 @@ hr {
 	border-top: 1px solid;
 	border-color: #f5f4f2;
 	margin: 2em;
+}
+.fieldsets {
+	display: flex;
+	gap: 1em;
+	justify-content: space-between;
+}
+.fieldsets > * {
+	flex-grow: 1;
+}
+input[type=text], input[type=password] {
+	border: solid;
+	border-width: 1px 1px 1px 1px;
+	border-color: #212529;
+	border-radius: .3em;
+	background: inherit;
+	color: inherit;
+	padding: .3em;
+}
+input[type=text]:focus, input[type=password]:focus {
+	border-color: #276cba;
+	outline: 1px solid #212529;
+}
+input[type=radio]:focus + label, label:focus {
+	outline: 1px solid #276cba;
+}
+input[type=radio] {
+	outline: none;
+}
+fieldset {
+	border: 1px solid #f5f4f2;
+	border-radius: .15em;
+	margin-bottom: 2em;
+}
+fieldset > legend {
+	font-size: .7rem;
+}
+#realm-picker ul{
+	padding:0;
+	list-style: none;
+}
+#realm-picker ul input[type=radio]{
+	float:left;
+	clear:left;
+}
+#realm-picker ul label{
+	margin-left:2em;
+	display:block;
+	margin-bottom:.8em;
+	padding-left: .2em;
+	border-radius: .2em;
+	cursor: pointer;
+}
+#realm-picker small {
+	opacity: .7;
+	margin-left:.8em;
 }
 
 .btn {
@@ -145,6 +203,11 @@ hr {
 	outline: none;
 }
 
+#user {
+	font-size: .8em;
+	text-align: right;
+}
+
 body{
 	display: grid;
 	grid-template-columns: 1fr;
@@ -204,18 +267,17 @@ ul.apps li a.btn {
 	min-width: 6em;
 }
 ul.buttons {
-	list-style: none;
+	display: flex;
+	justify-content: center;
 	line-height: 2.4em;
+	gap: .35em;
 }
 ul.buttons li {
 	margin-bottom: .5em;
 }
 
-#profile-encrypt {
-	margin-bottom: 2em;
-}
 #profile-encrypt input, #passphrase-show {
-	font-size: 2em;
+	font-size: 1.25em;
 }
 
 
@@ -248,8 +310,19 @@ ul.buttons li {
 	.btn.btn-default:active {
 		background: #008098;
 	}
-	hr {
+	hr, fieldset {
 		border-color: #313539;
+	}
+	input[type=text], input[type=password] {
+		border-color: #818589;
+	}
+	input[type=text]:focus, input[type=password]:focus {
+		border-color: #f5f4f2;
+		outline: 1px solid #f5f4f2;
+	}
+	input[type=radio]:focus + label, label:focus {
+		outline-color: #008fa7;
+		color: white;
 	}
 	nav li a:hover, nav li a:focus {
 		background: rgba(255,255,255,.05);

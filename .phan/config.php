@@ -43,14 +43,13 @@ use Phan\Issue;
  * '-d' flag.
  */
 return [
-
 	// The PHP version that the codebase will be checked for compatibility against.
 	// For best results, the PHP binary used to run Phan should have the same PHP version.
 	// (Phan relies on Reflection for some types, param counts,
 	// and checks for undefined classes/methods/functions)
 	//
 	// Supported values: `'5.6'`, `'7.0'`, `'7.1'`, `'7.2'`, `'7.3'`, `'7.4'`,
-	// `'8.0'`, `'8.1'`, `null`.
+	// `'8.0'`, `'8.1'`, `'8.2'`, `'8.3'`, `null`.
 	// If this is set to `null`,
 	// then Phan assumes the PHP version which is closest to the minor version
 	// of the php executable used to execute Phan.
@@ -269,16 +268,21 @@ return [
 	// Add any issue types (such as `'PhanUndeclaredMethod'`)
 	// to this list to inhibit them from being reported.
 	'suppress_issue_types' => [
-		// Phan has been a bit too strict regarding PHP 8.
-		// It should be okay for closures I think.
-		'PhanParamNameIndicatingUnusedInClosure',
-
-		// Sometimes Phan doesn't see that we handle a possible false
-		// through a flag to the function.  We rely on Psalm for finding those.
-		'PhanPossiblyFalseTypeArgument',
-
-		// Fails with \fyrkat\openssl\OpenSSLConfig::__construct()
+		// Phan often confuses positional and named arguments
 		'PhanTypeMismatchArgumentReal',
+
+		// Phan reports this error, even though this syntax is valid since PHP 8.1, which we target
+		'PhanCompatibleTrailingCommaParameterList',
+
+		// Phan has difficulty with more advanced array shapes from Psalm
+		'PhanUnextractableAnnotationElementName',
+		'PhanUnextractableAnnotationSuffix',
+
+		// Phan doesn't recognise if($x==null){return;}f($x) and complains about possibly null being passed to f
+		'PhanTypeMismatchArgumentNullable',
+
+		// We use $_ to indicate unused parameter
+		'PhanParamNameIndicatingUnusedInClosure',
 	],
 
 	// A regular expression to match files to be excluded

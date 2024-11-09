@@ -14,6 +14,7 @@
 </header>
 {% endif %}
 <main>
+{% if realms|length == 1 %}
 	<p>Do you want to use your account to connect to eduroam on this device?</p>
 	<p class="text-center"><button type="submit" class="btn btn-default" name="{{ postField }}" value="{{ postValue }}">Approve</button></p>
 	<hr>
@@ -21,6 +22,11 @@
 		<summary>Why is this needed?</summary>
 		<p>By clicking approve, you allow the application to receive Wi-Fi profiles on your behalf.</p>
 	</details>
+{% else %}
+	<p>Please select your user group to continue</p>
+{% include 'realm-picker.html' %}
+	<p class="text-center"><button type="submit" class="btn btn-default" name="{{ postField }}" value="{{ postValue }}">Continue</button></p>
+{% endif %}
 </main>
 </form>
 {% endblock %}

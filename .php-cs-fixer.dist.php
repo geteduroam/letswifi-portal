@@ -23,39 +23,41 @@ EOD
 		'@PSR2' => true,
 		'@Symfony' => true,
 		'@Symfony:risky' => true,
-		'@PHP81Migration' => true,
 		'@PHP80Migration:risky' => true,
-		'align_multiline_comment' => [
-			'comment_type' => 'all_multiline',
-		],
+		'@PHP84Migration' => true,
+		'align_multiline_comment' => ['comment_type' => 'all_multiline'],
 		'array_indentation' => true,
 		'array_push' => true,
-		'array_syntax' => [
-			'syntax' => 'short',
-		],
+		'array_syntax' => ['syntax' => 'short'],
 		'backtick_to_shell_exec' => true,
 		'blank_line_after_namespace' => true,
 		'blank_line_after_opening_tag' => false, /* declare strict types definition goes here */
 		'blank_line_before_statement' => [
-				'statements' => [
-					'break',
-					'continue',
-					'declare',
-					'default',
-					'exit',
-					'goto',
-					'include',
-					'include_once',
-					'phpdoc',
-					'require',
-					'require_once',
-					'return',
-					'switch',
-					'throw',
-					'try',
-					'yield',
-					'yield_from',
+			'statements' => [
+				'default',
+				'exit',
+				'goto',
+				'include',
+				'include_once',
+				'phpdoc',
+				'require',
+				'require_once',
+				'return',
+				'switch',
+				'throw',
+				'try',
+				'yield',
+				'yield_from',
 			],
+		],
+		'braces_position' => [
+			'allow_single_line_anonymous_functions' => false,
+			'allow_single_line_empty_anonymous_classes' => false,
+			'anonymous_classes_opening_brace' => 'same_line',
+			'anonymous_functions_opening_brace' => 'same_line',
+			'classes_opening_brace' => 'next_line_unless_newline_at_signature_end',
+			'control_structures_opening_brace' =>'same_line',
+			'functions_opening_brace' => 'next_line_unless_newline_at_signature_end',
 		],
 		'cast_spaces' => [
 			'space' => 'none',
@@ -66,8 +68,6 @@ EOD
 			'single_item_single_line' => false,
 			'single_line' => false,
 		],
-		'class_keyword_remove' => false,
-		'class_reference_name_casing' => true,
 		'combine_consecutive_issets' => true,
 		'combine_consecutive_unsets' => true,
 		'combine_nested_dirname' => true,
@@ -77,10 +77,10 @@ EOD
 		],
 		'constant_case' => ['case' => 'lower'], // constants such as true, false, null
 		'control_structure_braces' => true,
-		'control_structure_continuation_position' => true,
-		'date_time_immutable' => true,
-		'declare_parentheses' => false, /* fix declare( strict_types=1 ); */
+		'control_structure_continuation_position' => ['position' => 'same_line'],
 		'date_time_create_from_format_call' => true,
+		'date_time_immutable' => true,
+		'declare_parentheses' => false,
 		'declare_strict_types' => true,
 		'dir_constant' => true,
 		'elseif' => true,
@@ -103,7 +103,10 @@ EOD
 		'fopen_flag_order' => true,
 		'fopen_flags' => ['b_mode' => false],
 		'full_opening_tag' => true,
-		'fully_qualified_strict_types' => true,
+		'fully_qualified_strict_types' => [
+			'import_symbols' => true,
+			'leading_backslash_in_global_namespace' => false,
+		],
 		'function_declaration' => false, /* Would remove spaces in function definitions */
 		'function_to_constant' => [
 			'functions' => [ /* default */
@@ -117,8 +120,8 @@ EOD
 		],
 		'global_namespace_import' => [
 			'import_classes' => true,
-			'import_constants' => false,
-			'import_functions' => false,
+			'import_constants' => null,
+			'import_functions' => null,
 		],
 		'implode_call' => true,
 		'include' => true,
@@ -132,9 +135,10 @@ EOD
 		'lowercase_static_reference' => true,
 		'magic_constant_casing' => true,
 		'method_argument_space' => [
-			'keep_multiple_spaces_after_comma' => false,
-			'on_multiline' => 'ignore', /* ensure_fully_multiline indents weirdly */
 			'after_heredoc' => true,
+			'attribute_placement' => 'same_line',
+			'keep_multiple_spaces_after_comma' => false,
+			'on_multiline' => 'ignore',
 		],
 		'method_chaining_indentation' => true,
 		'modernize_types_casting' => true,
@@ -159,7 +163,7 @@ EOD
 		],
 		'no_alias_functions' => true,
 		'no_alternative_syntax' => true,
-		'no_blank_lines_after_phpdoc' => false, /* yes for functions, classes. no for file. Can't choose, so false for now */
+		'no_blank_lines_after_phpdoc' => true,
 		'no_break_comment' => [
 			'comment_text' => '@todo document implicit fall-through',
 		],
@@ -169,15 +173,21 @@ EOD
 		'no_empty_statement' => true,
 		'no_extra_blank_lines' => [
 			'tokens' => [
+				'attribute',
+				'curly_brace_block',
 				'extra',
+				'parenthesis_brace_block',
+				'return',
+				'square_brace_block',
+				'switch',
+				'use',
 			],
 		],
 		'no_homoglyph_names' => true,
+		'no_leading_import_slash' => true,
 		'no_leading_namespace_whitespace' => true,
-		'no_mixed_echo_print' => [
-			'use' => 'echo',
-		],
-		'no_multiple_statements_per_line' => true,
+		'no_mixed_echo_print' => ['use' => 'echo'],
+		'no_multiple_statements_per_line' => false,
 		'no_php4_constructor' => true,
 		'no_short_bool_cast' => true,
 		'no_singleline_whitespace_before_semicolons' => true,
@@ -217,10 +227,9 @@ EOD
 			'after_heredoc' => true,
 		],
 		'no_whitespace_in_blank_line' => true,
-		'non_printable_character' => [
-			'use_escape_sequences_in_strings' => true,
-		],
+		'non_printable_character' => ['use_escape_sequences_in_strings' => true],
 		'normalize_index_brace' => true,
+		'nullable_type_declaration_for_default_null_value' => true,
 		'object_operator_without_whitespace' => true,
 		'ordered_class_elements' => [
 			'order' => [
@@ -287,19 +296,15 @@ EOD
 		'simplified_null_return' => true,
 		'single_blank_line_at_eof' => true,
 		'single_class_element_per_statement' => true,
-		'single_line_comment_spacing' => false,
 		'single_import_per_statement' => true,
 		'single_line_after_imports' => true,
 		'single_line_comment_spacing' => true,
-		'space_after_semicolon' => [
-			'remove_in_empty_for_expressions' => true,
-		],
-		'spaces_inside_parentheses' => [
-			'space' => 'single',
-		],
+		'single_space_around_construct' => true,
+		'space_after_semicolon' => ['remove_in_empty_for_expressions' => true],
+		'spaces_inside_parentheses' => ['space' => 'single'],
 		'standardize_increment' => true,
 		'standardize_not_equals' => true,
-		'statement_indentation' => true,
+		'statement_indentation' => ['stick_comment_to_next_continuous_control_statement' => false],
 		'static_lambda' => true,
 		'strict_comparison' => true,
 		'strict_param' => true,
@@ -318,14 +323,13 @@ EOD
 			'elements' => ['arrays', 'arguments', 'parameters', 'match'],
 		],
 		'trim_array_spaces' => true,
-		'type_declaration_spaces' => [
-			'elements' => ['function', 'property'],
-		],
+		'type_declaration_spaces' => ['elements' => ['function', 'property']],
 		'types_spaces' => [
-			'space' => 'single',
+			'space' => 'none',
 			'space_multiple_catch' => 'single',
 		],
 		'unary_operator_spaces' => true,
+		'use_arrow_functions' => true,
 		'visibility_required' => true,
 		'whitespace_after_comma_in_array' => true,
 		'yoda_style' => [
@@ -335,6 +339,5 @@ EOD
 			'always_move_variable' => true,
 		],
 	])
-	->setFinder($finder)
-;
+	->setFinder($finder);
 return $config;

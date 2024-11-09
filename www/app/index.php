@@ -8,10 +8,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+use letswifi\LetsWifiApp;
+
 require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 2 ), 'src', '_autoload.php'] );
 $basePath = '..';
 
-$app = new letswifi\LetsWifiApp();
+$app = new LetsWifiApp( basePath: $basePath );
 $app->registerExceptionHandler();
 
 $app->render( [

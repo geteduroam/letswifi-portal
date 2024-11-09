@@ -1,0 +1,13 @@
+{% extends "dialog.html" %}
+
+{% block title %}{{ code }} {{ code_explain }}{% endblock %}
+
+{% block content %}
+<main>
+<h1>{{ code }} {{ code_explain }}</h1>
+<p>{{ message }}</p>
+<pre>{{ stacktrace }}
+
+</pre>
+</main>
+{% endblock %}
