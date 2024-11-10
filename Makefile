@@ -7,7 +7,9 @@ SIMPLESAMLPHP_FLAVOUR := slim
 camera-ready-dev: camera-ready dev
 .PHONY: camera-ready-dev
 
-camera-ready: syntax codestyle phpunit psalm phan
+camera-ready: syntax codestyle phpunit psalm
+	# We disabled phan checking for now, due to a bug affecting Phan in this codebase
+	# https://github.com/phan/phan/issues/4887
 .PHONY: camera-ready
 
 dev: check-php etc/letswifi.conf.php vendor
