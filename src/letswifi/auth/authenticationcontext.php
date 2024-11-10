@@ -37,6 +37,10 @@ class AuthenticationContext implements JsonSerializable
 
 	protected string $oauthSecret;
 
+	/**
+	 * @param array<string,mixed>                              $authServiceParams
+	 * @param array<string,array{key:string,iss:int,exp:?int}> $oauth
+	 */
 	public function __construct(
 		public readonly string $authService,
 		array $authServiceParams,
@@ -51,13 +55,13 @@ class AuthenticationContext implements JsonSerializable
 		\assert( $browserAuth instanceof BrowserAuthInterface );
 
 		foreach ( $oauth as $kid => $o ) {
-			// Use kid, issued and expiry fields in a better way
+			// TODO Use kid, issued and expiry fields in a better way
 			if ( $now->getTimestamp() > $o['iss'] ) {
 				$oauthSecret = \base64_decode( $o['key'], true );
 				break;
 			}
 		}
-		if ( !isset( $oauthSecret ) || !\is_string( $oauthSecret ) || !isset( $kid ) || !$browserAuth instanceof BrowserAuthInterface ) {
+		if ( !isset( $oauthSecret ) || !\is_string( $oauthSecret ) || !isset( $kid ) ) {
 			throw new DomainException( 'No appropriate oauth key available' );
 		}
 		$this->oauthSecret = $oauthSecret;

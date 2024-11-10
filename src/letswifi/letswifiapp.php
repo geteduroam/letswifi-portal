@@ -17,7 +17,6 @@ use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Loader\FilesystemLoader;
 use fyrkat\oauth\Client;
-use fyrkat\oauth\OAuth;
 use fyrkat\openssl\PKCS7;
 use letswifi\auth\User;
 use letswifi\credential\UserCredentialManager;

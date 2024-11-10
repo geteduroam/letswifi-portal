@@ -42,7 +42,6 @@ class Provider implements JsonSerializable
 	public static function fromArray( TenantConfig $tenantConfig, array $data ): self
 	{
 		$auth = null;
-		$oauth = null;
 		if ( \array_key_exists( 'auth', $data ) ) {
 			$authService = $data['auth']['service'] ?? null;
 			if ( null === $authService ) {
