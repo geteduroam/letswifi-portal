@@ -48,6 +48,7 @@ class RealmManager extends DatabaseStorage
 			'realm' => $realm,
 			'requester' => $user,
 			'expires' => \gmdate( static::DATE_FORMAT ),
+			'revoked' => \gmdate( static::DATE_FORMAT ),
 		] );
 	}
 
