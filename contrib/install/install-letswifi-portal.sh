@@ -72,7 +72,7 @@ then
 
 	tee "$APPLICATION_DIR/etc/letswifi.conf.php" << EOF >/dev/null
 <?php
-require '$SETTINGS_DIR/letswifi.conf.php';
+return require '$SETTINGS_DIR/letswifi.conf.php';
 EOF
 
 	tee "$SETTINGS_DIR/letswifi.conf.php" << EOF >/dev/null
@@ -93,7 +93,7 @@ EOF
 	'pdo.username' => null,
 	'pdo.password' => null,
 	//'signing.cert' => __DIR__ . DIRECTORY_SEPARATOR . 'signing.pem',
-	'oauth.clients' => (require __DIR__ . DIRECTORY_SEPARATOR . 'clients.php'),
+	'oauth.clients' => (require '$APPLICATION_DIR/etc/clients.php'),
 ];
 EOF
 	"$APPLICATION_DIR"/bin/add-realm.php "$default_realm" 3650
@@ -132,7 +132,7 @@ service apache2 restart
 
 if [ -n "$acme_email" ]
 then
-	wget --output-document /usr/sbin/acme.sh https://raw.githubusercontent.com/acmesh-official/acme.sh/$BRANCH/acme.sh
+	wget --output-document /usr/sbin/acme.sh https://raw.githubusercontent.com/acmesh-official/acme.sh/master/acme.sh
 	chmod +x /usr/sbin/acme.sh
 	mkdir -p /var/www/html/.well-known/acme-challenge
 	# todo own account for ACME
