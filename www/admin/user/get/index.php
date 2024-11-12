@@ -28,8 +28,10 @@ $app->requireAdmin( 'admin-user-get' );
 $realmManager = $app->getRealmManager();
 $realm = $app->getRealm();
 
+$hideRevoked = \array_key_exists( 'revoked', $_GET ) && '0' === $_GET['revoked'];
+
 if ( $user ) {
-	$certificates = $realmManager->listUserCertificates( $realm->getName(), $user );
+	$certificates = $realmManager->listUserCertificates( $realm->getName(), $user, $hideRevoked );
 	$queryVars = ['user' => $user];
 } elseif ( $subject ) {
 	$certificate = $realmManager->getCertificate( $realm->getName(), $subject );
