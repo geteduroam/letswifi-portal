@@ -12,7 +12,15 @@
 			'auth' => [
 				'service' => 'DevAuth',
 				'param' => [],
-				'oauth' => [
+			],
+			'oauth' => [
+				'clients' => (require __DIR__ . DIRECTORY_SEPARATOR . 'clients.php'),
+				'pdo' => [
+					'dsn' => 'sqlite:' . dirname( __DIR__ ) . '/var/letswifi-dev.sqlite',
+					'username' => null,
+					'password' => null,
+				],
+				'keys' => [
 					'my_kid' => [
 						'key' => 'N8Je0+zjMwQX8bkKXu7XyKUDRszsuRETDtYrKMtRlPU=',
 						'iss' => 1676291040,

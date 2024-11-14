@@ -1,5 +1,6 @@
 /composer.phar
-/etc/letswifi.conf.php
+/etc/*
+!/etc/*.dist.php
 /fifo
 /phan.phar
 /php-cs-fixer-v2.phar

@@ -25,7 +25,7 @@ const POST_VALUE = 'yes';
 $app = new LetsWifiApp( basePath: $basePath );
 $app->registerExceptionHandler();
 $provider = $app->getProvider();
-$oauth = $provider->auth->getOAuthHandler();
+$oauth = $provider->auth->oauth;
 
 $oauth->assertAuthorizeRequest();
 

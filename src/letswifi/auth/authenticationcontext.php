@@ -33,13 +33,11 @@ class AuthenticationContext implements JsonSerializable
 
 	public readonly BrowserAuthInterface $browserAuth;
 
-	protected ?OAuth $oauth = null;
-
-	protected string $oauthSecret;
+	public readonly OAuth $oauth;
 
 	/**
-	 * @param array<string,mixed>                              $authServiceParams
-	 * @param array<string,array{key:string,iss:int,exp:?int}> $oauth
+	 * @param array<string,mixed> $authServiceParams
+	 * @param array{keys:array<string,array{key:string,iss:int,exp:?int,pdo:array{dsn:string,username?:string,password?:string}}>,clients:array<array{clientId:string,redirectUris?:array<string>,scopes:array<string>,refresh?:bool,clientSecret?:string}>,...} $oauth
 	 */
 	public function __construct(
 		public readonly string $authService,
@@ -54,7 +52,7 @@ class AuthenticationContext implements JsonSerializable
 		$browserAuth = new $authService( ...$authServiceParams );
 		\assert( $browserAuth instanceof BrowserAuthInterface );
 
-		foreach ( $oauth as $kid => $o ) {
+		foreach ( $oauth['keys'] as $kid => $o ) {
 			// TODO Use kid, issued and expiry fields in a better way
 			if ( $now->getTimestamp() > $o['iss'] ) {
 				$oauthSecret = \base64_decode( $o['key'], true );
@@ -64,22 +62,32 @@ class AuthenticationContext implements JsonSerializable
 		if ( !isset( $oauthSecret ) || !\is_string( $oauthSecret ) || !isset( $kid ) ) {
 			throw new DomainException( 'No appropriate oauth key available' );
 		}
-		$this->oauthSecret = $oauthSecret;
-		$this->kid = $kid;
-		$this->browserAuth = $browserAuth;
-	}
 
-	public function registerOAuthPDO( PDO $pdo ): void
-	{
-		if ( null !== $this->oauth ) {
-			throw new DomainException( 'OAuth is already registered' );
-		}
-		$accessTokenSealer = new JWTSealer( AccessToken::class, $this->oauthSecret );
-		$authorizationCodeSealer = new JWTSealer( AuthorizationCode::class, $this->oauthSecret );
+		$dsn = $oauth['pdo']['dsn'];
+		$username = $oauth['pdo']['username'] ?? null;
+		$password = $oauth['pdo']['password'] ?? null;
+
+		$pdo = new PDO( $dsn, $username, $password );
+		$pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+
+		$accessTokenSealer = new JWTSealer( AccessToken::class, $oauthSecret );
+		$authorizationCodeSealer = new JWTSealer( AuthorizationCode::class, $oauthSecret );
 		$refreshTokenSealer = new PDOSealer( RefreshToken::class, $pdo );
 
-		/** @psalm-suppress ArgumentTypeCoercion Psalm reverses parent/child (PSALMBUG) */
+		/** @psalm-suppress ArgumentTypeCoercion */
 		$this->oauth = new OAuth( $accessTokenSealer, $authorizationCodeSealer, $refreshTokenSealer );
+		$this->kid = $kid;
+		$this->browserAuth = $browserAuth;
+
+		foreach ( $oauth['clients'] as $client ) {
+			$this->oauth->registerClient( new Client(
+				$client['clientId'],
+				$client['redirectUris'] ?? [],
+				$client['scopes'],
+				$client['refresh'] ?? false,
+				$client['clientSecret'] ?? null,
+			) );
+		}
 	}
 
 	public function jsonSerialize(): array
@@ -87,23 +95,16 @@ class AuthenticationContext implements JsonSerializable
 		return ['authService' => $this->authService, 'now' => $this->now];
 	}
 
-	public function getOAuthHandler(): OAuth
-	{
-		return $this->oauth ?? throw new DomainException( 'Cannot register client before OAuth has been registered' );
-	}
-
 	public function getAuthenticatedUser( Provider $provider, ?string $scope = null, bool $force = false ): ?User
 	{
 		if ( null !== $scope ) {
-			if ( null !== $this->oauth ) {
-				try {
-					$token = $this->oauth->getAccessTokenFromRequest( $scope );
-					$grant = $token->getGrant();
+			try {
+				$token = $this->oauth->getAccessTokenFromRequest( $scope );
+				$grant = $token->getGrant();
 
-					return $this->getAuthenticatedUserFromGrant( $provider, $grant );
-				} catch ( BearerException $e ) {
-					return $force ? throw $e : null;
-				}
+				return $this->getAuthenticatedUserFromGrant( $provider, $grant );
+			} catch ( BearerException $e ) {
+				return $force ? throw $e : null;
 			}
 		} else {
 			$userId = $force ? $this->browserAuth->getUserId() : $this->browserAuth->requireAuth();
@@ -121,11 +122,6 @@ class AuthenticationContext implements JsonSerializable
 		}
 
 		throw new DomainException( 'Exhausted all available authentication methods without success' );
-	}
-
-	public function registerClient( Client $client ): void
-	{
-		$this->getOAuthHandler()->registerClient( $client );
 	}
 
 	private function getAuthenticatedUserFromGrant( Provider $provider, Grant $grant ): User

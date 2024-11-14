@@ -16,7 +16,6 @@ use Throwable;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Loader\FilesystemLoader;
-use fyrkat\oauth\Client;
 use fyrkat\openssl\PKCS7;
 use letswifi\auth\User;
 use letswifi\credential\UserCredentialManager;
@@ -147,22 +146,7 @@ final class LetsWifiApp
 
 	public function getProvider(): Provider
 	{
-		$provider = $this->tenantConfig->getProvider( $this->getHttpHost() );
-
-		// Provider contains an authentication context,
-		// we'll populate the OAuth settings here
-		$provider->auth->registerOAuthPDO( $this->getPDO() );
-		foreach ( $this->config->getArray( 'oauth.clients' ) as $client ) {
-			$provider->auth->registerClient( new Client(
-				$client['clientId'],
-				$client['redirectUris'] ?? [],
-				$client['scopes'],
-				$client['refresh'] ?? false,
-				$client['clientSecret'] ?? null,
-			) );
-		}
-
-		return $provider;
+		return $this->tenantConfig->getProvider( $this->getHttpHost() );
 	}
 
 	public function getPDO(): PDO

@@ -41,22 +41,16 @@ class Provider implements JsonSerializable
 
 	public static function fromArray( TenantConfig $tenantConfig, array $data ): self
 	{
-		$auth = null;
-		if ( \array_key_exists( 'auth', $data ) ) {
-			$authService = $data['auth']['service'] ?? null;
-			if ( null === $authService ) {
-				throw new DomainException( 'No auth service is set for the provider' );
-			}
-			$authServiceParams = $data['auth']['param'] ?? [];
-			$oauth = $data['auth']['oauth'];
-			if ( null === $oauth ) {
-				throw new DomainException( 'Provider oauth settings not specified' );
-			}
-			$auth = new AuthenticationContext( $authService, $authServiceParams, $oauth );
+		$authService = $data['auth']['service'] ?? null;
+		if ( null === $authService ) {
+			throw new DomainException( 'No auth service is set for the provider' );
 		}
-		if ( null === $auth ) {
-			throw new DomainException( 'Provider auth not specified' );
+		$oauth = $data['oauth'] ?? null;
+		if ( null === $oauth ) {
+			throw new DomainException( 'Provider oauth settings not specified' );
 		}
+		$authServiceParams = $data['auth']['param'] ?? [];
+		$auth = new AuthenticationContext( $authService, $authServiceParams, $oauth );
 
 		return new self(
 			tenantConfig: $tenantConfig,
