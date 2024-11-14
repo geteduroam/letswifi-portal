@@ -125,7 +125,6 @@ class GoogleOncFormat extends Format
 	{
 		\assert( $this->credential instanceof CertificateCredential ); // We don't support anything else yet
 		$pkcs12 = $this->credential->getPKCS12( ca: true, des: true );
-		\assert( null !== $pkcs12 );
 
 		$caCertificates = $this->getCAPayloadFromAuthMethod( $this->credential->realm->trust );
 		$clientCertificate = $this->getClientCredentialPayloadFromAuthMethod( $pkcs12 );

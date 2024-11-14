@@ -21,7 +21,6 @@ class Pkcs12Format extends Format
 	{
 		\assert( $this->credential instanceof CertificateCredential ); // We don't support anything else yet
 		$pkcs12 = $this->credential->getPKCS12( ca: true, des: true );
-		\assert( null !== $pkcs12 );
 
 		return $pkcs12->getPKCS12Bytes( $this->passphrase ?: '' );
 	}

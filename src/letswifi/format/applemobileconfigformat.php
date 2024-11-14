@@ -35,7 +35,6 @@ class AppleMobileconfigFormat extends Format
 		// If we include the CA, MacOS will also trust that CA for HTTPS traffic
 		// MacOS needs the bundle to be 3DES encoded
 		$pkcs12 = $this->credential->getPKCS12( ca: false, des: true );
-		\assert( null !== $pkcs12 );
 
 		$result = '<?xml version="1.0" encoding="UTF-8"?>'
 			. "\n" . '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">'

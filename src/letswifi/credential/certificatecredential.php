@@ -28,7 +28,7 @@ class CertificateCredential extends Credential
 	private ?PKCS12 $pkcs12noCAdes = null;
 
 	/**
-	 * @param Closure():?PKCS12 $pkcs12Generator
+	 * @param Closure():PKCS12 $pkcs12Generator
 	 */
 	public function __construct(
 		User $user,
@@ -39,23 +39,20 @@ class CertificateCredential extends Credential
 		parent::__construct( $user, $realm, $provider );
 	}
 
-	public function getPKCS12( bool $ca = true, bool $des = false ): ?PKCS12
+	public function getPKCS12( bool $ca = true, bool $des = false ): PKCS12
 	{
 		if ( null === $this->pkcs12 ) {
 			$this->pkcs12 = $this->generateClientCertificate();
 		}
-		if ( null === $this->pkcs12 ) {
-			return null;
-		}
 
 		switch ( [$ca, $des] ) {
 			case [false, false]:return $this->pkcs12noCA ?? $this->pkcs12noCA = new PKCS12( $this->pkcs12->x509, $this->pkcs12->privateKey );
-			case [true, false]:return $this->pkcs12;
-			case [false, true]:return $this->pkcs12noCAdes ?? $this->getPKCS12( false, false )?->use3des();
+			case [false, true]:return $this->pkcs12noCAdes ?? $this->pkcs12noCAdes = $this->getPKCS12( false, false )->use3des();
 			case [true, true]:return $this->pkcs12des ?? $this->pkcs12des = $this->pkcs12->use3des();
 		}
 
-		return null;
+		// $ca==true, $des==false
+		return $this->pkcs12;
 	}
 
 	public function getExpiry(): ?DateTimeInterface
@@ -67,12 +64,10 @@ class CertificateCredential extends Credential
 	{
 		$pkcs12 = $this->getPKCS12();
 
-		return null === $pkcs12
-			? null
-			: $pkcs12->x509->getSubject()->getCommonName();
+		return $pkcs12->x509->getSubject()->getCommonName();
 	}
 
-	private function generateClientCertificate(): ?PKCS12
+	private function generateClientCertificate(): PKCS12
 	{
 		$f = $this->pkcs12Generator;
 
