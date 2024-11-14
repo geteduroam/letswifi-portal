@@ -128,6 +128,7 @@ class DatabaseStorage
 			switch ( $key ) {
 				case 'issued': $query .= '`issued` < :issued'; break;
 				case 'expires': $query .= '(`expires` > :expires OR `expires` IS NULL)'; break;
+				case 'revoked': $query .= '(`revoked` > :revoked OR `revoked` IS NULL)'; break;
 				default: $query .= \is_array( $value )
 					? "`${key}` IN (:" . $key . \implode( ",:${key}", \array_keys( $value ) ) . ')'
 					: "`${key}` = :${key}"

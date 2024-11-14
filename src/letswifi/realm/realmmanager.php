@@ -42,13 +42,18 @@ class RealmManager extends DatabaseStorage
 		return new Realm( $this, $realm );
 	}
 
-	public function listUserCertificates( string $realm, string $user ): array
+	public function listUserCertificates( string $realm, string $user, bool $hideRevoked = false ): array
 	{
-		return $this->getEntriesFromTableWhere( 'realm_signing_log', [
+		$query = [
 			'realm' => $realm,
 			'requester' => $user,
 			'expires' => \gmdate( static::DATE_FORMAT ),
-		] );
+		];
+		if ( $hideRevoked ) {
+			$query['revoked'] = \gmdate( static::DATE_FORMAT );
+		}
+
+		return $this->getEntriesFromTableWhere( 'realm_signing_log', $query );
 	}
 
 	public function getCertificate( string $realm, string $subject ): ?array
