@@ -11,42 +11,58 @@ WORKING_DIR=/var/lib/letswifi
 SETTINGS_DIR=/etc/letswifi
 SETTINGS_FILE="$SETTINGS_DIR/install-answers.sh"
 
-test -f "$SETTINGS_FILE" && . "$SETTINGS_FILE"
 fqdn="${fqdn:-$(hostname -f)}"
+acme_server=https://api.buypass.com/acme/directory
+test -f "$SETTINGS_FILE" && . "$SETTINGS_FILE"
 
-if test -d "$APPLICATION_DIR"
+if ! command -v dialog >/dev/null
 then
-	dialog --backtitle "Let's Wi-Fi installation" --yesno "Let's Wi-Fi appears to be installed already, in the following directory:\n\n$APPLICATION_DIR\n\nThis script will not touch the existing installation.\n\nHowever, you may continue running this script,\nso it can refresh Apache and SimpleSAMLphp settings.\nDo you want to do that instead?" 0 0 >&2
-	skip_letswifi_install=1
-else
-	if command -v dialog >/dev/null
-	then
-		dialog --backtitle "Let's Wi-Fi installation" --yesno 'This script will install the letswifi server software.\n\nContinue?' 0 0 >&2
-	elif command -v whiptail >/dev/null
-	then
-		whiptail --yesno 'This script will install the letswifi server software.\n\nContinue?' 10 60 >&2
-	else
-		printf 'This script will install the letswifi server software.\n\nContinue [y/N]? ' >&2
-		read answer
-		printf %s "$answer" | grep -q -e Y -e y
-	fi
+	whiptail --yesno 'This script will install the letswifi server software.\n\nContinue?' 10 60 >&2
+	apt-get -qq install dialog || apt-get -qq update && apt-get -qq install dialog
 fi
+command -v dialog >/dev/null || apt-get install -y dialog || { apt-get update && apt-get install -y dialog; }
 
-command -v dialog >/dev/null || apt-get install -y dialog || apt-get update && apt-get install -y dialog
 mkdir -p "$WORKING_DIR"
 mkdir -p "$SETTINGS_DIR"
 
-fqdn="$(dialog --backtitle "Let's Wi-Fi installation" --title 'Hostname' --inputbox 'Domain name for the webserver' 0 80 "$fqdn" 3>&1 1>&2 2>&3 3>&-)"
-printf 'fqdn=%s\n' "$fqdn" >>"$SETTINGS_FILE"
-if [ "${skip_letswifi_install:-0}" = "0" ]
-then
-	default_realm="$(dialog --backtitle "Let's Wi-Fi installation" --title 'Default realm selection' --inputbox 'Enter the domain name that is used for the realm' 0 80 "$default_realm" 3>&1 1>&2 2>&3 3>&-)"
-	printf 'default_realm=%s\n' "$default_realm" >>"$SETTINGS_FILE"
-fi
-metadata_url="$(dialog --backtitle "Let's Wi-Fi installation" --title 'SimpleSAMLphp configuration' --inputbox 'Enter URL to SAML-IdP metadata' 0 80 "$metadata_url" 3>&1 1>&2 2>&3 3>&-)"
-printf 'metadata_url=%s\n' "$metadata_url" >>"$SETTINGS_FILE"
+while [ -z "$firstrun" ] || [ -z "$fqdn" ] || [ -z "$realm" ]
+do
+	result=$(dialog --backtitle "Let's Wi-Fi installation" --title 'Installation parameters' --ok-label 'Install' \
+		--form "Please enter your settings for this Let's Wi-Fi installation." 19 80 12 \
+		'Hostname for webserver (*)        https://' 1 0 "$fqdn" 1 43 80 0 \
+		'Realm for RADIUS credential (*)   @' 2 0 "$realm" 2 36 80 0 \
+		'SAML federation metadata URL' 4 0 "$metadata_url" 4 35 80 0 \
+		\
+		'ACME server URL' 6 0 "$acme_server" 6 35 80 0 \
+		'ACME registration e-mail address' 7 0 "$acme_email" 7 35 80 0 \
+		\
+		'Keep ACME fields empty to use a self-signed certificate instead.' 9 0 '' 0 0 0 0 \
+		'Answers are written to /etc/letswifi/install-answers.sh,' 11 0 '' 0 0 0 0 \
+		'it can be used to run this script with --unattend.' 12 0 '' 0 0 0 0 \
+		3>&1 1>&2 2>&3 3>&-)
+	printf '%s' "$result" | {
+		set +e
+		IFS=
+		read fqdn
+		read realm
+		read metadata_url
+		read acme_server
+		read acme_email
+		set -e
+		printf 'fqdn=%s\nrealm=%s\nmetadata_url=%s\nacme_server=%s\nacme_email=%s\n' "$fqdn" "$realm" "$metadata_url" "$acme_server" "$acme_email" >"$SETTINGS_FILE.new"
+		if [ -f "$SETTINGS_FILE" ]
+		then
+			diff -q "$SETTINGS_FILE.new" "$SETTINGS_FILE" && rm -f "$SETTINGS_FILE.new" || { mv "$SETTINGS_FILE" "$SETTINGS_FILE.old"; mv "$SETTINGS_FILE.new" "$SETTINGS_FILE"; }
+		else
+			mv "$SETTINGS_FILE.new" "$SETTINGS_FILE"
+		fi
+	}
+	dialog --clear
+	test -f "$SETTINGS_FILE" && . "$SETTINGS_FILE"
+	firstrun=1
+done
 
-apt-get install -y ca-certificates git php-fpm php-dom php-sqlite3 php-curl sqlite3 simplesamlphp apache2 composer
+apt-get install -qq ca-certificates git php-fpm php-dom php-sqlite3 php-curl sqlite3 simplesamlphp apache2 composer
 a2enconf simplesamlphp "$(basename /etc/apache2/conf-available/php*-fpm.conf)"
 a2dismod status
 
@@ -83,9 +99,9 @@ EOF
 		'authSource' => 'default-sp',
 	],
 	'realm.selector' => null, // one of null or httphost
-	'realm.default' => '$default_realm', // used when realm.selector = null
+	'realm.default' => '$realm', // used when realm.selector = null
 	'realm.auth' => [
-		'$default_realm' => [
+		'$realm' => [
 			'userIdAttribute' => null, // attributeName, or null for NameID
 		],
 	],
@@ -96,7 +112,7 @@ EOF
 	'oauth.clients' => (require '$APPLICATION_DIR/etc/clients.php'),
 ];
 EOF
-	"$APPLICATION_DIR"/bin/add-realm.php "$default_realm" 3650
+	"$APPLICATION_DIR"/bin/add-realm.php "$realm" 3650
 else
 	( cd "$APPLICATION_DIR"; test "$(git branch)" = '* main' && git pull; )
 fi
@@ -137,9 +153,9 @@ then
 	mkdir -p /var/www/html/.well-known/acme-challenge
 	# todo own account for ACME
 	test -f /var/lib/acme/.acme.sh/ca/api.buypass.com/acme/directory/account.json \
-		|| /usr/sbin/acme.sh --server https://api.buypass.com/acme/directory --register-account --accountemail "$acme_email"
-	/usr/sbin/acme.sh --server https://api.buypass.com/acme/directory --issue -d "$fqdn" --webroot /var/www/html
+		|| /usr/sbin/acme.sh --server "$acme_server" --register-account --accountemail "$acme_email"
+	/usr/sbin/acme.sh --server "$acme_server" --issue -d "$fqdn" --webroot /var/www/html
 	# todo ACME cron
 fi
 
-dialog --backtitle "Let's Wi-Fi installation" --msgbox "Installation completed, Let's Wi-Fi should now be set up on port 443\n\nThe SAML SP metadata should be available on the following url:\n\nhttps://${fqdn}/simplesamlphp/module.php/saml/sp/metadata.php/default-sp" 0 0 >&2
+dialog --backtitle "Let's Wi-Fi installation" --msgbox "Installation completed, Let's Wi-Fi should now be set up on port 443\n\nThe SAML SP metadata should be available on the following url:\n\nhttps://${fqdn}/simplesamlphp/module.php/saml/sp/metadata.php/default-sp\n\nConfiguration files for Let's Wi-Fi and SimpleSAMLphp are respectively\nlocated in /etc/letswifi and /etc/simplesaml" 0 0 >&2
