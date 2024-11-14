@@ -92,7 +92,7 @@ class AuthenticationContext implements JsonSerializable
 		return $this->oauth ?? throw new DomainException( 'Cannot register client before OAuth has been registered' );
 	}
 
-	public function getUser( Provider $provider, ?string $scope = null, bool $force = false ): ?User
+	public function getAuthenticatedUser( Provider $provider, ?string $scope = null, bool $force = false ): ?User
 	{
 		if ( null !== $scope ) {
 			if ( null !== $this->oauth ) {
@@ -100,7 +100,7 @@ class AuthenticationContext implements JsonSerializable
 					$token = $this->oauth->getAccessTokenFromRequest( $scope );
 					$grant = $token->getGrant();
 
-					return $this->getUserFromGrant( $provider, $grant );
+					return $this->getAuthenticatedUserFromGrant( $provider, $grant );
 				} catch ( BearerException $e ) {
 					return $force ? throw $e : null;
 				}
@@ -108,7 +108,7 @@ class AuthenticationContext implements JsonSerializable
 		} else {
 			$userId = $force ? $this->browserAuth->getUserId() : $this->browserAuth->requireAuth();
 
-			return null !== $userId ? $this->constructUser( $provider, $userId ) : null;
+			return null !== $userId ? $this->constructAuthenticatedUser( $provider, $userId ) : null;
 		}
 
 		return null;
@@ -116,7 +116,7 @@ class AuthenticationContext implements JsonSerializable
 
 	public function requireAuth( Provider $provider, ?string $scope = null ): User
 	{
-		if ( $user = $this->getUser( provider: $provider, scope: $scope, force: true ) ) {
+		if ( $user = $this->getAuthenticatedUser( provider: $provider, scope: $scope, force: true ) ) {
 			return $user;
 		}
 
@@ -128,7 +128,7 @@ class AuthenticationContext implements JsonSerializable
 		$this->getOAuthHandler()->registerClient( $client );
 	}
 
-	private function getUserFromGrant( Provider $provider, Grant $grant ): User
+	private function getAuthenticatedUserFromGrant( Provider $provider, Grant $grant ): User
 	{
 		$sub = $grant->getSub();
 		if ( null === $grant->realm ) {
@@ -141,7 +141,7 @@ class AuthenticationContext implements JsonSerializable
 		}
 		$affiliations = \explode( ',', $grant->__get( 'affiliations' ) ?? '' );
 
-		return $this->constructUser(
+		return $this->constructAuthenticatedUser(
 			provider: $provider,
 			userId: $sub,
 			clientId: $grant->clientId,
@@ -150,7 +150,7 @@ class AuthenticationContext implements JsonSerializable
 		);
 	}
 
-	private function constructUser( Provider $provider, string $userId, ?string $clientId = null, ?array $affiliations = null, ?Realm $realm = null ): User
+	private function constructAuthenticatedUser( Provider $provider, string $userId, ?string $clientId = null, ?array $affiliations = null, ?Realm $realm = null ): User
 	{
 		return new User(
 			userId: $userId,

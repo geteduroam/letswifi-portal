@@ -95,14 +95,16 @@ class Provider implements JsonSerializable
 		return null === $this->contactId ? null : $this->tenantConfig->getContact( $this->contactId );
 	}
 
-	public function getUser( ?string $scope = null ): ?User
+	public function getAuthenticatedUser( ?string $scope = null ): ?User
 	{
-		return $this->auth->getUser( provider: $this, scope: $scope );
+		$user = $this->auth->getAuthenticatedUser( provider: $this, scope: $scope );
+
+		return null === $user ? null : $this->verifyUserRealms( $user );
 	}
 
 	public function requireAuth( ?string $scope = null ): User
 	{
-		return $this->auth->requireAuth( provider: $this, scope: $scope );
+		return $this->verifyUserRealms( $this->auth->requireAuth( provider: $this, scope: $scope ) );
 	}
 
 	/**
@@ -127,5 +129,16 @@ class Provider implements JsonSerializable
 		}
 
 		return $result;
+	}
+
+	private function verifyUserRealms( User $user ): User
+	{
+		foreach ( $user->getRealms() as $realmId => $realm ) {
+			if ( $realmId !== $realm->realmId || !$this->hasRealm( $realm->realmId ) ) {
+				throw new DomainException( 'Authenticated user has access to a realm that is invalid for this provider' );
+			}
+		}
+
+		return $user;
 	}
 }

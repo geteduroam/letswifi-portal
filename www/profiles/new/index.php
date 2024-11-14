@@ -19,7 +19,7 @@ $basePath = '../..';
 $app = new LetsWifiApp( basePath: $basePath );
 $app->registerExceptionHandler();
 $provider = $app->getProvider();
-$user = $provider->getUser( scope: 'eap-metadata' ) ?? $provider->requireAuth();
+$user = $provider->getAuthenticatedUser( scope: 'eap-metadata' ) ?? $provider->requireAuth();
 
 // Workaround for MacOS/ChromeOS flow; we want to provide the download through a meta refresh,
 // but the refresh should only work once.

@@ -42,6 +42,8 @@ class UserCredentialManager
 	) {
 		// Ensure that the realm is one that is available for this user
 		$this->realm = $user->getRealm( \is_string( $realm ) ? $realm : $realm->realmId );
+
+		// The following check should already have happened when $provider->getAuthenticatedUser() was called
 		\assert( $user->canUseRealm( $this->realm ) );
 		\assert( $provider->hasRealm( $this->realm ) );
 	}
@@ -134,7 +136,6 @@ class UserCredentialManager
 	{
 		// TODO check that $expiry is not too far in the future,
 		// during some test we ended up with the date 88363-05-14 and MySQL didn't like
-		// TODO more generic method to get an arbitrary generator
 		$expiry = $this->now->add( $this->realm->validity );
 		$userKey = new PrivateKey( new OpenSSLConfig( privateKeyType: OpenSSLKey::KEYTYPE_RSA ) );
 		$commonName = static::createCommonName( '@' . \rawurlencode( $this->realm->realmId ) );
