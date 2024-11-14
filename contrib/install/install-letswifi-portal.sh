@@ -122,7 +122,7 @@ test -f "/var/lib/acme/certs/$fqdn/$fqdn.key" || test -f "/var/lib/acme/certs/$f
 cp "/var/lib/acme/certs/$fqdn/$fqdn.cer" "/var/lib/acme/certs/$fqdn/fullchain.cer"
 a2dissite 000-default default-ssl
 a2ensite letswifi-portal
-a2enmod ssl proxy_fcgi
+a2enmod ssl proxy_fcgi setenvif
 service apache2 restart
 >/var/www/html/index.html
 
