@@ -71,16 +71,6 @@ class UserCredentialManager
 		throw new DomainException( 'Unable to issue a credential of class ' . $credentialClass );
 	}
 
-	private function getSigningBundle( Realm $realm ): PKCS12
-	{
-		$sub = $this->config->getRealmData( $realm->realmId )['signer'];
-		$certificateData = $this->config->getCertificateData( $sub );
-		$x509 = new X509( $certificateData['x509'] );
-		$key = new PrivateKey( $certificateData['key'], $certificateData['passphrase'] ?? null );
-
-		return new PKCS12( x509: $x509, privateKey: $key );
-	}
-
 	/**
 	 * @suppress PhanPossiblyNonClassMethodCall Phan doesn't understand PDO
 	 * @suppress PhanPossiblyFalseTypeArgumentInternal Assume getTimestamp() doesn't return false

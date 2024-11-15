@@ -17,6 +17,9 @@ use letswifi\auth\User;
 
 class Provider implements JsonSerializable
 {
+	/**
+	 * @param array<string,array<string>> $realmMap
+	 */
 	public function __construct(
 		private readonly TenantConfig $tenantConfig,
 		public readonly string $host,
@@ -128,7 +131,8 @@ class Provider implements JsonSerializable
 	private function verifyUserRealms( User $user ): User
 	{
 		foreach ( $user->getRealms() as $realmId => $realm ) {
-			if ( $realmId !== $realm->realmId || !$this->hasRealm( $realm->realmId ) ) {
+			\assert( $realmId === $realm->realmId );
+			if ( !$this->hasRealm( $realmId ) ) {
 				throw new DomainException( 'Authenticated user has access to a realm that is invalid for this provider' );
 			}
 		}

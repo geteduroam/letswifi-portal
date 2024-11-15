@@ -35,6 +35,14 @@ class TenantConfig
 	}
 
 	/**
+	 * Get a certificate by it's subject, including the chain up to (including) the root
+	 *
+	 * This function filters away the private key, disallowing consumers of this class
+	 * to sign certificates or leak the key.  In order to get access to the private keys,
+	 * direct access to the inner $this->config, as provided in the constructor, is needed.
+	 *
+	 * @see LetsWifiConfig#getCertificateData(string)
+	 *
 	 * @return array<X509>
 	 */
 	public function getCertificatesWithChain( string ...$sub ): array

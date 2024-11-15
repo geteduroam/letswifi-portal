@@ -18,6 +18,7 @@ use fyrkat\openssl\X509;
 class Realm implements JsonSerializable
 {
 	/**
+	 * @param array<string>  $serverNames
 	 * @param array<X509>    $trust
 	 * @param array<Network> $networks
 	 */

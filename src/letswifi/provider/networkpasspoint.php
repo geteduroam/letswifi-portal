@@ -12,6 +12,10 @@ namespace letswifi\provider;
 
 class NetworkPasspoint extends Network
 {
+	/**
+	 * @param array<string> $oids
+	 * @param array<string> $naiRealms
+	 */
 	public function __construct(
 		string $networkId,
 		string $displayName,
