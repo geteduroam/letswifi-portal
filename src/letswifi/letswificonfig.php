@@ -10,52 +10,32 @@
 
 namespace letswifi;
 
-use DomainException;
-
 class LetsWifiConfig extends Config
 {
-	/**
-	 * @return array{}
-	 */
-	public function getProviderData( string $httpHost ): array
+	public function getProviderData( string $httpHost ): Config
 	{
-		$providers = $this->getArray( 'providers' );
-		if ( \array_key_exists( $httpHost, $providers ) ) {
-			return $providers[$httpHost] + ['host' => $httpHost];
-		}
-		if ( \array_key_exists( '*', $providers ) ) {
-			return $providers['*'] + ['host' => '*'];
-		}
+		$providers = $this->getDictionary( 'providers' );
 
-		throw new DomainException( 'Cannot get provider for this hostname' );
+		return $providers->getDictionaryOrNull( $httpHost ) ?? $providers->getDictionary( '*' );
 	}
 
-	public function getContactData( string $contactId ): array
+	public function getContactData( string $contactId ): Config
 	{
-		return $this->getArray( 'contact' )[$contactId] ?? throw new DomainException( 'Cannot get contact information for ' . $contactId );
+		return $this->getDictionary( 'contact' )->getDictionary( "{$contactId}" );
 	}
 
-	/**
-	 * @return array{realm_id:string,display_name:string,description:string,server_names:array<string>,signer:string,trust:array<string>,validity:int|string,contact:string}
-	 */
-	public function getRealmData( string $realmId ): array
+	public function getRealmData( string $realmId ): Config
 	{
-		return ( $this->getArray( 'realm' )[$realmId] ?? throw new DomainException( 'Cannot get realm information ' . $realmId ) ) + ['realm_id' => $realmId];
+		return $this->getDictionary( 'realm' )->getDictionary( $realmId );
 	}
 
-	/**
-	 * @return array{x509:string,key:string,passphrase?:?string,issuer?:?string}
-	 */
-	public function getCertificateData( string $sub ): array
+	public function getCertificateData( string $sub ): Config
 	{
-		return $this->getArray( 'certificate' )[$sub];
+		return $this->getDictionary( 'certificate' )->getDictionary( $sub );
 	}
 
-	/**
-	 * @return array{network_id:string,display_name:string,oid?:array<string>,nai?:array<string>,ssid?:string}
-	 */
-	public function getNetworkData( string $network ): array
+	public function getNetworkData( string $network ): Config
 	{
-		return $this->getArray( 'network' )[$network] + ['network_id' => $network];
+		return $this->getDictionary( 'network' )->getDictionary( $network );
 	}
 }

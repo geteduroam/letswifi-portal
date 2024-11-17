@@ -11,20 +11,24 @@
 namespace letswifi;
 
 use DomainException;
-use PDO;
+use OutOfBoundsException;
 
 abstract class Config
 {
+	public const KEY_SEPARATOR = '->';
+
+	protected string $keyPrefixStr = '';
+
+	/** @var array<string> */
+	protected array $keyPrefix = [];
+
 	/** @var array<string,mixed> */
 	private $conf;
-
-	/** @var ?PDO */
-	private $pdo;
 
 	/**
 	 * @param ?array|string $conf PHP file
 	 */
-	public function __construct( $conf = null )
+	final public function __construct( $conf = null )
 	{
 		if ( null === $conf ) {
 			$conf = \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 2 ), 'etc', 'letswifi.conf.php'] );
@@ -49,43 +53,86 @@ abstract class Config
 
 	public function getString( string $key ): string
 	{
-		if ( !\array_key_exists( $key, $this->conf ) ) {
-			throw new DomainException( "Expecting config key {$key} to be string, but does not exist" );
-		}
-		$data = $this->conf[$key];
-		if ( !\is_string( $data ) ) {
-			throw new DomainException( "Expecting config key {$key} to be string, but is " . \gettype( $data ) );
-		}
+		$data = $this->getStringOrNull( $key );
 
-		return $data;
+		return null === $data ? throw new DomainException( "Expecting config key {$this->keyPrefixStr}{$key} to be string, but is null" ) : $data;
 	}
 
-	public function getArray( string $key ): array
+	public function getParentKey(): string
 	{
-		if ( !\array_key_exists( $key, $this->conf ) ) {
-			throw new DomainException( "Expecting config key {$key} to be array, but does not exist" );
+		$keyElements = \explode( self::KEY_SEPARATOR, $this->keyPrefixStr );
+		while ( \count( $keyElements ) > 0 ) {
+			if ( $candidate = \array_pop( $keyElements ) ) {
+				return $candidate;
+			}
 		}
-		$data = $this->conf[$key];
+
+		throw new OutOfBoundsException( 'This object is the root configuration node' );
+	}
+
+	public function getDictionaryOrNull( string $key ): ?static
+	{
+		$result = $this->getDictionary( $key );
+
+		return empty( $result->conf ) ? null : $result;
+	}
+
+	public function getRawArray( string $key ): array
+	{
+		$data = $this->getField( $key );
 		if ( !\is_array( $data ) ) {
-			throw new DomainException( "Expecting config key {$key} to be string, but is " . \gettype( $data ) );
+			throw new DomainException( "Expecting config key {$this->keyPrefixStr}{$key} to be dictionary, but is " . \gettype( $data ) );
 		}
 
 		return $data;
 	}
 
-	public function getArrayOrEmpty( string $key ): array
+	public function getDictionary( string $key ): static
 	{
-		return $this->getArrayOrNull( $key ) ?? [];
+		$data = $this->getField( $key );
+		if ( !empty( $data ) && !\is_string( \key( $data ) ) ) {
+			throw new DomainException( "Expecting config key {$this->keyPrefixStr}{$key} to be dictionary, but is list" );
+		}
+		$result = clone $this;
+		$result->conf = $data ?? [];
+		$result->keyPrefixStr = $this->keyPrefixStr . $key . self::KEY_SEPARATOR;
+		$result->keyPrefix[] = $key;
+
+		return $result;
 	}
 
-	public function getArrayOrNull( string $key ): ?array
+	public function getList( string $key ): array
 	{
-		if ( !isset( $this->conf[$key] ) ) {
+		$data = $this->getListOrNull( $key );
+
+		return null === $data ? throw new DomainException( "Expecting config key {$this->keyPrefixStr}{$key} to be list, but is null" ) : $data;
+	}
+
+	public function getListOrEmpty( string $key ): array
+	{
+		return $this->getListOrNull( $key ) ?? [];
+	}
+
+	public function getListOrNull( string $key ): ?array
+	{
+		$data = $this->getField( $key );
+		if ( null === $data ) {
 			return null;
 		}
-		$data = $this->conf[$key];
 		if ( !\is_array( $data ) ) {
-			throw new DomainException( "Expecting config key {$key} to be string, but is " . \gettype( $data ) );
+			throw new DomainException( "Expecting config key {$this->keyPrefixStr}{$key} to be list, but is " . \gettype( $data ) );
+		}
+		if ( \is_string( \key( $data ) ) ) {
+			throw new DomainException( "Expecting config key {$this->keyPrefixStr}{$key} to be list, but is dictionary" );
+		}
+		foreach ( $data as $k => &$value ) {
+			if ( \is_array( $value ) && \is_string( \key( $value ) ) ) {
+				$value = clone $this;
+				$value->conf = $value;
+				$value->keyPrefixStr .= "{$key}[{$k}]";
+				$value->keyPrefix[] = $key;
+				$value->keyPrefix[] = $k;
+			}
 		}
 
 		return $data;
@@ -93,14 +140,43 @@ abstract class Config
 
 	public function getStringOrNull( string $key ): ?string
 	{
-		if ( !isset( $this->conf[$key] ) ) {
+		$data = $this->getField( $key );
+		if ( null === $data ) {
 			return null;
 		}
-		$data = $this->conf[$key];
 		if ( !\is_string( $data ) ) {
-			throw new DomainException( "Expecting config key {$key} to be string, but is " . \gettype( $data ) );
+			throw new DomainException( "Expecting config key {$this->keyPrefixStr}{$key} to be string, but is " . \gettype( $data ) );
 		}
 
 		return $data;
+	}
+
+	public function getNumeric( string $key ): string|int|float
+	{
+		$data = $this->getField( $key );
+		if ( !\is_numeric( $data ) ) {
+			throw new DomainException( "Expecting config key {$this->keyPrefixStr}{$key} to be numeric, but is " . \gettype( $data ) );
+		}
+
+		return $data;
+	}
+
+	public function getNumericOrNull( string $key ): string|int|float|null
+	{
+		$data = $this->getField( $key );
+		if ( null === $data || !\is_numeric( $data ) ) {
+			throw new DomainException( "Expecting config key {$this->keyPrefixStr}{$key} to be numeric, but is " . \gettype( $data ) );
+		}
+
+		return $data;
+	}
+
+	protected function getField( string $key ): mixed
+	{
+		if ( \array_key_exists( $key, $this->conf ) ) {
+			return $this->conf[$key];
+		}
+
+		return null;
 	}
 }

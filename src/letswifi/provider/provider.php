@@ -12,6 +12,7 @@ namespace letswifi\provider;
 
 use DomainException;
 use JsonSerializable;
+use letswifi\Config;
 use letswifi\auth\AuthenticationContext;
 use letswifi\auth\User;
 
@@ -42,27 +43,22 @@ class Provider implements JsonSerializable
 		];
 	}
 
-	public static function fromArray( TenantConfig $tenantConfig, array $data ): self
+	public static function fromConfig( TenantConfig $tenantConfig, Config $data ): self
 	{
-		$authService = $data['auth']['service'] ?? null;
-		if ( null === $authService ) {
-			throw new DomainException( 'No auth service is set for the provider' );
-		}
-		$oauth = $data['oauth'] ?? null;
-		if ( null === $oauth ) {
-			throw new DomainException( 'Provider oauth settings not specified' );
-		}
-		$authServiceParams = $data['auth']['param'] ?? [];
+		$authData = $data->getDictionary( 'auth' );
+		$authService = $authData->getString( 'service' );
+		$oauth = $data->getDictionary( 'oauth' );
+		$authServiceParams = $authData->getRawArray( 'param' );
 		$auth = new AuthenticationContext( $authService, $authServiceParams, $oauth );
 
 		return new self(
 			tenantConfig: $tenantConfig,
-			host: $data['host'],
-			displayName: $data['display_name'],
+			host: $data->getParentKey(),
+			displayName: $data->getString( 'display_name' ),
 			auth: $auth,
-			realmMap: $data['realm'],
-			contactId: $data['contact'],
-			description: $data['description'],
+			realmMap: $data->getRawArray( 'realm' ),
+			contactId: $data->getString( 'contact' ),
+			description: $data->getString( 'description' ),
 		);
 	}
 

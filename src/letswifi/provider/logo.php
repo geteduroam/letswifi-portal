@@ -10,22 +10,31 @@
 
 namespace letswifi\provider;
 
+use Closure;
 use DomainException;
+use letswifi\Config;
 
 class Logo
 {
-	public function __construct( private readonly string $bytes, public readonly string $contentType )
+	/**
+	 * @param Closure():string $emit
+	 */
+	public function __construct( private readonly Closure $imageGenerator, public readonly string $contentType )
 	{
 	}
 
-	public static function fromArray( array $logo ): self
+	public static function fromConfig( Config $logo ): self
 	{
-		return new self( bytes: $logo['bytes'], contentType: $logo['content_type'] );
+		$contentType = $logo->getString( 'content_type' );
+
+		return new self( imageGenerator: static fn(): string => $logo->getString( 'bytes' ), contentType: $contentType );
 	}
 
 	public function getBytes(): string
 	{
-		return $this->bytes;
+		$f = $this->imageGenerator;
+
+		return $f();
 	}
 
 	public function emit(): never
@@ -33,9 +42,13 @@ class Logo
 		if ( \headers_sent() ) {
 			throw new DomainException( 'Headers already sent' );
 		}
+		$bytes = $this->getBytes();
+		if ( \headers_sent() ) {
+			throw new DomainException( 'Headers sent when trying to get logo payload' );
+		}
 		\header( 'Content-Type: ' . $this->contentType );
-		\header( 'Content-Length: ' . \strlen( $this->bytes ) );
+		\header( 'Content-Length: ' . \strlen( $bytes ) );
 
-		exit( $this->bytes );
+		exit( $bytes );
 	}
 }

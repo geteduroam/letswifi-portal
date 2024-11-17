@@ -10,6 +10,8 @@
 
 namespace letswifi\provider;
 
+use letswifi\Config;
+
 class NetworkPasspoint extends Network
 {
 	/**
@@ -25,16 +27,13 @@ class NetworkPasspoint extends Network
 		parent::__construct( networkId: $networkId, displayName: $displayName );
 	}
 
-	/**
-	 * @param array{network_id:string,display_name:string,oid:array<string>,nai?:array<string>,...} $networkData
-	 */
-	public static function fromArray( array $networkData ): self
+	public static function fromConfig( Config $networkConfig ): self
 	{
 		return new self(
-			networkId: $networkData['network_id'],
-			displayName: $networkData['display_name'],
-			oids: $networkData['oid'],
-			naiRealms: $networkData['nai'] ?? [],
+			networkId: $networkConfig->getParentKey(),
+			displayName: $networkConfig->getString( 'display_name' ),
+			oids: $networkConfig->getList( 'oid' ),
+			naiRealms: $networkConfig->getListOrEmpty( 'nai' ),
 		);
 	}
 }

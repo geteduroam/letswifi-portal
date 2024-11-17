@@ -131,12 +131,12 @@ class UserCredentialManager
 		$commonName = static::createCommonName( '@' . \rawurlencode( $this->realm->realmId ) );
 		$dn = new DN( ['CN' => $commonName] );
 		$csr = CSR::generate( $dn, $userKey );
-		$signerDN = $this->config->getRealmData( $this->realm->realmId )['signer'];
-		$caCert = new X509( $this->config->getCertificateData( $signerDN )['x509'] );
+		$signerDN = $this->config->getRealmData( $this->realm->realmId )->getString( 'signer' );
+		$signerData = $this->config->getCertificateData( $signerDN );
+		$caCert = new X509( $signerData->getString( 'x509' ) );
 		$serial = $this->logPreparedUserCredential( $caCert, $csr, $expiry, 'client' );
 
-		$signerData = $this->config->getCertificateData( $signerDN );
-		$caKey = new PrivateKey( $signerData['key'], $signerData['passphrase'] ?? null );
+		$caKey = new PrivateKey( $signerData->getString( 'key' ), $signerData->getStringOrNull( 'passphrase' ) );
 		$conf = new OpenSSLConfig( x509Extensions: OpenSSLConfig::X509_EXTENSION_CLIENT );
 		$userCert = $csr->sign( $caCert, $caKey, $expiry, $conf, $serial );
 		$this->logCompletedUserCredential( $userCert, 'client' );

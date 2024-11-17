@@ -14,6 +14,7 @@ use DateInterval;
 use DomainException;
 use JsonSerializable;
 use fyrkat\openssl\X509;
+use letswifi\Config;
 
 class Realm implements JsonSerializable
 {
@@ -35,18 +36,18 @@ class Realm implements JsonSerializable
 	) {
 	}
 
-	public static function fromArray( TenantConfig $tenantConfig, array $realmData ): self
+	public static function fromConfig( TenantConfig $tenantConfig, Config $realmData ): self
 	{
 		return new self(
 			tenantConfig: $tenantConfig,
-			realmId: $realmData['realm_id'],
-			displayName: $realmData['display_name'],
-			serverNames: $realmData['server_names'],
-			trust: $tenantConfig->getCertificatesWithChain( ...$realmData['trust'] ),
-			validity: static::getValidity( $realmData['validity'] ),
-			networks: $tenantConfig->getNetworks( ...$realmData['networks'] ),
-			description: $realmData['description'],
-			contactId: $realmData['contact'],
+			realmId: $realmData->getParentKey(),
+			displayName: $realmData->getString( 'display_name' ),
+			serverNames: $realmData->getList( 'server_names' ),
+			trust: $tenantConfig->getCertificatesWithChain( ...$realmData->getList( 'trust' ) ),
+			validity: static::getValidity( $realmData->getNumeric( 'validity' ) ),
+			networks: $tenantConfig->getNetworks( ...$realmData->getList( 'networks' ) ),
+			description: $realmData->getString( 'description' ),
+			contactId: $realmData->getString( 'contact' ),
 		);
 	}
 
@@ -68,10 +69,13 @@ class Realm implements JsonSerializable
 		return null === $this->contactId ? null : $this->tenantConfig->getContact( $this->contactId );
 	}
 
-	protected static function getValidity( int|string|DateInterval $in ): DateInterval
+	protected static function getValidity( int|float|string|DateInterval $in ): DateInterval
 	{
 		if ( $in instanceof DateInterval ) {
 			return $in;
+		}
+		if ( \is_float( $in ) ) {
+			$in = (int)\round( $in );
 		}
 		if ( \is_int( $in ) && 0 < $in ) {
 			return new DateInterval( "P{$in}D" );

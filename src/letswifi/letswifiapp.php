@@ -133,7 +133,7 @@ final class LetsWifiApp
 	{
 		if ( null === $this->twig ) {
 			$loader = new FilesystemLoader(
-				$this->config->getArrayOrNull( 'tpldir' )
+				$this->config->getListOrNull( 'tpldir' )
 				?? [\implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 2 ), 'tpl'] )],
 			);
 			$this->twig = new Environment( $loader, [
@@ -152,9 +152,10 @@ final class LetsWifiApp
 	public function getPDO(): PDO
 	{
 		if ( null === $this->pdo ) {
-			$dsn = $this->config->getString( 'pdo.dsn' );
-			$username = $this->config->getStringOrNull( 'pdo.username' );
-			$password = $this->config->getStringOrNull( 'pdo.password' );
+			$pdoData = $this->config->getDictionary( 'pdo' );
+			$dsn = $pdoData->getString( 'dsn' );
+			$username = $pdoData->getStringOrNull( 'username' );
+			$password = $pdoData->getStringOrNull( 'password' );
 
 			$this->pdo = new PDO( $dsn, $username, $password );
 			$this->pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );

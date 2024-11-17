@@ -23,6 +23,7 @@ use fyrkat\oauth\token\AccessToken;
 use fyrkat\oauth\token\AuthorizationCode;
 use fyrkat\oauth\token\Grant;
 use fyrkat\oauth\token\RefreshToken;
+use letswifi\Config;
 use letswifi\auth\browser\BrowserAuthInterface;
 use letswifi\provider\Provider;
 use letswifi\provider\Realm;
@@ -35,14 +36,10 @@ class AuthenticationContext implements JsonSerializable
 
 	public readonly OAuth $oauth;
 
-	/**
-	 * @param array<string,mixed> $authServiceParams
-	 * @param array{keys:array<string,array{key:string,iss:int,exp:?int,pdo:array{dsn:string,username?:string,password?:string}}>,clients:array<array{clientId:string,redirectUris?:array<string>,scopes:array<string>,refresh?:bool,clientSecret?:string}>,...} $oauth
-	 */
 	public function __construct(
 		public readonly string $authService,
 		array $authServiceParams,
-		array $oauth,
+		Config $oauth,
 		protected readonly DateTimeImmutable $now = new DateTimeImmutable(),
 	) {
 		if ( !\preg_match( '/^[A-Z][A-Za-z0-9]+$/', $authService ) ) {
@@ -52,7 +49,7 @@ class AuthenticationContext implements JsonSerializable
 		$browserAuth = new $authService( ...$authServiceParams );
 		\assert( $browserAuth instanceof BrowserAuthInterface );
 
-		foreach ( $oauth['keys'] as $kid => $o ) {
+		foreach ( $oauth->getRawArray( 'keys' ) as $kid => $o ) {
 			// TODO Use kid, issued and expiry fields in a better way
 			if ( $now->getTimestamp() > $o['iss'] ) {
 				$oauthSecret = \base64_decode( $o['key'], true );
@@ -63,9 +60,10 @@ class AuthenticationContext implements JsonSerializable
 			throw new DomainException( 'No appropriate oauth key available' );
 		}
 
-		$dsn = $oauth['pdo']['dsn'];
-		$username = $oauth['pdo']['username'] ?? null;
-		$password = $oauth['pdo']['password'] ?? null;
+		$pdoData = $oauth->getDictionary( 'pdo' );
+		$dsn = $pdoData->getString( 'dsn' );
+		$username = $pdoData->getStringOrNull( 'username' );
+		$password = $pdoData->getStringOrNull( 'password' );
 
 		$pdo = new PDO( $dsn, $username, $password );
 		$pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
@@ -79,7 +77,7 @@ class AuthenticationContext implements JsonSerializable
 		$this->kid = $kid;
 		$this->browserAuth = $browserAuth;
 
-		foreach ( $oauth['clients'] as $client ) {
+		foreach ( $oauth->getRawArray( 'clients' ) as $client ) {
 			$this->oauth->registerClient( new Client(
 				$client['clientId'],
 				$client['redirectUris'] ?? [],

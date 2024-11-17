@@ -10,6 +10,8 @@
 
 namespace letswifi\provider;
 
+use letswifi\Config;
+
 class NetworkSSID extends Network
 {
 	public function __construct(
@@ -20,15 +22,12 @@ class NetworkSSID extends Network
 		parent::__construct( networkId: $networkId, displayName: $displayName );
 	}
 
-	/**
-	 * @param array{network_id:string,display_name:string,ssid:string,...} $networkData
-	 */
-	public static function fromArray( array $networkData ): self
+	public static function fromConfig( Config $networkConfig ): self
 	{
 		return new self(
-			networkId: $networkData['network_id'],
-			displayName: $networkData['display_name'],
-			ssid: $networkData['ssid'],
+			networkId: $networkConfig->getParentKey(),
+			displayName: $networkConfig->getString( 'display_name' ),
+			ssid: $networkConfig->getString( 'ssid' ),
 		);
 	}
 }

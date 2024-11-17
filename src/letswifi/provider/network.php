@@ -11,6 +11,7 @@
 namespace letswifi\provider;
 
 use DomainException;
+use letswifi\Config;
 
 abstract class Network
 {
@@ -19,19 +20,17 @@ abstract class Network
 	}
 
 	/**
-	 * @param array{network_id:string,display_name:string,oid?:array<string>,nai?:array<string>,ssid?:string} $networkData
-	 *
 	 * @return array<Network>
 	 */
-	public static function allFromArray( array $networkData ): array
+	public static function allFromConfig( Config $networkConfig ): array
 	{
 		$result = [];
-		if ( \array_key_exists( 'ssid', $networkData ) ) {
-			$result[] = NetworkSSID::fromArray( $networkData );
-		} elseif ( \array_key_exists( 'oid', $networkData ) ) {
-			$result[] = NetworkPasspoint::fromArray( $networkData );
+		if ( null !== $networkConfig->getStringOrNull( 'ssid' ) ) {
+			$result[] = NetworkSSID::fromConfig( $networkConfig );
+		} elseif ( null !== $networkConfig->getStringOrNull( 'oid' ) ) {
+			$result[] = NetworkPasspoint::fromConfig( $networkConfig );
 		} else {
-			throw new DomainException( "Incomplete network {$networkData['network_id']}" );
+			throw new DomainException( \sprintf( 'Incomplete network %s', $networkConfig->getParentKey() ) );
 		}
 
 		return $result;

@@ -21,17 +21,17 @@ class TenantConfig
 
 	public function getProvider( string $httpHost ): Provider
 	{
-		return Provider::fromArray( $this, $this->config->getProviderData( $httpHost ) );
+		return Provider::fromConfig( $this, $this->config->getProviderData( $httpHost ) );
 	}
 
 	public function getContact( string $contactId ): Contact
 	{
-		return Contact::fromArray( $this->config->getContactData( $contactId ) );
+		return Contact::fromConfig( $this->config->getContactData( $contactId ) );
 	}
 
 	public function getRealm( string $realmId ): Realm
 	{
-		return Realm::fromArray( $this, $this->config->getRealmData( $realmId ) );
+		return Realm::fromConfig( $this, $this->config->getRealmData( $realmId ) );
 	}
 
 	/**
@@ -53,10 +53,10 @@ class TenantConfig
 			while ( $subject ) {
 				$certificateData = $this->config->getCertificateData( $subject );
 				if ( !\in_array( $subject, $subjects, true ) ) {
-					\array_unshift( $result, new X509( $certificateData['x509'] ) );
+					\array_unshift( $result, new X509( $certificateData->getString( 'x509' ) ) );
 				}
 				$subjects[] = $subject;
-				$subject = $certificateData['issuer'] ?? null;
+				$subject = $certificateData->getStringOrNull( 'issuer' );
 			}
 		}
 
@@ -69,7 +69,7 @@ class TenantConfig
 	public function getNetworks( string ...$networks ): array
 	{
 		return \array_merge( ...\array_values( \array_map(
-			fn( string $n ) => Network::allFromArray( $this->config->getNetworkData( $n ) ),
+			fn( string $n ) => Network::allFromConfig( $this->config->getNetworkData( $n ) ),
 			$networks,
 		) ) );
 	}

@@ -10,6 +10,8 @@
 
 namespace letswifi\provider;
 
+use letswifi\Config;
+
 class Contact
 {
 	public function __construct(
@@ -21,14 +23,17 @@ class Contact
 	) {
 	}
 
-	public static function fromArray( array $contactData ): self
+	public static function fromConfig( Config $contactData ): self
 	{
+		$location = $contactData->getDictionary( 'location' );
+		$logo = $contactData->getDictionary( 'logo' );
+
 		return new self(
-			mail: $contactData['mail'],
-			web: $contactData['web'],
-			phone: $contactData['phone'],
-			location: null === $contactData['location'] ? null : Location::fromArray( $contactData['location'] ),
-			logo: null === $contactData['logo'] ? null : Logo::fromArray( $contactData['logo'] ),
+			mail: $contactData->getStringOrNull( 'mail' ),
+			web: $contactData->getStringOrNull( 'web' ),
+			phone: $contactData->getStringOrNull( 'phone' ),
+			location: Location::fromConfig( $contactData->getDictionary( 'location' ) ),
+			logo: Logo::fromConfig( $contactData->getDictionary( 'logo' ) ),
 		);
 	}
 }
