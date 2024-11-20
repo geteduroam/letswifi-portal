@@ -169,6 +169,44 @@ tee /etc/apache2/sites-available/letswifi-portal.conf << EOF >/dev/null
 </VirtualHost>
 EOF
 
+a2dissite 000-default default-ssl
+a2ensite letswifi-portal
+a2enmod ssl proxy_fcgi setenvif
+>/var/www/html/index.html
+
+if [ -n "$acme_email" -a -n "$acme_server" ]
+then
+	acme_hostname="$(printf %s "$acme_server" | sed -es_^https://__ -es_/.*\$__)"
+	[ -f /usr/bin/acme.sh ] || wget --output-document /usr/bin/acme.sh https://raw.githubusercontent.com/acmesh-official/acme.sh/master/acme.sh
+	chmod +x /usr/bin/acme.sh
+	mkdir -p /var/www/html/.well-known/acme-challenge
+	getent passwd acme >/dev/null || useradd	\
+		--comment 'ACME protocol client'	\
+		--home-dir /var/lib/acme	\
+		--shell /bin/sh	\
+		--system acme
+	mkdir -p /var/lib/acme/certs
+	touch /var/log/acme.sh.log
+	[ -L /var/lib/acme/.acme.sh -a -d /var/lib/acme/.acme.sh ] || ln -s ./ /var/lib/acme/.acme.sh
+	chown -Rh acme:acme /var/lib/acme /var/log/acme.sh.log /var/www/html/.well-known/acme-challenge
+	test -f /var/lib/acme/account.conf || tee /var/lib/acme/account.conf <<EOF
+CERT_HOME="/var/lib/acme/certs"
+LOG_FILE='/var/log/acme.sh.log'
+ECC_SUFFIX=
+EOF
+	test -d "/var/lib/acme/.acme.sh/ca/$acme_hostname"	\
+		|| su acme -c "/usr/bin/acme.sh --no-color --server '$acme_server' --register-account --accountemail '$acme_email'"
+	if ! service apache2 status >/dev/null
+	then
+		a2dissite letswifi-portal
+		service apache2 start
+	fi
+	su acme -c "/usr/bin/acme.sh --no-color --server '$acme_server' --issue -d '$fqdn' --webroot /var/www/html"
+	a2ensite letswifi-portal
+	crontab -u acme -l || crontab -u acme - <<EOF
+4 17 * * * /usr/bin/acme.sh/acme.sh --cron --home /var/lib/acme > /dev/null
+EOF
+fi
 mkdir -p "/var/lib/acme/certs/$fqdn"
 test -f "/var/lib/acme/certs/$fqdn/$fqdn.key" || test -f "/var/lib/acme/certs/$fqdn/$fqdn.cer"	\
 	|| openssl req -x509 -newkey rsa:2048	\
@@ -176,28 +214,8 @@ test -f "/var/lib/acme/certs/$fqdn/$fqdn.key" || test -f "/var/lib/acme/certs/$f
 		-out "/var/lib/acme/certs/$fqdn/$fqdn.cer"	\
 		-sha256 -days 3650 -nodes	\
 		-subj "/C=XX/ST=StateName/L=CityName/O=CompanyName/OU=CompanySectionName/CN=CommonNameOrHostname"
-cp "/var/lib/acme/certs/$fqdn/$fqdn.cer" "/var/lib/acme/certs/$fqdn/fullchain.cer"
-a2dissite 000-default default-ssl
-a2ensite letswifi-portal
-a2enmod ssl proxy_fcgi setenvif
+cp -n "/var/lib/acme/certs/$fqdn/$fqdn.cer" "/var/lib/acme/certs/$fqdn/fullchain.cer" || true
 service apache2 restart
->/var/www/html/index.html
-
-# First fix own account for ACME
-#acme_email="$(dialog --backtitle "Let's Wi-Fi installation" --title 'ACME configuration' --ok-label Yes --cancel-label No --inputbox 'A self signed certificate has been created.\n\nDo you want to obtain a certificate for $fqdn using ACME now?\n\nThen enter e-mail address for registering an ACME account' 0 0 3>&1 1>&2 2>&3 3>&- || true)"
-#printf 'acme_email=%s\n' "$acme_email" >>"$SETTINGS_FILE"
-
-if [ -n "$acme_email" ]
-then
-	wget --output-document /usr/sbin/acme.sh https://raw.githubusercontent.com/acmesh-official/acme.sh/master/acme.sh
-	chmod +x /usr/sbin/acme.sh
-	mkdir -p /var/www/html/.well-known/acme-challenge
-	# todo own account for ACME
-	test -f /var/lib/acme/.acme.sh/ca/api.buypass.com/acme/directory/account.json \
-		|| /usr/sbin/acme.sh --server "$acme_server" --register-account --accountemail "$acme_email"
-	/usr/sbin/acme.sh --server "$acme_server" --issue -d "$fqdn" --webroot /var/www/html
-	# todo ACME cron
-fi
 
 printf '\033[0m' >&2
 dialog --backtitle "Let's Wi-Fi installation" --msgbox "Installation completed, Let's Wi-Fi should now be set up on port 443\n\n$extra_info\n\nConfiguration files for Let's Wi-Fi and SimpleSAMLphp are respectively\nlocated in /etc/letswifi and /etc/simplesaml" 0 0 >&2
