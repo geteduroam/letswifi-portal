@@ -27,18 +27,18 @@ mkdir -p "$SETTINGS_DIR"
 
 while [ -z "$firstrun" ] || [ -z "$fqdn" ] || [ -z "$realm" ]
 do
-	result=$(dialog --backtitle "Let's Wi-Fi installation" --title 'Installation parameters' --ok-label 'Install' \
-		--form "Please enter your settings for this Let's Wi-Fi installation." 19 80 12 \
-		'Hostname for webserver (*)        https://' 1 0 "$fqdn" 1 43 80 0 \
-		'Realm for RADIUS credential (*)   @' 2 0 "$realm" 2 36 80 0 \
-		'SAML federation metadata URL' 4 0 "$metadata_url" 4 35 80 0 \
+	result=$(dialog --backtitle "Let's Wi-Fi installation" --title 'Installation parameters' --ok-label 'Install'	\
+		--form "Please enter your settings for this Let's Wi-Fi installation." 19 80 12	\
+		'Hostname for webserver (*)        https://' 1 0 "$fqdn" 1 43 80 0	\
+		'Realm for RADIUS credential (*)   @' 2 0 "$realm" 2 36 80 0	\
+		'SAML federation metadata URL' 4 0 "$metadata_url" 4 35 80 0	\
 		\
-		'ACME server URL' 6 0 "$acme_server" 6 35 80 0 \
-		'ACME registration e-mail address' 7 0 "$acme_email" 7 35 80 0 \
+		'ACME server URL' 6 0 "$acme_server" 6 35 80 0	\
+		'ACME registration e-mail address' 7 0 "$acme_email" 7 35 80 0	\
 		\
-		'Keep ACME fields empty to use a self-signed certificate instead.' 9 0 '' 0 0 0 0 \
-		'Answers are written to /etc/letswifi/install-answers.sh,' 11 0 '' 0 0 0 0 \
-		'it can be used to run this script with --unattend.' 12 0 '' 0 0 0 0 \
+		'Keep ACME fields empty to use a self-signed certificate instead.' 9 0 '' 0 0 0 0	\
+		'Answers are written to /etc/letswifi/install-answers.sh,' 11 0 '' 0 0 0 0	\
+		'it can be used to run this script with --unattend.' 12 0 '' 0 0 0 0	\
 		3>&1 1>&2 2>&3 3>&-)
 	printf '%s' "$result" | {
 		set +e
@@ -62,25 +62,66 @@ do
 	firstrun=1
 done
 
-apt-get install -qq ca-certificates git php-fpm php-dom php-sqlite3 php-curl sqlite3 simplesamlphp apache2 composer
+if [ -n "$metadata_url" ]
+then
+	ssp_authsource=default-sp
+	user_id_attribute=null
+	extra_info="The SAML SP metadata should be available on the following url:\n\nhttps://${fqdn}/simplesamlphp/module.php/saml/sp/metadata.php/default-sp"
+else
+	password=$(base64 /dev/random | tr -d /+ | head -c8)
+	ssp_authsource=authcrypt-hash
+	user_id_attribute=\'uid\'
+	extra_info="You can log in to the portal with the following credentials:\nAddress:  https://${fqdn}/\nUsername: letswifi\nPassword: $password"
+fi
+
+printf '\033[0;44;37m\033[2J' >&2
+
+apt-get install -qq cron ca-certificates git php-fpm php-dom php-sqlite3 php-curl sqlite3 simplesamlphp apache2 composer
 a2enconf simplesamlphp "$(basename /etc/apache2/conf-available/php*-fpm.conf)"
 a2dismod status
 
 
-
-fgrep "'metarefresh' => " /etc/simplesamlphp/config.php || \
-	sed -e "/^ *'module\\.enable' =>/a\\"	\
-		-e "         'metarefresh' => true,\\"	\
-		/etc/simplesamlphp/config.php
-fgrep "'cron' => true" /etc/simplesamlphp/config.php || \
-	sed -e "/^ *'module\\.enable' =>/a\\"	\
-		-e "         'cron' => true,\\"	\
-		/etc/simplesamlphp/config.php
+if [ -n "$metadata_url" ]
+then
+	fgrep -q "'metarefresh' => " /etc/simplesamlphp/config.php ||	\
+		sed -i -e "/^ *'module\\.enable' =>/a\\"	\
+			-e "         'metarefresh' => true,\\"	\
+			/etc/simplesamlphp/config.php
+	fgrep -q "'cron' => true" /etc/simplesamlphp/config.php ||	\
+		sed -i -e "/^ *'module\\.enable' =>/a\\"	\
+			-e "         'cron' => true,\\"	\
+			/etc/simplesamlphp/config.php
+	crontab -u www-data -l || crontab -u www-data - <<EOF
+4 51 * * * php /usr/share/simplesamlphp/modules/cron/bin/cron.php -t hourly
+EOF
+else
+	# SimpleSAMLphp changes the output of pwgen.php over the versions,
+	# making it really hard for us to use it in a script
+	password_hash="$(printf %s "$password" | /usr/share/simplesamlphp/bin/pwgen.php | tr -d \\n | sed -e s/hash:// -e's/^.* //')"
+	fgrep -q "'authcrypt' => " /etc/simplesamlphp/config.php ||	\
+		sed -i -e "/^ *'module\\.enable' =>/a\\"	\
+			-e "         'authcrypt' => true,\\"	\
+			/etc/simplesamlphp/config.php
+	fgrep -q "\$config['authcrypt-hash']" /etc/simplesamlphp/authsources.php ||	\
+		tee >>/etc/simplesamlphp/authsources.php <<EOF
+\$config['authcrypt-hash'] = ['authcrypt:Hash'] + require "$SETTINGS_DIR/localusers.php";
+EOF
+	[ -f "$SETTINGS_DIR/localusers.php" ] && mv "$SETTINGS_DIR/localusers.php" "$SETTINGS_DIR/localusers.php.bak"
+	tee >>"$SETTINGS_DIR/localusers.php" <<EOF
+<?php return [
+'letswifi:$password_hash' => ['uid' => 'letswifi', 'eduPersonAffiliation' => ['member', 'employee', 'staff']],
+// Passwords can be hashed using /usr/share/simplesamlphp/bin/pwgen.php
+];
+EOF
+	ssp_authsource=authcrypt-hash
+	user_id_attribute=\'uid\'
+	extra_info="You can log in to the portal with the following credentials:\nAddress:  https://${fqdn}/\nUsername: letswifi\nPassword: $password"
+fi
 
 if [ "${skip_letswifi_install:-0}" = "0" ]
 then
 	git clone "$LETSWIFI_REPO" "$APPLICATION_DIR"
-	( cd "$APPLICATION_DIR"; COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev; )
+	( cd "$APPLICATION_DIR"; COMPOSER_ALLOW_SUPERUSER=1 composer --no-ansi install --no-dev; )
 	mkdir -p /var/lib/letswifi/database
 	chmod 700 /var/lib/letswifi/database
 	sqlite3 /var/lib/letswifi/database/letswifi.sqlite <"$APPLICATION_DIR/sql/letswifi.sqlite.sql"
@@ -96,13 +137,13 @@ EOF
 	'auth.service' => 'SimpleSAMLAuth',
 	'auth.params' => [
 		'autoloadInclude' => '$SIMPLESAMLPHP_PATH/lib/_autoload.php',
-		'authSource' => 'default-sp',
+		'authSource' => '$ssp_authsource',
 	],
 	'realm.selector' => null, // one of null or httphost
 	'realm.default' => '$realm', // used when realm.selector = null
 	'realm.auth' => [
 		'$realm' => [
-			'userIdAttribute' => null, // attributeName, or null for NameID
+			'userIdAttribute' => $user_id_attribute, // attributeName, or null for NameID
 		],
 	],
 	'pdo.dsn' => 'sqlite:/var/lib/letswifi/database/letswifi.sqlite',
@@ -129,11 +170,11 @@ tee /etc/apache2/sites-available/letswifi-portal.conf << EOF >/dev/null
 EOF
 
 mkdir -p "/var/lib/acme/certs/$fqdn"
-test -f "/var/lib/acme/certs/$fqdn/$fqdn.key" || test -f "/var/lib/acme/certs/$fqdn/$fqdn.cer" \
-	|| openssl req -x509 -newkey rsa:2048 \
-		-keyout "/var/lib/acme/certs/$fqdn/$fqdn.key" \
-		-out "/var/lib/acme/certs/$fqdn/$fqdn.cer" \
-		-sha256 -days 3650 -nodes \
+test -f "/var/lib/acme/certs/$fqdn/$fqdn.key" || test -f "/var/lib/acme/certs/$fqdn/$fqdn.cer"	\
+	|| openssl req -x509 -newkey rsa:2048	\
+		-keyout "/var/lib/acme/certs/$fqdn/$fqdn.key"	\
+		-out "/var/lib/acme/certs/$fqdn/$fqdn.cer"	\
+		-sha256 -days 3650 -nodes	\
 		-subj "/C=XX/ST=StateName/L=CityName/O=CompanyName/OU=CompanySectionName/CN=CommonNameOrHostname"
 cp "/var/lib/acme/certs/$fqdn/$fqdn.cer" "/var/lib/acme/certs/$fqdn/fullchain.cer"
 a2dissite 000-default default-ssl
@@ -158,4 +199,5 @@ then
 	# todo ACME cron
 fi
 
-dialog --backtitle "Let's Wi-Fi installation" --msgbox "Installation completed, Let's Wi-Fi should now be set up on port 443\n\nThe SAML SP metadata should be available on the following url:\n\nhttps://${fqdn}/simplesamlphp/module.php/saml/sp/metadata.php/default-sp\n\nConfiguration files for Let's Wi-Fi and SimpleSAMLphp are respectively\nlocated in /etc/letswifi and /etc/simplesaml" 0 0 >&2
+printf '\033[0m' >&2
+dialog --backtitle "Let's Wi-Fi installation" --msgbox "Installation completed, Let's Wi-Fi should now be set up on port 443\n\n$extra_info\n\nConfiguration files for Let's Wi-Fi and SimpleSAMLphp are respectively\nlocated in /etc/letswifi and /etc/simplesaml" 0 0 >&2
