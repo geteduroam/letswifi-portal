@@ -77,6 +77,7 @@ phan: vendor
 
 codestyle: vendor
 	$(PHP) vendor/bin/php-cs-fixer fix
+	$(PHP) vendor/bin/twig-cs-fixer fix
 .PHONY: codestyle
 
 phpunit: vendor

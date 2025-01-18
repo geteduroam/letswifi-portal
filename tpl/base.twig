@@ -10,11 +10,11 @@
 {% block layout %}{% endblock %}
 <footer>
 	<ul id="languages">
-{% for displayName,locale in _supportedLocales %}
+{% for displayName, locale in _supportedLocales %}
 {% if locale == _locale %}
 		<li lang="{{ locale }}"><strong>{{ displayName }}</strong></li>
 {% else %}
-		<li lang="{{ locale }}"><a href="?lang={{ locale|split('-',2)|first }}">{{ displayName }}</a></li>
+		<li lang="{{ locale }}"><a href="?lang={{ locale|split('-', 2)|first }}">{{ displayName }}</a></li>
 {% endif %}
 {% endfor %}
 	</ul>

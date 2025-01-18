@@ -1,16 +1,16 @@
-{% extends "base.twig" %}
+{% extends 'base.twig' %}
 
 {% block documentClass %}3col{% endblock %}
 
 {% set menu = {
-	'home': {'name':'Info', 'href':'/'},
-	'app': {'name':'Apps', 'href':'/app/'},
+	home: {name: 'Info', href: '/'},
+	app: {name: 'Apps', href: '/app/'},
 } %}
 
 {% block layout %}
 <nav>
 	<ul>
-{% for tl,menuItem in menu %}
+{% for tl, menuItem in menu %}
 {% if _basePath ~ menuItem.href == href %}
 		<li class="active"><a>
 {% else %}

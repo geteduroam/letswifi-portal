@@ -1,4 +1,4 @@
-{% extends "menu.twig" %}
+{% extends 'menu.twig' %}
 
 {% block title %}Apps{% endblock %}
 
@@ -7,7 +7,7 @@
 	<h1>geteduroam<small>– eduroam authentication made easy</small></h1>
 	<p>For most users, the easiest way to use geteduroam is to use one of the official apps.</p>
 	<ul class="apps buttons">
-{% for id,app in apps %}
+{% for id, app in apps %}
 		<li><a class="btn btn-default" href="{{ app.url }}">{{ app.name }}</a></li>
 {% endfor %}
 	</ul>
@@ -15,7 +15,7 @@
 	<hr>
 	<p>For some platforms there are no apps available. For these platforms, you can download a configuration profile that you can install directly using the operating systems facilities.</p>
 	<ul class="apps buttons devices">
-{% for id,conf in os_config %}
+{% for id, conf in os_config %}
 		<li><a href="{{ conf.url }}" class="btn btn-default">{{ conf.name }}</a></li>
 {% endfor %}
 	</ul>

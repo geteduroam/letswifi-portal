@@ -14,9 +14,10 @@
 	},
 	"require-dev": {
 		"vimeo/psalm": "^5.13",
-		"phpunit/phpunit": "^9.5",
+		"phan/phan": "^5.4",
 		"friendsofphp/php-cs-fixer": "^3",
-		"phan/phan": "^5.4"
+		"vincentlanglet/twig-cs-fixer": "^3.5",
+		"phpunit/phpunit": "^9.5"
 	},
 	"authors": [
 		{

@@ -23,4 +23,5 @@
 /.php_cs.cache
 /.php-cs-fixer.cache
 /.phpunit.result.cache
+/.twig-cs-fixer.cache
 *.eap-config
