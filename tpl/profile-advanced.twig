@@ -1,4 +1,4 @@
-{% extends "menu.html" %}
+{% extends "menu.twig" %}
 
 {% block title %}New configuration profile{% endblock %}
 
@@ -16,7 +16,7 @@
 			<p>
 				{{ t('Alternatively, you can use a configuration profile') }}
 			<div class="fieldsets">
-{% include 'realm-picker.html' %}
+{{ include('realm-picker.twig') }}
 				<fieldset id="profile-encrypt">
 					<legend accesskey="e">{{ t('Encryption') }}</legend>
 				<p>

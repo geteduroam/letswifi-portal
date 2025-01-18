@@ -119,7 +119,7 @@ final class LetsWifiApp
 		}
 		\header( 'Content-Type: text/html;charset=utf8' );
 
-		$template = $this->getTwig()->load( "{$template}.html" );
+		$template = $this->getTwig()->load( "{$template}.twig" );
 
 		exit( $template->render(
 			[

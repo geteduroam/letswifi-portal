@@ -1,4 +1,4 @@
-{% extends "dialog.html" %}
+{% extends "dialog.twig" %}
 
 {% block title %}{{ t('Profile download') }}{% endblock %}
 
@@ -11,7 +11,7 @@
 <details>
 	<summary>{{ t('Download not starting?') }}</summary>
 {% else %}
-{% include 'realm-picker.html' %}
+{% include 'realm-picker.twig' %}
 {% endif %}
 	<p><input type="hidden" name="format" value="{{ format }}"><button type="submit" class="btn btn-default" id="btn-download">{{ t('Start download') }}</button></p>
 </form>

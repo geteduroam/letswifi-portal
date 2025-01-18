@@ -1,4 +1,4 @@
-{% extends "dialog.html" %}
+{% extends "dialog.twig" %}
 
 {% block title %}Authorize{% endblock %}
 
@@ -24,7 +24,7 @@
 	</details>
 {% else %}
 	<p>{{ t('Select your user realm') }}</p>
-{% include 'realm-picker.html' %}
+{% include 'realm-picker.twig' %}
 	<p class="text-center"><button type="submit" class="btn btn-default" name="{{ postField }}" value="{{ postValue }}">{{ t('Continue') }}</button></p>
 {% endif %}
 </main>
