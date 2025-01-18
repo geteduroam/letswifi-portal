@@ -28,8 +28,5 @@ abstract class Credential
 
 	abstract public function getExpiry(): ?DateTimeInterface;
 
-	/*public function getIdentity(): string
-	{
-		return $this->user->userId . '@' . $this->realm->realmId;
-	}*/
+	abstract public function getIdentity(): string;
 }
