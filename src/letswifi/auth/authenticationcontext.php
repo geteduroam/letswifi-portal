@@ -108,7 +108,7 @@ class AuthenticationContext implements JsonSerializable
 		} else {
 			$userId = $force ? $this->browserAuth->requireAuth() : $this->browserAuth->getUserId();
 
-			return null !== $userId ? $this->constructAuthenticatedUser( $provider, $userId ) : null;
+			return null !== $userId ? $this->constructAuthenticatedUser( $provider, $userId, 'browser' ) : null;
 		}
 
 		return null;
@@ -136,16 +136,20 @@ class AuthenticationContext implements JsonSerializable
 		}
 		$affiliations = \explode( ',', $grant->__get( 'affiliations' ) ?? '' );
 
+		if ( null === $grant->client_id ) {
+			throw new DomainException( "User {$sub} with realm {$grant->realm} has no client_id" );
+		}
+
 		return $this->constructAuthenticatedUser(
 			provider: $provider,
 			userId: $sub,
-			clientId: $grant->clientId,
+			clientId: $grant->client_id,
 			affiliations: $affiliations,
 			realm: $realm,
 		);
 	}
 
-	private function constructAuthenticatedUser( Provider $provider, string $userId, ?string $clientId = null, ?array $affiliations = null, ?Realm $realm = null ): User
+	private function constructAuthenticatedUser( Provider $provider, string $userId, string $clientId, ?array $affiliations = null, ?Realm $realm = null ): User
 	{
 		return new User(
 			userId: $userId,
