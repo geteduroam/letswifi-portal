@@ -12,13 +12,21 @@ namespace letswifi\auth\browser;
 
 class DevAuth implements BrowserAuthInterface
 {
-	public function __construct( public readonly ?string $staticUser = null )
+	/**
+	 * @param array<string> $affiliations
+	 */
+	public function __construct( private readonly ?string $username = null, private readonly array $affiliations = [] )
 	{
 		if ( \PHP_SAPI !== 'cli-server' ) {
 			\header( 'Content-Type: text/plain' );
 
 			exit( 'Development auth module cannot be used in production' . \PHP_EOL );
 		}
+	}
+
+	public function isLoggedIn(): bool
+	{
+		return true;
 	}
 
 	public function requireAuth(): string
@@ -28,10 +36,10 @@ class DevAuth implements BrowserAuthInterface
 
 	public function getUserId(): string
 	{
-		// Returns owner of this PHP file
-		$user = $this->staticUser ?? \get_current_user();
-		\assert( !\str_contains( $user, 'SYSTEM' ), 'File is owned by Windows SYSTEM user' );
-		\assert( !\str_contains( $user, 'root' ), 'File is owned by unix root' );
+		// Get the running user ID
+		$user = $this->username ?? \get_current_user();
+		\assert( !\str_contains( $user, 'SYSTEM' ), 'Running as Windows SYSTEM user' );
+		\assert( !\str_contains( $user, 'root' ), 'Running as root' );
 
 		return $user;
 	}
@@ -46,6 +54,6 @@ class DevAuth implements BrowserAuthInterface
 
 	public function getAffiliations(): array
 	{
-		return ['staff', 'student', 'employee'];
+		return $this->affiliations;
 	}
 }

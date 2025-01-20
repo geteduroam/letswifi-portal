@@ -22,7 +22,7 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 	protected Simple $as;
 
 	/** @var ?array<string,array<string>> */
-	private $attributes;
+	private ?array $attributes = null;
 
 	/**
 	 * @psalm-suppress UnresolvableInclude We don't know where SimpleSAMLphp is
@@ -49,6 +49,11 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 			require $autoloadInclude;
 		}
 		$this->as = new Simple( $authSource );
+	}
+
+	public function isLoggedIn(): bool
+	{
+		return $this->as->isAuthenticated();
 	}
 
 	/**
@@ -81,11 +86,7 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 	 */
 	public function getUserId(): ?string
 	{
-		if ( $this->as->isAuthenticated() ) {
-			return $this->requireAuth();
-		}
-
-		return null;
+		return $this->isLoggedIn() ? $this->requireAuth() : null;
 	}
 
 	/**

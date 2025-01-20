@@ -60,8 +60,12 @@
 			// param are the parameters provided to the service.
 			// REQUIRED: Array service => string, param => array
 			'auth' => [
+				// DevAuth only works with the PHP CLI server
 				'service' => 'DevAuth',
-				'param' => [],
+				'param' => [
+					'username' => \get_current_user(),
+					'affiliations' => ['staff', 'student', 'employee'],
+				],
 			],
 
 			// Database for logging pseudocredentials and OAuth credentials

@@ -10,12 +10,23 @@
 
 namespace letswifi\auth\browser;
 
+/** @psalm-immutable */
 class BasicAuth implements BrowserAuthInterface
 {
-	public function __construct( public readonly array $accounts )
+	public readonly array $server;
+
+	/**
+	 * @param array<string,string>        $accounts     username/password combinations
+	 * @param array<string,array<string>> $affiliations Mapping username to affiliations
+	 */
+	public function __construct( private readonly array $accounts, public readonly array $affiliations = [], ?array $server = null )
 	{
+		$this->server = $server ?? $_SERVER;
 	}
 
+	/**
+	 * @psalm-suppress ImpureFunctionCall The function will not return
+	 */
 	public function requireAuth(): string
 	{
 		$userId = $this->getUserId();
@@ -27,12 +38,17 @@ class BasicAuth implements BrowserAuthInterface
 		exit( "401 Unauthorized\r\n" );
 	}
 
+	public function isLoggedIn(): bool
+	{
+		return null !== $this->getUserId();
+	}
+
 	public function getUserId(): ?string
 	{
-		if ( \array_key_exists( 'PHP_AUTH_USER', $_SERVER ) ) {
-			$user = $_SERVER['PHP_AUTH_USER'];
+		if ( \array_key_exists( 'PHP_AUTH_USER', $this->server ) ) {
+			$user = $this->server['PHP_AUTH_USER'];
 			if ( \array_key_exists( $user, $this->accounts ) ) {
-				if ( \hash_equals( $this->accounts[$user], $_SERVER['PHP_AUTH_PW'] ?? '' ) ) {
+				if ( \hash_equals( $this->accounts[$user], $this->server['PHP_AUTH_PW'] ?? '' ) ) {
 					return $user;
 				}
 			}
@@ -51,6 +67,10 @@ class BasicAuth implements BrowserAuthInterface
 
 	public function getAffiliations(): array
 	{
-		return ['staff', 'student', 'employee'];
+		if ( $userId = $this->getUserId() ) {
+			return $this->affiliations[$userId] ?? [];
+		}
+
+		return [];
 	}
 }
