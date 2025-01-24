@@ -159,7 +159,7 @@ class AppleMobileconfigFormat extends Format
 				$result .= '				</array>'
 					. "\n			</dict>"
 					. "\n			<key>EncryptionType</key>"
-					. "\n			<string>WPA</string>"
+					. "\n			<string>WPA2</string>"
 					. "\n			<key>HIDDEN_NETWORK</key>"
 					. "\n			<false/>"
 					. "\n			<key>PayloadCertificateUUID</key>"
