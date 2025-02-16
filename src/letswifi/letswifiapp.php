@@ -10,12 +10,15 @@
 
 namespace letswifi;
 
+use DateTimeInterface;
+use JsonSerializable;
 use RuntimeException;
 use Throwable;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Loader\FilesystemLoader;
 use Twig\TwigFunction;
+use fyrkat\multilang\MultiLanguageString;
 use fyrkat\multilang\TranslationContext;
 use fyrkat\openssl\PKCS7;
 use letswifi\auth\User;
@@ -23,7 +26,11 @@ use letswifi\credential\UserCredentialLog;
 use letswifi\tenant\Provider;
 use letswifi\tenant\Realm;
 use letswifi\tenant\TenantConfig;
+use stdClass;
 
+/**
+ * @psalm-type recursivearray = array<null|scalar>
+ */
 final class LetsWifiApp
 {
 	public const HTTP_CODES = [
@@ -43,6 +50,9 @@ final class LetsWifiApp
 	/** Fallback locale used when the Accept-Language header was not set */
 	public const FALLBACK_LOCALE = 'en';
 
+	/** Object to indicate that a JSON key must be deleted from the output */
+	public readonly stdClass $jsonOutputDelete;
+
 	/** Prevent endless loop if an exception occurs when rendering the error page */
 	private bool $crashing = false;
 
@@ -58,6 +68,8 @@ final class LetsWifiApp
 	{
 		$this->config = $config ?? new LetsWifiConfig( new configuration\DictionaryFile( \dirname( __DIR__, 2 ) . \DIRECTORY_SEPARATOR . 'etc' . \DIRECTORY_SEPARATOR . 'tenant.conf.php' ) );
 		$this->tenantConfig = new TenantConfig( $this->config );
+
+		$this->jsonOutputDelete = new stdClass();
 	}
 
 	public function getIP(): string
@@ -110,8 +122,16 @@ final class LetsWifiApp
 		exit( 1 );
 	}
 
-	public function render( array $data, ?string $template = null, ?string $basePath = '/' ): never
+	/**
+	 * @template T
+	 *
+	 * @param array<class-string<T>,callable(T):array<string,?recursivearray|stdClass>> $reshape Function to reshape objects of the given type; keys returned by the function override native keys, if value is equal to $jsonOutputDelete, the key is removed
+	 */
+	public function render( array $data, ?string $template = null, ?string $basePath = '/', array $reshape = [] ): never
 	{
+		if ( !$this->crashing ) {
+			$data = $this->deepConvertToJson( $data, $reshape );
+		}
 		if ( null === $template || \array_key_exists( 'json', $_GET ) || !$this->isBrowser() ) {
 			\header( 'Content-Type: application/json' );
 
@@ -284,14 +304,67 @@ final class LetsWifiApp
 			] );
 			$filter = new TwigFunction(
 				't',
-				fn(
-					\fyrkat\multilang\MultiLanguageString|string $s, mixed ...$values,
-				) => \sprintf( $this->getTranslationContext()->translateHtml( $s ), ...$values ),
+				fn( MultiLanguageString|string $untranslated, mixed ...$values ) => \sprintf(
+					$this->getTranslationContext()->translateHtml( $untranslated ),
+					...\array_map( static fn( string $unescaped ) => \htmlspecialchars( $unescaped, \ENT_QUOTES, 'UTF-8' ), $values ),
+				),
 				['is_safe' => ['html']],
 			);
 			$this->twig->addFunction( $filter );
 		}
 
 		return $this->twig;
+	}
+
+	/**
+	 * @template T
+	 *
+	 * @param array<mixed>                                                              $data
+	 * @param array<class-string<T>,callable(T):array<string,?recursivearray|stdClass>> $reshape Function to reshape objects of the given type; keys returned by the function override native keys, if value is equal to $jsonOutputDelete, the key is removed
+	 *
+	 * @return array<mixed>
+	 */
+	private function deepConvertToJson( array $data, array $reshape = [] ): array
+	{
+		foreach ( $data as $key => &$value ) {
+			if ( $value instanceof MultiLanguageString ) {
+				continue;
+			}
+			if ( \is_array( $value ) ) {
+				$value = $this->deepConvertToJson( $value, $reshape );
+				continue;
+			}
+			if ( $value instanceof DateTimeInterface ) {
+				$value = $value->format( 'c' );
+				continue;
+			}
+			if ( \is_object( $value ) ) {
+				$reshapeFunction = null;
+				foreach ( $reshape as $class => $f ) {
+					if ( \is_a( $value, $class ) ) {
+						$reshapeFunction = $f;
+					}
+				}
+				if ( $value instanceof JsonSerializable ) {
+					if ( null === $reshapeFunction ) {
+						$value = $this->deepConvertToJson( $value->jsonSerialize(), $reshape );
+					} else {
+						/** @psalm-suppress InvalidArgument $value is both instance of JsonSerializable and T */
+						$value = \array_filter(
+							$this->deepConvertToJson( $reshapeFunction( $value ) + $value->jsonSerialize(), $reshape ),
+							fn ( $v ) => $this->jsonOutputDelete !== $v,
+						);
+					}
+				} elseif ( null !== $reshapeFunction ) {
+					/** @psalm-suppress InvalidArgument $value is T */
+					$value = \array_filter(
+						$this->deepConvertToJson( $reshapeFunction( $value ), $reshape ),
+						fn ( $v ) => $this->jsonOutputDelete !== $v,
+					);
+				}
+			}
+		}
+
+		return $data;
 	}
 }
