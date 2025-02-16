@@ -20,7 +20,7 @@ use letswifi\configuration\Dictionary;
 class Provider implements JsonSerializable
 {
 	/**
-	 * @param array<string,array<string>> $realmMap
+	 * @param array<string,array<string>> $realmMap affiliation => realms
 	 */
 	public function __construct(
 		private readonly TenantConfig $tenantConfig,
@@ -58,7 +58,8 @@ class Provider implements JsonSerializable
 			authServiceParams: $authServiceParams,
 			oauthSecret: $data->getString( 'oauthsecret' ),
 			oauthClients: $data->getRawArray( 'clients' ),
-			pdoData: $data->getDictionary( 'pdo' ) );
+			pdoData: $data->getDictionary( 'pdo' ),
+		);
 
 		return new self(
 			tenantConfig: $tenantConfig,
@@ -78,8 +79,13 @@ class Provider implements JsonSerializable
 			$realm = $realm->realmId;
 		}
 
-		return \array_reduce(
-			$this->realmMap, static fn ( $r, $c ) => $c || $r->realmId === $realm, false );
+		foreach ( $this->realmMap as $realms ) {
+			if ( \in_array( $realm, $realms, true ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/** @return array<Realm> */
