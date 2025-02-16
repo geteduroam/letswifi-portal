@@ -5,8 +5,8 @@
 
 {% for realm in realms %}
 					<li>
-						<input type="radio" name="realm" value="{{ realm.realmId }}" id="realm_{{ realm.realmId }}" required>
-						<label for="realm_{{ realm.realmId }}"><strong>{{ t(realm.displayName) }}</strong> <small>{{ realm.realmId }}</small>
+						<input type="radio" name="realm" value="{{ realm.realm_id }}" id="realm_{{ realm.realm_id }}" required>
+						<label for="realm_{{ realm.realm_id }}"><strong>{{ t(realm.display_name) }}</strong> <small>{{ realm.realm_id }}</small>
 {% if realm.description %}
 							<br>{{ t(realm.description) }}
 {% endif %}
