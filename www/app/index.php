@@ -9,6 +9,7 @@
  */
 
 use letswifi\LetsWifiApp;
+use letswifi\configuration\DictionaryFile;
 
 require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 2 ), 'src', '_autoload.php'] );
 $basePath = '..';
@@ -16,36 +17,32 @@ $basePath = '..';
 $app = new LetsWifiApp( basePath: $basePath );
 $app->registerExceptionHandler();
 
+// Temporary read file directly, add facility in Provider for this later
+$installProfiles = new DictionaryFile( \dirname( __DIR__, 2 ) . \DIRECTORY_SEPARATOR . 'etc' . \DIRECTORY_SEPARATOR . 'userinstallers.conf.php' );
+
+// TODO: Make platform class that handles this, move this code out of the view
+$platforms = $installProfiles->getRawArray( 'platforms' );
+$apps = $installProfiles->getRawArray( 'apps' );
+$profiles = $installProfiles->getRawArray( 'profiles' );
+
+foreach ( $platforms as $key => &$platform ) {
+	// Set "apps" and "profiles" for the platform to the actual apps and profiles,
+	// instead of just references.
+	$platform['apps'] = \array_combine(
+		$platform['apps'] ?? [],
+		\array_map( static fn ( string $appName ): array => $apps[$appName], $platform['apps'] ?? [] ),
+	);
+
+	$platform['profiles'] = \array_combine(
+		$platform['profiles'] ?? [],
+		\array_map(
+			static fn ( string $profileName ): array => $profiles[$profileName] + ['href' => "{$basePath}/profiles/new/{$profileName}/"],
+			$platform['profiles'] ?? [],
+		),
+	);
+}
+
 $app->render( [
-	'apps' => [
-		'android' => [
-			'url' => 'https://play.google.com/store/apps/details?id=app.eduroam.geteduroam',
-			'name' => 'Android',
-		],
-		'ios' => [
-			'url' => 'https://apps.apple.com/app/geteduroam/id1504076137',
-			'name' => 'iOS',
-		],
-		'windows' => [
-			'url' => 'https://dl.eduroam.app/windows/x86_64/geteduroam.exe',
-			'name' => 'Windows',
-		],
-		'huawei' => [
-			'url' => 'https://appgallery.huawei.com/app/C104231893',
-			'name' => 'Huawei',
-		],
-	],
-	'os_config' => [
-		'mobileconfig' => [
-			'url' => "{$basePath}/profiles/mac/",
-			'name' => 'macOS',
-		],
-		'onc' => [
-			'url' => "{$basePath}/profiles/onc/",
-			'name' => 'ChromeOS',
-		],
-	],
-	'manual' => [
-		'url' => "{$basePath}/profiles/new/",
-	],
+	'platforms' => $platforms,
+	'advanced_href' => "{$basePath}/profiles/new/",
 ], 'app', $basePath );

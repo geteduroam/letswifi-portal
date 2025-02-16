@@ -8,11 +8,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'src', '_autoload.php'] );
-$basePath = '../..';
+require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 4 ), 'src', '_autoload.php'] );
+$basePath = '../../..';
 \assert( \array_key_exists( 'REQUEST_METHOD', $_SERVER ) );
 
-$downloadFormat = 'google-onc';
-$href = "{$basePath}/profiles/onc/";
+$downloadFormat = 'apple-mobileconfig';
 
-require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__ ), 'new', '_download.php'] );
+require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__ ), '_download.php'] );

@@ -10,12 +10,14 @@
 
 use letswifi\LetsWifiApp;
 
-if ( !isset( $downloadFormat ) || !isset( $href ) || !isset( $basePath ) ) {
+if ( !isset( $downloadFormat ) || !isset( $basePath ) ) {
 	\header( 'Content-Type: text/plain', true, 400 );
 
 	exit( "400 Bad Request\r\n\r\nInvalid request\r\n" );
 }
 \assert( \array_key_exists( 'REQUEST_METHOD', $_SERVER ) );
+
+$href = "{$basePath}/profiles/new/{$downloadFormat}/";
 
 $app = new LetsWifiApp( basePath: $basePath );
 $app->registerExceptionHandler();

@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare( strict_types=1 );
 
 /*
  * This file is part of letswifi; a system for easy eduroam device enrollment
@@ -12,6 +12,17 @@ return [
 	'en-GB' => 'English',
 
 	'Realm' => 'Realm',
+	'If you cannot use the official app, you can download an installation profile for manual installation.' => 'If you cannot use the official app, you may also download an installation profile for manual installation.',
+	'Download an installation profile for manual installation.' => 'Download an installation profile for manual installation.',
+	'Other options' => 'Other options',
+
+	'All installer apps' => 'All installer apps',
+	'Generate a certificate for manual use' => 'Generate a certificate for manual use',
+	'Download the %s app to configure your device.' => 'Download the %s app to configure your device.',
+	'View apps and profiles for all platforms' => 'View apps and profiles for all platforms',
+	'Options for other platforms and professional users' => 'Opties voor andere platformen en professionele gebruikers',
+	'Options for professional users' => 'Options for professional users',
+
 	'Profile download' => 'Profile download',
 	'Download starting' => 'Your download will begin shortly',
 	'Download not starting?' => 'Download not starting?',

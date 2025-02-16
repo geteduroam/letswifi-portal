@@ -1,21 +1,23 @@
 {% extends 'menu.twig' %}
 
-{% block title %}{{ t('Apps') }}{% endblock %}
+{% block title %}{{ t(provider.display_name) }}{% endblock %}
 
 {% block content %}
 <div class="main-container">
 	<main>
-		<h1>{{ t('All installer apps') }}</h1>
-		<hr>
-		{% for platform in platforms %}
+		<h1>{{ t(provider.display_name) }}</h1>
+		{% if platform %}
+			<div class="platform-jumbotron">
 			<h2>{{ platform.name }}</h2>
 			{% if platform.apps %}
+				<p>{{ t('Download the %s app to configure your device.', platform.name) }}
 				<ul class="apps buttons">
 				{% for app_id, app in platform.apps %}
 					<li class="{{ app_id }} {{ app.type }}"><a class="btn btn-default" href="{{ app.href }}">{{ app.name }}</a></li>
 				{% endfor %}
 				</ul>
 			{% endif %}
+
 			{% if platform.profiles %}
 				{% if platform.apps %}
 					<details><summary>{{ t('If you cannot use the official app, you can download an installation profile for manual installation.') }}</summary>
@@ -29,14 +31,16 @@
 					</details>
 				{% endif %}
 			{% endif %}
-			<hr>
-		{% endfor %}
+			</div>
 
-		<h1>{{ t('Other options') }}</h1>
+			<h1>{{ t('Other options') }}</h1>
+		{% endif %}
+		<p><a href="{{ all_platforms_href }}">{{ t('View apps and profiles for all platforms') }}</a>
 		<details>
-			<summary>{{ t('Options for other platforms and professional users') }}</summary>
+			<summary>{{ t('Options for professional users') }}</summary>
 			<p><a href="{{ advanced_href }}">{{ t('Generate a certificate for manual use') }}</a></p>
 		</details>
+
 	</main>
 </div>
 {% endblock %}
