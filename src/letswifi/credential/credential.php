@@ -11,22 +11,61 @@
 namespace letswifi\credential;
 
 use DateTimeInterface;
+use DomainException;
+use JsonSerializable;
 use letswifi\auth\User;
 use letswifi\tenant\Provider;
 use letswifi\tenant\Realm;
 
-abstract class Credential
+/**
+ * @template T
+ */
+abstract class Credential implements JsonSerializable
 {
+	/**
+	 * @param Closure():T $pkcs12Generator
+	 */
 	public function __construct(
+		public readonly ?string $credentialId,
 		public readonly User $user,
 		public readonly Realm $realm,
 		public readonly Provider $provider,
+		protected readonly ?\Closure $revoke = null,
 	) {
-		\assert( $user->canUseRealm( $this->realm ) );
-		\assert( $provider->hasRealm( $this->realm ) );
 	}
+
+	public function jsonSerialize(): array
+	{
+		return [
+			'credential_id' => $this->credentialId,
+			'not_before' => $this->getIssued(),
+			'not_after' => $this->getExpiry(),
+			'revoked' => $this->getRevoked(),
+			'user' => $this->user,
+			'realm' => $this->realm,
+			'provider' => $this->provider,
+		];
+	}
+
+	abstract public function isRevoked(): bool;
+
+	abstract public function getRevoked(): ?DateTimeInterface;
+
+	abstract public function getIssued(): ?DateTimeInterface;
 
 	abstract public function getExpiry(): ?DateTimeInterface;
 
-	abstract public function getIdentity(): string;
+	/** @return T */
+	abstract public function getPayload();
+
+	public function revoke(): void
+	{
+		$f = $this->revoke;
+		if ( null === $f ) {
+			throw new DomainException( 'Credential cannot be revoked' );
+		}
+		$f();
+	}
+
+	abstract public function getIdentity(): ?string;
 }

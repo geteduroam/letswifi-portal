@@ -26,50 +26,39 @@ use letswifi\auth\User;
 use letswifi\tenant\Provider;
 use letswifi\tenant\Realm;
 
-class UserCredentialLog
+/**
+ * @implements CredentialIssuer<PKCS12>
+ *
+ * @internal
+ */
+class CertificateCredentialIssuer implements CredentialIssuer
 {
 	public const DATE_FORMAT = 'Y-m-d H:i:s';
 
-	public readonly Realm $realm;
-
-	private ?PDO $pdo = null;
-
+	/** @param Closure(string):void $revoke */
 	public function __construct(
 		public readonly User $user,
-		Realm|string $realm,
+		public readonly Realm $realm,
 		public readonly Provider $provider,
+		public readonly DateTimeImmutable $now,
+		private readonly PDO $pdo,
 		private readonly LetsWifiConfig $config,
-		protected readonly DateTimeImmutable $now = new DateTimeImmutable(),
+		private readonly \Closure $revoke,
 	) {
-		// Ensure that the realm is one that is available for this user
-		$this->realm = $user->getRealm( \is_string( $realm ) ? $realm : $realm->realmId );
-
-		// The following check should already have happened when $provider->getAuthenticatedUser() was called
-		\assert( $user->canUseRealm( $this->realm ) );
-		\assert( $provider->hasRealm( $this->realm ) );
 	}
 
-	/**
-	 * Issue a new credential
-	 *
-	 * @psalm-suppress InvalidReturnType Psalm doesn't understand that T is any subclass from Credential (PSALMBUG)
-	 * @psalm-suppress InvalidReturnStatement Psalm doesn't understand that T is any subclass from Credential (PSALMBUG)
-	 *
-	 * @psalm-template T of Credential
-	 *
-	 * @psalm-param class-string<T> $credentialClass
-	 *
-	 * @param string $credentialClass The device or platform to generate a profile for
-	 *
-	 * @psalm-return T
-	 */
-	public function issue( string $credentialClass ): Credential
+	public function issue(): CertificateCredential
 	{
-		switch ( $credentialClass ) {
-			case CertificateCredential::class: return $this->issueCertificateCredential();
-		}
+		$pkcs12 = $this->generateClientCertificate();
+		$credentialId = (string)$pkcs12->x509->getSubject();
 
-		throw new DomainException( 'Unable to issue a credential of class ' . $credentialClass );
+		return new CertificateCredential(
+			credentialId: $credentialId,
+			user: $this->user,
+			realm: $this->realm,
+			provider: $this->provider,
+			pkcs12: $pkcs12,
+		);
 	}
 
 	/**
@@ -79,7 +68,7 @@ class UserCredentialLog
 	private function logPreparedUserCredential( X509 $caCert, CSR $csr, DateTimeInterface $expiry, string $usage ): int
 	{
 		$csrData = $csr->getCSRPem();
-		$statement = $this->getPDO()->prepare( 'INSERT INTO `realm_signing_log` (`realm`, `ca_sub`, `requester`, `usage`, `sub`, `issued`, `expires`, `csr`, `client`, `user_agent`, `ip`) VALUES (:realm, :ca_sub, :requester, :usage, :sub, :issued, :expires, :csr, :client, :user_agent, :ip)' );
+		$statement = $this->pdo->prepare( 'INSERT INTO `realm_signing_log` (`realm`, `ca_sub`, `requester`, `usage`, `sub`, `issued`, `expires`, `csr`, `client`, `user_agent`, `ip`) VALUES (:realm, :ca_sub, :requester, :usage, :sub, :issued, :expires, :csr, :client, :user_agent, :ip)' );
 		$statement->bindValue( 'realm', $this->realm->realmId, PDO::PARAM_STR );
 		$statement->bindValue( 'ca_sub', $caCert->getSubject(), PDO::PARAM_STR );
 		$statement->bindValue( 'requester', $this->user->userId, PDO::PARAM_STR );
@@ -92,7 +81,7 @@ class UserCredentialLog
 		$statement->bindValue( 'user_agent', $this->user->userAgent, PDO::PARAM_STR );
 		$statement->bindValue( 'ip', $this->user->ip, PDO::PARAM_STR );
 		$statement->execute();
-		$last = $this->getPDO()->lastInsertId();
+		$last = $this->pdo->lastInsertId();
 		$lastId = (int)$last;
 		if ( 0 < $lastId && (string)$lastId === $last ) {
 			return $lastId;
@@ -107,7 +96,7 @@ class UserCredentialLog
 	 */
 	private function logCompletedUserCredential( X509 $userCert, string $usage ): void
 	{
-		$statement = $this->getPDO()->prepare( 'UPDATE `realm_signing_log` SET `issued` = :issued, `expires` = :expires, `x509` = :x509 WHERE `serial` = :serial AND `realm` = :realm AND `requester` = :requester AND `usage` = :usage AND `ca_sub` = :ca_sub' );
+		$statement = $this->pdo->prepare( 'UPDATE `realm_signing_log` SET `issued` = :issued, `expires` = :expires, `x509` = :x509 WHERE `serial` = :serial AND `realm` = :realm AND `requester` = :requester AND `usage` = :usage AND `ca_sub` = :ca_sub' );
 		$statement->bindValue( 'issued', \gmdate( static::DATE_FORMAT, $userCert->getValidFrom()->getTimestamp() ), PDO::PARAM_STR );
 		$statement->bindValue( 'expires', \gmdate( static::DATE_FORMAT, $userCert->getValidTo()->getTimestamp() ), PDO::PARAM_STR );
 		$statement->bindValue( 'x509', $userCert->getX509Pem(), PDO::PARAM_STR );
@@ -129,7 +118,7 @@ class UserCredentialLog
 		// during some test we ended up with the date 88363-05-14 and MySQL didn't like
 		$expiry = $this->now->add( $this->realm->validity );
 		$userKey = new PrivateKey( new OpenSSLConfig( privateKeyType: OpenSSLKey::KEYTYPE_RSA ) );
-		$commonName = static::createCommonName( '@' . \rawurlencode( $this->realm->realmId ) );
+		$commonName = $this->createCommonName();
 		$dn = new DN( ['CN' => $commonName] );
 		$csr = CSR::generate( $dn, $userKey );
 
@@ -147,28 +136,17 @@ class UserCredentialLog
 		return new PKCS12( $userCert, $userKey, [$caCert] );
 	}
 
-	private function getPDO(): PDO
+	/**
+	 * Create random string that ends with @realm
+	 */
+	private function createCommonName(): string
 	{
-		if ( null === $this->pdo ) {
-			$pdoData = $this->config->getProviderData( $this->provider->host )->getDictionary( 'pdo' );
-			$dsn = $pdoData->getString( 'dsn' );
-			$username = $pdoData->getStringOrNull( 'username' );
-			$password = $pdoData->getStringOrNull( 'password' );
-
-			$this->pdo = new PDO( $dsn, $username, $password );
-			$this->pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+		$realm = '@' . \rawurlencode( $this->realm->realmId );
+		if ( \strlen( $realm ) > 48 ) {
+			throw new DomainException( 'Realm is too long to fit in certificate' );
 		}
+		$random = \strtolower( \strtr( \base64_encode( \random_bytes( 12 ) ), '/+9876', '012345' ) );
 
-		return $this->pdo;
-	}
-
-	private function issueCertificateCredential(): CertificateCredential
-	{
-		return new CertificateCredential( $this->user, $this->realm, $this->provider, fn() => $this->generateClientCertificate() );
-	}
-
-	private static function createCommonName( string $realm ): string
-	{
-		return \substr( \strtolower( \strtr( \base64_encode( \random_bytes( 12 ) ), '/+9876', '012345' ) ), 0, 64 - \strlen( $realm ) ) . $realm;
+		return $random . $realm;
 	}
 }

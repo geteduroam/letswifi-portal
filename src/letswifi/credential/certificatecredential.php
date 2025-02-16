@@ -12,65 +12,99 @@ namespace letswifi\credential;
 
 use Closure;
 use DateTimeInterface;
+use DomainException;
 use fyrkat\openssl\PKCS12;
 use letswifi\auth\User;
 use letswifi\tenant\Provider;
 use letswifi\tenant\Realm;
 
+/**
+ * @extends Credential<PKCS12>
+ */
 class CertificateCredential extends Credential
 {
-	private ?PKCS12 $pkcs12 = null;
+	private readonly DateTimeInterface $expiry;
 
-	private ?PKCS12 $pkcs12des = null;
+	private readonly DateTimeInterface $issued;
 
-	private ?PKCS12 $pkcs12noCA = null;
-
-	private ?PKCS12 $pkcs12noCAdes = null;
+	private readonly ?string $identity;
 
 	/**
-	 * @param Closure():PKCS12 $pkcs12Generator
+	 * @param Closure():void $revoke
 	 */
 	public function __construct(
+		?string $credentialId,
 		User $user,
 		Realm $realm,
 		Provider $provider,
-		private readonly Closure $pkcs12Generator,
+		?Closure $revoke = null,
+		?DateTimeInterface $expiry = null,
+		?DateTimeInterface $issued = null,
+		private readonly ?DateTimeInterface $revoked = null,
+		?string $identity = null,
+		private readonly ?PKCS12 $pkcs12 = null,
 	) {
-		parent::__construct( $user, $realm, $provider );
+		parent::__construct(
+			credentialId: $credentialId,
+			user: $user,
+			realm: $realm,
+			provider: $provider,
+			revoke: $revoke,
+		);
+
+		if ( null === $pkcs12 ) {
+			$this->expiry = $expiry ?? throw new DomainException( 'Expiry not provided' );
+			$this->issued = $issued ?? throw new DomainException( 'Issued not provided' );
+			$this->identity = $identity ?? throw new DomainException( 'Identity not provided' );
+		} else {
+			$this->expiry = $pkcs12->x509->getValidTo();
+			$this->issued = $pkcs12->x509->getValidFrom();
+			$this->identity = $pkcs12->x509->getSubject()->getCommonName();
+		}
+	}
+
+	public function getPayload(): PKCS12
+	{
+		return $this->getPKCS12();
 	}
 
 	public function getPKCS12( bool $ca = true, bool $des = false ): PKCS12
 	{
-		if ( null === $this->pkcs12 ) {
-			$this->pkcs12 = $this->generateClientCertificate();
-		}
+		$pkcs12 = $this->pkcs12
+				?? throw new DomainException( 'Cannot create PKCS12 because private key is not available' );
 
 		switch ( [$ca, $des] ) {
-			case [false, false]:return $this->pkcs12noCA ?? $this->pkcs12noCA = new PKCS12( $this->pkcs12->x509, $this->pkcs12->privateKey );
-			case [false, true]:return $this->pkcs12noCAdes ?? $this->pkcs12noCAdes = $this->getPKCS12( false, false )->use3des();
-			case [true, true]:return $this->pkcs12des ?? $this->pkcs12des = $this->pkcs12->use3des();
+			case [false, false]:return new PKCS12( $pkcs12->x509, $pkcs12->privateKey );
+			case [false, true]:return $this->getPKCS12( false )->use3des();
+			case [true, true]:return $this->getPKCS12( true )->use3des();
 			case [true, false]:
 			default:
-				return $this->pkcs12;
+				return $pkcs12;
 		}
 	}
 
 	public function getExpiry(): ?DateTimeInterface
 	{
-		return null === $this->pkcs12 ? null : $this->pkcs12->x509->getValidTo();
+		return $this->expiry;
 	}
 
-	public function getIdentity(): string
+	public function getIssued(): DateTimeInterface
 	{
-		$pkcs12 = $this->getPKCS12();
-
-		return $pkcs12->x509->getSubject()->getCommonName();
+		return $this->issued;
 	}
 
-	private function generateClientCertificate(): PKCS12
+	public function getRevoked(): ?DateTimeInterface
 	{
-		$f = $this->pkcs12Generator;
+		return $this->revoked;
+	}
 
-		return $f();
+	public function isRevoked(): bool
+	{
+		return null !== $this->revoked;
+	}
+
+	public function getIdentity(): ?string
+	{
+		return $this->identity;
 	}
 }

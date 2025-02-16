@@ -9,7 +9,6 @@
  */
 
 use letswifi\LetsWifiApp;
-use letswifi\credential\CertificateCredential;
 use letswifi\format\Format;
 
 require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'src', '_autoload.php'] );
@@ -93,6 +92,7 @@ switch ( $overrideMethod ?? $_SERVER['REQUEST_METHOD'] ) {
 				'url' => "{$basePath}/app/",
 			],
 		], 'profile-advanced', $basePath, );
+		\assert( false, 'Unreachable code' );
 
 		exit; // should not be reached
 	case 'POST':
@@ -108,22 +108,22 @@ switch ( $overrideMethod ?? $_SERVER['REQUEST_METHOD'] ) {
 
 			exit( "400 Bad Request\r\n\r\nInvalid passphrase\r\n" );
 		}
-		$credentialManager = $app->getUserCredentialLog( user: $user, realm: $realm );
-		// TODO fix hardcoded credential type, should be realm property?
-		$credential = $credentialManager->issue( CertificateCredential::class );
+		$credentialManager = $app->getCredentialIssuer( user: $user, realm: $realm );
+		$credential = $credentialManager->issue();
 		$format = $overrideFormat ?? null;
 		foreach ( [$_POST, $_GET] as $candidate ) {
 			if ( null === $format && \array_key_exists( 'format', $candidate ) && \is_string( $candidate['format'] ) ) {
 				$format = $candidate['format'];
 			}
 		}
-		$formatter = Format::getFormatter( $format ?? 'NULL',
+		$formatter = Format::getFormatter( $format ?? 'null',
 			credential: $credential,
 			translator: $app->getTranslationContext(),
 			profileSigner: $app->getProfileSigner(),
 			passphrase: $passphrase,
 		);
 		$formatter->emit();
+		\assert( false, 'Unreachable code' );
 
 		exit; // should not be reached
 

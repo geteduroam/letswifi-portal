@@ -1,0 +1,86 @@
+{% extends 'menu.twig' %}
+
+{% block title %}{{ t('User information %s', user.user_id) }}{% endblock %}
+
+{% block content %}
+<main>
+	<div class="user">
+		<h1>{{ t('User information') }}</h1>
+		<dl>
+			<dt>{{ t('User ID') }}</dt>
+			<dd>{{ user.user_id }}</dd>
+		</dl>
+{% if user.affiliations %}
+		<dl>
+			<dt>{{ t('Affiliations') }}</dt>
+			<dd>
+				<ul>
+{% for affiliation in user.affiliations %}
+					<li>{{ affiliation }}</li>
+{% endfor %}
+				</ul>
+			</dd>
+		</dl>
+{% endif %}
+	</div>
+	<div class="realms" id="realm-picker">
+		<h1>{{ t('Available realms') }}</h1>
+{% if realms|length > 1 %}
+			<ul>
+
+{% for realm in realms %}
+				<li>
+					<img src="{{ realm.logo_endpoint }}" alt="Logo" aria-hidden="true">
+					<strong>{{ t(realm.display_name) }}</strong>
+					<small>{{ realm.realm_id }}</small>
+{% if realm.description %}
+					<br>{{ t(realm.description) }}
+{% endif %}
+				</li>
+{% endfor %}
+			</ul>
+{% else %}
+			<p>{{ t('No realms available') }}</p>
+{% endif %}
+
+	</div>
+
+	<form method="POST" action="{{ form_action }}">
+		<h1>{{ t('Authorised applications') }}</h1>
+		<table>
+			<tr>
+				<th>{{ t('Client ID') }}</th>
+				<th>{{ t('Issued') }}</th>
+				<th>{{ t('Expires') }}</th>
+			</tr>
+{% for grant in grants %}
+			<tr>
+				<td>{{ grant.client_id }}</td>
+				<td>{{ grant.not_before|split('T', 2)|first }}</td>
+				<td>{{ grant.not_after|split('T', 2)|first }}</td>
+				<td><button name="revoke_grant" value="{{ grant.session_id }}">{{ t('Revoke') }}</button></td>
+			</tr>
+{% endfor %}
+		</table>
+	</form>
+
+	<form method="POST" action="{{ form_action }}">
+		<h1>{{ t('Credentials') }}</h1>
+		<table>
+			<tr>
+				<th>{{ t('Credential') }}</th>
+				<th>{{ t('Issued') }}</th>
+				<th>{{ t('Expires') }}</th>
+			</tr>
+{% for credential in credentials %}
+			<tr>
+				<td><span class="{{ credential.revoked ? 'revoked' : '' }}">{{ credential.credential_id }}</span></td>
+				<td>{{ credential.not_before|split('T', 2)|first }}</td>
+				<td>{{ credential.not_after|split('T', 2)|first }}</td>
+				<td><button name="revoke_credential" value="{{ credential.credential_id }}">{{ t('Revoke') }}</button></td>
+			</tr>
+{% endfor %}
+		</table>
+	</form>
+</main>
+{% endblock %}

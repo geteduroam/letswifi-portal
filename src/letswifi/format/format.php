@@ -33,19 +33,19 @@ abstract class Format
 		?PKCS7 $profileSigner = null,
 		?string $passphrase = null,
 	): self {
+		// Convert "class-name" to "\letswifi\format\ClassNameFormat"
 		if ( !\preg_match( '/[^0-9a-z\\-]|--|^[0-9]|^-|-$/m', $type ) ) {
 			$className = \sprintf( '\\letswifi\\format\\%sFormat', \ucfirst(
 				\preg_replace_callback(
 					'/(\\-[a-z])/',
 					static fn( $m ) => \strtoupper( \ltrim( $m[1], '-' ) ), $type ),
-			),
-			);
+			) );
 			if ( !\str_contains( $className, '-' ) && \class_exists( $className ) && \is_subclass_of( $className, self::class ) ) {
 				return new $className( $credential, $translator, $profileSigner, $passphrase );
 			}
 		}
 
-		throw new DomainException( 'Invalid formatter type specified: ' . $type );
+		throw new DomainException( 'Invalid formatter specified: ' . $type );
 	}
 
 	public function emit(): never
