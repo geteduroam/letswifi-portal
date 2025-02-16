@@ -22,7 +22,9 @@ use fyrkat\multilang\MultiLanguageString;
 use fyrkat\multilang\TranslationContext;
 use fyrkat\openssl\PKCS7;
 use letswifi\auth\User;
-use letswifi\credential\UserCredentialLog;
+use letswifi\credential\CertificateCredentialLog;
+use letswifi\credential\CredentialIssuer;
+use letswifi\credential\CredentialLog;
 use letswifi\tenant\Provider;
 use letswifi\tenant\Realm;
 use letswifi\tenant\TenantConfig;
@@ -68,6 +70,13 @@ final class LetsWifiApp
 	{
 		$this->config = $config ?? new LetsWifiConfig( new configuration\DictionaryFile( \dirname( __DIR__, 2 ) . \DIRECTORY_SEPARATOR . 'etc' . \DIRECTORY_SEPARATOR . 'tenant.conf.php' ) );
 		$this->tenantConfig = new TenantConfig( $this->config );
+
+		if ( \PHP_SAPI === 'cli-server' ) {
+			// Ensure that we are setting the recommended CSP when developing,
+			// to prevent nasty surprises later on.
+			\header( "Content-Security-Policy: default-src: 'self'; object-src 'none'; base-uri 'none';" );
+			\header( 'X-Frame-Options: deny' );
+		}
 
 		$this->jsonOutputDelete = new stdClass();
 	}
@@ -228,14 +237,21 @@ final class LetsWifiApp
 		return $this->tenantConfig->getProvider( $this->getHttpHost() );
 	}
 
-	public function getUserCredentialLog( User $user, ?Realm $realm ): UserCredentialLog
+	public function getCredentialLog( User $user ): CredentialLog
 	{
-		return new UserCredentialLog(
+		// TODO decide which type of log we need, hardcode Certificate for now
+		return new CertificateCredentialLog(
 			user: $user,
-			realm: $realm ?? $user->getRealm(),
 			provider: $this->getProvider(),
 			config: $this->config,
 		);
+	}
+
+	public function getCredentialIssuer( User $user, ?Realm $realm ): CredentialIssuer
+	{
+		$log = $this->getCredentialLog( $user );
+
+		return $log->getCredentialIssuer( $realm ?? $user->getRealm() );
 	}
 
 	/**
