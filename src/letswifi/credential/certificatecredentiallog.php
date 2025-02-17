@@ -205,7 +205,8 @@ class CertificateCredentialLog extends CredentialLog
 	private function getPDO(): PDO
 	{
 		if ( null === $this->pdo ) {
-			$pdoData = $this->config->getProviderData( $this->provider->host )->getDictionary( 'pdo' );
+			$providers = $this->config->getDictionary( 'provider' );
+			$pdoData = $providers->getDictionary( $this->provider->host )->getDictionary( 'pdo' );
 			$dsn = $pdoData->getString( 'dsn' );
 			$username = $pdoData->getStringOrNull( 'username' );
 			$password = $pdoData->getStringOrNull( 'password' );

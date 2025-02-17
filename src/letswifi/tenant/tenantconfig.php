@@ -12,26 +12,29 @@ namespace letswifi\tenant;
 
 use fyrkat\openssl\X509;
 use letswifi\LetsWifiConfig;
+use letswifi\configuration\Dictionary;
 
 class TenantConfig
 {
-	public function __construct( private readonly LetsWifiConfig $config )
+	public function __construct( private readonly Dictionary $config )
 	{
 	}
 
 	public function getProvider( string $httpHost ): Provider
 	{
-		return Provider::fromConfig( $this, $this->config->getProviderData( $httpHost ) );
+		$providers = $this->config->getDictionary( 'provider' );
+
+		return Provider::fromConfig( $this, $providers->getDictionaryOrNull( $httpHost ) ?? $providers->getDictionary( '*' ) );
 	}
 
 	public function getContact( string $contactId ): Contact
 	{
-		return Contact::fromConfig( $this->config->getContactData( $contactId ) );
+		return Contact::fromConfig( $this->config->getDictionary( 'contact' )->getDictionary( $contactId ) );
 	}
 
 	public function getRealm( string $realmId ): Realm
 	{
-		return Realm::fromConfig( $this, $this->config->getRealmData( $realmId ) );
+		return Realm::fromConfig( $this, $this->config->getDictionary( 'realm' )->getDictionary( $realmId ) );
 	}
 
 	/**
@@ -49,9 +52,10 @@ class TenantConfig
 	{
 		$result = [];
 		$subjects = [];
+		$certificates = $this->config->getDictionary( 'certificate' );
 		foreach ( $sub as $subject ) {
 			while ( $subject ) {
-				$certificateData = $this->config->getCertificateData( $subject );
+				$certificateData = $certificates->getDictionary( $subject );
 				if ( !\in_array( $subject, $subjects, true ) ) {
 					\array_unshift( $result, new X509( $certificateData->getString( 'x509' ) ) );
 				}
@@ -68,8 +72,10 @@ class TenantConfig
 	 */
 	public function getNetworks( string ...$networks ): array
 	{
+		$networkData = $this->config->getDictionary( 'network' );
+
 		return \array_merge( ...\array_values( \array_map(
-			fn( string $n ) => Network::allFromConfig( $this->config->getNetworkData( $n ) ),
+			static fn( string $n ) => Network::allFromConfig( $networkData->getDictionary( $n ) ),
 			$networks,
 		) ) );
 	}

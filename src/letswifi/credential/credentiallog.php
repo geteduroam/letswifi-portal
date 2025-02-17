@@ -13,8 +13,8 @@ namespace letswifi\credential;
 use DateTimeImmutable;
 use DomainException;
 use Generator;
-use letswifi\LetsWifiConfig;
 use letswifi\auth\User;
+use letswifi\configuration\Dictionary;
 use letswifi\tenant\Provider;
 use letswifi\tenant\Realm;
 
@@ -26,7 +26,7 @@ abstract class CredentialLog
 	public function __construct(
 		public readonly User $user,
 		public readonly Provider $provider,
-		protected readonly LetsWifiConfig $config,
+		protected readonly Dictionary $config,
 		public readonly DateTimeImmutable $now = new DateTimeImmutable(),
 	) {
 	}

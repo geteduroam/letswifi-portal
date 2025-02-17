@@ -22,6 +22,8 @@ use fyrkat\multilang\MultiLanguageString;
 use fyrkat\multilang\TranslationContext;
 use fyrkat\openssl\PKCS7;
 use letswifi\auth\User;
+use letswifi\configuration\Dictionary;
+use letswifi\configuration\DictionaryFile;
 use letswifi\credential\CertificateCredentialLog;
 use letswifi\credential\CredentialIssuer;
 use letswifi\credential\CredentialLog;
@@ -64,11 +66,11 @@ final class LetsWifiApp
 
 	private ?TranslationContext $translationContext = null;
 
-	private readonly LetsWifiConfig $config;
+	private readonly Dictionary $config;
 
-	public function __construct( public readonly string $basePath, ?LetsWifiConfig $config = null )
+	public function __construct( public readonly string $basePath, ?Dictionary $config = null )
 	{
-		$this->config = $config ?? new LetsWifiConfig( new configuration\DictionaryFile( \dirname( __DIR__, 2 ) . \DIRECTORY_SEPARATOR . 'etc' . \DIRECTORY_SEPARATOR . 'tenant.conf.php' ) );
+		$this->config = $config ?? new DictionaryFile( \dirname( __DIR__, 2 ) . \DIRECTORY_SEPARATOR . 'etc' . \DIRECTORY_SEPARATOR . 'tenant.conf.php' );
 		$this->tenantConfig = new TenantConfig( $this->config );
 
 		if ( \PHP_SAPI === 'cli-server' ) {
@@ -269,12 +271,13 @@ final class LetsWifiApp
 			return null;
 		}
 
-		$data = $this->config->getCertificateData( $dn );
+		$certificates = $this->config->getDictionary( 'certificate' );
+		$data = $certificates->getDictionary( $dn );
 		$signingKey = $data->getString( 'key' );
 		$signingCert = '';
 		do {
 			$signingCert .= $data->getString( 'x509' );
-			$data = $this->config->getCertificateData( $data->getString( 'issuer' ) );
+			$data = $certificates->getDictionary( $data->getString( 'issuer' ) );
 		} while ( $data->has( 'issuer' ) );
 
 		return PKCS7::readChainPEM( "{$signingCert}{$signingKey}", null );

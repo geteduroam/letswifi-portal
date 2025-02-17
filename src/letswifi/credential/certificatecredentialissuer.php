@@ -21,8 +21,8 @@ use fyrkat\openssl\OpenSSLKey;
 use fyrkat\openssl\PKCS12;
 use fyrkat\openssl\PrivateKey;
 use fyrkat\openssl\X509;
-use letswifi\LetsWifiConfig;
 use letswifi\auth\User;
+use letswifi\configuration\Dictionary;
 use letswifi\tenant\Provider;
 use letswifi\tenant\Realm;
 
@@ -42,7 +42,7 @@ class CertificateCredentialIssuer implements CredentialIssuer
 		public readonly Provider $provider,
 		public readonly DateTimeImmutable $now,
 		private readonly PDO $pdo,
-		private readonly LetsWifiConfig $config,
+		private readonly Dictionary $config,
 		private readonly \Closure $revoke,
 	) {
 	}
@@ -122,7 +122,9 @@ class CertificateCredentialIssuer implements CredentialIssuer
 		$dn = new DN( ['CN' => $commonName] );
 		$csr = CSR::generate( $dn, $userKey );
 
-		$signerData = $this->config->getCertificateData( $this->config->getRealmData( $this->realm->realmId )->getString( 'signer' ) );
+		$signerData = $this->config->getDictionary( 'certificate' )->getDictionary(
+			$this->config->getDictionary( 'realm' )->getDictionary( $this->realm->realmId )->getString( 'signer' ),
+		);
 		$caCert = new X509( $signerData->getString( 'x509' ) );
 
 		$serial = $this->logPreparedUserCredential( $caCert, $csr, $expiry, 'client' );
