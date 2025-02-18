@@ -10,7 +10,7 @@
 		"twig/twig": "^3.3.8",
 		"fyrkat/openssl": "^2",
 		"fyrkat/oauth-server": "^1.2.2",
-		"fyrkat/multilang": "^1,>=1.0.1"
+		"fyrkat/multilang": "^1.0.2"
 	},
 	"require-dev": {
 		"vimeo/psalm": "^5.13",

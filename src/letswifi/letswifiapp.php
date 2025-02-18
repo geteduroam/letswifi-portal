@@ -104,7 +104,7 @@ final class LetsWifiApp
 	{
 		\error_log( $ex->__toString() );
 		$code = $ex->getCode();
-		if ( !\is_int( $code ) || !\array_key_exists( $code, static::HTTP_CODES ) ) {
+		if ( !\array_key_exists( $code, static::HTTP_CODES ) ) {
 			$code = 500;
 		}
 		$codeExplain = static::HTTP_CODES[$code];
@@ -321,15 +321,16 @@ final class LetsWifiApp
 			$this->twig = new Environment( $loader, [
 				// 'cache' => '/path/to/compilation_cache',
 			] );
-			$filter = new TwigFunction(
+			$this->twig->addFunction( new TwigFunction(
 				't',
-				fn( MultiLanguageString|string $untranslated, mixed ...$values ) => \sprintf(
-					$this->getTranslationContext()->translateHtml( $untranslated ),
-					...\array_map( static fn( string $unescaped ) => \htmlspecialchars( $unescaped, \ENT_QUOTES, 'UTF-8' ), $values ),
-				),
+				fn( MultiLanguageString|string $untranslated, mixed ...$values ) => $this->getTranslationContext()->translateHtml( $untranslated, $_, ...$values ),
 				['is_safe' => ['html']],
-			);
-			$this->twig->addFunction( $filter );
+			) );
+			$this->twig->addFunction( new TwigFunction(
+				'tattr',
+				fn( MultiLanguageString|string $untranslated, mixed ...$values ) => \htmlspecialchars( $this->getTranslationContext()->translate( $untranslated, $_, ...$values ), \ENT_QUOTES | \ENT_SUBSTITUTE, 'UTF-8' ),
+				['is_safe' => ['html']],
+			) );
 		}
 
 		return $this->twig;
