@@ -1,0 +1,313 @@
+:root {
+	--bg-color: #f6f4f2;
+	--highlight-bg-color: #fefcfa;
+	--body-text-color: #212529;
+	--body-code-text-color: #a05;
+	--accent-color: #276cba;
+	--light-border-color: #e5e4e2;
+	--border-danger-bg-color: #a04;
+	--border-danger-active-bg-color: #803;
+	--button-text-color: #fff;
+}
+
+html {
+	background: var(--bg-color);
+	color: var(--body-text-color);
+	font-family: sans-serif;
+	line-height: 1.15;
+	-webkit-text-size-adjust: 100%;
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+	margin: 0;
+	padding: 0;
+}
+a:active, button:active { position: relative; top: 2px; }
+summary:active, #realm-picker > ul > li:has(label):active { position: relative; top: 1px; }
+
+body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+	font-weight: 400;
+	line-height: 1.5;
+	text-align: left;
+	margin: 1em;
+}
+
+header, header * {
+	text-align: right;
+	user-select: none;
+	-webkit-user-select: none;
+	-webkit-touch-callout: none;
+	user-drag: none;
+	-webkit-user-drag: none;
+	cursor: default;
+}
+header a {
+	cursor: pointer;
+}
+header #product-name {
+	float: left;
+	font-weight: bold;
+	text-decoration: none;
+	color: var(--body-text-color);
+}
+header details {
+	display: inline-block;
+}
+header details > summary, header details > * {
+	background: var(--bg-color);
+}
+header details[open] > summary {
+	filter: invert(1);
+}
+header details > summary {
+	list-style: none;
+}
+header details > summary::-webkit-details-marker {
+	display: none;
+}
+header details > ul {
+	position: absolute;
+	white-space: nowrap;
+	border: thin solid gray;
+	box-shadow: 0 .2rem .2rem rgba(0,0,0,.5);
+	border-radius: 0 0 .2rem .2rem;
+}
+header details#user-chooser > ul {
+	right: 1rem;
+}
+header details > ul {
+	list-style: none;
+	font-size: 1.2em;
+}
+header summary {
+	font-size: 1.2em;
+	padding: .2em .8em .2em 2em;
+}
+header #language-chooser summary {
+	background-repeat: no-repeat;
+	background-position: .5em 50%;
+	background-size: 1.2em;
+	background-image: url('oojs-ui/images/icons/language.svg');
+}
+header #user-chooser summary {
+	background-repeat: no-repeat;
+	background-position: .5em 50%;
+	background-size: 1.2em;
+	background-image: url('oojs-ui/images/icons/userAvatar.svg');
+}
+header details > ul, header details > ul > li {
+	margin: 0;
+	padding: 0;
+}
+header details > ul > li a, header details > ul > li strong {
+	padding: .3em 1em;
+	margin: 0;
+	display: block;
+	top: 0 !important;
+	color: var(--body-text-color);
+	text-decoration: none;
+	position: relative;
+}
+header details > ul > li a:hover {
+	background-color: var(--accent-color);
+	color: var(--bg-color);
+}
+
+main > * {
+	max-width: 46rem;
+	margin: 1rem auto;
+}
+html.dialog main > * {
+	max-width: 24rem;
+}
+html.dialog main > p.fullwidth {
+	max-width: 27.3em;
+}
+
+section {
+	padding: 0 .8em .4em .8em;
+}
+section.highlight {
+	box-shadow: 0 .1em .2em rgba(0,0,0,.4);
+	border-radius: .1em;
+	border-left: thick solid var(--accent-color);
+	background: var(--highlight-bg-color);
+}
+
+pre {
+	overflow-x: scroll;
+}
+code {
+	background: rgba(0,0,0,.08);
+	padding: .2em .4em;
+	color: var(--body-code-text-color);
+}
+p {
+	font-size: .95em;
+}
+p.text-center {
+	text-align: center
+}
+p picture img {
+	max-width: 100%;
+}
+picture.screenshot.mac img {
+	filter: drop-shadow(0 .15em .15em rgba(0,0,0,.5));
+}
+details, form table {
+	font-size: .8rem;
+}
+form table {
+	width: 100%;
+}
+summary, button {
+	cursor: pointer;
+}
+hr {
+	border: none;
+	border-top: 1px solid;
+	border-color: var(--light-border-color);
+	margin: 2em;
+}
+.fieldsets {
+	display: flex;
+	gap: 1em;
+	justify-content: space-between;
+}
+.fieldsets > * {
+	flex-grow: 1;
+}
+input[type=text], input[type=password] {
+	border: solid;
+	border-width: 1px 1px 1px 1px;
+	border-color: var(--body-text-color);
+	border-radius: .3em;
+	background: inherit;
+	color: inherit;
+	padding: .3em;
+}
+input[type=text]:focus, input[type=password]:focus {
+	border-color: var(--accent-color);
+	outline: 1px solid var(--body-text-color);
+}
+input[type=radio]:focus + label, label:focus {
+	outline: 2px solid var(--accent-color);
+}
+input[type=radio] {
+	outline: none;
+}
+fieldset {
+	border: 1px solid var(--light-border-color);
+	border-radius: .15em;
+	margin-bottom: 2em;
+}
+fieldset > legend {
+	font-size: .7rem;
+}
+#realm-picker ul {
+	padding: 0;
+	list-style: none;
+}
+#realm-picker ul input[type=radio] {
+	margin: .4em 0 0 .8em;
+	float: left;
+	clear: left;
+}
+#realm-picker ul label {
+	padding-left: 2.3em;
+	display: block;
+	margin-bottom: .8em;
+	border-radius: .2em;
+	cursor: pointer;
+	white-space: nowrap;
+}
+#realm-picker small {
+	opacity: .7;
+	margin-left: .8em;
+}
+.realms li > img {
+	clear: left;
+	float: left;
+	height: 3em;
+	max-width: 5em;
+	padding: 0 .3em .1em 0;
+}
+
+.buttons {
+	list-style: none;
+	display: flex;
+	gap: .5em;
+	padding: 0;
+}
+.btn, button {
+	font-size: 1em;
+	border: none;
+	padding: 0.2em 2em;
+	line-height: 1.7em;
+	border-radius: .2em;
+	display: inline-block;
+	text-decoration: none;
+}
+.btn:active, .btn:focus, button:active, button:focus {
+	box-shadow: inset 0 0 0 .2em var(--accent-color), inset 0 0 0 .3em white;
+	outline: 0;
+}
+.btn.btn-default, button {
+	background: var(--accent-color);
+	color: var(--button-text-color);
+}
+.btn.btn-default:active, button:active {
+	background: var(--accent-color);
+}
+.btn.btn-danger, button.btn-danger {
+	background: var(--button-danger-bg-color);
+	color: var(--button-text-color);
+}
+.btn.btn-danger:active, button.btn-danger:active {
+	background: var(--button-danger-active-bg-color);
+}
+.btn-txt {
+	color: var(--body-text-color);
+	display: inline;
+	padding: 0;
+	margin: 0;
+	background: none;
+	text-decoration: underline;
+	font-size: inherit;
+}
+.btn.fullwidth {
+	display: block;
+	width: 100%;
+	box-sizing: border-box;
+	text-align: left;
+}
+
+.oojs-icon{
+	padding-left: 3em;
+}
+.oojs-icon:after {
+	padding-left: 3em;
+	background-repeat: no-repeat;
+	background-position: .6em 50%;
+	background-size: 1.4em;
+	content: "";
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	left: 0;
+	top: 0;
+}
+.oojs-icon:hover:after {
+	filter: invert(100%);
+	-webkit-filter: invert(100%);
+}
+
+.oojs-icon-userContributions:after {
+	background-image: url('oojs-ui/images/icons/userContributions-ltr.svg');
+}
+.oojs-icon-login:after {
+	background-image: url('oojs-ui/images/icons/login-ltr.svg');
+}
+.oojs-icon-logout:after {
+	background-image: url('oojs-ui/images/icons/logout-ltr.svg');
+}
+

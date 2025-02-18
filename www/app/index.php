@@ -21,11 +21,17 @@ $app->registerExceptionHandler();
 $installProfiles = new DictionaryFile( \dirname( __DIR__, 2 ) . \DIRECTORY_SEPARATOR . 'etc' . \DIRECTORY_SEPARATOR . 'userinstallers.conf.php' );
 
 // TODO: Make platform class that handles this, move this code out of the view
+$userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
 $platforms = $installProfiles->getRawArray( 'platforms' );
 $apps = $installProfiles->getRawArray( 'apps' );
 $profiles = $installProfiles->getRawArray( 'profiles' );
 
 foreach ( $platforms as $key => &$platform ) {
+	$pattern = \str_replace( '@', '\\@', $platform['match'] );
+	\assert( \is_string( $pattern ) );
+
+	$platform['match'] = \preg_match( "@{$pattern}@", $userAgent );
+
 	// Set "apps" and "profiles" for the platform to the actual apps and profiles,
 	// instead of just references.
 	$platform['apps'] = \array_combine(

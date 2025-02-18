@@ -2,25 +2,10 @@
 
 {% block documentClass %}3col{% endblock %}
 
-{% set menu = {
-	home: {name: 'Info', href: '/'},
-	app: {name: 'Apps', href: '/app/'},
-} %}
-
+{% block header %}
+<a draggable="false" href="{{ _basePath }}" id="product-name" aria-description="Home">{{ __product_name }}</a>
+{% endblock %}
 {% block layout %}
-<nav>
-	<ul>
-{% for tl, menuItem in menu %}
-{% if _basePath ~ menuItem.href == href %}
-		<li class="active"><a>
-{% else %}
-		<li><a href="{{ _basePath ~ menuItem.href }}">
-{% endif %}
-		{{ t(menuItem.name) }}</a></li>
-{% endfor %}
-	</ul>
-</nav>
-
 {% block content %}
 {% endblock %}
 {% endblock %}

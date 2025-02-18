@@ -11,29 +11,48 @@
 return [
 	'en-GB' => 'English',
 
-	'Realm' => 'Realm',
+	// Pages showing apps and profiles for different platforms
 	'If you cannot use the official app, you can download an installation profile for manual installation.' => 'If you cannot use the official app, you may also download an installation profile for manual installation.',
+	'There is no app available for %s.' => 'There is no app available for %s.',
 	'Download an installation profile for manual installation.' => 'Download an installation profile for manual installation.',
 	'Other options' => 'Other options',
-
-	'All installer apps' => 'All installer apps',
+	'Options for professional users' => 'Options for professional users',
+	'Options for other platforms and professional users' => 'Options for other platforms and professional users',
 	'Generate a certificate for manual use' => 'Generate a certificate for manual use',
+
+	// base.twig
+	'Logged in' => 'Logged in',
+	'User' => 'User',
+	'Login' => 'Login',
+	'Logout' => 'Logout',
+	'User information' => 'User information',
+
+	// start.twig
+	'Welcome to %1$s at %2$s' => 'Welcome to %1$s at %2$s',
+	'To use %1$s at %2$s, download the app or profile for your device below.' => 'To use %1$s at %2$s, download the app or profile for your device below.',
 	'Download the %s app to configure your device.' => 'Download the %s app to configure your device.',
 	'View apps and profiles for all platforms' => 'View apps and profiles for all platforms',
-	'Options for other platforms and professional users' => 'Opties voor andere platformen en professionele gebruikers',
-	'Options for professional users' => 'Options for professional users',
+	'login required' => 'login required',
 
+	// app.twig
+	'Apps' => 'Apps',
+	'All installer apps' => 'All installer apps',
+
+	// realm-picker.twig
+	'Realm' => 'Realm',
+
+	// profile-download.twig
 	'Profile download' => 'Profile download',
+	'Download %s profile' => 'Download %s profile',
 	'Download starting' => 'Your download will begin shortly',
 	'Download not starting?' => 'Download not starting?',
 	'Start download' => 'Start download',
 	'Use passphrase when prompted:' => 'When prompted for a passphrase during installation, enter the following passphrase:',
 
-	'advanced' => 'advanced',
-	'optional' => 'optional',
-
+	// profile-advanced.twig
 	'Download the app' => 'Download the app',
 	'We recommend that you use the app' => 'For most users, the easiest is to use one of the official apps.',
+	'Manual advanced profile creation' => 'Manual advanced profile creation',
 	'Create configuration profile' => 'Create configuration profile',
 	'Alternatively, you can use a configuration profile' => 'For advanced users, and for using eduroam on a device where no app is yet available, it is also possible to download a configuration profile.',
 	'Encryption' => 'Encryption',
@@ -41,13 +60,34 @@ return [
 	'Passphrase is only needed during installation' => 'After installing the profile, the passphrase is not needed anymore; it is only used during installation in order to decrypt the profile contents.',
 	'Use the feature depending encryption support on your system' => 'Use this option in regard whether your system supports encrypted or unencrypted profiles.',
 	'Enter passphrase for encryption' => 'Enter a passphrase to encrypt the profile',
+	'advanced' => 'advanced',
+	'optional' => 'optional',
 
+	// error.twig
 	'An error occurred' => 'An error occurred',
 	'Debug info' => 'Detailed error report (due to debug enabled)',
 	'Contact helpdesk' => 'Contact your helpdesk to get help',
 
-	'Not %s?' => 'Not %s?',
+	// me.twig
+	'User information' => 'User information',
+	'User ID' => 'User ID',
+	'Affiliations' => 'Affiliations',
+	'User information is not stored after you log out.' => 'User information is not stored after you log out.',
+	'User ID is connected to credentials while they are valid and short time thereafter.' => 'User ID is connected to credentials while they are valid and short time thereafter.',
+	'Available realms' => 'Available realms',
+	'No realms available' => 'No realms available',
+	'Authorised applications' => 'Authorised applications',
+	'No authorised applications' => 'No authorised applications',
+	'Client ID' => 'Client ID',
+	'Issued' => 'Issued',
+	'Expires' => 'Expires',
+	'Revoke' => 'Revoke',
+	'Credentials' => 'Credentials',
+	'Credential' => 'Credential',
+	'No credentials' => 'No credentials',
 
+	// authorize.twig
+	'Authorize %s' => 'Authorize %s',
 	'Do you want to issue a pseudo-credential?' => 'Do you want to use your account to connect this device to the Wi-Fi network?',
 	'Approve' => 'Approve',
 	'Why is this needed?' => 'Why is this needed?',

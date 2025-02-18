@@ -151,9 +151,13 @@ final class LetsWifiApp
 		\header( 'Content-Type: text/html;charset=utf8' );
 
 		$template = $this->getTwig()->load( "{$template}.twig" );
+		$provider = $this->getProvider();
+		$user = $provider->getAuthenticatedUser();
 
 		exit( $template->render(
 			[
+				'_user' => $user?->userId,
+				'_logout_href' => $provider->auth->browserAuth->getLogoutURL( $this->getBaseUrl() ),
 				'_basePath' => $basePath,
 				'_locale' => $this->getTranslationContext()->primaryLocale,
 				'_supportedLocales' => $this->getTranslationContext()->getSupportedLocales(),

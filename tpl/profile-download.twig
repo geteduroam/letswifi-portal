@@ -1,11 +1,12 @@
 {% extends 'dialog.twig' %}
 
-{% block title %}{{ t('Profile download') }}{% endblock %}
+{% block title %}{{ tattr('Profile download') }}{% endblock %}
 
 {% block content %}
 <main>
-<h1>geteduroam<small>– eduroam authentication made easy</small></h1>
+<section class="highlight">
 <form method="POST" action="{{ action }}" id="form-download">
+<h1>{{ t('Download %s profile', format) }}</h1>
 {% if realms|length == 1 %}
 <p>{{ t('Download starting') }}</p>
 <details>
@@ -15,22 +16,20 @@
 {% endif %}
 	<p><input type="hidden" name="format" value="{{ format }}"><button type="submit" class="btn btn-default" id="btn-download">{{ t('Start download') }}</button></p>
 </form>
+</section>
 {% if realms|length == 1 %}
 </details>
 {% endif %}
-<hr>
 
 {% if passphrase %}
 <p>{{ t('Use passphrase when prompted:') }}</p>
 <p id="passphrase-show">{{ passphrase }}</p>
-<hr>
 {% endif %}
 
 {% if format == 'apple-mobileconfig' %}
 <p>{{ t('apple-mobileconfig instructions') }}</p>
-<p aria-hidden="true">
+<p aria-hidden="true" class="fullwidth">
 	<picture class="screenshot mac">
-	<source srcset="{{ _basePath }}/assets/mac/sonoma-dark.png" media="(prefers-color-scheme: dark)">
 	<img src="{{ _basePath }}/assets/mac/sonoma.png">
 </picture>
 </p>

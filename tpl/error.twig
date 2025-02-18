@@ -1,14 +1,14 @@
-{% extends 'dialog.twig' %}
+{% extends 'base.twig' %}
 
 {% block title %}{{ code }} {{ code_explain }}{% endblock %}
 
-{% block content %}
+{% block layout %}
 <main>
 <h1>{{ code }} {{ code_explain }}</h1>
 <p>{{ t('An error occurred') }}
-<p>{{ message }}</p>
+<p><code>{{ message }}</code>
 {% if stacktrace %}
-{{ t('Debug info') }}
+<p>{{ t('Debug info') }}
 <pre>{{ stacktrace }}
 
 </pre>

@@ -1,10 +1,10 @@
 {% extends 'menu.twig' %}
 
-{% block title %}New configuration profile{% endblock %}
+{% block title %}{{ tattr('New configuration profile') }}{% endblock %}
 
 {% block content %}
 <main>
-	<h1>geteduroam<small>– eduroam authentication made easy</small></h1>
+	<h1>{{ t('Manual certificate creation') }}</h1>
 	<p>{{ t('We recommend that you use the app') }}</p>
 	<ul class="apps buttons">
 		<li><a class="btn btn-default" href="{{ app.url }}">{{ t('Download the app') }}</a></li>
@@ -12,6 +12,8 @@
 	<hr>
 	<details>
 		<summary>{{ t('Create configuration profile') }} ({{ t('advanced') }})</summary>
+		<section class="highlight">
+		<h1>{{ t('Manual advanced profile creation') }}</h1>
 		<form method="post">
 			<p>
 				{{ t('Alternatively, you can use a configuration profile') }}
@@ -35,7 +37,7 @@
 				<li><button type="submit" name="format" value="{{ formatName }}" class="btn btn-default">{{ t(formatData.name) }}</button></li>
 {% endfor %}
 			</ul>
-		</form>
+		</form></section>
 	</details>
 </main>
 {% endblock %}

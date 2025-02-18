@@ -1,18 +1,17 @@
 {% extends 'menu.twig' %}
 
-{% block title %}{{ t('Apps') }}{% endblock %}
+{% block title %}{{ tattr('Apps') }}{% endblock %}
 
 {% block content %}
-<div class="main-container">
 	<main>
 		<h1>{{ t('All installer apps') }}</h1>
-		<hr>
-		{% for platform in platforms %}
+		{% for platform in platforms|sort((a, b) => a.match ? -1 : (b.match ? 1 : a.name|lower <=> b.name|lower)) %}
+			<section class="{{ platform.match == true ? 'highlight' : '' }}">
 			<h2>{{ platform.name }}</h2>
 			{% if platform.apps %}
 				<ul class="apps buttons">
 				{% for app_id, app in platform.apps %}
-					<li class="{{ app_id }} {{ app.type }}"><a class="btn btn-default" href="{{ app.href }}">{{ app.name }}</a></li>
+					<li class="{{ app_id }} {{ app.type }}"><a class="btn btn-default" href="{{ app.href }}" rel="nofollow,noreferrer,noopener">{{ app.name }}</a></li>
 				{% endfor %}
 				</ul>
 			{% endif %}
@@ -20,7 +19,9 @@
 				{% if platform.apps %}
 					<details><summary>{{ t('If you cannot use the official app, you can download an installation profile for manual installation.') }}</summary>
 				{% else %}
-					<p>{{ t('Download an installation profile for manual installation.') }}
+					<p>
+						{{ t('There is no app available for %s.', platform.name) }}<br>
+						{{ t('Download an installation profile for manual installation.') }}
 				{% endif %}
 				{% for profile in platform.profiles %}
 					<a href="{{ profile.href }}">{{ profile.name }}</a>
@@ -29,14 +30,15 @@
 					</details>
 				{% endif %}
 			{% endif %}
-			<hr>
+			</section>
 		{% endfor %}
 
+		<section class="platform-other">
 		<h1>{{ t('Other options') }}</h1>
 		<details>
 			<summary>{{ t('Options for other platforms and professional users') }}</summary>
 			<p><a href="{{ advanced_href }}">{{ t('Generate a certificate for manual use') }}</a></p>
 		</details>
+		</section>
 	</main>
-</div>
 {% endblock %}
