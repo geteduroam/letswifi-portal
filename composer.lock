@@ -8,11 +8,11 @@
     "packages": [
         {
             "name": "fyrkat/multilang",
-            "version": "v1.0.2",
+            "version": "v1.0.3",
             "source": {
                 "type": "git",
                 "url": "https://git.sr.ht/~jornane/php-multilang",
-                "reference": "1f976181ae21594f48785525ec4352fd6a0d3e0a"
+                "reference": "ef5298d05dc5dc43d03cc8351bca2e0206b18576"
             },
             "require": {
                 "php": ">=8.1"
@@ -40,7 +40,7 @@
                     "email": "git@jornane.no"
                 }
             ],
-            "time": "2025-02-17T20:16:02+00:00"
+            "time": "2025-02-19T08:46:42+00:00"
         },
         {
             "name": "fyrkat/oauth-server",
