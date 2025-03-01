@@ -48,6 +48,7 @@ final class LetsWifiApp
 		410 => 'Gone',
 		411 => 'Length Required',
 		417 => 'Expectation Failed',
+		421 => 'Misdirected Request',
 		500 => 'Internal Server Error',
 	];
 
@@ -151,13 +152,18 @@ final class LetsWifiApp
 		\header( 'Content-Type: text/html;charset=utf8' );
 
 		$template = $this->getTwig()->load( "{$template}.twig" );
-		$provider = $this->getProvider();
-		$user = $provider->getAuthenticatedUser();
+
+		try {
+			$provider = $this->getProvider();
+		} catch ( Throwable ) {
+			$provider = null;
+		}
+		$user = $provider?->getAuthenticatedUser();
 
 		exit( $template->render(
 			[
 				'_user' => $user?->userId,
-				'_logout_href' => $provider->auth->browserAuth->getLogoutURL( $this->getBaseUrl() ),
+				'_logout_href' => $provider?->auth->browserAuth->getLogoutURL( $this->getBaseUrl() ),
 				'_basePath' => $basePath,
 				'_locale' => $this->getTranslationContext()->primaryLocale,
 				'_supportedLocales' => $this->getTranslationContext()->getSupportedLocales(),

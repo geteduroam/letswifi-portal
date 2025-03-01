@@ -12,7 +12,9 @@ namespace letswifi\tenant;
 
 use fyrkat\openssl\X509;
 use letswifi\LetsWifiConfig;
+use letswifi\configuration\ConfigurationException;
 use letswifi\configuration\Dictionary;
+use letswifi\error\MisdirectException;
 
 class TenantConfig
 {
@@ -24,7 +26,12 @@ class TenantConfig
 	{
 		$providers = $this->config->getDictionary( 'provider' );
 
-		return Provider::fromConfig( $this, $providers->getDictionaryOrNull( $httpHost ) ?? $providers->getDictionary( '*' ) );
+		try {
+			return Provider::fromConfig( $this, $providers->getDictionaryOrNull( $httpHost )
+				?? $providers->getDictionary( '*' ) );
+		} catch ( ConfigurationException $e ) {
+			throw new MisdirectException( $httpHost, $e );
+		}
 	}
 
 	public function getContact( string $contactId ): Contact
