@@ -164,9 +164,9 @@ summary, button {
 }
 hr {
 	border: none;
-	border-top: 1px solid;
+	border-top: thin solid;
 	border-color: var(--light-border-color);
-	margin: 2em;
+	margin: 2em auto;
 }
 .fieldsets {
 	display: flex;
@@ -178,7 +178,7 @@ hr {
 }
 input[type=text], input[type=password] {
 	border: solid;
-	border-width: 1px 1px 1px 1px;
+	border-width: thin;
 	border-color: var(--body-text-color);
 	border-radius: .3em;
 	background: inherit;
@@ -187,16 +187,16 @@ input[type=text], input[type=password] {
 }
 input[type=text]:focus, input[type=password]:focus {
 	border-color: var(--accent-color);
-	outline: 1px solid var(--body-text-color);
+	outline: thin solid var(--body-text-color);
 }
 input[type=radio]:focus + label, label:focus {
-	outline: 2px solid var(--accent-color);
+	outline: medium solid var(--accent-color);
 }
 input[type=radio] {
 	outline: none;
 }
 fieldset {
-	border: 1px solid var(--light-border-color);
+	border: thin solid var(--light-border-color);
 	border-radius: .15em;
 	margin-bottom: 2em;
 }
@@ -310,4 +310,3 @@ fieldset > legend {
 .oojs-icon-logout:after {
 	background-image: url('oojs-ui/images/icons/logout-ltr.svg');
 }
-
