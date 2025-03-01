@@ -95,6 +95,6 @@ return [
 	'Select your user realm' => 'Please select your user group to continue',
 	'Continue' => 'Continue',
 
-	'apple-mobileconfig instructions' => 'After opening the file on MacOS, install it by going to <strong>System Settings</strong> → <strong>Privacy & Security</strong> → <strong>Profiles</strong>.',
+	'apple-mobileconfig instructions' => 'After opening the file on MacOS, install it by opening the <strong>System Settings</strong> app, click <strong>Profile Downloaded</strong> and then double-click the new profile.',
 	'google-onc instructions' => 'After downloading the file, open the Chrome browser and browse to this URL: <a href="chrome://network">chrome://network</a>. Then, use the <strong>Import ONC file</strong> button. The import is silent; the new network definitions will be added to the preferred networks.',
 ];

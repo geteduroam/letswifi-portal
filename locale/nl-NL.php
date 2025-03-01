@@ -94,6 +94,6 @@ return [
 	'Select your user realm' => 'Kies je realm om verder te gaan',
 	'Continue' => 'Ga door',
 
-	'apple-mobileconfig instructions' => 'Na het openen van het bestand op MacOS, open <strong>Systeemvoorkeuren</strong> → <strong>Privacy & Veiligheid</strong> → <strong>Profielen</strong>.',
+	'apple-mobileconfig instructions' => 'Na het openen van het bestand op MacOS, open <strong>Systeemvoorkeuren</strong>, klik op <strong>Profiel gedownload</strong> en dubbelklik vervolgens op het nieuwe profiel.',
 	'google-onc instructions' => 'Nadat het bestand gedownload is, open de Chrome browser en ga naar deze URL: <a href="chrome://network">chrome://network</a>. Gebruik daarna de <strong lang="en-US">Import ONC file</strong> knop. Er komt geen bevestiging van de import. De netwerkgegevens worden toegevoegd aan de voorkeursnetwerken.',
 ];
