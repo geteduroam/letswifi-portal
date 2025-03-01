@@ -35,6 +35,9 @@ class CertificateCredentialLog extends CredentialLog
 
 	public function createCredentialIssuer( Realm $realm ): CertificateCredentialIssuer
 	{
+		// TODO: Check if this assertion can ever be true
+		\assert( $this->user->canUseRealm( $realm ) );
+
 		return new CertificateCredentialIssuer(
 			user: $this->user,
 			realm: $realm,
@@ -80,6 +83,9 @@ class CertificateCredentialLog extends CredentialLog
 	 */
 	public function getStatisticsPerClient( Realm $realm ): array
 	{
+		// TODO: Check if this assertion can ever be true
+		\assert( $this->user->canUseRealm( $realm ) );
+
 		$statement = $this->getPDO()->prepare( 'SELECT `client` AS `client_id`, MIN(`issued`) AS `first_issued`, MAX(`issued`) AS `last_issued`, MIN(`expires`) AS `first_expires`, MAX(`expires`) AS `last_expires`, COUNT(*) AS `count` FROM `realm_signing_log` WHERE `realm` = :realm AND `requester` = :requester AND `expires` > :now GROUP BY `client_id`' );
 		$statement->bindValue( 'now', \gmdate( static::DATE_FORMAT, $this->now->getTimestamp() ), PDO::PARAM_STR );
 		$statement->bindValue( 'realm', $realm->realmId, PDO::PARAM_STR );
@@ -108,6 +114,9 @@ class CertificateCredentialLog extends CredentialLog
 	 */
 	public function listCredentials( ?Realm $realm = null, ?string $client = null ): Generator
 	{
+		// TODO: Check if this assertion can ever be true
+		\assert( null === $realm || $this->user->canUseRealm( $realm ) );
+
 		$realms = [];
 		$clientQueryPart = null === $client ? '' : 'AND `client` = :client';
 		$realmQueryPart = null === $realm ? '' : 'AND `realm` = :realm';
@@ -157,6 +166,9 @@ class CertificateCredentialLog extends CredentialLog
 
 	public function getCredential( string $credentialId, ?Realm $realm = null, ?string $client = null ): CertificateCredential
 	{
+		// TODO: Check if this assertion can ever be true
+		\assert( null === $realm || $this->user->canUseRealm( $realm ) );
+
 		$clientQueryPart = null === $client ? '' : 'AND `client` = :client';
 		$realmQueryPart = null === $realm ? '' : 'AND `realm` = :realm';
 		$statement = $this->getPDO()->prepare( "SELECT `realm`, `ca_sub`, `requester`, `usage`, `sub`, `issued`, `expires`, `revoked`, `csr`, `client`, `user_agent`, `ip`, `x509` FROM `realm_signing_log` WHERE `sub` =:sub AND `requester` = :requester {$clientQueryPart} {$realmQueryPart} ORDER BY `issued` ASC" );
@@ -203,6 +215,9 @@ class CertificateCredentialLog extends CredentialLog
 
 	private function revoke( Realm $realm, string $subject ): void
 	{
+		// TODO: Check if this assertion can ever be true
+		\assert( $this->user->canUseRealm( $realm ) );
+
 		$revokeStatement = $this->getPDO()->prepare( 'UPDATE `realm_signing_log` SET `revoked` = :revoked WHERE `sub` = :sub AND `realm` = :realm AND `requester` = :requester AND `revoked` IS NULL' );
 		$revokeStatement->bindValue( 'revoked', \gmdate( static::DATE_FORMAT, $this->now->getTimestamp() ), PDO::PARAM_STR );
 		$revokeStatement->bindValue( 'requester', $this->user->userId, PDO::PARAM_STR );
