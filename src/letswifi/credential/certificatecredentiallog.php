@@ -203,8 +203,9 @@ class CertificateCredentialLog extends CredentialLog
 
 	private function revoke( Realm $realm, string $subject ): void
 	{
-		$revokeStatement = $this->getPDO()->prepare( 'UPDATE `realm_signing_log` SET `revoked` = :revoked WHERE `sub` = :sub AND `realm` = :realm AND `revoked` IS NULL' );
+		$revokeStatement = $this->getPDO()->prepare( 'UPDATE `realm_signing_log` SET `revoked` = :revoked WHERE `sub` = :sub AND `realm` = :realm AND `requester` = :requester AND `revoked` IS NULL' );
 		$revokeStatement->bindValue( 'revoked', \gmdate( static::DATE_FORMAT, $this->now->getTimestamp() ), PDO::PARAM_STR );
+		$revokeStatement->bindValue( 'requester', $this->user->userId, PDO::PARAM_STR );
 		$revokeStatement->bindValue( 'realm', $realm->realmId, PDO::PARAM_STR );
 		$revokeStatement->bindParam( 'sub', $subject, PDO::PARAM_STR );
 		$revokeStatement->execute();
