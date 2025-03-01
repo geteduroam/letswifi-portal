@@ -46,7 +46,11 @@ class CertificateCredentialLog extends CredentialLog
 		);
 	}
 
-	/** @return array<string,statistics> Mapping from realm_id to statistics */
+	/**
+	 * @return array<string,statistics> Mapping from realm_id to statistics
+	 *
+	 * @deprecated Not currently in use, might be useful for a dashboard
+	 */
 	public function getStatisticsPerRealm(): array
 	{
 		$statement = $this->getPDO()->prepare( 'SELECT `realm` AS `realm_id`, MIN(`issued`) AS `first_issued`, MAX(`issued`) AS `last_issued`, MIN(`expires`) AS `first_expires`, MAX(`expires`) AS `last_expires`, COUNT(*) AS `count` FROM `realm_signing_log` WHERE `requester` = :requester AND `expires` > :now GROUP BY `realm`' );
@@ -69,7 +73,11 @@ class CertificateCredentialLog extends CredentialLog
 		return $result;
 	}
 
-	/** @return array<string,statistics> Mapping from client_id to statistics */
+	/**
+	 * @return array<string,statistics> Mapping from client_id to statistics
+	 *
+	 * @deprecated Not currently in use, might be useful for a dashboard
+	 */
 	public function getStatisticsPerClient( Realm $realm ): array
 	{
 		$statement = $this->getPDO()->prepare( 'SELECT `client` AS `client_id`, MIN(`issued`) AS `first_issued`, MAX(`issued`) AS `last_issued`, MIN(`expires`) AS `first_expires`, MAX(`expires`) AS `last_expires`, COUNT(*) AS `count` FROM `realm_signing_log` WHERE `realm` = :realm AND `requester` = :requester AND `expires` > :now GROUP BY `client_id`' );
