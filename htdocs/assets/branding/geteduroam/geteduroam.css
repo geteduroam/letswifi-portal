@@ -1,0 +1,20 @@
+:root {
+	--accent-color: #276cba;
+	--button-danger-bg-color: #d14;
+	--button-danger-active-bg-color: #b13;
+
+	/*
+	--bg-color: #f6f4f2;
+	--highlight-bg-color: #fefcfa;
+	--body-text-color: #212529;
+	--body-code-text-color: #a05;
+	--light-border-color: #e5e4e2;
+	--button-text-color: #fff;
+	*/
+}
+
+header #product-name {
+	height: 2.5em;
+	background: url('eduroam.svg') left center / contain no-repeat;
+	color: rgba(0,0,0,0);
+}

@@ -1,7 +1,7 @@
 <?php declare( strict_types=1 );
 
 /*
- * This file is part of letswifi; a system for easy eduroam device enrollment
+ * This file is part of letswifi; a system for easy 802.1x device enrollment
  *
  * Copyright: Jørn Åne de Jong <jorn.dejong@letswifi.eu>
  * Copyright: Paul Dekkers, SURF <paul.dekkers@surf.nl>
@@ -127,7 +127,7 @@ class Provider implements JsonSerializable
 		// It might be better in the Realm class, or in the \letswifi\auth namespace.
 		$result = [];
 		foreach ( $this->realmMap as $affiliation => $realms ) {
-			if ( '*' === $affiliation || \in_array( $affiliation, $affiliations, true ) ) {
+			if ( '' === $affiliation || \in_array( $affiliation, $affiliations, true ) ) {
 				if ( empty( $realms ) ) {
 					// Stop evaluating more affiliations
 					break;

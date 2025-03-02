@@ -13,7 +13,7 @@
 	<projectFiles>
 		<directory name="bin"/>
 		<directory name="src"/>
-		<directory name="www"/>
+		<directory name="htdocs"/>
 		<ignoreFiles>
 			<directory name="vendor"/>
 		</ignoreFiles>
@@ -27,13 +27,13 @@
 		<RiskyTruthyFalsyComparison>
 			<errorLevel type="suppress">
 				<directory name="src"/>
-				<directory name="www"/>
+				<directory name="htdocs"/>
 			</errorLevel>
 		</RiskyTruthyFalsyComparison>
 		<UnresolvableInclude>
 			<errorLevel type="suppress">
 				<directory name="bin"/>
-				<directory name="www"/>
+				<directory name="htdocs"/>
 				<file name="src/_autoload.php"/><!-- because Composer -->
 			</errorLevel>
 		</UnresolvableInclude>

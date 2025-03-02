@@ -1,7 +1,7 @@
 <?php declare( strict_types=1 );
 
 /*
- * This file is part of letswifi; a system for easy eduroam device enrollment
+ * This file is part of letswifi; a system for easy 802.1x device enrollment
  *
  * Copyright: Jørn Åne de Jong <jorn.dejong@letswifi.eu>
  * Copyright: Paul Dekkers, SURF <paul.dekkers@surf.nl>
@@ -54,7 +54,7 @@ return [
 	'We recommend that you use the app' => 'For most users, the easiest is to use one of the official apps.',
 	'Manual advanced profile creation' => 'Manual advanced profile creation',
 	'Create configuration profile' => 'Create configuration profile',
-	'Alternatively, you can use a configuration profile' => 'For advanced users, and for using eduroam on a device where no app is yet available, it is also possible to download a configuration profile.',
+	'Alternatively, you can use a configuration profile' => 'For advanced users, or on a device where no app is yet available, it is also possible to download a configuration profile.',
 	'Encryption' => 'Encryption',
 	'When encrypting you need a passphrase when installing' => 'Encrypting your profile requires you to enter the passphrase to decrypt the contents of the profile.',
 	'Passphrase is only needed during installation' => 'After installing the profile, the passphrase is not needed anymore; it is only used during installation in order to decrypt the profile contents.',

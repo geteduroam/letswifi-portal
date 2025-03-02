@@ -1,27 +1,21 @@
-/etc/*
-/etc/**/*
-!/etc/*/
-!/etc/*.dist.*
-!/etc/**/*.dist.*
-!/etc/*.dev.*
-!/etc/**/*.dev.*
-!/etc/*.md
-!/etc/**/*.md
-
-/composer.phar
-/fifo
-/phan.phar
-/php-cs-fixer-v2.phar
-/php-cs-fixer-v3.phar
-/phpunit-7.phar
-/psalm.phar
-/simplesamlphp*
+# Created by running Make targets
+/config
 /var
 /vendor
-/www/simplesaml
-/.geteduroam-refresh-*
 /.php_cs.cache
 /.php-cs-fixer.cache
 /.phpunit.result.cache
 /.twig-cs-fixer.cache
+
+# Removed in earlier versions
+/etc
+/fifo
+
+# Composer
+*.phar
+
+# Often manually created by developers
+/simplesamlphp*
+/www/simplesaml
 *.eap-config
+.geteduroam-refresh-*

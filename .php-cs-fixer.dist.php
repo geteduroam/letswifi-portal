@@ -1,25 +1,48 @@
-<?php declare(strict_types=1);
-$finder = PhpCsFixer\Finder::create()
-	->in(__DIR__ . DIRECTORY_SEPARATOR . 'bin')
-	->in(__DIR__ . DIRECTORY_SEPARATOR . 'src')
-	->in(__DIR__ . DIRECTORY_SEPARATOR . 'www')
-	->in(__DIR__ . DIRECTORY_SEPARATOR . 'tests')
-	->in(__DIR__ . DIRECTORY_SEPARATOR . 'locale')
-	->in(__DIR__ . DIRECTORY_SEPARATOR . '.phan')
-	->notName('_autoload.php')
+<?php declare( strict_types=1 );
+
+/*
+ * This file is part of letswifi; a system for easy 802.1x device enrollment
+ *
+ * Copyright: Jørn Åne de Jong <jorn.dejong@letswifi.eu>
+ * Copyright: Paul Dekkers, SURF <paul.dekkers@surf.nl>
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+use PhpCsFixer\Config;
+use PhpCsFixer\Finder;
+
+$finder = Finder::create()->in( [
+	__DIR__ . \DIRECTORY_SEPARATOR . 'bin',
+	__DIR__ . \DIRECTORY_SEPARATOR . 'config-dist',
+	__DIR__ . \DIRECTORY_SEPARATOR . 'htdocs',
+	__DIR__ . \DIRECTORY_SEPARATOR . 'src',
+	__DIR__ . \DIRECTORY_SEPARATOR . 'tests',
+	__DIR__ . \DIRECTORY_SEPARATOR . 'locale',
+	__DIR__ . \DIRECTORY_SEPARATOR . '.phan',
+] )->notName( '_autoload.php' )
+	->append( Finder::create()
+		->in( __DIR__ . \DIRECTORY_SEPARATOR . 'bin' )
+		->name( '/[a-z-]+/' )
+		->depth( 0 ),
+	)
+	->append( Finder::create()
+		->in( __DIR__ )
+		->ignoreDotFiles( false )
+		->depth( 0 ),
+	)
 ;
-$config = (new PhpCsFixer\Config())
-	->setRiskyAllowed(true)
-	->setIndent("\t")
-	->setRules([
+$config = ( new Config() )
+	->setRiskyAllowed( true )
+	->setIndent( "\t" )
+	->setRules( [
 		'header_comment' => [
 			'header' => <<< 'EOD'
-This file is part of letswifi; a system for easy eduroam device enrollment
+				This file is part of letswifi; a system for easy 802.1x device enrollment
 
-Copyright: Jørn Åne de Jong <jorn.dejong@letswifi.eu>
-Copyright: Paul Dekkers, SURF <paul.dekkers@surf.nl>
-SPDX-License-Identifier: BSD-3-Clause
-EOD
+				Copyright: Jørn Åne de Jong <jorn.dejong@letswifi.eu>
+				Copyright: Paul Dekkers, SURF <paul.dekkers@surf.nl>
+				SPDX-License-Identifier: BSD-3-Clause
+				EOD,
 		],
 		'@PSR2' => true,
 		'@Symfony' => true,
@@ -57,14 +80,14 @@ EOD
 			'anonymous_classes_opening_brace' => 'same_line',
 			'anonymous_functions_opening_brace' => 'same_line',
 			'classes_opening_brace' => 'next_line_unless_newline_at_signature_end',
-			'control_structures_opening_brace' =>'same_line',
+			'control_structures_opening_brace' => 'same_line',
 			'functions_opening_brace' => 'next_line_unless_newline_at_signature_end',
 		],
 		'cast_spaces' => [
 			'space' => 'none',
 		],
 		'class_attributes_separation' => true,
-		'class_definition' => [ /* default */
+		'class_definition' => [/* default */
 			'multi_line_extends_each_single_line' => false,
 			'single_item_single_line' => false,
 			'single_line' => false,
@@ -97,7 +120,7 @@ EOD
 				'openssl_x509_checkpurpose',
 				'openssl_x509_fingerprint',
 				'openssl_x509_read',
-			]
+			],
 		],
 		'explicit_indirect_variable' => true,
 		'explicit_string_variable' => true,
@@ -110,7 +133,7 @@ EOD
 		],
 		'function_declaration' => false, /* Would remove spaces in function definitions */
 		'function_to_constant' => [
-			'functions' => [ /* default */
+			'functions' => [/* default */
 				'get_called_class',
 				'get_class',
 				'get_class_this',
@@ -339,6 +362,8 @@ EOD
 			'less_and_greater' => true,
 			'always_move_variable' => true,
 		],
-	])
-	->setFinder($finder);
+	] )
+	->setFinder( $finder )
+;
+
 return $config;

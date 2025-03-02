@@ -1,14 +1,24 @@
-<?php
+<?php declare( strict_types=1 );
 
-$ruleset = new TwigCsFixer\Ruleset\Ruleset();
-$ruleset->addStandard(new TwigCsFixer\Standard\TwigCsFixer());
-$ruleset->overrideRule(new TwigCsFixer\Rules\Whitespace\IndentRule(useTab: true));
+/*
+ * This file is part of letswifi; a system for easy 802.1x device enrollment
+ *
+ * Copyright: Jørn Åne de Jong <jorn.dejong@letswifi.eu>
+ * Copyright: Paul Dekkers, SURF <paul.dekkers@surf.nl>
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
 
-$finder = new TwigCsFixer\File\Finder();
-$finder->in('tpl/');
+use PhpCsFixer\Finder;
+use TwigCsFixer\Config\Config;
+use TwigCsFixer\Rules\Whitespace\IndentRule;
+use TwigCsFixer\Ruleset\Ruleset;
 
-$config = new TwigCsFixer\Config\Config();
-$config->setRuleset($ruleset);
-$config->setFinder($finder);
-
-return $config;
+return ( new Config() )
+	->setRuleset( ( new Ruleset() )
+		->addStandard( new TwigCsFixer\Standard\TwigCsFixer() )
+		->overrideRule( new IndentRule( useTab: true ) ),
+	)
+	->setFinder( Finder::create()
+		->in( 'template/' ),
+	)
+;

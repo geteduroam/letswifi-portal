@@ -1,7 +1,7 @@
 <?php declare( strict_types=1 );
 
 /*
- * This file is part of letswifi; a system for easy eduroam device enrollment
+ * This file is part of letswifi; a system for easy 802.1x device enrollment
  *
  * Copyright: Jørn Åne de Jong <jorn.dejong@letswifi.eu>
  * Copyright: Paul Dekkers, SURF <paul.dekkers@surf.nl>
@@ -12,7 +12,7 @@ return [
 	'nl-NL' => 'Nederlands',
 
 	// Pages showing apps and profiles for different platforms
-	'If you cannot use the official app, you can download an installation profile for manual installation.' => 'Als de officiele app niet kunt gebruiken, kan je een installatieprofiel voor handmatige installatie downloaden.',
+	'If you cannot use the official app, you can download an installation profile for manual installation.' => 'Handmatig installatieprofiel indien de app niet gebruikt kan worden.',
 	'There is no app available for %s.' => 'Er is geen app beschikbaar voor %s.',
 	'Download an installation profile for manual installation.' => 'Download een installatieprofile voor handmatige installatie.',
 	'Other options' => 'Andere opties',

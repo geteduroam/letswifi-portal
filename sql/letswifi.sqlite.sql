@@ -1,31 +1,4 @@
 
-CREATE TABLE IF NOT EXISTS "realm_signer" (
-	"realm" TEXT NOT NULL PRIMARY KEY REFERENCES "realm"("realm"),
-	"signer_ca_sub" NOT NULL REFERENCES "ca"("sub"),
-	"validity_days" INTEGER NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS "ca" (
-	"sub" TEXT NOT NULL PRIMARY KEY,
-	"pub" BLOB NOT NULL,
-	"key" BLOB,
-	"issuer" TEXT REFERENCES ""("sub")
-);
-
-CREATE TABLE IF NOT EXISTS "realm" (
-	"realm" TEXT NOT NULL PRIMARY KEY
-);
-
-CREATE TABLE IF NOT EXISTS "realm_server_name" (
-	"realm" TEXT REFERENCES "realm"("realm") NOT NULL,
-	"server_name" TEXT NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS "realm_trust" (
-	"realm" TEXT REFERENCES "realm"("realm") NOT NULL,
-	"trusted_ca_sub" TEXT REFERENCES "ca"("sub") NOT NULL
-);
-
 CREATE TABLE IF NOT EXISTS "oauth_grant" (
 	"sid" TEXT NOT NULL PRIMARY KEY,
 	"grant_data" TEXT NOT NULL,
@@ -39,22 +12,6 @@ CREATE TABLE IF NOT EXISTS "oauth_token" (
 	"used" INTEGER,
 	"exp" INTEGER NOT NULL,
 	"type" TEXT NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS "realm_oauth" (
-	"kid" TEXT NOT NULL PRIMARY KEY,
-	"realm" TEXT NOT NULL PRIMARY KEY REFERENCES "realm"("realm"),
-	"key" BLOB NOT NULL,
-	"issued" INTEGER NOT NULL,
-	"expires" INTEGER
-);
-
-CREATE TABLE "provider" (
-	"http_host" TEXT PRIMARY KEY,
-	"auth_service" TEXT NOT NULL,
-	"auth_param" BLOB,
-	"realm" TEXT REFERENCES "realm"("realm")
-	"realm_map" BLOB
 );
 
 CREATE TABLE IF NOT EXISTS "realm_signing_log" (

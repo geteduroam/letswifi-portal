@@ -1,7 +1,7 @@
 <?php declare( strict_types=1 );
 
 /*
- * This file is part of letswifi; a system for easy eduroam device enrollment
+ * This file is part of letswifi; a system for easy 802.1x device enrollment
  *
  * Copyright: Jørn Åne de Jong <jorn.dejong@letswifi.eu>
  * Copyright: Paul Dekkers, SURF <paul.dekkers@surf.nl>
@@ -67,12 +67,12 @@ final class LetsWifiApp
 
 	private ?TranslationContext $translationContext = null;
 
-	private readonly Dictionary $config;
+	private readonly Dictionary $globalConfig;
 
-	public function __construct( public readonly string $basePath, ?Dictionary $config = null )
+	public function __construct( public readonly string $basePath, ?Dictionary $globalConfig = null )
 	{
-		$this->config = $config ?? new DictionaryFile( \dirname( __DIR__, 2 ) . \DIRECTORY_SEPARATOR . 'etc' . \DIRECTORY_SEPARATOR . 'tenant.conf.php' );
-		$this->tenantConfig = new TenantConfig( $this->config );
+		$this->globalConfig = $globalConfig ?? new DictionaryFile( \dirname( __DIR__, 2 ) . \DIRECTORY_SEPARATOR . 'config' . \DIRECTORY_SEPARATOR . 'config.conf.php' );
+		$this->tenantConfig = new TenantConfig( $this->globalConfig );
 
 		if ( \PHP_SAPI === 'cli-server' ) {
 			// Ensure that we are setting the recommended CSP when developing,
@@ -82,6 +82,11 @@ final class LetsWifiApp
 		}
 
 		$this->jsonOutputDelete = new stdClass();
+	}
+
+	public function getBrandingConfiguration(): ?Dictionary
+	{
+		return $this->globalConfig->getDictionaryOrNull( 'branding' );
 	}
 
 	public function getIP(): string
@@ -153,12 +158,15 @@ final class LetsWifiApp
 
 		$template = $this->getTwig()->load( "{$template}.twig" );
 
+		$provider = null;
+		$user = null;
+
 		try {
 			$provider = $this->getProvider();
+			$user = $provider->getAuthenticatedUser();
 		} catch ( Throwable ) {
-			$provider = null;
 		}
-		$user = $provider?->getAuthenticatedUser();
+		$branding = $this->getBrandingConfiguration();
 
 		exit( $template->render(
 			[
@@ -167,6 +175,11 @@ final class LetsWifiApp
 				'_basePath' => $basePath,
 				'_locale' => $this->getTranslationContext()->primaryLocale,
 				'_supportedLocales' => $this->getTranslationContext()->getSupportedLocales(),
+				'_product_name' => $branding?->getStringOrNull( 'product_name' ) ?? "Let's Wi-Fi",
+				'_network_name' => $branding?->getStringOrNull( 'network_name' ) ?? "Let's Wi-Fi",
+				'_product_shortname' => $branding?->getStringOrNull( 'product_shortname' ) ?? 'letswifi',
+				'_branding_css_file' => $branding?->getStringOrNull( 'css_file' ),
+				'_branding_favicon_file' => $branding?->getStringOrNull( 'favicon_file' ),
 			] + $data,
 		) );
 	}
@@ -255,7 +268,7 @@ final class LetsWifiApp
 		return new CertificateCredentialLog(
 			user: $user,
 			provider: $this->getProvider(),
-			config: $this->config,
+			config: $this->globalConfig,
 		);
 	}
 
@@ -281,7 +294,7 @@ final class LetsWifiApp
 			return null;
 		}
 
-		$certificates = $this->config->getDictionary( 'certificate' );
+		$certificates = $this->globalConfig->getDictionary( 'certificate' );
 		$data = $certificates->getDictionary( $dn );
 		$signingKey = $data->getString( 'key' );
 		$signingCert = '';
@@ -326,7 +339,7 @@ final class LetsWifiApp
 	{
 		if ( null === $this->twig ) {
 			$loader = new FilesystemLoader(
-				[\implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 2 ), 'tpl'] )],
+				[\implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 2 ), 'template'] )],
 			);
 			$this->twig = new Environment( $loader, [
 				// 'cache' => '/path/to/compilation_cache',
@@ -338,8 +351,7 @@ final class LetsWifiApp
 			) );
 			$this->twig->addFunction( new TwigFunction(
 				'tattr',
-				fn( MultiLanguageString|string $untranslated, mixed ...$values ) => \htmlspecialchars( $this->getTranslationContext()->translate( $untranslated, $_, ...$values ), \ENT_QUOTES | \ENT_SUBSTITUTE, 'UTF-8' ),
-				['is_safe' => ['html']],
+				fn( MultiLanguageString|string $untranslated, mixed ...$values ) => $this->getTranslationContext()->translate( $untranslated, $_, ...$values ),
 			) );
 		}
 

@@ -1,7 +1,7 @@
 <?php declare( strict_types=1 );
 
 /*
- * This file is part of letswifi; a system for easy eduroam device enrollment
+ * This file is part of letswifi; a system for easy 802.1x device enrollment
  *
  * Copyright: Jørn Åne de Jong <jorn.dejong@letswifi.eu>
  * Copyright: Paul Dekkers, SURF <paul.dekkers@surf.nl>
@@ -28,7 +28,7 @@ class TenantConfig
 
 		try {
 			return Provider::fromConfig( $this, $providers->getDictionaryOrNull( $httpHost )
-				?? $providers->getDictionary( '*' ) );
+				?? $providers->getDictionary( '_default' ) );
 		} catch ( ConfigurationException $e ) {
 			throw new MisdirectException( $httpHost, $e );
 		}
