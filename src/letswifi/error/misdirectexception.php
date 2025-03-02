@@ -14,7 +14,7 @@ use Throwable;
 
 class MisdirectException extends UserException
 {
-	public function __construct( public readonly string $httpHost, Throwable $previous )
+	public function __construct( public readonly string $httpHost, ?Throwable $previous = null )
 	{
 		parent::__construct( "Hostname {$httpHost} is not served by this server.", 421, $previous );
 	}
