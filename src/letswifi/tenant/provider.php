@@ -77,7 +77,7 @@ class Provider implements JsonSerializable
 			realmMap: $providerData->getRawArray( 'realm' ),
 			location: \array_map( [Location::class, 'fromConfig'], $location ),
 			logo: null === $logo ? null : Logo::fromConfig( $logo ),
-			contactId: $providerData->getString( 'contact' ),
+			contactId: $providerData->getStringOrNull( 'contact' ),
 			description: $providerData->getMultiLanguageStringOrNull( 'description' ),
 			profileSigner: $providerData->getStringOrNull( 'profile-signer' ),
 		);

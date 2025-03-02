@@ -56,7 +56,7 @@ class Realm implements JsonSerializable
 			location: \array_map( [Location::class, 'fromConfig'], $location ),
 			logo: null === $logo ? null : Logo::fromConfig( $logo ),
 			description: $realmData->getMultiLanguageStringOrNull( 'description' ),
-			contactId: $realmData->getString( 'contact' ),
+			contactId: $realmData->getStringOrNull( 'contact' ),
 		);
 	}
 

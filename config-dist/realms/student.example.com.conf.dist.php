@@ -57,7 +57,7 @@ return [
 	// this contact information may be present in the file.
 	// When using an app, it may show this information prior to connecting,
 	// and when re-launching the app after the profile has been configured.
-	// REQUIRED: String, ID of contact
+	// OPTIONAL: String, ID of contact, match with contact in config.conf.php
 	'contact' => 'example.com',
 
 	// List of Wi-Fi networks to configure on the clients

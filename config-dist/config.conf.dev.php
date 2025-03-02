@@ -61,7 +61,7 @@ return [
 			// and it will be available through public API.
 			// After the user selects a realm,
 			// the contact information from the realm is used.
-			// REQUIRED: String, ID of contact
+			// OPTIONAL: String, ID of contact, match with contact in config.conf.php
 			'contact' => 'example.com',
 
 			// Authentication configuration
