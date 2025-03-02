@@ -60,7 +60,7 @@ class SimpleSAMLFeideAuth extends SimpleSAMLAuth
 			}
 			\header( 'Location: https://' . $this->feideHostname . '/simplesaml/module.php/feide/preselectOrg.php?' . \http_build_query( ['HomeOrg' => $this->feideHomeOrg, 'ReturnTo' => $loginUrl] ) );
 
-			exit;
+			exit; // Stop after redirect
 		}
 
 		return parent::requireAuth();

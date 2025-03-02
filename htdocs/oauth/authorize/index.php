@@ -11,6 +11,7 @@
 use fyrkat\oauth\token\Grant;
 use letswifi\LetsWifiApp;
 use letswifi\auth\browser\MismatchIdpException;
+use letswifi\error\ForbiddenException;
 
 require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'src', '_autoload.php'] );
 \assert( \array_key_exists( 'REQUEST_METHOD', $_SERVER ) ); // Psalm
@@ -48,14 +49,9 @@ if ( 'POST' === $_SERVER['REQUEST_METHOD'] ) {
 		), POST_VALUE === $_POST[POST_FIELD] );
 
 		// handler should never return, this code should be unreachable
-		\header( 'Content-Type: text/plain' );
-
-		exit( "500 Internal Server Error\r\n\r\nServer error: OAuth POST request was not handled\r\n" );
+		throw new LogicException( 'Server error: OAuth POST request was not handled' );
 	} catch ( MismatchIdpException $e ) {
-		\header( 'Content-Type: text/plain' );
-		\printf( "403 Forbidden\r\n\r\nRealm %s is not valid for user %s", $realm->realmId, $user->userId );
-
-		exit;
+		throw new ForbiddenException( \sprintf( 'Cannot authorize realm %s for user %s', $realm->realmId, $user->userId ), $e );
 	}
 }
 

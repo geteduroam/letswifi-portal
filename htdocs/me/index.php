@@ -35,7 +35,7 @@ if ( 'POST' === ( $_SERVER['REQUEST_METHOD'] ?? '' ) ) {
 	}
 	\header( "Location: {$indexUrl}" );
 
-	exit;
+	exit; // Stop after redirect
 }
 
 /** @psalm-suppress InvalidArgument https://github.com/vimeo/psalm/issues/11287 */

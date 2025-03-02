@@ -8,13 +8,20 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+use letswifi\LetsWifiApp;
+use letswifi\error\HttpMethodException;
+
 // This file is still here for compatibility with old clients
 
-\assert( \array_key_exists( 'REQUEST_METHOD', $_SERVER ) ); // Psalm
-if ( 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
-	\header( 'Content-Type: text/plain', true, 405 );
+if ( 'POST' !== ( $_SERVER['REQUEST_METHOD'] ?? null ) ) {
+	// We were planning on just including another file and letting it handle all startup formalities
+	// but since we already have to handle an error here, just do a quick startup sequence here
+	require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'src', '_autoload.php'] );
+	$basePath = '../..';
+	$app = new LetsWifiApp( basePath: $basePath );
+	$app->registerExceptionHandler();
 
-	exit( "405 Method Not Allowed\r\n\r\nOnly POST is allowed for this resource\r\n" );
+	throw new HttpMethodException( ['POST'] );
 }
 
 $_GET['format'] ??= 'eap-config';

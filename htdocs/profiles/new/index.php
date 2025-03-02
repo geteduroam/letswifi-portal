@@ -9,6 +9,7 @@
  */
 
 use letswifi\LetsWifiApp;
+use letswifi\error\HttpMethodException;
 use letswifi\format\Format;
 
 require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'src', '_autoload.php'] );
@@ -73,7 +74,7 @@ if ( 'GET' === $_SERVER['REQUEST_METHOD'] && isset( $_GET['download'] ) ) {
 	if ( !isset( $overrideMethod ) && \array_key_exists( 'REQUEST_URI', $_SERVER ) ) {
 		\header( 'Location: ' . \strstr( $_SERVER['REQUEST_URI'], '?', true ) );
 
-		exit;
+		exit; // Stop after redirect
 	}
 }
 
@@ -104,9 +105,7 @@ switch ( $overrideMethod ?? $_SERVER['REQUEST_METHOD'] ) {
 		$passphrase = $overridePassphrase ?? $_POST['passphrase'] ?? null ?: null;
 		\assert( '' !== $passphrase );
 		if ( \is_array( $passphrase ) ) {
-			\header( 'Content-Type: text/plain', true, 400 );
-
-			exit( "400 Bad Request\r\n\r\nInvalid passphrase\r\n" );
+			$passphrase = null;
 		}
 		$credentialManager = $app->getCredentialIssuer( user: $user, realm: $realm );
 		$credential = $credentialManager->issue();
@@ -128,7 +127,5 @@ switch ( $overrideMethod ?? $_SERVER['REQUEST_METHOD'] ) {
 		exit; // should not be reached
 
 	default:
-		\header( 'Content-Type: text/plain', true, 405 );
-
-		exit( "405 Method Not Allowed\r\n" );
+		throw new HttpMethodException( ['POST', 'GET'] );
 }

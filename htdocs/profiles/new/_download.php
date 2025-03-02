@@ -9,13 +9,17 @@
  */
 
 use letswifi\LetsWifiApp;
+use letswifi\error\HttpMethodException;
 
 if ( !isset( $downloadFormat ) || !isset( $basePath ) ) {
+	// Do not throw an exception here, because we haven't properly initialized;
+	// the autoloader may not even be available
+	// Just abort the old fashioned way.
+
 	\header( 'Content-Type: text/plain', true, 400 );
 
 	exit( "400 Bad Request\r\n\r\nInvalid request\r\n" );
 }
-\assert( \array_key_exists( 'REQUEST_METHOD', $_SERVER ) );
 
 $href = "{$basePath}/profiles/new/{$downloadFormat}/";
 
@@ -46,7 +50,7 @@ if ( isset( $passphrase ) ) {
 	] );
 }
 
-switch ( $_SERVER['REQUEST_METHOD'] ) {
+switch ( $_SERVER['REQUEST_METHOD'] ?? null ) {
 	case 'GET': $app->render(
 		[
 			'passphrase' => ( $passphrase ?? null ) ?: null,
@@ -58,6 +62,4 @@ switch ( $_SERVER['REQUEST_METHOD'] ) {
 		], 'profile-download', $basePath, );
 }
 
-\header( 'Content-Type: text/plain', true, 405 );
-
-exit( "405 Method Not Allowed\r\n" );
+throw new HttpMethodException( ['GET'] );

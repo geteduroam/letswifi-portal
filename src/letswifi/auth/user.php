@@ -10,8 +10,8 @@
 
 namespace letswifi\auth;
 
-use DomainException;
 use JsonSerializable;
+use letswifi\error\RealmMismatchException;
 use letswifi\tenant\Realm;
 
 class User implements JsonSerializable
@@ -67,13 +67,13 @@ class User implements JsonSerializable
 				}
 			}
 
-			throw new DomainException( 'No default realm is available for the current user' );
+			throw new RealmMismatchException();
 		}
 
 		if ( \array_key_exists( $realmId, $this->realms ) ) {
 			return $this->realms[$realmId];
 		}
 
-		throw new DomainException( "Realm {$realmId} is not available for the current user" );
+		throw new RealmMismatchException( $realmId );
 	}
 }
