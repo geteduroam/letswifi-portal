@@ -33,7 +33,9 @@
 
 {% for realm in realms %}
 				<li>
+{% if realm.logo_endpoint %}
 					<img src="{{ realm.logo_endpoint }}" alt="Logo" aria-hidden="true">
+{% endif %}
 					<strong>{{ t(realm.display_name) }}</strong>
 					<small>{{ realm.realm_id }}</small>
 {% if realm.description %}

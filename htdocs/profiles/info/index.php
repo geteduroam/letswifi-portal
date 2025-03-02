@@ -22,7 +22,7 @@ $profileInfo['description'] = $provider->description;
 if ( null !== $profileInfo['logo'] ) {
 	// Override the logo object with an URL to the logo
 	unset( $profileInfo['logo'] );
-	$profileInfo['logo_endpoint'] = "{$app->getCurrentIndexUrl()}logo.php";
+	$profileInfo['logo_endpoint'] = "{$app->getIndexUrl()}logo.php";
 	\ksort( $profileInfo );
 }
 $app->render(

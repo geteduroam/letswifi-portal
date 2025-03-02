@@ -76,6 +76,7 @@ return [
 					// If this is not provided SimpleSAMLphp must be loaded another way.
 					// OPTIONAL: String path
 					'autoloadInclude' => '/usr/local/share/simplesamlphp/lib/_autoload.php',
+
 					// The auth source to use in SimpleSAMLphp.
 					// Must match auth source configured in SimpleSAMLphp.
 					// Required but set to default-sp if not provided or null.
@@ -144,6 +145,37 @@ return [
 			// umask 337; head -c16 /dev/random | base64 | tr -d = >oauthsecret.txt
 			// REQUIRED: String
 			'oauthsecret#file' => 'oauthsecret.txt',
+
+			// Location of the venue in lat/lon
+			// This data, if provided, is included in the API and in eap-config files,
+			// but currently it's not being used for anything.
+			// OPTIONAL: Array with lat: float, lon: float
+			// 'location' => [
+			// 	['lat' => 52.0, 'lon' => 5.1], // Utrecht Centraal
+			// ],
+			'location' => [],
+
+			// Logo for the provider
+			// This will be displayed prominent in the apps
+			// If no logo is to be set, omit the whole entry
+			// OPTIONAL: Array with data: string and content_type: string
+			// 'logo' => [
+			// 	// The contents of the image file; it's recommended to instead use
+			// 	// data#file and refer to a file instead
+			// 	// If you don't want to set a logo, remove the whole logo,
+			// 	// not just this entry; the logo is optional, but if you
+			// 	// specify a logo, the data is required.
+			// 	// REQUIRED: String
+			// 	'data#file' => 'logo.png',
+			// 	'data#file'=>null, // REMOVE THIS LINE
+			//
+			// 	// Content type, also known as MIME type; typically image/{png,jpeg},
+			// 	// but image/svg+xml is also possible. Automatically detected
+			// 	// from the file extension if you use data#file
+			// 	// OPTIONAL: String
+			// 	'content_type' => null,
+			// ],
+			'logo' => null,
 
 			// The DN of the certificate that will be used for signing
 			// apple-mobileconfig profiles.  This certificate does not need
@@ -230,6 +262,37 @@ return [
 			// The names of the networks must match the network ID in this configuration
 			// REQUIRED: Array, list of network IDs
 			'networks' => ['eduroam'],
+
+			// Location of the venue in lat/lon
+			// This data, if provided, is included in the API and in eap-config files,
+			// but currently it's not being used for anything.
+			// OPTIONAL: Array with lat: float, lon: float
+			// 'location' => [
+			// 	['lat' => 52.0, 'lon' => 5.1], // Utrecht Centraal
+			// ],
+			'location' => [],
+
+			// Logo for the realm
+			// This will be displayed prominent in the apps
+			// If no logo is to be set, omit the whole entry
+			// OPTIONAL: Array with data: string and content_type: string
+			// 'logo' => [
+			// 	// The contents of the image file; it's recommended to instead use
+			// 	// data#file and refer to a file instead
+			// 	// If you don't want to set a logo, remove the whole logo,
+			// 	// not just this entry; the logo is optional, but if you
+			// 	// specify a logo, the data is required.
+			// 	// REQUIRED: String
+			// 	'data#file' => 'logo.png',
+			// 	'data#file'=>null, // REMOVE THIS LINE
+			//
+			// 	// Content type, also known as MIME type; typically image/{png,jpeg},
+			// 	// but image/svg+xml is also possible. Automatically detected
+			// 	// from the file extension if you use data#file
+			// 	// OPTIONAL: String
+			// 	'content_type' => null,
+			// ],
+			'logo' => null,
 		],
 	],
 
@@ -283,36 +346,6 @@ return [
 			// OPTIONAL: Array language => name
 			'phone' => '+1555eduroam',
 			'phone' => null, // REMOVE THIS LINE
-
-			// Location of the venue in lat/lon
-			// This data, if provided, is included in the API and in eap-config files,
-			// but currently it's not being used for anything.
-			// OPTIONAL: Array with lat: float, lon: float
-			'location' => [
-				['lat' => 52.0, 'lon' => 5.1], // Utrecht Centraal
-			],
-			'location' => [], // REMOVE THIS LINE
-
-			// Logo for the provider or realm
-			// This will be displayed prominent in the apps
-			// If no logo is to be set, omit the whole entry
-			// OPTIONAL: Array with data: string and content_type: string
-			'logo' => [
-				// The contents of the image file; it's recommended to instead use
-				// data#file and refer to a file instead
-				// If you don't want to set a logo, remove the whole logo,
-				// not just this entry; the logo is optional, but if you
-				// specify a logo, the data is required.
-				// REQUIRED: String
-				'data#file' => 'logo.png',
-
-				// Content type, also known as MIME type; typically image/{png,jpeg},
-				// but image/svg+xml is also possible. Automatically detected
-				// from the file extension if you use data#file
-				// OPTIONAL: String
-				'content_type' => null,
-			],
-			'logo' => null, // REMOVE THIS LINE
 		],
 	],
 

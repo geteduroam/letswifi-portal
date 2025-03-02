@@ -58,7 +58,7 @@ class EapConfigFormat extends Format
 		foreach ( $this->credential->provider->getContact()?->location ?? [] as $location ) {
 			$result .= $this->generateLocationXml( $location );
 		}
-		if ( null !== $logo = $this->credential->provider->getContact()?->logo ) {
+		if ( null !== $logo = $this->credential->provider->logo ?? $this->credential->realm->logo ) {
 			$result .= ''
 				. "\r\n\t\t\t" . '<ProviderLogo mime="' . $this->e( $logo->contentType ) . '" encoding="base64">' . \base64_encode( $logo->getBytes() ) . '</ProviderLogo>';
 		}

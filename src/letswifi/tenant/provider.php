@@ -21,6 +21,7 @@ class Provider implements JsonSerializable
 {
 	/**
 	 * @param array<string,array<string>> $realmMap affiliation => realms
+	 * @param array<Location>             $location
 	 */
 	public function __construct(
 		private readonly TenantConfig $tenantConfig,
@@ -28,6 +29,8 @@ class Provider implements JsonSerializable
 		public readonly MultiLanguageString $displayName,
 		public readonly AuthenticationContext $auth,
 		public readonly array $realmMap,
+		public readonly array $location = [],
+		public readonly ?Logo $logo = null,
 		public readonly ?string $contactId = null,
 		public readonly ?MultiLanguageString $description = null,
 		public readonly ?string $profileSigner = null,
@@ -35,7 +38,7 @@ class Provider implements JsonSerializable
 	}
 
 	/**
-	 * @return array{host:string,display_name:MultiLanguageString,realm_map:array<string,array<string>>,contact:?Contact,description:?MultiLanguageString}
+	 * @return array{host:string,display_name:MultiLanguageString,realm_map:array<string,array<string>>,contact:?Contact,description:?MultiLanguageString,location:array<Location>,logo:bool}
 	 */
 	public function jsonSerialize(): array
 	{
@@ -45,31 +48,38 @@ class Provider implements JsonSerializable
 			'realm_map' => $this->realmMap,
 			'contact' => $this->getContact(),
 			'description' => $this->description,
+			'location' => $this->location,
+			'logo' => isset( $this->logo ),
 		];
 	}
 
-	public static function fromConfig( TenantConfig $tenantConfig, Dictionary $data ): self
+	public static function fromConfig( TenantConfig $tenantConfig, Dictionary $providerData ): self
 	{
-		$authData = $data->getDictionary( 'auth' );
+		$authData = $providerData->getDictionary( 'auth' );
 		$authService = $authData->getString( 'service' );
 		$authServiceParams = $authData->getRawArray( 'param' );
 		$auth = new AuthenticationContext(
 			authService: $authService,
 			authServiceParams: $authServiceParams,
-			oauthSecret: $data->getString( 'oauthsecret' ),
-			oauthClients: $data->getRawArray( 'clients' ),
-			pdoData: $data->getDictionary( 'pdo' ),
+			oauthSecret: $providerData->getString( 'oauthsecret' ),
+			oauthClients: $providerData->getRawArray( 'clients' ),
+			pdoData: $providerData->getDictionary( 'pdo' ),
 		);
+
+		$location = $providerData->getDictionaryList( 'location' );
+		$logo = $providerData->getDictionaryOrNull( 'logo' );
 
 		return new self(
 			tenantConfig: $tenantConfig,
-			host: $data->getParentKey(),
-			displayName: $data->getMultiLanguageString( 'display_name' ),
+			host: $providerData->getParentKey(),
+			displayName: $providerData->getMultiLanguageString( 'display_name' ),
 			auth: $auth,
-			realmMap: $data->getRawArray( 'realm' ),
-			contactId: $data->getString( 'contact' ),
-			description: $data->getMultiLanguageStringOrNull( 'description' ),
-			profileSigner: $data->getStringOrNull( 'profile-signer' ),
+			realmMap: $providerData->getRawArray( 'realm' ),
+			location: \array_map( [Location::class, 'fromConfig'], $location ),
+			logo: null === $logo ? null : Logo::fromConfig( $logo ),
+			contactId: $providerData->getString( 'contact' ),
+			description: $providerData->getMultiLanguageStringOrNull( 'description' ),
+			profileSigner: $providerData->getStringOrNull( 'profile-signer' ),
 		);
 	}
 

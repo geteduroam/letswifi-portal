@@ -193,18 +193,18 @@ final class LetsWifiApp
 		return $_SERVER['HTTP_HOST'];
 	}
 
-	public static function getCurrentUrl(): string
+	public static function getRequestUrl(): string
 	{
 		$vhost = self::getHttpHost();
 
-		return ( self::isHttps() ? 'https://' : 'http://' ) . $vhost . static::getCurrentPath();
+		return ( self::isHttps() ? 'https://' : 'http://' ) . $vhost . static::getRequestPath();
 	}
 
-	public static function getCurrentIndexUrl(): string
+	public static function getIndexUrl(): string
 	{
 		$vhost = self::getHttpHost();
 
-		return ( self::isHttps() ? 'https://' : 'http://' ) . $vhost . static::getCurrentIndexPath();
+		return ( self::isHttps() ? 'https://' : 'http://' ) . $vhost . static::getIndexPath();
 	}
 
 	public function getBaseUrl(): string
@@ -232,7 +232,7 @@ final class LetsWifiApp
 				// https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#controlling_third-party_cookies_with_samesite
 			] );
 
-			\header( 'Location: ' . $this->getCurrentUrl(), true, 302 );
+			\header( 'Location: ' . $this->getRequestUrl(), true, 302 );
 			\header( 'Content-Type: text/plain' );
 			\header( 'Cache-Control: no-store' );
 			\header( 'Content-Language: en-GB' );
@@ -242,7 +242,7 @@ final class LetsWifiApp
 				'',
 				'Please return to the previous page, or redirect:',
 				'',
-				$this->getCurrentUrl(),
+				$this->getRequestUrl(),
 				'',
 			] ) );
 		}
@@ -306,10 +306,22 @@ final class LetsWifiApp
 		return PKCS7::readChainPEM( "{$signingCert}{$signingKey}", null );
 	}
 
+	public static function getIndexPath(): string
+	{
+		return \dirname( static::getRequestPath() . 'x' ) . '/';
+	}
+
+	public static function getRequestPath(): string
+	{
+		$requestUri = $_SERVER['REQUEST_URI'] ?? '';
+
+		return \strstr( $requestUri, '?', true ) ?: $requestUri;
+	}
+
 	protected function getBasePath(): string
 	{
 		$requestUri = $_SERVER['REQUEST_URI'] ?? '';
-		$path = \explode( '/', \rtrim( $this->getCurrentIndexPath(), '/' ) );
+		$path = \explode( '/', \rtrim( $this->getIndexPath(), '/' ) );
 		$baseParts = \explode( '/', $this->basePath );
 		while ( !empty( $baseParts ) ) {
 			$element = \array_shift( $baseParts );
@@ -321,18 +333,6 @@ final class LetsWifiApp
 		}
 
 		return \implode( '/', $path ) . '/';
-	}
-
-	protected static function getCurrentIndexPath(): string
-	{
-		return \dirname( static::getCurrentPath() . 'x' ) . '/';
-	}
-
-	protected static function getCurrentPath(): string
-	{
-		$requestUri = $_SERVER['REQUEST_URI'] ?? '';
-
-		return \strstr( $requestUri, '?', true ) ?: $requestUri;
 	}
 
 	protected function getTwig(): Environment

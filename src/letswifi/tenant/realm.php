@@ -20,9 +20,10 @@ use letswifi\configuration\Dictionary;
 class Realm implements JsonSerializable
 {
 	/**
-	 * @param array<string>  $serverNames
-	 * @param array<X509>    $trust
-	 * @param array<Network> $networks
+	 * @param array<string>   $serverNames
+	 * @param array<X509>     $trust
+	 * @param array<Network>  $networks
+	 * @param array<Location> $location
 	 */
 	public function __construct(
 		private readonly TenantConfig $tenantConfig,
@@ -33,12 +34,17 @@ class Realm implements JsonSerializable
 		public readonly DateInterval $validity,
 		public readonly array $networks,
 		public readonly ?MultiLanguageString $description = null,
+		public readonly array $location = [],
+		public readonly ?Logo $logo = null,
 		public readonly ?string $contactId = null,
 	) {
 	}
 
 	public static function fromConfig( TenantConfig $tenantConfig, Dictionary $realmData ): self
 	{
+		$location = $realmData->getDictionaryList( 'location' );
+		$logo = $realmData->getDictionaryOrNull( 'logo' );
+
 		return new self(
 			tenantConfig: $tenantConfig,
 			realmId: $realmData->getParentKey(),
@@ -47,13 +53,15 @@ class Realm implements JsonSerializable
 			trust: $tenantConfig->getCertificatesWithChain( ...$realmData->getRawArray( 'trust' ) ),
 			validity: static::getValidity( $realmData->getInteger( 'validity' ) ),
 			networks: $tenantConfig->getNetworks( ...$realmData->getRawArray( 'networks' ) ),
+			location: \array_map( [Location::class, 'fromConfig'], $location ),
+			logo: null === $logo ? null : Logo::fromConfig( $logo ),
 			description: $realmData->getMultiLanguageStringOrNull( 'description' ),
 			contactId: $realmData->getString( 'contact' ),
 		);
 	}
 
 	/**
-	 * @return array{realm_id:string,display_name:MultiLanguageString,description:?MultiLanguageString,contact:?Contact}
+	 * @return array{realm_id:string,display_name:MultiLanguageString,description:?MultiLanguageString,contact:?Contact,location:array<Location>,logo:bool}
 	 */
 	public function jsonSerialize(): array
 	{
@@ -62,6 +70,8 @@ class Realm implements JsonSerializable
 			'display_name' => $this->displayName,
 			'description' => $this->description,
 			'contact' => $this->getContact(),
+			'location' => $this->location,
+			'logo' => isset( $this->logo ),
 		];
 	}
 

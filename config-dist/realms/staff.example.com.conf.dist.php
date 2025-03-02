@@ -67,4 +67,21 @@ return [
 	// The names of the networks must match the network ID in this configuration
 	// REQUIRED: Array, list of network IDs
 	'networks' => ['eduroam'],
+
+	// Logo for the realm
+	// This will be displayed prominent in the apps
+	// If no logo is to be set, omit this whole entry
+	// OPTIONAL: Array with data: string and content_type: string
+	// 'logo' => [
+	// The contents of the image file; it's recommended to instead use
+	// data#file and refer to a file instead
+	// REQUIRED: String
+	// 'data#file' => 'logo.png',
+
+	// Content type, also known as MIME type; typically image/{png,jpeg},
+	// but image/svg+xml is also possible. Automatically detected
+	// from the file extension if you use data#file
+	// OPTIONAL: String
+	// 'content_type' => null,
+	// ],
 ];

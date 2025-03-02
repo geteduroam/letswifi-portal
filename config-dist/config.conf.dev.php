@@ -92,6 +92,31 @@ return [
 			// REQUIRED: String
 			'oauthsecret#file' => 'oauthsecret.txt',
 
+			// Location of the venue in lat/lon
+			// This data, if provided, is included in the API and in eap-config files,
+			// but currently it's not being used for anything.
+			// OPTIONAL: Array with lat: float, lon: float
+			'location' => [
+				['lat' => 52.0, 'lon' => 5.1], // Utrecht Centraal
+			],
+
+			// Logo for the provider
+			// This will be displayed prominent in the apps
+			// If no logo is to be set, omit this whole entry
+			// OPTIONAL: Array with data: string and content_type: string
+			'logo' => [
+				// The contents of the image file; it's recommended to instead use
+				// data#file and refer to a file instead
+				// REQUIRED: String
+				// 'data#file' => 'logo.png',
+
+				// Content type, also known as MIME type; typically image/{png,jpeg},
+				// but image/svg+xml is also possible. Automatically detected
+				// from the file extension if you use data#file
+				// OPTIONAL: String
+				'content_type' => null,
+			],
+
 			// The DN of the certificate that will be used for signing
 			// apple-mobileconfig profiles.  This certificate does not need
 			// to be a certificate authority, but it must be publicly trusted
@@ -157,31 +182,6 @@ return [
 			// Website address for support
 			// OPTIONAL: Array language => name
 			'phone' => '+1555eduroam',
-
-			// Location of the venue in lat/lon
-			// This data, if provided, is included in the API and in eap-config files,
-			// but currently it's not being used for anything.
-			// OPTIONAL: Array with lat: float, lon: float
-			'location' => [
-				['lat' => 52.0, 'lon' => 5.1], // Utrecht Centraal
-			],
-
-			// Logo for the provider or realm
-			// This will be displayed prominent in the apps
-			// If no logo is to be set, omit the whole entry
-			// OPTIONAL: Array with data: string and content_type: string
-			'logo' => [
-				// The contents of the image file; it's recommended to instead use
-				// data#file and refer to a file instead
-				// REQUIRED: String
-				'data#file' => 'logo.jpg',
-
-				// Content type, also known as MIME type; typically image/{png,jpeg},
-				// but image/svg+xml is also possible. Automatically detected
-				// from the file extension if you use data#file
-				// OPTIONAL: String
-				'content_type' => null,
-			],
 		],
 	],
 

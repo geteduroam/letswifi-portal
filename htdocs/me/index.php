@@ -11,7 +11,6 @@
 use fyrkat\oauth\token\Grant;
 use letswifi\LetsWifiApp;
 use letswifi\credential\Credential;
-use letswifi\tenant\Contact;
 use letswifi\tenant\Realm;
 
 require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 2 ), 'src', '_autoload.php'] );
@@ -21,7 +20,7 @@ $app->registerExceptionHandler();
 $provider = $app->getProvider();
 $oauth = $provider->auth->oauth;
 $user = $provider->requireAuth();
-$indexUrl = $app->getCurrentIndexUrl();
+$indexUrl = $app->getIndexUrl();
 
 $realmId = $_GET['realm'] ?? null;
 $credentialLog = $app->getCredentialLog( $user );
@@ -49,13 +48,11 @@ $app->render(
 		'form_action' => $indexUrl,
 		// TODO show realms with credential counts
 	], 'me', $basePath, [
-		Contact::class => static fn( Contact $c ) => [
-			'logo' => $app->jsonOutputDelete,
-		],
 		Realm::class => static fn( Realm $r ) => [
-			'logo_endpoint' => $r->getContact()?->logo === null
-				? $app->jsonOutputDelete
-				: "{$indexUrl}logo.php?" . \http_build_query( ['realm' => $r->realmId] ),
+			'logo' => $app->jsonOutputDelete,
+			'logo_endpoint' => null === $r->logo
+				? ( null === $provider->logo ? $app->jsonOutputDelete : "{$basePath}/profiles/info/logo.php" )
+				: "{$basePath}/profiles/info/logo.php?" . \http_build_query( ['realm' => $r->realmId] ),
 		],
 		Credential::class => static fn( Credential $c ) => [
 			'user' => $app->jsonOutputDelete,

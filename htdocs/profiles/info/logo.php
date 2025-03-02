@@ -9,6 +9,7 @@
  */
 
 use letswifi\LetsWifiApp;
+use letswifi\error\NotFoundException;
 
 require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'src', '_autoload.php'] );
 $basePath = '../..';
@@ -16,11 +17,17 @@ $basePath = '../..';
 $app = new LetsWifiApp( basePath: $basePath );
 $app->registerExceptionHandler();
 $provider = $app->getProvider();
-$profileInfo = $provider->getContact();
-$logo = $profileInfo?->logo;
+$logo = $provider->logo;
+
+$realmId = $_GET['realm'] ?? null;
+if ( \is_string( $realmId ) ) {
+	$realm = $provider->getRealm( $realmId );
+	$logo = null === $realm ? null : $realm->logo ?? $logo;
+}
+
 if ( null !== $logo ) {
 	$logo->emit();
+	// this should never be reached
 }
-\header( 'Content-Type: text/plain', true, 404 );
 
-exit( "HTTP 404 Not Found\r\n\r\nNo logo configured for this provider.\r\n" );
+throw new NotFoundException();
