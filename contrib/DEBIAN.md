@@ -1,24 +1,27 @@
-# Installation on Debian
+# Installation on Debian with MySQL
 
-Install packages
+## Install packages
 
 	apt-get install \
+		cron \
+		ca-certificates \
 		git \
-		php7.4-mysql \
-		php7.4-xml \
-		lighttpd \
-		php-cgi \
-		simplesamlphp \
-		default-mysql-server
+		php-fpm php-dom php-sqlite3 php-curl \
+		apache2 a2enconf \
+		composer \
+		default-mysql-server \
 
+## Enable PHP
 
-Create database
+a2enconf "$(basename /etc/apache2/conf-available/php*-fpm.conf)"
+
+## Create database
 
 	mysql
 	CREATE DATABASE `letswifi` DEFAULT CHARACTER SET = `utf8mb4` DEFAULT COLLATE = `utf8mb4_unicode_ci`;
 
 
-Install the application
+## Install the application
 
 	mkdir -p /opt/geteduroam
 	cd /opt/geteduroam

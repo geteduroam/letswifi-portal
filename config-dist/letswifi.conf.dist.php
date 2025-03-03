@@ -142,7 +142,7 @@ return [
 
 			// OAuth shared secret
 			// Create a new one with the following commands:
-			// umask 337; head -c16 /dev/random | base64 | tr -d = >oauthsecret.txt
+			// umask 337; head -c32 /dev/random | base64 | tr -d = >oauthsecret.txt
 			// REQUIRED: String
 			'oauthsecret#file' => 'oauthsecret.txt',
 
@@ -201,100 +201,7 @@ return [
 	// and how to generate a RADIUS credential.  Additionally,
 	// it contains information on which network to connect to and helpdesk info.
 	// Realms are accessible to users depending on the realm settings in the provider.
-	'realm' => [
-		// Example realm for staff
-		'example.com' => [
-			// The short name of the realm; multi-language,
-			// at least one language must be provided.
-			// Will be used as title in choice menus, profile installation, etc.
-			// REQUIRED: Array language => name
-			'display_name' => [
-				'en-GB' => 'Example',
-				'nl-NL' => 'Voorbeeld',
-			],
-
-			// Longer descriptive name of the realm; multi-language.
-			// at least one language must be provided.
-			// Will be used as title in choice menus, profile installation, etc.
-			// OPTIONAL: Array language => name
-			'description' => [
-				'en-GB' => 'The example realm',
-				'nl-NL' => 'De voorbeeldrealm',
-			],
-
-			// The client requires that the RADIUS server presents a certificate
-			// containing at least one of these server names.
-			// For old Android versions that don't support multiple server names,
-			// the longest common suffix is used instead;
-			// because of this it is recommend to keep all server names within the same domain.
-			// REQUIRED: Array, list of server names, at least one
-			'server_names' => ['radius.example.com'],
-
-			// Signing certificate authority
-			// This CA must have both certificate and private key available
-			// REQUIRED: String, name of the signer CA
-			'signer' => 'CN=example.com Let\'s Wi-Fi CA',
-
-			// Trusted certificate authorities
-			// This can be more than one; server certificate must be signed by one CA
-			// Private key does not need to be present, but then the RADIUS server
-			// must be provisioned another way, such as through an ACME provider
-			// REQUIRED: Array, list of trusted CAs
-			'trust' => ['C=US, O=Let\'s Encrypt, CN=R11', 'CN=example.com Let\'s Wi-Fi CA'],
-
-			// When signing the client certificate credential,
-			// set the validity this many days in the future
-			// REQUIRED: Integer, number of days of validity
-			'validity' => 365,
-
-			// Contact information for this realm
-			// When the user has selected a realm and downloads a profile file,
-			// this contact information may be present in the file.
-			// When using an app, it may show this information prior to connecting,
-			// and when re-launching the app after the profile has been configured.
-			// OPTIONAL: String, ID of contact, references contact in configuration
-			'contact' => 'example.com',
-
-			// List of Wi-Fi networks to configure on the clients
-			// These can be SSID and HS20 networks.
-			// Currently there is no way to let users opt-in or opt-out from networks,
-			// you may use different realms for this if it is desireable.
-			// The names of the networks must match the network ID in this configuration
-			// REQUIRED: Array, list of network IDs
-			'networks' => ['eduroam'],
-
-			// Location of the venue in lat/lon
-			// This data, if provided, is included in the API and in eap-config files,
-			// but currently it's not being used for anything.
-			// OPTIONAL: Array with lat: float, lon: float
-			// 'location' => [
-			// 	['lat' => 52.0, 'lon' => 5.1], // Utrecht Centraal
-			// ],
-			'location' => [],
-
-			// Logo for the realm
-			// This will be displayed prominent in the apps
-			// If no logo is to be set, omit the whole entry
-			// OPTIONAL: Array with data: string and content_type: string
-			// 'logo' => [
-			// 	// The contents of the image file; it's recommended to instead use
-			// 	// data#file and refer to a file instead
-			// 	// If you don't want to set a logo, remove the whole logo,
-			// 	// not just this entry; the logo is optional, but if you
-			// 	// specify a logo, the data is required.
-			// 	// REQUIRED: String
-			// 	'data#file' => 'logo.png',
-			// 	'data#file'=>null, // REMOVE THIS LINE
-			//
-			// 	// Content type, also known as MIME type; typically image/{png,jpeg},
-			// 	// but image/svg+xml is also possible. Automatically detected
-			// 	// from the file extension if you use data#file
-			// 	// OPTIONAL: String
-			// 	'content_type' => null,
-			// ],
-			'logo' => null,
-		],
-	],
+	'realm#dir' => 'realms/',
 
 	// Wi-Fi network that the client must select
 	'network' => [
