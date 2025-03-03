@@ -54,7 +54,7 @@ class Command
 			$argv[0] = \basename( $argv[0] );
 		}
 		$this->argv = \array_values( $argv );
-		$this->config = new DictionaryFile( \dirname( __DIR__, 3 ) . '/config/config.conf.php' );
+		$this->config = new DictionaryFile( \dirname( __DIR__, 3 ) . '/config/letswifi.conf.php' );
 	}
 
 	public function run(): void

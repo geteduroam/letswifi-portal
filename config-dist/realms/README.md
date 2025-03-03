@@ -1,6 +1,6 @@
 # Realm files
 
-In order to use these files, update **tenant.conf.php** file and add `realm#dir`.
+In order to use these files, update **letswifi.conf.php** file and add `realm#dir`.
 Also remove `realm` from the file, otherwise it takes priority.
 
 ```diff
@@ -15,5 +15,5 @@ Also remove `realm` from the file, otherwise it takes priority.
 
 Files in this directory must be named after the realm.
 So if your realm is **example.com**, create a file named **example.com.conf.php**.
-The **.dist.conf.php
+The **.dist.conf.php** files are examples that you can copy and modify to match your setup.
 This file should start with `<?php return [` so that it returns the array when included.

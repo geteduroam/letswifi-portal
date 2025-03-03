@@ -1,6 +1,6 @@
 # Let's Wi-Fi configuration
 
-The application reads the configuration file `config.conf.php`,
+The application reads the configuration file `letswifi.conf.php`,
 example files are provided for development and production.
 There's inline documentation in the example configuration files.
 

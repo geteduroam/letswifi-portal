@@ -1,6 +1,6 @@
 # Provider files
 
-In order to use these files, update **tenant.conf.php** file and add `provider#dir`.
+In order to use these files, update **letswifi.conf.php** file and add `provider#dir`.
 Also remove `provider` from the file, otherwise it takes priority.
 
 ```diff

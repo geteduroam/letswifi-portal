@@ -71,7 +71,7 @@ final class LetsWifiApp
 
 	public function __construct( public readonly string $basePath, ?Dictionary $globalConfig = null )
 	{
-		$this->globalConfig = $globalConfig ?? new DictionaryFile( \dirname( __DIR__, 2 ) . \DIRECTORY_SEPARATOR . 'config' . \DIRECTORY_SEPARATOR . 'config.conf.php' );
+		$this->globalConfig = $globalConfig ?? new DictionaryFile( \dirname( __DIR__, 2 ) . \DIRECTORY_SEPARATOR . 'config' . \DIRECTORY_SEPARATOR . 'letswifi.conf.php' );
 		$this->tenantConfig = new TenantConfig( $this->globalConfig );
 
 		if ( \PHP_SAPI === 'cli-server' ) {

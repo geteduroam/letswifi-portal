@@ -12,7 +12,7 @@ camera-ready: syntax codestyle phpunit psalm
 	@# https://github.com/phan/phan/issues/4887
 .PHONY: camera-ready
 
-dev: check-php config/config.conf.php config/clients.conf.php config/branding.conf.php config/database.conf.php config/realms config/certs vendor config/oauthsecret.txt
+dev: check-php config/letswifi.conf.php config/clients.conf.php config/branding.conf.php config/database.conf.php config/realms config/certs vendor config/oauthsecret.txt
 	@test -f var/letswifi-dev.sqlite || make var/letswifi-dev.sqlite
 	$(PHP) -S [::1]:1080 -t htdocs/
 .PHONY: dev
@@ -45,9 +45,9 @@ config/clients.conf.php:
 config/branding.conf.php:
 	mkdir -p config
 	-cp -n config-dist/branding-eduroam.conf.dist.php config/branding.conf.php
-config/config.conf.php:
+config/letswifi.conf.php:
 	mkdir -p config
-	-cp -n config-dist/config.conf.dev.php config/config.conf.php
+	-cp -n config-dist/letswifi.conf.dev.php config/letswifi.conf.php
 config/database.conf.php:
 	mkdir -p config
 	-cp -n config-dist/database.conf.dev.php config/database.conf.php
@@ -75,7 +75,7 @@ var/letswifi-dev.sqlite: var
 	## TODO: Automatically add realm and signing CA
 
 simplesamlphp:
-	-cp -n config-dist/config.conf.dist.php config/config.conf.php
+	-cp -n config-dist/letswifi.conf.dist.php config/letswifi.conf.php
 	curl -sSL https://github.com/simplesamlphp/simplesamlphp/releases/download/v$(SIMPLESAMLPHP_VERSION)/simplesamlphp-$(SIMPLESAMLPHP_VERSION)-$(SIMPLESAMLPHP_FLAVOUR).tar.gz | tar xzf -
 	ln -sf simplesamlphp-$(SIMPLESAMLPHP_VERSION)/ simplesamlphp || true
 	ln -sf ../simplesamlphp/public/ htdocs/simplesaml || true

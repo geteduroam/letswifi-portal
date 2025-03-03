@@ -14,7 +14,7 @@ it can be placed either before or after the certificate.
 It's recommended to put the key after the certificate.
 Do not put the chain in the .pem file.
 
-In order to use these files, make sure that the following is set in **tenant.conf.php**:
+In order to use these files, make sure that the following is set in **letswifi.conf.php**:
 
 ```php
 // Location where to store certificates.
