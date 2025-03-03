@@ -14,9 +14,9 @@ use DomainException;
 
 class DictionaryFile extends Dictionary
 {
-	protected string $dir;
+	public string $dir;
 
-	protected string $baseDir;
+	public string $baseDir;
 
 	public function __construct( string $file )
 	{
@@ -41,6 +41,18 @@ class DictionaryFile extends Dictionary
 		|| ( parent::offsetExists( "{$offset}#pemdir" ) && \is_dir( $this->safePath( parent::offsetGet( "{$offset}#pemdir" ), $offset ) ) );
 	}
 
+	/**
+	 * @param class-string<Dictionary> $class
+	 *
+	 * @return array<string,Dictionary>
+	 */
+	public function getDictionaryList( string $key, ?string $class = null ): array
+	{
+		$class ??= parent::offsetExists( $key ) ? parent::class : self::class;
+
+		return parent::getDictionaryList( $key, $class );
+	}
+
 	public function offsetGet( mixed $offset ): mixed
 	{
 		if ( parent::offsetExists( $offset ) ) {
@@ -53,8 +65,9 @@ class DictionaryFile extends Dictionary
 		if ( parent::offsetExists( "{$offset}#file" ) ) {
 			return \file_get_contents( $this->safePath( parent::get( "{$offset}#file", '' ), $offset ) );
 		}
-		// No support for #dir, these can be lazy loaded
-		// No support for #pemdir, these can be lazy loaded
+		if ( parent::offsetExists( "{$offset}#dir" ) ) {
+			return $this->offsetGetDir( $offset );
+		}
 
 		return null;
 	}
@@ -86,10 +99,24 @@ class DictionaryFile extends Dictionary
 		}
 
 		if ( null === $result ) {
-			throw new ConfigurationException( $this->getConfigPath( $key ) . ': Key does not exist' );
+			throw new ConfigurationException( $this->getConfigPath( $key ) . ': Configuration not set' );
 		}
 
 		$result->parentKeys[] = $key;
+
+		return $result;
+	}
+
+	protected function getList( string $key, mixed $t ): array
+	{
+		$result = [];
+		$list = parent::getList( $key, $t );
+		foreach ( $list as $k => $v ) {
+			if ( \is_int( $k ) ) {
+				return $list;
+			}
+			$result[\strstr( $k, '#', true ) ?: $k] = $v;
+		}
 
 		return $result;
 	}
@@ -105,5 +132,18 @@ class DictionaryFile extends Dictionary
 		}
 
 		return $realPath;
+	}
+
+	private function offsetGetDir( mixed $offset ): array
+	{
+		$dir = parent::get( "{$offset}#dir", '' );
+		$list = DictionaryDir::createList( $this->safePath( $dir, $offset ) );
+		foreach ( $list as $key => &$value ) {
+			if ( \str_ends_with( $key, '#inc' ) ) {
+				$value = $this->safePath( "{$dir}/{$value}", $key );
+			}
+		}
+
+		return $list;
 	}
 }

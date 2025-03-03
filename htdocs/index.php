@@ -27,7 +27,6 @@ if ( $installProfiles = $app->getBrandingConfiguration() ) {
 
 	foreach ( $platforms as $key => $platform ) {
 		$pattern = \str_replace( '@', '\\@', $platform->getString( 'match' ) );
-		\assert( \is_string( $pattern ) );
 
 		if ( \preg_match( "@{$pattern}@", $userAgent ) ) {
 			$matchedPlatform = $installProfiles->getDictionary( 'platforms' )->getRawArray( $key );

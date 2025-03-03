@@ -20,14 +20,22 @@ class DictionaryDir extends DictionaryFile
 	/** @var string */
 	protected const EXTENSION = 'conf.php';
 
-	public readonly string $extension;
+	protected readonly string $extension;
 
 	public function __construct( string $dir, ?string $extension = null )
 	{
-		$extension ??= static::EXTENSION;
-		$this->extension = $extension;
+		$this->extension = $extension ?? static::EXTENSION;
 		$this->dir = $dir;
 		$this->baseDir = $dir;
+		$conf = static::createList( $dir, $this->extension );
+		Dictionary::__construct( $conf );
+		$this->data = $conf; // Psalm doesn't seem to understand that the constructor already does this
+	}
+
+	public static function createList( string $dir, ?string $extension = null, ?string $sigil = null ): array
+	{
+		$extension ??= static::EXTENSION;
+		$sigil ??= static::SIGIL;
 		if ( !$handle = \opendir( $dir ) ) {
 			throw new DomainException( 'Cannot open configuration directory: ' . $dir );
 		}
@@ -40,7 +48,7 @@ class DictionaryDir extends DictionaryFile
 			$key = \substr( $entry, 0, -1 * $extensionLength );
 			$conf[$key . static::SIGIL] = $entry;
 		}
-		Dictionary::__construct( $conf );
-		$this->data = $conf; // Psalm doesn't seem to understand that the constructor already does this
+
+		return $conf;
 	}
 }

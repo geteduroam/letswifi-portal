@@ -77,13 +77,32 @@ class Dictionary implements ArrayAccess
 		return $this->has( $key ) ? $this->getDictionary( $key ) : null;
 	}
 
-	public function getDictionaryList( string $key ): array
+	/**
+	 * @param class-string<Dictionary> $class
+	 *
+	 * @return array<string,Dictionary>
+	 */
+	public function getDictionaryList( string $key, string $class = self::class ): array
 	{
-		return $this->getList( $key, self::class );
+		// TODO: Add $this->has($key) check
+
+		$result = [];
+		foreach ( $this->getList( $key, $class ) as $k => $v ) {
+			\assert( $v instanceof self );
+			$v->parentKeys[] = $key;
+			$v->parentKeys[] = $k;
+			$result[$k] = $v;
+		}
+
+		return $result;
 	}
 
 	public function getDictionary( string $key ): self
 	{
+		if ( !$this->has( $key ) ) {
+			throw new ConfigurationException( $this->getConfigPath( $key ) . ': Configuration not set' );
+		}
+
 		$result = $this->get( $key, self::class );
 		\assert( $result instanceof self );
 		$result->parentKeys[] = $key;
