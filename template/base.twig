@@ -15,7 +15,9 @@
 <header>
 	{% block header %}<span id="product-name" aria-hidden>{{ _product_name }}</span>{% endblock %}
 	<details id="language-chooser">
-		<summary>{{ t(_locale) }}</summary>
+		<summary>
+			<span class="oojs-icon oojs-icon-language"></span>{{ t(_locale) }}
+		</summary>
 		<ul class="dropdown" id="languages">
 	{% for displayName, locale in _supportedLocales %}
 	{% if locale == _locale %}
@@ -27,7 +29,9 @@
 		</ul>
 	</details>
 	<details id="user-chooser">
-		<summary>{{ _user ? t('Logged in') : t('User') }}</summary>
+		<summary>
+			<span class="oojs-icon oojs-icon-userAvatar"></span>{{ _user ? t('Logged in') : t('User') }}
+		</summary>
 		<ul class="dropdown" id="user-options">
 		{% if _user %}
 			<li><a draggable="false" class="oojs-icon oojs-icon-userContributions" href="{{ _basePath }}/me/">{{ t('User information') }}</a></li>
