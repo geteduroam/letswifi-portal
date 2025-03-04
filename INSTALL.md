@@ -148,6 +148,12 @@ Import the certificate by piping it in the import script.
 curl -fsS https://crt.buypass.no/crt/BPClass2Rot.cer | openssl x509 -inform DER -outform PEM | letswifi ca import
 ```
 </details>
+<details><summary>Hellenic Academic and Research Institutions</summary>
+
+```sh
+curl -fsS https://www.tbs-certificats.com/issuerdata/HaricaECCRootCA2015.crt | letswifi ca import
+```
+</details>
 <details><summary>Let's Encrypt, aka ISRG Root</summary>
 
 ```sh
@@ -176,6 +182,7 @@ letswifi realm example.com \
 	--lang nl-NL --name 'Kantoor-Wi-Fi' \
 	--validity 365 \
 	--trust 'C=NO, O=Buypass AS-983163327, CN=Buypass Class 2 Root CA' \
+	--trust 'C=GR, L=Athens, O=Hellenic Academic and Research Institutions Cert. Authority, CN=Hellenic Academic and Research Institutions ECC RootCA 2015' \
 	--trust 'C=US, O=Internet Security Research Group, CN=ISRG Root X1' \
 	--trust 'C=US, O=Internet Security Research Group, CN=ISRG Root X2' \
 	--server-name 'radius.example.com'
