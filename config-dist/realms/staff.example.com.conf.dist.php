@@ -45,7 +45,7 @@ return [
 	// Private key does not need to be present, but then the RADIUS server
 	// must be provisioned another way, such as through an ACME provider
 	// REQUIRED: Array, list of trusted CAs
-	'trust' => ['C=US, O=Let\'s Encrypt, CN=R11', 'CN=example.com Let\'s Wi-Fi CA'],
+	'trust' => ['C=US, O=Internet Security Research Group, CN=ISRG Root X1', 'CN=example.com Let\'s Wi-Fi CA'],
 
 	// When signing the client certificate credential,
 	// set the validity this many days in the future

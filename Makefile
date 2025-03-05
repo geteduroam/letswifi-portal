@@ -12,7 +12,7 @@ camera-ready: syntax codestyle phpunit psalm
 	@# https://github.com/phan/phan/issues/4887
 .PHONY: camera-ready
 
-dev: check-php config/letswifi.conf.php config/clients.conf.php config/branding.conf.php config/database.conf.php config/realms config/certs vendor config/oauthsecret.txt
+dev: check-php vendor config/certs config/letswifi.conf.php config/clients.conf.php config/branding.conf.php config/database.conf.php config/realms config/oauthsecret.txt
 	@test -f var/letswifi-dev.sqlite || make var/letswifi-dev.sqlite
 	$(PHP) -S [::1]:1080 -t htdocs/
 .PHONY: dev
@@ -44,14 +44,14 @@ config/clients.conf.php:
 	-cp -n config-dist/clients.conf.dist.php config/clients.conf.php
 config/branding.conf.php:
 	mkdir -p config
-	-cp -n config-dist/branding-eduroam.conf.dist.php config/branding.conf.php
+	-cp -n config-dist/branding.conf.dist-eduroam.php config/branding.conf.php
 config/letswifi.conf.php:
 	mkdir -p config
 	-cp -n config-dist/letswifi.conf.dev.php config/letswifi.conf.php
 config/database.conf.php:
 	mkdir -p config
 	-cp -n config-dist/database.conf.dev.php config/database.conf.php
-config/realms:
+config/realms: vendor
 	mkdir -p config/realms
 	-cp -n config-dist/realms/example.com.conf.dist.php config/realms/example.com.conf.php
 	-cp -n config-dist/realms/staff.example.com.conf.dist.php config/realms/staff.example.com.conf.php
@@ -62,7 +62,6 @@ config/certs:
 	mkdir -p config
 	-cp -na config-dist/certs config/
 	chmod o-rwx config/certs
-
 var:
 	mkdir -p var
 
