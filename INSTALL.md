@@ -28,7 +28,7 @@ but it has been tested and is known to work on:
 apt-get install \
 	curl cron ca-certificates \
 	git \
-	php-fpm php-dom php-sqlite3 php-curl composer \
+	php-fpm php-dom php-sqlite3 php-mbstring php-curl composer \
 	apache2 \
 	sqlite3
 a2enmod proxy_fcgi setenvif
@@ -43,7 +43,7 @@ systemctl restart apache2
 pkg install \
 	apache24 \
 	git-lite \
-	php84-dom php84-sqlite3 php84-curl composer \
+	php84-dom php84-sqlite3 php84-curl php84-mbstring composer \
 	sqlite3
 ```
 </details>
@@ -66,6 +66,9 @@ Remember to enable HTTPS.
 	ServerName  	example.com
 	DocumentRoot	/usr/local/share/letswifi-portal/htdocs
 	Alias       	/simplesaml	/usr/local/share/simplesamlphp/public
+
+	SetEnv	SIMPLESAMLPHP_CONFIG_DIR	/etc/simplesamlphp
+	SetEnv	LETSWIFI_CONFIG_DIR     	/etc/letswifi
 
 	SSLEngine              	on
 	SSLCertificateFile     	/etc/ssl/certs/ssl-cert-snakeoil.pem
@@ -98,12 +101,19 @@ cd letswifi-portal
 composer --quiet install
 cp -a config-dist /etc/letswifi
 ln -s /etc/letswifi/ config
-ln -s ../share/letswifi-portal/bin/letswifi ../../bin/
 
 mkdir -p /var/lib/letswifi
 ln -s /var/lib/letswifi var
 chown www-data:www-data /var/lib/letswifi
 chmod 750 /var/lib/letswifi
+
+tee ../../bin/letswifi <<EOF
+#!/usr/bin/env php
+<?php
+putenv( 'LETSWIFI_CONFIG_DIR=/etc/letswifi' );
+require '$PWD/bin/letswifi';
+EOF
+chmod +x ../../bin/letswifi
 ```
 
 #### Configuration
@@ -115,7 +125,7 @@ chgrp -R www-data .
 mv letswifi.conf.dist.php letswifi.conf.php
 mv clients.conf.dist.php clients.conf.php
 mv branding.conf.dist-eduroam.php branding.conf.php
-sed -e"s@\(\s*'dsn'\).*\$@\1 => 'sqlite:/var/lib/letswifi/letswifi.sqlite',@" \
+sed -e"s@^\(\s*'dsn'\).*\$@\1 => 'sqlite:/var/lib/letswifi/letswifi.sqlite',@" \
 	<database.conf.dist-sqlite.php >database.conf.php
 
 head -c32 /dev/random | base64 | tr -d = >oauthsecret.txt

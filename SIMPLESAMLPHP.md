@@ -9,7 +9,7 @@ we think you should install it in `/usr/local/share` instead.
 Debian and Ubuntu have packages for SimpleSAMLphp, but they're outdated.
 We need to use at least version 2.x the packages provided are for 1.x.
 SimpleSAMLphp 1.x **WILL NOT WORK** with this application.
-Configuration files from SimpleSAMLphp **ARE NOT COMPATIBLE** with SimpleSAMLphp.
+Configuration files from SimpleSAMLphp 1.x **ARE NOT COMPATIBLE** with SimpleSAMLphp 2.x.
 If you set up SimpleSAMLphp 1.x for Let's Wi-Fi, you'll have to do it again from scratch for 2.x.
 
 Here is a script for installing SimpleSAMLphp easily.
