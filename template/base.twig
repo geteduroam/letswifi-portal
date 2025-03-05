@@ -21,9 +21,9 @@
 		<ul class="dropdown" id="languages">
 	{% for displayName, locale in _supportedLocales %}
 	{% if locale == _locale %}
-			<li lang="{{ locale }}"><strong>{{ displayName }}</strong></li>
+			<li lang="{{ locale }}"><span><small class="oojs-icon oojs-icon-check"></small>{{ displayName }}</span></li>
 	{% else %}
-			<li lang="{{ locale }}"><a draggable="false" href="?lang={{ locale|split('-', 2)|first }}">{{ displayName }}</a></li>
+			<li lang="{{ locale }}"><a draggable="false" href="?lang={{ locale|split('-', 2)|first }}"><small class="oojs-icon"></small>{{ displayName }}</a></li>
 	{% endif %}
 	{% endfor %}
 		</ul>

@@ -67,11 +67,16 @@ header details > * {
 header details > summary {
 	list-style: none;
 	padding: .1em .6em;
+	font-size: 1.2em;
 }
 header details > summary::-webkit-details-marker {
 	display: none;
 }
 header details > ul {
+	/* language and user chooser */
+	margin: .1rem -.2rem;
+	padding: .4rem 0;
+
 	position: absolute;
 	white-space: nowrap;
 	border: thin solid rgba(128,128,128,.5);
@@ -83,15 +88,7 @@ header details > ul {
 header details#user-chooser > ul {
 	right: 1rem;
 }
-header summary {
-	font-size: 1.2em;
-	padding: .1em;
-}
-header details > ul {
-	margin: .1rem -.2rem;
-	padding: .4rem 0;
-}
-header details > ul > li a, header details > ul > li strong {
+header details > ul > li > * {
 	padding: .1em 1em;
 	margin: 0;
 	display: block;
@@ -100,11 +97,11 @@ header details > ul > li a, header details > ul > li strong {
 	text-decoration: none;
 	position: relative;
 }
-header details > ul > li a {
+header details > ul > li > a {
 	color: var(--text-color) !important;
 }
 header details[open] > summary,
-header details > ul > li a:hover {
+header details > ul > li > a:hover {
 	background-color: var(--accent-color);
 	color: var(--button-text-color) !important;
 }
@@ -295,8 +292,11 @@ fieldset > legend {
 	content: "";
 }
 
-.oojs-icon-userContributions:before {
-	background-image: url('oojs-ui/images/icons/userContributions-ltr.svg');
+.oojs-icon-check:before {
+	background-image: url('oojs-ui/images/icons/check.svg');
+}
+.oojs-icon-language:before {
+	background-image: url('oojs-ui/images/icons/language.svg');
 }
 .oojs-icon-login:before {
 	background-image: url('oojs-ui/images/icons/login-ltr.svg');
@@ -304,11 +304,11 @@ fieldset > legend {
 .oojs-icon-logout:before {
 	background-image: url('oojs-ui/images/icons/logout-ltr.svg');
 }
-.oojs-icon-language:before {
-	background-image: url('oojs-ui/images/icons/language.svg');
-}
 .oojs-icon-userAvatar:before {
 	background-image: url('oojs-ui/images/icons/userAvatar.svg');
+}
+.oojs-icon-userContributions:before {
+	background-image: url('oojs-ui/images/icons/userContributions-ltr.svg');
 }
 
 @media (prefers-color-scheme: dark) {
@@ -335,6 +335,9 @@ fieldset > legend {
 
 	header details > ul, section.highlight {
 		box-shadow: none;
+	}
+	header details > ul {
+		outline: thin solid var(--bg-color);
 	}
 	picture.screenshot.mac img {
 		filter: none;
