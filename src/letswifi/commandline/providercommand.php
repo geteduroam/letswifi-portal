@@ -20,7 +20,7 @@ class ProviderCommand extends Command
 		echo "HTTP HOST\tDISPLAY NAME\tCONTACT\tAUTH SERVICE" . \PHP_EOL;
 		foreach ( $providers as $name => $provider ) {
 			$displayName = $provider->getMultiLanguageString( 'display_name' )->jsonSerialize();
-			$contact = $provider->getString( 'contact' );
+			$contact = $provider->getStringOrNull( 'contact' ) ?? '-';
 			$authService = $provider->getDictionary( 'auth' )->getString( 'service' );
 			echo "{$name}\t" . \reset( $displayName )['display'] . "\t{$contact}\t{$authService}" . \PHP_EOL;
 		}
