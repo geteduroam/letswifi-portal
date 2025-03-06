@@ -1,47 +1,3 @@
-CREATE TABLE `realm` (
-		`realm` varchar(127) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-		PRIMARY KEY (`realm`)
-	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-CREATE TABLE `ca` (
-		`sub` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-		`pub` text COLLATE utf8mb4_unicode_ci NOT NULL,
-		`key` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-		`issuer` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-		PRIMARY KEY (`sub`),
-		FOREIGN KEY(issuer) REFERENCES ca(sub)
-	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-CREATE TABLE `realm_signer` (
-		`realm` varchar(127) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-		`signer_ca_sub` varchar(127) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-		`default_validity_days` int(11) NOT NULL,
-		PRIMARY KEY (`realm`),
-		FOREIGN KEY(realm) REFERENCES realm(realm),
-		FOREIGN KEY(signer_ca_sub) REFERENCES ca(sub)
-	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-CREATE TABLE `realm_server_name` (
-		`realm` varchar(127) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-		`server_name` varchar(127) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-		FOREIGN KEY(realm) REFERENCES realm(realm)
-	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-CREATE TABLE `realm_trust` (
-		`realm` varchar(127) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-		`trusted_ca_sub` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-		FOREIGN KEY(realm) REFERENCES realm(realm),
-		FOREIGN KEY(trusted_ca_sub) REFERENCES ca(sub)
-	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-CREATE TABLE `realm_key` (
-		`realm` varchar(127) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-		`key` blob NOT NULL,
-		`issued` int(11) NOT NULL,
-		`expires` int(11) DEFAULT NULL,
-		PRIMARY KEY (`realm`),
-		FOREIGN KEY(realm) REFERENCES realm(realm)
-	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `realm_signing_log` (
 		`serial` int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -61,13 +17,6 @@ CREATE TABLE `realm_signing_log` (
 		PRIMARY KEY (`serial`),
 		FOREIGN KEY(realm) REFERENCES realm(realm),
 		FOREIGN KEY(ca_sub) REFERENCES ca(sub)
-	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-CREATE TABLE `realm_vhost` (
-		`http_host` varchar(127) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-		`realm` varchar(127) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-		PRIMARY KEY (`http_host`),
-		FOREIGN KEY(realm) REFERENCES realm(realm)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `oauth_grant` (
