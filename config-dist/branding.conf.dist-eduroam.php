@@ -19,7 +19,10 @@ return [
 		'android' => [
 			'name' => 'Android',
 			'match' => 'Android [1-9]',
-			'apps' => ['playstore', 'huawei'],
+			// You can add the Huawei AppGallery here as well,
+			// but the app is out of date.
+			// We recommend that you do not use it.
+			'apps' => ['fdroid', 'playstore'],
 		],
 		'chromebook' => [
 			'name' => 'ChromeOS',
@@ -56,13 +59,15 @@ return [
 			'href' => 'https://apps.apple.com/app/geteduroam/id1504076137',
 			'type' => 'store',
 		],
-		/* Add when released
 		'fdroid' => [
 			'name' => 'F-Droid',
+			'href' => 'https://f-droid.org/en/packages/app.eduroam.geteduroam',
 			'type' => 'store',
 		],
-		 */
 		'huawei' => [
+			// The app in the Huawei AppGallery is outdated.
+			// We recommend that you do not use it.
+			// Devices without Google Play can use F-Droid.
 			'name' => 'Huawei AppGallery',
 			'href' => 'https://appgallery.huawei.com/app/C104231893',
 			'type' => 'store',
