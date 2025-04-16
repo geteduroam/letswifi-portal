@@ -28,8 +28,8 @@ return [
 	'User information' => 'Gebruikersinformatie',
 
 	// start.twig
-	'Welcome to %1$s at %2$s' => 'Welcome to %1$s at %2$s',
-	'To use %1$s at %2$s, download the app or profile for your device below.' => 'To use %1$s at %2$s, download the app or profile for your device below.',
+	'Welcome to %1$s at %2$s' => 'Welkom bij %1$s voor %2$s',
+	'To use %1$s at %2$s, download the app or profile for your device below.' => 'Om %1$s bij %2$s te gebruiken, download de app of het profiel voor jouw apparaat hieronder.',
 	'Download the %s app to configure your device.' => 'Download de %s app om je apparaat in te stellen.',
 	'View apps and profiles for all platforms' => 'Bekijk apps en profielen voor alle platformen',
 	'login required' => 'inloggen vereist',
