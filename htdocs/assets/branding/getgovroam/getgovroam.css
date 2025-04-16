@@ -1,0 +1,16 @@
+:root {
+	--accent-color: #23a2b2;
+	--button-danger-bg-color: #d14;
+	--button-danger-active-bg-color: #b13;
+}
+
+header #product-name {
+	height: 2.5em;
+	background: url('govroam.svg') left center / contain no-repeat;
+	color: rgba(0,0,0,0);
+}
+@media (prefers-color-scheme: dark) {
+	:root {
+		--bg-color: #222;
+	}
+}
