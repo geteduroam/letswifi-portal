@@ -32,7 +32,7 @@ return [
 		],
 		'ios' => [
 			'name' => 'iOS',
-			'match' => '(iPad|iPhone|iPod);.*OS [1-9]_',
+			'match' => '(iPad|iPhone|iPod);.*OS [1-9]?[0-9]_[0-9]',
 			'apps' => ['appstore'],
 			'profiles' => ['apple-mobileconfig'],
 		],
@@ -43,7 +43,7 @@ return [
 		],
 		'macos' => [
 			'name' => 'macOS',
-			'match' => 'Mac OS X [1-9][0-9][._][0-9]',
+			'match' => 'Mac OS X [1-9]?[0-9][._][0-9]',
 			'profiles' => ['apple-mobileconfig'],
 		],
 		'windows' => [
