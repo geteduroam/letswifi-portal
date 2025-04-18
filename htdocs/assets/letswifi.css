@@ -24,6 +24,9 @@ html {
 	margin: 0;
 	padding: 0;
 }
+:link { color: #06c; }
+:visited { color: #551a8b; }
+:link:active, :visited:active { color: #e00; }
 a:active, button:active { position: relative; top: 2px; }
 summary:active, #realm-picker > ul > li:has(label):active { position: relative; top: 1px; }
 
@@ -321,12 +324,11 @@ fieldset > legend {
 
 		--code-text-color: #e47;
 
-		--accent-color: #a61b70;
-		--button-danger-bg-color: #a04;
-		--button-danger-active-bg-color: #803;
-		--button-text-color: #fff;
 		--light-border-color: #353432;
 	}
+	:link { color: #46e; }
+	:visited { color: #96c; }
+	:link:active, :visited:active { color: #e00; }
 
 	.oojs-icon:before {
 		filter: invert(80%);
@@ -343,10 +345,7 @@ fieldset > legend {
 		filter: none;
 	}
 
-	a {
-		color: #46e;
-	}
-	a:visited {
-		color: #96c;
+	section.highlight {
+		border-left-width: 4px;
 	}
 }

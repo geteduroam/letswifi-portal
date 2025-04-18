@@ -9,6 +9,7 @@ header #product-name {
 	background: url('eduroam.svg') left center / contain no-repeat;
 	color: rgba(0,0,0,0);
 }
+
 @media (prefers-color-scheme: dark) {
 	header #product-name {
 		background-image: url('eduroam-dark.svg');
