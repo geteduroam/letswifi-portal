@@ -339,6 +339,7 @@ fieldset > legend {
 	gap: .5em;
 	padding: 0;
 }
+
 .btn, button {
 	font-size: 1em;
 	border: none;
@@ -378,15 +379,77 @@ fieldset > legend {
 	text-align: left;
 }
 
+.apps .badge a, .apps .badge img {
+	display: inline-block;
+	border-radius: 5px;
+}
+.apps .badge a img {
+	height: 2.4em;
+	display: block;
+}
+.apps .badge.app-store a, .apps .badge.app-store img {
+	/*
+	the Apple badge has a slightly rounder border;
+	using it here as well makes the focus indicator
+	follow the badge
+	*/
+	border-radius: 6.3px;
+}
+.apps .badge.microsoft-store img {
+	/*
+	the Microsoft badge doesn't have a border,
+	so we have to add one ourselves
+	*/
+	border: 1px solid var(--text-color);
+	box-sizing: border-box;
+}
+.apps .download a {
+	border: 1px solid var(--text-color);
+	display: inline-block;
+	line-height: 2.2em;
+	color: var(--highlight-text-color);
+	border-radius: .4em;
+	text-decoration: none;
+	padding: 0 .6em;
+}
+.apps .download a span {
+	display: inline-block;
+}
+.apps .download a span > span {
+	display: block;
+	line-height: 1em;
+	position: relative;
+	top: .4em;
+	padding: 0 .3rem;
+}
+.apps .download a span > span.platform {
+	font-weight: bold;
+	font-size: .6em;
+}
+
 .oojs-icon{
 }
-.oojs-icon:before,
+.oojs-icon:before, .apps .link a:after, .apps .download a:before,
 details:has(p) > summary:before {
 	padding: .1em .2em .1em 1.5em;
 	background-repeat: no-repeat;
 	background-position: 0 50%;
 	background-size: contain;
 	content: "";
+}
+.apps .link a:after, .apps .download a:before {
+	font-size: .7em;
+}
+.apps .link a:after {
+	background-image: url('oojs-ui/images/icons/linkExternal-ltr.svg');
+	background-position: 100% 50%;
+	padding: 0 0 0 2em;
+}
+.apps .download a:before {
+	background-image: url('oojs-ui/images/icons/download.svg');
+	position: relative;
+	top: -.2em;
+	padding: 0 1.5em 0 0;
 }
 
 .oojs-icon-check:before {
@@ -427,7 +490,7 @@ details:has(p) > summary:before {
 	:visited { color: #96c; }
 	:link:active, :visited:active { color: #e00; }
 
-	.oojs-icon:before,
+	.oojs-icon:before, .oojs-icon:before, .apps .link a:after, .apps .download a:before,
 	details:has(p) > summary:before {
 		filter: invert(80%);
 		-webkit-filter: invert(80%);

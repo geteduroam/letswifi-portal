@@ -14,7 +14,7 @@ return [
 	// Pages showing apps and profiles for different platforms
 	'If you cannot use the official app, you can download an installation profile for manual installation.' => 'Handmatig installatieprofiel indien de app niet gebruikt kan worden.',
 	'There is no app available for %s.' => 'Er is geen app beschikbaar voor %s.',
-	'Download an installation profile for manual installation.' => 'Download een installatieprofile voor handmatige installatie.',
+	'Download an installation profile for manual installation.' => 'Download een installatieprofiel voor handmatige installatie.',
 	'Other options' => 'Andere opties',
 	'Options for professional users' => 'Opties voor professionele gebruikers',
 	'Options for other platforms and professional users' => 'Opties voor andere platformen en professionele gebruikers',
@@ -95,4 +95,17 @@ return [
 
 	'apple-mobileconfig instructions' => 'Na het openen van het bestand op MacOS, open <strong>Systeemvoorkeuren</strong>, klik op <strong>Profiel gedownload</strong> en dubbelklik vervolgens op het nieuwe profiel.',
 	'google-onc instructions' => 'Nadat het bestand gedownload is, open de Chrome browser en ga naar deze URL: <a href="chrome://network">chrome://network</a>. Gebruik daarna de <strong lang="en-US">Import ONC file</strong> knop. Er komt geen bevestiging van de import. De netwerkgegevens worden toegevoegd aan de voorkeursnetwerken.',
+
+	// filenames for localised store badges
+	'Download from the Microsoft Store' => 'Downloaden uit de Microsoft Store',
+	'en-us%%20%s.svg' => 'nl%%20%s.svg',
+
+	'Get it on F-Droid' => 'Verkrijg op F-Droid',
+	'get-it-on-en.svg' => 'get-it-on-nl.svg',
+
+	'Download on the App Store' => 'Download in de App Store',
+	'Download_on_the_App_Store_Badge_US-UK_RGB_blk_092917.svg' => 'Download_on_the_App_Store_Badge_NL_RGB_blk_100317.svg',
+
+	'Get it on Google Play' => 'Ontdek het op Google Play',
+	'Google_Play_Store_badge_EN.svg' => 'Google_Play_Store_badge_NL.svg',
 ];

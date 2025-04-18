@@ -1,4 +1,4 @@
-<?php declare( strict_types=1 );
+<?php declare(strict_types=1);
 
 /*
  * This file is part of letswifi; a system for easy 802.1x device enrollment
@@ -9,89 +9,91 @@
  */
 
 return [
-	'product_name' => 'geteduroam',
-	'product_shortname' => 'geteduroam',
-	'network_name' => 'eduroam',
-	'css_file' => 'geteduroam.css',
-	'favicon_file' => 'geteduroam.ico',
+	'product_name' => 'getgovroam',
+	'product_shortname' => 'getgovroam',
+	'network_name' => 'govroam',
+	'css_file' => 'getgovroam.css',
+	'favicon_file' => 'getgovroam.ico',
 
 	'platforms' => [
 		'android' => [
 			'name' => 'Android',
 			'match' => 'Android [1-9]',
-			// You can add the Huawei AppGallery here as well,
-			// but the app is out of date.
-			// We recommend that you do not use it.
-			'apps' => ['fdroid', 'playstore'],
+			'apps' => ['play-store', /*'f-droid'*/],
 		],
 		'chromebook' => [
 			'name' => 'ChromeOS',
 			'match' => 'CrOS',
-			'apps' => ['playstore'],
+			'apps' => ['play-store'],
 			'profiles' => ['google-onc'],
 		],
 		'ios' => [
 			'name' => 'iOS',
-			'match' => '(iPad|iPhone|iPod);.*OS [1-9]?[0-9]_[0-9]',
-			'apps' => ['appstore'],
+			'match' => '(iPad|iPhone|iPod);.*OS [1-9][0-9]+_[0-9]',
+			'apps' => ['app-store'],
 			'profiles' => ['apple-mobileconfig'],
 		],
+		/*
 		'linux' => [
 			'name' => 'Linux',
 			'match' => 'Linux',
 			'apps' => ['linux'],
 		],
+		*/
 		'macos' => [
 			'name' => 'macOS',
-			'match' => 'Mac OS X [1-9]?[0-9][._][0-9]',
+			'match' => 'Mac OS X [1-9][0-9][._][0-9]',
 			'profiles' => ['apple-mobileconfig'],
 		],
 		'windows' => [
 			'name' => 'Windows',
 			'match' => 'Windows NT [0-9]',
-			'apps' => ['winnt-amd64', 'winnt-arm64'],
+			'apps' => [/*'microsoft-store',*/ 'winnt-amd64'/*, 'winnt-arm64'*/],
 		],
 	],
 
 	'apps' => [
-		'appstore' => [
+		'app-store' => [
 			'name' => 'App Store',
-			'href' => 'https://apps.apple.com/app/geteduroam/id1504076137',
+			'href' => 'https://apps.apple.com/app/getgovroam/id1570235475',
 			'type' => 'store',
 		],
-		'fdroid' => [
+		/*
+		'f-droid' => [
 			'name' => 'F-Droid',
+			'type' => 'store',
 			'href' => 'https://f-droid.org/en/packages/app.eduroam.geteduroam',
-			'type' => 'store',
-		],
-		'huawei' => [
-			// The app in the Huawei AppGallery is outdated.
-			// We recommend that you do not use it.
-			// Devices without Google Play can use F-Droid.
-			'name' => 'Huawei AppGallery',
-			'href' => 'https://appgallery.huawei.com/app/C104231893',
-			'type' => 'store',
 		],
 		'linux' => [
 			'name' => 'GitHub Release',
 			'href' => 'https://github.com/geteduroam/linux-app/releases',
 			'type' => 'link',
 		],
-		'playstore' => [
+		*/
+		'play-store' => [
 			'name' => 'Play Store',
-			'href' => 'https://play.google.com/store/apps/details?id=app.eduroam.geteduroam',
+			'href' => 'https://play.google.com/store/apps/details?id=app.govroam.getgovroam',
 			'type' => 'store',
 		],
+		/*
+		'microsoft-store' => [
+			'name' => 'Microsoft Store',
+			'href' => 'https://apps.microsoft.com/detail?mode=direct',
+			'type' => 'store',
+		],
+		*/
 		'winnt-amd64' => [
-			'name' => 'Intel/AMD',
-			'href' => 'https://dl.eduroam.app/windows/amd64/geteduroam.exe',
+			'name' => 'x64 EXE',
+			'href' => 'https://getgovroam.nl/app/getgovroam.exe',
 			'type' => 'download',
 		],
+		/*
 		'winnt-arm64' => [
-			'name' => 'ARM',
+			'name' => 'arm64 EXE',
 			'href' => 'https://dl.eduroam.app/windows/arm64/geteduroam.exe',
 			'type' => 'download',
 		],
+		*/
 	],
 
 	'profiles' => [
