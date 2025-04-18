@@ -12,9 +12,7 @@
 		{% if platform.apps %}
 			<p>{{ 'Download the %s app to configure your device.'|t(platform.name) }}
 			<ul class="apps buttons">
-			{% for app_id, app in platform.apps %}
-				<li class="{{ app_id }} {{ app.type }}"><a class="btn btn-default" href="{{ app.href }}" rel="nofollow,noreferrer,noopener">{{ app.name }}</a></li>
-			{% endfor %}
+			{{ include('_app-button.twig') }}
 			</ul>
 		{% endif %}
 

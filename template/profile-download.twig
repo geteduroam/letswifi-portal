@@ -12,7 +12,7 @@
 <details>
 	<summary>{{ 'Download not starting?'|t }}</summary>
 {% else %}
-{{ include('realm-picker.twig') }}
+{{ include('_realm-picker.twig') }}
 {% endif %}
 	<p><input type="hidden" name="format" value="{{ format }}"><button type="submit" class="btn btn-default" id="btn-download">{{ 'Start download'|t }}</button></p>
 </form>

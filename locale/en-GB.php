@@ -96,4 +96,17 @@ return [
 
 	'apple-mobileconfig instructions' => 'After opening the file on MacOS, install it by opening the <strong>System Settings</strong> app, click <strong>Profile Downloaded</strong> and then double-click the new profile.',
 	'google-onc instructions' => 'After downloading the file, open the Chrome browser and browse to this URL: <a href="chrome://network">chrome://network</a>. Then, use the <strong>Import ONC file</strong> button. The import is silent; the new network definitions will be added to the preferred networks.',
+
+	// filenames for localised store badges
+	'Download from the Microsoft Store' => 'Download from the Microsoft Store',
+	'en-us%%20%s.svg' => 'en-us%%20%s.svg',
+
+	'Get it on F-Droid' => 'Get it on F-Droid',
+	'get-it-on-en.svg' => 'get-it-on-en.svg',
+
+	'Download on the App Store' => 'Download on the App Store',
+	'Download_on_the_App_Store_Badge_US-UK_RGB_blk_092917.svg' => 'Download_on_the_App_Store_Badge_US-UK_RGB_blk_092917.svg',
+
+	'Get it on Google Play' => 'Get it on Google Play',
+	'Google_Play_Store_badge_EN.svg' => 'Google_Play_Store_badge_EN.svg',
 ];
