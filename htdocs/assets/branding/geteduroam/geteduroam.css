@@ -1,7 +1,43 @@
+/*
+Use Franklin Gothic and Open Sans, the eduroam typeface.
+https://eduroam.org/eduroam-media-and-resources/
+*/
+@font-face {
+	font-family: 'Franklin Gothic Regular';
+	font-style: normal;
+	font-weight: normal;
+	src: local('Franklin Gothic Regular'), url('FranklinGothic.woff') format('woff');
+}
+@font-face {
+	font-family: 'Franklin Gothic Condensed';
+	font-style: normal;
+	font-weight: normal;
+	src: local('Franklin Gothic Condensed'), url('FranklinGothicCondensed.woff') format('woff');
+}
+@font-face {
+	font-family: 'Open Sans';
+	font-style: normal;
+	font-weight: normal;
+	src: local('Open Sans'), url('OpenSans-Regular.woff') format('woff');
+}
+
 :root {
 	--accent-color: #276cba;
 	--button-danger-bg-color: #d14;
 	--button-danger-active-bg-color: #b13;
+}
+
+header {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+body {
+	font-family: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+h1, .apps .download a span .platform {
+	font-family: "Franklin Gothic Regular", "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+h2, h3, h4, h5, h6, .apps .download a span {
+	font-family: "Franklin Gothic Condensed", "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 header #product-name {
