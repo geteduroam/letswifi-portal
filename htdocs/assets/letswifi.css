@@ -57,12 +57,39 @@ header #product-name {
 	text-decoration: none;
 	color: var(--text-color);
 }
-header details {
+header > details {
 	display: inline-block;
+	font-size: .8rem;
 }
-header details > summary{
+header > details > summary {
+	white-space: nowrap;
 	background: none;
 	border-radius: .1rem;
+
+	/*
+	hide the text on the button,
+	showing only the icon;
+	text will remain available for screen readers
+	*/
+	width: 1.5em;
+	overflow: hidden;
+}
+header details > ul {
+	/*
+	stick the menu to the right side of the page;
+	either only for #user-chooser or for everything,
+	depending if only the icon is visible
+	*/
+	right: 1rem;
+}
+header > details > summary:focus-visible {
+	width: auto;
+}
+header > details > summary > span {
+	margin-right: 6em;
+}
+header > details > summary:focus-visible > span {
+	margin-right: inherit;
 }
 header details > * {
 	background: var(--highlight-bg-color);
@@ -79,6 +106,7 @@ header details > ul {
 	/* language and user chooser */
 	margin: .1rem -.2rem;
 	padding: .4rem 0;
+	cursor: default;
 
 	position: absolute;
 	white-space: nowrap;
@@ -87,9 +115,6 @@ header details > ul {
 	border-radius: .2rem;
 	list-style: none;
 	font-size: 1.2em;
-}
-header details#user-chooser > ul {
-	right: 1rem;
 }
 header details > ul > li > * {
 	padding: .1em 1em;
@@ -104,15 +129,22 @@ header details > ul > li > a {
 	color: var(--text-color) !important;
 }
 header details[open] > summary,
-header details > ul > li > a:hover {
+header details > ul > li > a:hover,
+header details > ul > li > a:focus {
 	background-color: var(--accent-color);
 	color: var(--button-text-color) !important;
 }
 header details[open] > summary .oojs-icon:before,
 header details > ul > li a.oojs-icon:hover:before,
-header details > ul > li a:hover .oojs-icon:before {
+header details > ul > li a.oojs-icon:focus:before,
+header details > ul > li a:hover .oojs-icon:before,
+header details > ul > li a:focus .oojs-icon:before {
 	filter: invert(100%);
 	-webkit-filter: invert(100%);
+}
+header details > ul > li a:hover,
+header details > ul > li a:focus {
+	outline: none;
 }
 
 main > * {
@@ -157,14 +189,30 @@ p picture img {
 picture.screenshot.mac img {
 	filter: drop-shadow(0 .15em .15em rgba(0,0,0,.5));
 }
-details, form table {
+details:has(p), form table {
 	font-size: .8rem;
 }
-form table {
-	width: 100%;
+details:has(p) > summary {
+	display: inline;
+}
+details:has(p) > summary:before {
+	display: inline-block;
+	background-image: url('oojs-ui/images/icons/play.svg');
+	background-position: 50% 50%;
+	width: .7em;
+	height: .7em;
+	padding: 0 !important;
+	margin-right: .5em;
+}
+details[open]:has(p) > summary:before {
+	transform: rotate(90deg);
+	transition: transform .1s ease-in-out;
 }
 summary, button {
 	cursor: pointer;
+}
+form table {
+	width: 100%;
 }
 hr {
 	border: none;
@@ -239,6 +287,7 @@ fieldset > legend {
 .buttons {
 	list-style: none;
 	display: flex;
+	flex-wrap: wrap;
 	gap: .5em;
 	padding: 0;
 }
@@ -287,7 +336,8 @@ fieldset > legend {
 
 .oojs-icon{
 }
-.oojs-icon:before {
+.oojs-icon:before,
+details:has(p) > summary:before {
 	padding: .1em .2em .1em 1.5em;
 	background-repeat: no-repeat;
 	background-position: 0 50%;
@@ -310,6 +360,9 @@ fieldset > legend {
 .oojs-icon-userAvatar:before {
 	background-image: url('oojs-ui/images/icons/userAvatar.svg');
 }
+.oojs-icon-userAvatarOutline:before {
+	background-image: url('oojs-ui/images/icons/userAvatarOutline.svg');
+}
 .oojs-icon-userContributions:before {
 	background-image: url('oojs-ui/images/icons/userContributions-ltr.svg');
 }
@@ -326,11 +379,12 @@ fieldset > legend {
 
 		--light-border-color: #353432;
 	}
-	:link { color: #46e; }
+	:link { color: #58f; }
 	:visited { color: #96c; }
 	:link:active, :visited:active { color: #e00; }
 
-	.oojs-icon:before {
+	.oojs-icon:before,
+	details:has(p) > summary:before {
 		filter: invert(80%);
 		-webkit-filter: invert(80%);
 	}

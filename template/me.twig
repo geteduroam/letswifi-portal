@@ -1,11 +1,11 @@
 {% extends 'menu.twig' %}
 
-{% block title %}{{ tattr('User information') }}{% endblock %}
+{% block title %}{{ tattr('Account information') }}{% endblock %}
 
 {% block content %}
 <main>
 	<section class="user highlight">
-		<h1>{{ t('User information') }}</h1>
+		<h1>{{ t('Account information') }}</h1>
 		<dl>
 			<dt>{{ t('User ID') }}</dt>
 			<dd><code>{{ user.user_id }}</code></dd>

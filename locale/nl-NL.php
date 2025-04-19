@@ -21,11 +21,11 @@ return [
 	'Generate a certificate for manual use' => 'Maak een certificaat voor handmatige installatie',
 
 	// base.twig
-	'Logged in' => 'Ingelogd',
-	'User' => 'Gebruiker',
+	'Language' => 'Taal',
+	'Account' => 'Account',
 	'Login' => 'Inloggen',
 	'Logout' => 'Uitloggen',
-	'User information' => 'Gebruikersinformatie',
+	'Account information' => 'Accountinformatie',
 
 	// start.twig
 	'Welcome to %1$s at %2$s' => 'Welkom bij %1$s voor %2$s',
@@ -68,7 +68,6 @@ return [
 	'Contact helpdesk' => 'Neem contact op met de helpdesk voor hulp',
 
 	// me.twig
-	'User information' => 'Gebruikersinformatie',
 	'User ID' => 'Gebruikers-ID',
 	'Affiliations' => 'Associaties',
 	'User information is not stored after you log out.' => 'Gebruikersinformatie wordt niet opgeslagen nadat je uitlogt.',

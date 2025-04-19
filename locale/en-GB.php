@@ -21,11 +21,11 @@ return [
 	'Generate a certificate for manual use' => 'Generate a certificate for manual use',
 
 	// base.twig
-	'Logged in' => 'Logged in',
-	'User' => 'User',
+	'Language' => 'Language',
+	'Account' => 'Account',
 	'Login' => 'Login',
 	'Logout' => 'Logout',
-	'User information' => 'User information',
+	'Account information' => 'Account information',
 
 	// start.twig
 	'Welcome to %1$s at %2$s' => 'Welcome to %1$s at %2$s',
@@ -69,7 +69,6 @@ return [
 	'Contact helpdesk' => 'Contact your helpdesk to get help',
 
 	// me.twig
-	'User information' => 'User information',
 	'User ID' => 'User ID',
 	'Affiliations' => 'Affiliations',
 	'User information is not stored after you log out.' => 'User information is not stored after you log out.',

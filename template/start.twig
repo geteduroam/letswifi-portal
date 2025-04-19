@@ -21,6 +21,7 @@
 		{% if platform.profiles %}
 			{% if platform.apps %}
 				<details><summary>{{ t('If you cannot use the official app, you can download an installation profile for manual installation.') }}</summary>
+				<p>
 			{% else %}
 				<p>
 					{{ t('There is no app available for %s.', platform.name) }}<br>
