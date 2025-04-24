@@ -14,39 +14,43 @@
 <title>{{ _product_name }} - {% block title %}{% endblock %}</title>
 <header>
 	{% block header %}<span id="product-name" aria-hidden>{{ _product_name }}</span>{% endblock %}
-	<details id="language-chooser">
-		<summary>
-			<span class="oojs-icon oojs-icon-language"></span>{{ t('Language') }}
-		</summary>
-		<ul class="dropdown" id="languages">
-	{% for displayName, locale in _supportedLocales|sort %}
-	{% if locale == _locale %}
-			<li lang="{{ locale }}"><span><small class="oojs-icon oojs-icon-check"></small>{{ displayName }}</span></li>
-	{% else %}
-			<li lang="{{ locale }}"><a draggable="false" href="?lang={{ locale|split('-', 2)|first }}"><small class="oojs-icon"></small>{{ displayName }}</a></li>
-	{% endif %}
-	{% endfor %}
-		</ul>
-	</details>
-	<details id="user-chooser">
-		<summary>
-			{% if _user -%}
-			<span class="oojs-icon oojs-icon-userAvatar"></span>
-			{% else -%}
-			<span class="oojs-icon oojs-icon-userAvatarOutline"></span>
-			{% endif -%}
-			{{ t('Account') }}
-		</summary>
-		<ul class="dropdown" id="user-options">
+	<div id="systray">
+		<details class="dropdown-container">
+			<summary class="dropdown-header">
+				<span class="oojs-icon oojs-icon-language dropdown-header-collapse"></span>{{ t('Language') }}
+			</summary>
+			<div class="dropdown">
+				<ul class="dropdown-menu" id="languages-dropdown">
+				{% for displayName, locale in _supportedLocales|sort %}
+				{% if locale == _locale %}
+					<li lang="{{ locale }}"><span><small class="oojs-icon oojs-icon-check"></small>{{ displayName }}</span></li>
+				{% else %}
+					<li lang="{{ locale }}"><a draggable="false" href="?lang={{ locale|split('-', 2)|first }}"><small class="oojs-icon"></small>{{ displayName }}</a></li>
+				{% endif %}
+				{% endfor %}
+				</ul>
+			</div>
+		</details>
 		{% if _user %}
-			<li><a draggable="false" class="oojs-icon oojs-icon-userContributions" href="{{ _basePath }}/me/">{{ t('Account information') }}</a></li>
-			{% if _logout_href %}
-			<li><a draggable="false" class="oojs-icon oojs-icon-logout" href="{{ _logout_href }}">{{ t('Logout') }}</a></li>
-			{% endif %}
-		{% else %}
-			<li><a draggable="false" class="oojs-icon oojs-icon-login" href="{{ _login_href ?? _basePath ~ '/me/' }}">{{ t('Login') }}</a></li>
-		{% endif %}
-		</ul>
-	</details>
+		<details class="dropdown-container">
+			<summary class="dropdown-header">
+				<span class="oojs-icon oojs-icon-userAvatar dropdown-header-collapse"></span>
+				{{ t('Account') }}
+			</summary>
+			<div class="dropdown">
+				<ul class="dropdown-menu" id="user-dropdown">
+					<li><a draggable="false" class="oojs-icon oojs-icon-userContributions" href="{{ _basePath }}/me/">{{ t('Account information') }}</a></li>
+					{% if _logout_href %}
+					<li><a draggable="false" class="oojs-icon oojs-icon-logout" href="{{ _logout_href }}">{{ t('Logout') }}</a></li>
+					{% endif %}
+				</ul>
+			</div>
+		</details>
+		{% else -%}
+		<div class="dropdown-container">
+			<a draggable="false" class="dropdown-header" href="{{ _login_href ?? _basePath ~ '/me/' }}"><span class="oojs-icon oojs-icon-userAvatarOutline"></span>{{ t('Login') }}</a>
+		</div>
+		{% endif -%}
+	</div>
 </header>
 {% block layout %}{% endblock %}
