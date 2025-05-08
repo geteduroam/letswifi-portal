@@ -1,0 +1,21 @@
+				{% for app_id, app in platform.apps %}
+					{% if app_id == 'play-store' %}
+						<li class="play-store {{ app.type }} badge"><a href="{{ app.href }}"><img src="/assets/badge/play-store/{{ tattr('Google_Play_Store_badge_EN.svg') }}" alt="{{ tattr('Get it on Google Play') }}"></a></li>
+					{% elseif app_id == 'app-store' %}
+						<li class="app-store {{ app.type }} badge"><a href="{{ app.href }}" rel="nofollow,noreferrer,noopener"><img src="/assets/badge/app-store/{{ tattr('Download_on_the_App_Store_Badge_US-UK_RGB_blk_092917.svg') }}" alt="{{ tattr('Download on the App Store') }}"></a></li>
+					{% elseif app_id == 'app-gallery' %}
+						<li class="app-gallery {{ app.type }} badge"><a href="{{ app.href }}" rel="nofollow,noreferrer,noopener"><img src="/assets/badge/app-gallery/huawei-Badge-Black.png" alt="{{ tattr('Explore it on AppGallery') }}"></a></li>
+					{% elseif app_id == 'f-droid' %}
+						<li class="f-droid {{ app.type }} badge"><a href="{{ app.href }}" rel="nofollow,noreferrer,noopener"><img src="/assets/badge/f-droid/{{ tattr('get-it-on-en.svg') }}" alt="{{ tattr('Get it on F-Droid') }}"></a></li>
+					{% elseif app_id == 'microsoft-store' %}
+						<li class="microsoft-store {{ app.type }} badge"><a href="{{ app.href }}" rel="nofollow,noreferrer,noopener"><picture>
+							<source srcset="/assets/badge/microsoft-store/{{ tattr('en-us%%20%s.svg', 'dark') }}" media="(prefers-color-scheme: dark)"/>
+							<img src="/assets/badge/microsoft-store/{{ tattr('en-us%%20%s.svg', 'light') }}" alt="{{ tattr('Download from the Microsoft Store') }}">
+						</picture></a></li>
+					{% elseif app.type == 'download' %}
+						{# Since app.href is probably cross-domain, the custom download= won't actually work #}
+						<li class="{{ app_id }} {{ app.type }}"><a href="{{ app.href }}" rel="nofollow,noreferrer,noopener" download="{{ app.href|split('?')|first|split('/')|last }}"><span><span class="platform">{{ platform.name }}</span><span>{{ app.name }}</span></span></a></li>
+					{% else %}
+						<li class="{{ app_id }} {{ app.type }}"><a href="{{ app.href }}" rel="nofollow,noreferrer,noopener">{{ app.name }}</a></li>
+					{% endif %}
+				{% endfor %}

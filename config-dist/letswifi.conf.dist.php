@@ -262,7 +262,8 @@ return [
 	// Additionally, it contains the list of available apps and profiles,
 	// and the links to these apps, as these can also be brand dependent.
 	// Find the appropriate branding file in config-dist and copy it here.
-	'branding#inc' => 'branding.conf.php',
+	// 'branding#inc' => 'branding-eduroam.conf.php',
+	// 'branding#inc' => 'branding-govroam.conf.php',
 
 	// Location where to store certificates.
 	// These are used for signing CA, trusted CAs for the RADIUS servers

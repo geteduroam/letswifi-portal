@@ -27,8 +27,8 @@ html {
 :link { color: #06c; }
 :visited { color: #551a8b; }
 :link:active, :visited:active { color: #e00; }
-a:active, button:active { position: relative; top: 2px; }
-summary:active, #realm-picker > ul > li:has(label):active { position: relative; top: 1px; }
+summary:active, button:active, #realm-picker > ul > li:has(label):active { position: relative; top: 1px; }
+a:active, button[type=submit]:active { position: relative; top: 2px; }
 
 body {
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
@@ -40,6 +40,8 @@ body {
 
 header {
 	text-align: right;
+	display: flex;
+	justify-content: space-between;
 }
 header, header * {
 	user-select: none;
@@ -52,71 +54,110 @@ header * {
 	text-align: left;
 }
 header #product-name {
-	float: left;
 	font-weight: bold;
 	text-decoration: none;
 	color: var(--text-color);
 }
-header > details {
+#systray > .dropdown-container {
 	display: inline-block;
 	font-size: .8rem;
-}
-header > details > summary {
-	white-space: nowrap;
-	background: none;
-	border-radius: .1rem;
+	position: relative;
 
+	/* needed for when it contains a <button> */
+	vertical-align: middle;
+}
+
+#systray > .dropdown-container > .dropdown-header:has(.dropdown-header-collapse) {
 	/*
 	hide the text on the button,
 	showing only the icon;
 	text will remain available for screen readers
 	*/
 	width: 1.5em;
-	overflow: hidden;
 }
-header details > ul {
-	/*
-	stick the menu to the right side of the page;
-	either only for #user-chooser or for everything,
-	depending if only the icon is visible
-	*/
-	right: 1rem;
-}
-header > details > summary:focus-visible {
+#systray > .dropdown-container > .dropdown-header:focus-visible {
 	width: auto;
 }
-header > details > summary > span {
-	margin-right: 6em;
+#systray > .dropdown-container > .dropdown-header > .oojs-icon {
+	margin-right: .35em;
 }
-header > details > summary:focus-visible > span {
-	margin-right: inherit;
-}
-header details > * {
+#systray > .dropdown-container > .dropdown {
 	background: var(--highlight-bg-color);
 }
-header details > summary {
-	list-style: none;
-	padding: .1em .6em;
+#systray > .dropdown-container > .dropdown-header {
+	white-space: nowrap;
+	border-radius: .1rem;
+	overflow: hidden;
+
+	padding: .2em .6em;
 	font-size: 1.2em;
+	display: block;
 }
-header details > summary::-webkit-details-marker {
+#systray > .dropdown-container > a.dropdown-header {
+	color: var(--text-color);
+	text-decoration: none;
+}
+#systray > .dropdown-container > button.dropdown-header {
+	color: var(--text-color);
+	background: none;
+	line-height: initial;
+	box-sizing: content-box;
+	border: none;
+
+	/* todo: find out why we need bigger vertical margin for a button */
+	padding: .3em .6em;
+}
+#systray > .dropdown-container > details::-webkit-details-marker {
 	display: none;
 }
-header details > ul {
-	/* language and user chooser */
+#systray > .dropdown-container > .dropdown {
+	/*
+	position is always relative to the ancestor with "position: absolute" or "position: relative";
+	so we made .dropdown-container "position: relative" without moving it.
+	This allows us to show the dropdown below the container, and expand it to the left due to "right: 0".
+	*/
+	position: absolute;
+	top: 1.9em;
+	right: 0;
+
 	margin: .1rem -.2rem;
-	padding: .4rem 0;
+	padding: 0;
 	cursor: default;
 
-	position: absolute;
 	white-space: nowrap;
 	border: thin solid rgba(128,128,128,.5);
 	box-shadow: 0 .1rem .2rem rgba(0,0,0,.2);
 	border-radius: .2rem;
-	list-style: none;
 	font-size: 1.2em;
 }
-header details > ul > li > * {
+#systray > .dropdown-container > dialog.dropdown {
+	/*
+	Dialog popovers are placed in the top layer and generate a new stacking context
+	https://developer.mozilla.org/en-US/docs/Web/API/Popover_API/Using
+	https://developer.mozilla.org/en-US/docs/Glossary/Top_layer
+
+	However, there is a relation between the anchor and the popover,
+	allowing to position the popover relative to the anchor.
+	However, not yet supported in Firefox and Safari (2025).
+
+	top: anchor(bottom);
+	right: anchor(right);
+
+	So we do it in this roundabout way:
+	*/
+	left: 100%;
+	transform: translateX(-100%) translateX(-.8rem) translateY(1em);
+}
+#systray > .dropdown-container > .dropdown:has(*:focus-visible) {
+	outline: 1px auto;
+}
+#systray > .dropdown-container > .dropdown > ul.dropdown-menu {
+	padding: 0;
+	margin: .4em 0;
+	list-style: none;
+}
+
+#systray > .dropdown-container > .dropdown > ul.dropdown-menu > li > * {
 	padding: .1em 1em;
 	margin: 0;
 	display: block;
@@ -125,25 +166,32 @@ header details > ul > li > * {
 	text-decoration: none;
 	position: relative;
 }
-header details > ul > li > a {
+#systray > .dropdown-container > .dropdown > ul.dropdown-menu > li > a {
 	color: var(--text-color) !important;
 }
-header details[open] > summary,
-header details > ul > li > a:hover,
-header details > ul > li > a:focus {
+#systray > .dropdown-container > button:active,
+#systray > .dropdown-container > a:active,
+#systray > details.dropdown-container[open] > summary,
+#systray > .dropdown-container > .dropdown > ul.dropdown-menu > li > a:hover,
+#systray > .dropdown-container > .dropdown > ul.dropdown-menu > li > a:active,
+#systray > .dropdown-container > .dropdown > ul.dropdown-menu > li > a:focus-visible {
 	background-color: var(--accent-color);
 	color: var(--button-text-color) !important;
 }
-header details[open] > summary .oojs-icon:before,
-header details > ul > li a.oojs-icon:hover:before,
-header details > ul > li a.oojs-icon:focus:before,
-header details > ul > li a:hover .oojs-icon:before,
-header details > ul > li a:focus .oojs-icon:before {
+#systray > .dropdown-container > button:active .oojs-icon:before,
+#systray > .dropdown-container > a:active .oojs-icon:before,
+#systray > details.dropdown-container[open] > summary .oojs-icon:before,
+#systray > .dropdown-container > .dropdown > ul.dropdown-menu > li a.oojs-icon:hover:before,
+#systray > .dropdown-container > .dropdown > ul.dropdown-menu > li a.oojs-icon:active:before,
+#systray > .dropdown-container > .dropdown > ul.dropdown-menu > li a.oojs-icon:focus-visible:before,
+#systray > .dropdown-container > .dropdown > ul.dropdown-menu > li a:hover .oojs-icon:before,
+#systray > .dropdown-container > .dropdown > ul.dropdown-menu > li a:active .oojs-icon:before,
+#systray > .dropdown-container > .dropdown > ul.dropdown-menu > li a:focus-visible .oojs-icon:before {
 	filter: invert(100%);
 	-webkit-filter: invert(100%);
 }
-header details > ul > li a:hover,
-header details > ul > li a:focus {
+#systray > .dropdown-container > .dropdown > ul.dropdown-menu > li a:hover,
+#systray > .dropdown-container > .dropdown > ul.dropdown-menu > li a:focus {
 	outline: none;
 }
 
@@ -291,6 +339,7 @@ fieldset > legend {
 	gap: .5em;
 	padding: 0;
 }
+
 .btn, button {
 	font-size: 1em;
 	border: none;
@@ -299,10 +348,6 @@ fieldset > legend {
 	border-radius: .2em;
 	display: inline-block;
 	text-decoration: none;
-}
-.btn:active, .btn:focus, button:active, button:focus {
-	box-shadow: inset 0 0 0 .2em var(--accent-color), inset 0 0 0 .3em white;
-	outline: 0;
 }
 .btn.btn-default, button {
 	background: var(--accent-color);
@@ -334,15 +379,77 @@ fieldset > legend {
 	text-align: left;
 }
 
+.apps .badge a, .apps .badge img {
+	display: inline-block;
+	border-radius: 5px;
+}
+.apps .badge a img {
+	height: 2.4em;
+	display: block;
+}
+.apps .badge.app-store a, .apps .badge.app-store img {
+	/*
+	the Apple badge has a slightly rounder border;
+	using it here as well makes the focus indicator
+	follow the badge
+	*/
+	border-radius: 6.3px;
+}
+.apps .badge.microsoft-store img {
+	/*
+	the Microsoft badge doesn't have a border,
+	so we have to add one ourselves
+	*/
+	border: 1px solid var(--text-color);
+	box-sizing: border-box;
+}
+.apps .download a {
+	border: 1px solid var(--text-color);
+	display: inline-block;
+	line-height: 2.2em;
+	color: var(--highlight-text-color);
+	border-radius: .4em;
+	text-decoration: none;
+	padding: 0 .6em;
+}
+.apps .download a span {
+	display: inline-block;
+}
+.apps .download a span > span {
+	display: block;
+	line-height: 1em;
+	position: relative;
+	top: .4em;
+	padding: 0 .3rem;
+}
+.apps .download a span > span.platform {
+	font-weight: bold;
+	font-size: .6em;
+}
+
 .oojs-icon{
 }
-.oojs-icon:before,
+.oojs-icon:before, .apps .link a:after, .apps .download a:before,
 details:has(p) > summary:before {
 	padding: .1em .2em .1em 1.5em;
 	background-repeat: no-repeat;
 	background-position: 0 50%;
 	background-size: contain;
 	content: "";
+}
+.apps .link a:after, .apps .download a:before {
+	font-size: .7em;
+}
+.apps .link a:after {
+	background-image: url('oojs-ui/images/icons/linkExternal-ltr.svg');
+	background-position: 100% 50%;
+	padding: 0 0 0 2em;
+}
+.apps .download a:before {
+	background-image: url('oojs-ui/images/icons/download.svg');
+	position: relative;
+	top: -.2em;
+	padding: 0 1.5em 0 0;
 }
 
 .oojs-icon-check:before {
@@ -383,16 +490,16 @@ details:has(p) > summary:before {
 	:visited { color: #96c; }
 	:link:active, :visited:active { color: #e00; }
 
-	.oojs-icon:before,
+	.oojs-icon:before, .oojs-icon:before, .apps .link a:after, .apps .download a:before,
 	details:has(p) > summary:before {
 		filter: invert(80%);
 		-webkit-filter: invert(80%);
 	}
 
-	header details > ul, section.highlight {
+	#systray > .dropdown-container > .dropdown, section.highlight {
 		box-shadow: none;
 	}
-	header details > ul {
+	#systray > .dropdown-container > .dropdown {
 		outline: thin solid var(--bg-color);
 	}
 	picture.screenshot.mac img {
