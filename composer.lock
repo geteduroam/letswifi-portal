@@ -73,11 +73,11 @@
         },
         {
             "name": "fyrkat/openssl",
-            "version": "v2.1.0",
+            "version": "v2.1.1",
             "source": {
                 "type": "git",
                 "url": "https://git.sr.ht/~jornane/php-openssl",
-                "reference": "fc51f6ed73072cac5479b95438b1d684f331a533"
+                "reference": "91cde8397ef408da2008fea670f4d537d5bee647"
             },
             "require": {
                 "ext-openssl": "*",
@@ -106,7 +106,7 @@
                 }
             ],
             "description": "Class wrappers for PHPs built-in openssl_* functions",
-            "time": "2025-02-27T20:37:38+00:00"
+            "time": "2025-05-12T12:33:20+00:00"
         },
         {
             "name": "symfony/deprecation-contracts",
