@@ -432,8 +432,8 @@ details:has(p) > summary:before {
 		--light-border-color: #353432;
 	}
 	:link { color: #58f; }
-	:visited { color: #96c; }
-	:link:active, :visited:active { color: #e00; }
+	:visited { color: #c8e; }
+	:link:active, :visited:active { color: #e34; }
 
 	.oojs-icon:before,
 	details:has(p) > summary:before {
