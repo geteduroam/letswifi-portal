@@ -149,7 +149,16 @@ header #product-name {
 	transform: translateX(-100%) translateX(-.8rem) translateY(1em);
 }
 #systray > .dropdown-container > .dropdown:has(*:focus-visible) {
+	/*
+	we would use this to add an extra line around the dropdown menu,
+	but in Safari this automatically enables when the popover becomes visible,
+	which is not what we want.
+	The accessability value is limited, because the menu item is also visually highlighted
+	so we don't do this rule but instead disable the outline
+
 	outline: 1px auto;
+	*/
+	outline: 0;
 }
 #systray > .dropdown-container > .dropdown > ul.dropdown-menu {
 	padding: 0;
@@ -190,7 +199,6 @@ header #product-name {
 	filter: invert(100%);
 	-webkit-filter: invert(100%);
 }
-#systray > .dropdown-container > .dropdown > ul.dropdown-menu > li a:hover,
 #systray > .dropdown-container > .dropdown > ul.dropdown-menu > li a:focus {
 	outline: none;
 }
