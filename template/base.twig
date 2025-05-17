@@ -21,12 +21,8 @@
 			</button>
 			<dialog popover class="dropdown" id="languages-dropdown">
 				<ul class="dropdown-menu">
-				{% for displayName, locale in _supportedLocales|sort %}
-				{% if locale == _locale %}
-					<li lang="{{ locale }}"><span><small class="oojs-icon oojs-icon-check"></small>{{ displayName }}</span></li>
-				{% else %}
-					<li lang="{{ locale }}"><a draggable="false" href="?lang={{ locale|split('-', 2)|first }}"><small class="oojs-icon"></small>{{ displayName }}</a></li>
-				{% endif %}
+				{% for locale in _supportedLocales|sort %}
+					<li lang="{{ locale }}"><a draggable="false" href="{{ locale.href }}"><small class="oojs-icon{{ locale.active ? ' oojs-icon-check' : '' }}"></small>{{ locale.display_name }}</a></li>
 				{% endfor %}
 				</ul>
 			</dialog>

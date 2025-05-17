@@ -168,13 +168,24 @@ final class LetsWifiApp
 		}
 		$branding = $this->getBrandingConfiguration();
 
+		$supportedLocales = [];
+		foreach ( $this->getTranslationContext()->getSupportedLocales() as $displayName => $locale ) {
+			$supportedLocales[$displayName] = [
+				'locale' => $locale,
+				'lang' => $locale->baseLanguage,
+				'display_name' => $displayName,
+				'href' => '?' . \http_build_query( $_GET + ['lang' => $locale->baseLanguage] ),
+				'active' => $locale->isA( $this->getTranslationContext()->primaryLocale ),
+			];
+		}
+
 		exit( $template->render(
 			[
 				'_user' => $user?->userId,
 				'_logout_href' => $provider?->auth->browserAuth->getLogoutURL( $this->getBaseUrl() ),
 				'_basePath' => $basePath,
 				'_locale' => $this->getTranslationContext()->primaryLocale,
-				'_supportedLocales' => $this->getTranslationContext()->getSupportedLocales(),
+				'_supportedLocales' => $supportedLocales,
 				'_product_name' => $branding?->getStringOrNull( 'product_name' ) ?? "Let's Wi-Fi",
 				'_network_name' => $branding?->getStringOrNull( 'network_name' ) ?? "Let's Wi-Fi",
 				'_product_shortname' => $branding?->getStringOrNull( 'product_shortname' ) ?? 'letswifi',
@@ -224,7 +235,13 @@ final class LetsWifiApp
 
 	public function getTranslationContext(): TranslationContext
 	{
-		if ( \array_key_exists( 'lang', $_GET ) && \is_string( $_GET['lang'] ) ) {
+		if ( 'GET' === ( $_SERVER['REQUEST_METHOD'] ?? null ) && \array_key_exists( 'lang', $_GET ) && \is_string( $_GET['lang'] ) ) {
+			$get = $_GET;
+			$url = $this->getRequestUrl();
+			unset( $get['lang'] );
+			if ( !empty( $get ) ) {
+				$url .= '?' . \http_build_query( $get );
+			}
 			\setcookie( 'lang', $_GET['lang'], [
 				'path' => $this->getBasePath(),
 				'secure' => $this->isHttps(),
@@ -232,7 +249,7 @@ final class LetsWifiApp
 				// https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#controlling_third-party_cookies_with_samesite
 			] );
 
-			\header( 'Location: ' . $this->getRequestUrl(), true, 302 );
+			\header( 'Location: ' . $url, true, 302 );
 			\header( 'Content-Type: text/plain' );
 			\header( 'Cache-Control: no-store' );
 			\header( 'Content-Language: en-GB' );
@@ -242,7 +259,7 @@ final class LetsWifiApp
 				'',
 				'Please return to the previous page, or redirect:',
 				'',
-				$this->getRequestUrl(),
+				$url,
 				'',
 			] ) );
 		}
