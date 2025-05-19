@@ -5,6 +5,8 @@ CREATE TABLE `realm_signing_log` (
 		`ca_sub` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
 		`requester` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
 		`sub` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+		`grant` varchar(127) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+		`ident` varchar(127) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
 		`issued` datetime NOT NULL,
 		`expires` datetime NOT NULL,
 		`csr` blob NOT NULL,
@@ -14,9 +16,7 @@ CREATE TABLE `realm_signing_log` (
 		`client` varchar(127) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
 		`user_agent` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
 		`ip` varchar(39) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-		`grant` varchar(127) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-		`identity` varchar(127) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-		PRIMARY KEY (`serial`),
+		PRIMARY KEY (`serial`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `oauth_grant` (

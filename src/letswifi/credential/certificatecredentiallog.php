@@ -123,7 +123,7 @@ class CertificateCredentialLog extends CredentialLog
 		$realms = [];
 		$clientQueryPart = null === $client ? '' : 'AND `client` = :client';
 		$realmQueryPart = null === $realm ? '' : 'AND `realm` = :realm';
-		$statement = $this->getPDO()->prepare( "SELECT `realm`, `ca_sub`, `requester`, `usage`, `sub`, `issued`, `expires`, `revoked`, `csr`, `client`, `user_agent`, `ip`, `x509`, `identity` FROM `realm_signing_log` WHERE `requester` = :requester {$clientQueryPart} {$realmQueryPart} AND `expires` > :now AND revoked IS NULL ORDER BY `issued` ASC" );
+		$statement = $this->getPDO()->prepare( "SELECT `realm`, `ca_sub`, `requester`, `usage`, `sub`, `issued`, `expires`, `revoked`, `csr`, `client`, `user_agent`, `ip`, `x509`, `ident` FROM `realm_signing_log` WHERE `requester` = :requester {$clientQueryPart} {$realmQueryPart} AND `expires` > :now AND revoked IS NULL ORDER BY `issued` ASC" );
 		$statement->bindValue( 'requester', $this->user->userId, PDO::PARAM_STR );
 		$statement->bindValue( 'now', \gmdate( static::DATE_FORMAT, $this->now->getTimestamp() ), PDO::PARAM_STR );
 		if ( null !== $client ) {
@@ -154,7 +154,7 @@ class CertificateCredentialLog extends CredentialLog
 			}
 
 			yield new CertificateCredential(
-				credentialId: $row['identity'],
+				credentialId: $row['ident'],
 				user: $this->user,
 				realm: $realm,
 				provider: $this->provider,
@@ -174,7 +174,7 @@ class CertificateCredentialLog extends CredentialLog
 
 		$clientQueryPart = null === $client ? '' : 'AND `client` = :client';
 		$realmQueryPart = null === $realm ? '' : 'AND `realm` = :realm';
-		$statement = $this->getPDO()->prepare( "SELECT `realm`, `ca_sub`, `requester`, `usage`, `sub`, `issued`, `expires`, `revoked`, `csr`, `client`, `user_agent`, `ip`, `x509`, `identity` FROM `realm_signing_log` WHERE `sub` =:sub AND `requester` = :requester {$clientQueryPart} {$realmQueryPart} ORDER BY `issued` ASC" );
+		$statement = $this->getPDO()->prepare( "SELECT `realm`, `ca_sub`, `requester`, `usage`, `sub`, `issued`, `expires`, `revoked`, `csr`, `client`, `user_agent`, `ip`, `x509`, `ident` FROM `realm_signing_log` WHERE `sub` =:sub AND `requester` = :requester {$clientQueryPart} {$realmQueryPart} ORDER BY `issued` ASC" );
 		$statement->bindValue( 'sub', $credentialId, PDO::PARAM_STR );
 		$statement->bindValue( 'requester', $this->user->userId, PDO::PARAM_STR );
 		if ( null !== $client ) {
@@ -190,7 +190,7 @@ class CertificateCredentialLog extends CredentialLog
 			$realm = $tenantConfig->getRealm( $row['realm'] );
 
 			return new CertificateCredential(
-				credentialId: $row['identity'],
+				credentialId: $row['ident'],
 				user: $this->user,
 				realm: $realm,
 				provider: $this->provider,
