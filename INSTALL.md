@@ -183,14 +183,19 @@ they are only provided for readability.
 If you want to use newlines, please write a backslash `\` before each newline
 to prevent the command from running before it's complete.
 
+<details open><summary><strong>Realm with new signing CA and existing trust CA</strong></summary>
+
+This option is recommended; the signing CA can be long lived and the RADIUS certificate can be one that's signed by a public CA.
+In this step you'll specify which public CA is used, but the actual RADIUS server certificate does not need to be known to the portal; the client will verify it from the trusted CA you specify here.
+
 ```sh
 letswifi realm example.com \
 	--newca 'Example CA' \
-	--lang en-GB --description 'The eduroam network at the office' \
-	--lang nl-NL --description 'Het eduroam network op kantoor' \
+	--lang en-GB --description 'The wireless network at the office' \
+	--lang nl-NL --description 'Het draadloos netwerk op kantoor' \
 	--lang en-GB --name 'Office Wi-Fi' \
 	--lang nl-NL --name 'Kantoor-Wi-Fi' \
-	--validity 365 \
+	--validity 366 \
 	--trust 'C=NO, O=Buypass AS-983163327, CN=Buypass Class 2 Root CA' \
 	--trust 'C=GR, L=Athens, O=Hellenic Academic and Research Institutions Cert. Authority, CN=Hellenic Academic and Research Institutions ECC RootCA 2015' \
 	--trust 'C=US, O=Internet Security Research Group, CN=ISRG Root X1' \
@@ -198,10 +203,37 @@ letswifi realm example.com \
 	--server-name 'radius.example.com'
 ```
 
+</details>
+
+<details><summary><strong>Realm with existing signing CA and existing trust CA</strong></summary>
+
+This is a slightly more advanced set-up, where you provide your own signing CA.
+You may want to do this if you want to use a common root CA,
+and provide an intermediate CA for client certificates.
+It's recommended for larger setups.
+
+Letswifi-portal will need the private key for the intermediate, but not for the root.
+
+We will assume a file **bundle.pem** to contain the root certificate, intermediate certificate and intermediate key.  The subject of this intermediate is **CN=Let's Wi-Fi CA**.
+
+```sh
+letswifi ca import <bundle.pem
+letswifi realm example.com \
+	--lang en-GB --description 'The wireless network at the office' \
+	--lang nl-NL --description 'Het draadloos netwerk op kantoor' \
+	--lang en-GB --name 'Office Wi-Fi' \
+	--lang nl-NL --name 'Kantoor-Wi-Fi' \
+	--signer "CN=Let's Wi-Fi CA" \
+	--trust 'C=GR, L=Athens, O=Hellenic Academic and Research Institutions Cert. Authority, CN=Hellenic Academic and Research Institutions ECC RootCA 2015' \
+	--server-name 'radius.example.com'
+```
+
+</details>
+
 Remove the `--trust` arguments you don't need.
 If you use them, make sure you imported them in the previous section.
 
-If you don't provide `--trust` at all, it will use the newly generated self-signed CA.
+If you don't provide `--trust` at all, the trust will be set to the same CA that's used for signing.
 
 #### Provider setup
 
