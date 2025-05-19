@@ -48,6 +48,9 @@ class DictionaryDir extends DictionaryFile
 			$key = \substr( $entry, 0, -1 * $extensionLength );
 			$conf[$key . static::SIGIL] = $entry;
 		}
+		if ( !$conf ) {
+			throw new DomainException( "{$dir} contains no files ending with .{$extension}" );
+		}
 
 		return $conf;
 	}
