@@ -17,7 +17,7 @@
 	<div id="systray">
 		<div class="dropdown-container">
 			<button class="dropdown-header" popovertarget="languages-dropdown">
-				<span class="oojs-icon oojs-icon-language dropdown-header-collapse"></span>{{ t('Language') }}
+				<span class="oojs-icon oojs-icon-language dropdown-header-collapse"></span>{{ 'Language'|t }}
 			</button>
 			<dialog popover class="dropdown" id="languages-dropdown">
 				<ul class="dropdown-menu">
@@ -31,20 +31,20 @@
 		<div class="dropdown-container" id="user-chooser">
 			<button class="dropdown-header" popovertarget="user-dropdown">
 				<span class="oojs-icon oojs-icon-userAvatar dropdown-header-collapse"></span>
-				{{ t('Account') }}
+				{{ 'Account'|t }}
 			</button>
 			<dialog popover class="dropdown" id="user-dropdown">
 				<ul class="dropdown-menu">
-					<li><a draggable="false" class="oojs-icon oojs-icon-userContributions" href="{{ _basePath }}/me/">{{ t('Account information') }}</a></li>
+					<li><a draggable="false" class="oojs-icon oojs-icon-userContributions" href="{{ _basePath }}/me/">{{ 'Account information'|t }}</a></li>
 					{% if _logout_href %}
-					<li><a draggable="false" class="oojs-icon oojs-icon-logout" href="{{ _logout_href }}">{{ t('Logout') }}</a></li>
+					<li><a draggable="false" class="oojs-icon oojs-icon-logout" href="{{ _logout_href }}">{{ 'Logout'|t }}</a></li>
 					{% endif %}
 				</ul>
 			</dialog>
 		</div>
 		{% else -%}
 		<div class="dropdown-container">
-			<a draggable="false" class="dropdown-header" href="{{ _login_href ?? _basePath ~ '/me/' }}"><span class="oojs-icon oojs-icon-userAvatarOutline"></span>{{ t('Login') }}</a>
+			<a draggable="false" class="dropdown-header" href="{{ _login_href ?? _basePath ~ '/me/' }}"><span class="oojs-icon oojs-icon-userAvatarOutline"></span>{{ 'Login'|t }}</a>
 		</div>
 		{% endif -%}
 	</div>

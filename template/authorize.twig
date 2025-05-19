@@ -1,6 +1,6 @@
 {% extends 'dialog.twig' %}
 
-{% block title %}{{ tattr('Authorize %s', _product_name) }}{% endblock %}
+{% block title %}{{ 'Authorize %s'|translate_raw(_product_name) }}{% endblock %}
 
 {% block content %}
 <form method="post">
@@ -8,25 +8,28 @@
 <header>
 	<p class="logout">
 		<a href="{{ logoutUrl }}" class="btn-txt">
-			{{ t('Not %s?', user.userId|escape) }}?
+			{{ 'Not %s?'|t(user.userId|escape) }}
 		</a>
 	</p>
 </header>
 {% endif %}
 <main>
+	<section>
+	<h1>{{ 'Authorize %s'|t(_product_name) }}</h1>
 {% if realms|length == 1 %}
-	<p>{{ t('Do you want to issue a pseudo-credential?') }}</p>
-	<p class="text-center"><button type="submit" class="btn btn-default" name="{{ postField }}" value="{{ postValue }}">{{ t('Approve') }}</button></p>
+	<p>{{ 'Do you want to issue a pseudo-credential?'|t }}</p>
+	<p class="text-center"><button type="submit" class="btn btn-default" name="{{ postField }}" value="{{ postValue }}">{{ 'Approve'|t }}</button></p>
 	<hr>
 	<details>
-		<summary>{{ t('Why is this needed?') }}</summary>
-		<p>{{ t('Requiring a manual step prevents automated enrollment.') }}</p>
+		<summary>{{ 'Why is this needed?'|t }}</summary>
+		<p>{{ 'Requiring a manual step prevents automated enrollment.'|t }}</p>
 	</details>
 {% else %}
-	<p>{{ t('Select your user realm') }}</p>
+	<p>{{ 'Select your user realm'|t }}</p>
 {{ include('realm-picker.twig') }}
-	<p class="text-center"><button type="submit" class="btn btn-default" name="{{ postField }}" value="{{ postValue }}">{{ t('Continue') }}</button></p>
+	<p class="text-center"><button type="submit" class="btn btn-default" name="{{ postField }}" value="{{ postValue }}">{{ 'Continue'|t }}</button></p>
 {% endif %}
+	</section>
 </main>
 </form>
 {% endblock %}

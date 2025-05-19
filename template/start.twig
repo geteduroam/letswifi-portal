@@ -1,16 +1,16 @@
 {% extends 'menu.twig' %}
 
-{% block title %}{{ tattr(provider.display_name) }}{% endblock %}
+{% block title %}{{ provider.display_name|translate_raw }}{% endblock %}
 
 {% block content %}
 <main>
-	<h1>{{ t('Welcome to %1$s at %2$s', _product_name, provider.display_name) }}</h1>
-	<p>{{ t('To use %1$s at %2$s, download the app or profile for your device below.', _network_name, provider.display_name) }}
+	<h1>{{ 'Welcome to %1$s at %2$s'|t(_product_name, provider.display_name) }}</h1>
+	<p>{{ 'To use %1$s at %2$s, download the app or profile for your device below.'|t(_network_name, provider.display_name) }}
 	{% if platform %}
 		<section class="platform-jumbotron highlight">
 		<h2>{{ platform.name }}</h2>
 		{% if platform.apps %}
-			<p>{{ t('Download the %s app to configure your device.', platform.name) }}
+			<p>{{ 'Download the %s app to configure your device.'|t(platform.name) }}
 			<ul class="apps buttons">
 			{% for app_id, app in platform.apps %}
 				<li class="{{ app_id }} {{ app.type }}"><a class="btn btn-default" href="{{ app.href }}" rel="nofollow,noreferrer,noopener">{{ app.name }}</a></li>
@@ -20,16 +20,16 @@
 
 		{% if platform.profiles %}
 			{% if platform.apps %}
-				<details><summary>{{ t('If you cannot use the official app, you can download an installation profile for manual installation.') }}</summary>
+				<details><summary>{{ 'If you cannot use the official app, you can download an installation profile for manual installation.'|t }}</summary>
 				<p>
 			{% else %}
 				<p>
-					{{ t('There is no app available for %s.', platform.name) }}<br>
-					{{ t('Download an installation profile for manual installation.') }}
+					{{ 'There is no app available for %s.'|t(platform.name) }}<br>
+					{{ 'Download an installation profile for manual installation.'|t }}
 			{% endif %}
 			{% for profile in platform.profiles %}
 				<p>
-					<a href="{{ profile.href }}">{{ profile.name }}</a> ({{ t('login required') }})
+					<a href="{{ profile.href }}">{{ profile.name }}</a> ({{ 'login required'|t }})
 			{% endfor %}
 			{% if platform.apps %}
 				</details>
@@ -38,12 +38,12 @@
 		</section>
 
 		<section class="platform-other">
-		<h2>{{ t('Other options') }}</h2>
+		<h2>{{ 'Other options'|t }}</h2>
 	{% endif %}
-	<p><a href="{{ all_platforms_href }}">{{ t('View apps and profiles for all platforms') }}</a>
+	<p><a href="{{ all_platforms_href }}">{{ 'View apps and profiles for all platforms'|t }}</a>
 	<details>
-		<summary>{{ t('Options for professional users') }}</summary>
-		<p><a href="{{ advanced_href }}">{{ t('Generate a certificate for manual use') }}</a></p>
+		<summary>{{ 'Options for professional users'|t }}</summary>
+		<p><a href="{{ advanced_href }}">{{ 'Generate a certificate for manual use'|t }}</a></p>
 		</section>
 	</details>
 

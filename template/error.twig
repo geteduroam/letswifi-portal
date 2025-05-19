@@ -5,15 +5,15 @@
 {% block layout %}
 <main>
 <h1>{{ code }} {{ code_explain }}</h1>
-<p>{{ t('An error occurred') }}
+<p>{{ 'An error occurred'|t }}
 <p><code>{{ message }}</code>
 {% if stacktrace %}
-<p>{{ t('Debug info') }}
+<p>{{ 'Debug info'|t }}
 <pre>{{ stacktrace }}
 
 </pre>
 {% else %}
-<p>{{ t('Contact helpdesk') }}</p>
+<p>{{ 'Contact helpdesk'|t }}</p>
 {% endif %}
 </main>
 {% endblock %}

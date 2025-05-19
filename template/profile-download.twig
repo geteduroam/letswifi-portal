@@ -1,20 +1,20 @@
 {% extends 'dialog.twig' %}
 
-{% block title %}{{ tattr('Profile download') }}{% endblock %}
+{% block title %}{{ 'Profile download'|translate_raw }}{% endblock %}
 
 {% block content %}
 <main>
 <section class="highlight">
 <form method="POST" action="{{ action }}" id="form-download">
-<h1>{{ t('Download %s profile', format) }}</h1>
+<h1>{{ 'Download %s profile'|t(format) }}</h1>
 {% if realms|length == 1 %}
-<p>{{ t('Download starting') }}</p>
+<p>{{ 'Download starting'|t }}</p>
 <details>
-	<summary>{{ t('Download not starting?') }}</summary>
+	<summary>{{ 'Download not starting?'|t }}</summary>
 {% else %}
 {{ include('realm-picker.twig') }}
 {% endif %}
-	<p><input type="hidden" name="format" value="{{ format }}"><button type="submit" class="btn btn-default" id="btn-download">{{ t('Start download') }}</button></p>
+	<p><input type="hidden" name="format" value="{{ format }}"><button type="submit" class="btn btn-default" id="btn-download">{{ 'Start download'|t }}</button></p>
 </form>
 </section>
 {% if realms|length == 1 %}
@@ -22,12 +22,12 @@
 {% endif %}
 
 {% if passphrase %}
-<p>{{ t('Use passphrase when prompted:') }}</p>
+<p>{{ 'Use passphrase when prompted:'|t }}</p>
 <p id="passphrase-show">{{ passphrase }}</p>
 {% endif %}
 
 {% if format == 'apple-mobileconfig' %}
-<p>{{ t('apple-mobileconfig instructions') }}</p>
+<p>{{ 'apple-mobileconfig instructions'|t }}</p>
 <p aria-hidden="true" class="fullwidth">
 	<picture class="screenshot mac">
 		<source srcset="{{ _basePath }}/assets/mac/sequoia-dark.png" media="(prefers-color-scheme: dark)">
@@ -37,7 +37,7 @@
 {% endif %}
 
 {% if format == 'google-onc' %}
-<p>{{ t('google-onc instructions') }}</p>
+<p>{{ 'google-onc instructions'|t }}</p>
 {% endif %}
 
 </main>

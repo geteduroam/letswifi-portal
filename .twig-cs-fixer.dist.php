@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-use PhpCsFixer\Finder;
 use TwigCsFixer\Config\Config;
+use TwigCsFixer\File\Finder;
 use TwigCsFixer\Rules\Whitespace\IndentRule;
 use TwigCsFixer\Ruleset\Ruleset;
 
