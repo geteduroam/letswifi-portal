@@ -115,6 +115,8 @@ If the file doesn't exist, copy from **authsources.php.dist**.
 
 ## /etc/simplesamlphp/module_cron.php
 
+Replace the file with the following contents
+
 ```php
 <?php
 $config = [
@@ -126,7 +128,9 @@ $config = [
 
 ## /etc/simplesamlphp/module_metarefresh.php
 
-Modify the file to add URLs for your IdP metadata
+Replace the file to add URLs for your IdP metadata.
+
+**Update the URL to the metadata URL for your IdP**
 
 ```php
 <?php
