@@ -63,5 +63,14 @@ abstract class CredentialLog
 	 */
 	abstract public function listCredentials( ?Realm $realm = null ): Generator;
 
-	abstract public function getCredential( string $credentialId, ?Realm $realm = null, ?string $client = null ): CertificateCredential;
+	/**
+	 * @return Credential<T>
+	 */
+	abstract public function getCredential( string $credentialId, ?Realm $realm = null, ?string $client = null ): Credential;
+
+	public function revokeCredential( string $credentialId ): void
+	{
+		$credential = $this->getCredential( $credentialId );
+		$credential->revoke();
+	}
 }

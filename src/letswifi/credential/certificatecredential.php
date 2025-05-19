@@ -27,8 +27,6 @@ class CertificateCredential extends Credential
 
 	private readonly DateTimeInterface $issued;
 
-	private readonly ?string $identity;
-
 	/**
 	 * @param Closure():void $revoke
 	 */
@@ -41,7 +39,7 @@ class CertificateCredential extends Credential
 		?DateTimeInterface $expiry = null,
 		?DateTimeInterface $issued = null,
 		private readonly ?DateTimeInterface $revoked = null,
-		?string $identity = null,
+		?string $anonymousIdentity = null,
 		private readonly ?PKCS12 $pkcs12 = null,
 	) {
 		parent::__construct(
@@ -55,11 +53,9 @@ class CertificateCredential extends Credential
 		if ( null === $pkcs12 ) {
 			$this->expiry = $expiry ?? throw new DomainException( 'Expiry not provided' );
 			$this->issued = $issued ?? throw new DomainException( 'Issued not provided' );
-			$this->identity = $identity ?? throw new DomainException( 'Identity not provided' );
 		} else {
 			$this->expiry = $pkcs12->x509->getValidTo();
 			$this->issued = $pkcs12->x509->getValidFrom();
-			$this->identity = $pkcs12->x509->getSubject()->getCommonName();
 		}
 	}
 
@@ -103,8 +99,8 @@ class CertificateCredential extends Credential
 		return null !== $this->revoked;
 	}
 
-	public function getIdentity(): ?string
+	public function getAnonymousIdentity(): ?string
 	{
-		return $this->identity;
+		return null;
 	}
 }

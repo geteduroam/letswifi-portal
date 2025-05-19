@@ -65,15 +65,16 @@ class CertificateCredentialIssuer implements CredentialIssuer
 	 * @suppress PhanPossiblyNonClassMethodCall Phan doesn't understand PDO
 	 * @suppress PhanPossiblyFalseTypeArgumentInternal Assume getTimestamp() doesn't return false
 	 */
-	private function logPreparedUserCredential( X509 $caCert, CSR $csr, DateTimeInterface $expiry, string $usage ): int
+	private function logPreparedUserCredential( X509 $caCert, CSR $csr, DateTimeInterface $expiry, string $ident, string $usage ): int
 	{
 		$csrData = $csr->getCSRPem();
-		$statement = $this->pdo->prepare( 'INSERT INTO `realm_signing_log` (`realm`, `ca_sub`, `requester`, `usage`, `sub`, `issued`, `expires`, `csr`, `client`, `user_agent`, `ip`) VALUES (:realm, :ca_sub, :requester, :usage, :sub, :issued, :expires, :csr, :client, :user_agent, :ip)' );
+		$statement = $this->pdo->prepare( 'INSERT INTO `realm_signing_log` (`realm`, `ca_sub`, `requester`, `ident`, `sub`, `usage`, `issued`, `expires`, `csr`, `client`, `user_agent`, `ip`) VALUES (:realm, :ca_sub, :requester, :ident, :sub, :usage, :issued, :expires, :csr, :client, :user_agent, :ip)' );
 		$statement->bindValue( 'realm', $this->realm->realmId, PDO::PARAM_STR );
 		$statement->bindValue( 'ca_sub', $caCert->getSubject(), PDO::PARAM_STR );
 		$statement->bindValue( 'requester', $this->user->userId, PDO::PARAM_STR );
-		$statement->bindValue( 'usage', $usage, PDO::PARAM_STR );
+		$statement->bindValue( 'ident', $ident, PDO::PARAM_STR );
 		$statement->bindValue( 'sub', $csr->getSubject(), PDO::PARAM_STR );
+		$statement->bindValue( 'usage', $usage, PDO::PARAM_STR );
 		$statement->bindValue( 'issued', \gmdate( static::DATE_FORMAT, $this->now->getTimestamp() ), PDO::PARAM_STR );
 		$statement->bindValue( 'expires', \gmdate( static::DATE_FORMAT, $expiry->getTimestamp() ), PDO::PARAM_STR );
 		$statement->bindValue( 'csr', $csrData, PDO::PARAM_STR );
@@ -118,8 +119,8 @@ class CertificateCredentialIssuer implements CredentialIssuer
 		// during some test we ended up with the date 88363-05-14 and MySQL didn't like
 		$expiry = $this->now->add( $this->realm->validity );
 		$userKey = new PrivateKey( new OpenSSLConfig( privateKeyType: OpenSSLKey::KEYTYPE_RSA ) );
-		$commonName = $this->createCommonName();
-		$dn = new DN( ['CN' => $commonName] );
+		$ident = $this->generateIdent();
+		$dn = new DN( ['CN' => $ident] );
 		$csr = CSR::generate( $dn, $userKey );
 
 		$signerData = $this->config->getDictionary( 'certificate' )->getDictionary(
@@ -127,7 +128,7 @@ class CertificateCredentialIssuer implements CredentialIssuer
 		);
 		$caCert = new X509( $signerData->getString( 'x509' ) );
 
-		$serial = $this->logPreparedUserCredential( $caCert, $csr, $expiry, 'client' );
+		$serial = $this->logPreparedUserCredential( $caCert, $csr, $expiry, $ident, 'client' );
 
 		$caKey = new PrivateKey( $signerData->getString( 'key' ), $signerData->getStringOrNull( 'passphrase' ) );
 
@@ -141,14 +142,17 @@ class CertificateCredentialIssuer implements CredentialIssuer
 	/**
 	 * Create random string that ends with @realm
 	 */
-	private function createCommonName(): string
+	private function generateIdent(): string
 	{
 		$realm = '@' . \rawurlencode( $this->realm->realmId );
 		if ( \strlen( $realm ) > 48 ) {
 			throw new DomainException( 'Realm is too long to fit in certificate' );
 		}
+
+		// $random will be 16 bytes long
 		$random = \strtolower( \strtr( \base64_encode( \random_bytes( 12 ) ), '/+9876', '012345' ) );
 
+		// result is at most 48 + 16 = 64 bytes
 		return $random . $realm;
 	}
 }

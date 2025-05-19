@@ -155,7 +155,7 @@ class EapConfigFormat extends Format
 	 */
 	private function generateClientCertAuthenticationMethodXml( CertificateCredential $authenticationMethod ): string
 	{
-		$identity = $authenticationMethod->getIdentity();
+		$identity = $authenticationMethod->getAnonymousIdentity();
 		\assert( $this->credential instanceof CertificateCredential );
 		$pkcs12 = $this->credential->getPKCS12( ca: true, des: true );
 

@@ -20,6 +20,8 @@ CREATE TABLE IF NOT EXISTS "realm_signing_log" (
 	"ca_sub" TEXT REFERENCES "ca"("sub") NOT NULL,
 	"requester" TEXT NOT NULL,
 	"sub" TEXT NOT NULL,
+	"grant" TEXT DEFAULT NULL,
+	"identity" TEXT NOT NULL,
 	"issued" TEXT NOT NULL,
 	"expires" TEXT NOT NULL,
 	"csr" TEXT NOT NULL,

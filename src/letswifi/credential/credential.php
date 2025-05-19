@@ -23,7 +23,7 @@ use letswifi\tenant\Realm;
 abstract class Credential implements JsonSerializable
 {
 	/**
-	 * @param Closure():T $pkcs12Generator
+	 * @param Closure():void $revoke
 	 */
 	public function __construct(
 		public readonly ?string $credentialId,
@@ -67,5 +67,5 @@ abstract class Credential implements JsonSerializable
 		$f();
 	}
 
-	abstract public function getIdentity(): ?string;
+	abstract public function getAnonymousIdentity(): ?string;
 }

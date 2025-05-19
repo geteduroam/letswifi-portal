@@ -35,7 +35,8 @@ class CertificateCredentialLog extends CredentialLog
 
 	public function createCredentialIssuer( Realm $realm ): CertificateCredentialIssuer
 	{
-		// TODO: Check if this assertion can ever be true
+		// TODO: Check if this assertion can ever fail;
+		// maybe convert to if/throw
 		\assert( $this->user->canUseRealm( $realm ) );
 
 		return new CertificateCredentialIssuer(
@@ -83,7 +84,8 @@ class CertificateCredentialLog extends CredentialLog
 	 */
 	public function getStatisticsPerClient( Realm $realm ): array
 	{
-		// TODO: Check if this assertion can ever be true
+		// TODO: Check if this assertion can ever fail;
+		// maybe convert to if/throw
 		\assert( $this->user->canUseRealm( $realm ) );
 
 		$statement = $this->getPDO()->prepare( 'SELECT `client` AS `client_id`, MIN(`issued`) AS `first_issued`, MAX(`issued`) AS `last_issued`, MIN(`expires`) AS `first_expires`, MAX(`expires`) AS `last_expires`, COUNT(*) AS `count` FROM `realm_signing_log` WHERE `realm` = :realm AND `requester` = :requester AND `expires` > :now GROUP BY `client_id`' );
@@ -114,13 +116,14 @@ class CertificateCredentialLog extends CredentialLog
 	 */
 	public function listCredentials( ?Realm $realm = null, ?string $client = null ): Generator
 	{
-		// TODO: Check if this assertion can ever be true
+		// TODO: Check if this assertion can ever fail;
+		// maybe convert to if/throw
 		\assert( null === $realm || $this->user->canUseRealm( $realm ) );
 
 		$realms = [];
 		$clientQueryPart = null === $client ? '' : 'AND `client` = :client';
 		$realmQueryPart = null === $realm ? '' : 'AND `realm` = :realm';
-		$statement = $this->getPDO()->prepare( "SELECT `realm`, `ca_sub`, `requester`, `usage`, `sub`, `issued`, `expires`, `revoked`, `csr`, `client`, `user_agent`, `ip`, `x509` FROM `realm_signing_log` WHERE `requester` = :requester {$clientQueryPart} {$realmQueryPart} AND `expires` > :now AND revoked IS NULL ORDER BY `issued` ASC" );
+		$statement = $this->getPDO()->prepare( "SELECT `realm`, `ca_sub`, `requester`, `usage`, `sub`, `issued`, `expires`, `revoked`, `csr`, `client`, `user_agent`, `ip`, `x509`, `identity` FROM `realm_signing_log` WHERE `requester` = :requester {$clientQueryPart} {$realmQueryPart} AND `expires` > :now AND revoked IS NULL ORDER BY `issued` ASC" );
 		$statement->bindValue( 'requester', $this->user->userId, PDO::PARAM_STR );
 		$statement->bindValue( 'now', \gmdate( static::DATE_FORMAT, $this->now->getTimestamp() ), PDO::PARAM_STR );
 		if ( null !== $client ) {
@@ -151,7 +154,7 @@ class CertificateCredentialLog extends CredentialLog
 			}
 
 			yield new CertificateCredential(
-				credentialId: \substr( $row['sub'], 3 ), // DANGEROUS, expect subject has only commonName
+				credentialId: $row['identity'],
 				user: $this->user,
 				realm: $realm,
 				provider: $this->provider,
@@ -159,19 +162,19 @@ class CertificateCredentialLog extends CredentialLog
 				issued: $this->dateTimeFromGmt( $row['issued'] ) ?? throw new DomainException( 'Issued cannot be NULL' ),
 				expiry: $this->dateTimeFromGmt( $row['expires'] ) ?? throw new DomainException( 'Expires cannot be NULL' ),
 				revoked: $this->dateTimeFromGmt( $row['revoked'] ),
-				identity: \substr( $row['sub'], 3 ), // DANGEROUS, expect subject has only commonName
 			);
 		}
 	}
 
 	public function getCredential( string $credentialId, ?Realm $realm = null, ?string $client = null ): CertificateCredential
 	{
-		// TODO: Check if this assertion can ever be true
+		// TODO: Check if this assertion can ever fail;
+		// maybe convert to if/throw
 		\assert( null === $realm || $this->user->canUseRealm( $realm ) );
 
 		$clientQueryPart = null === $client ? '' : 'AND `client` = :client';
 		$realmQueryPart = null === $realm ? '' : 'AND `realm` = :realm';
-		$statement = $this->getPDO()->prepare( "SELECT `realm`, `ca_sub`, `requester`, `usage`, `sub`, `issued`, `expires`, `revoked`, `csr`, `client`, `user_agent`, `ip`, `x509` FROM `realm_signing_log` WHERE `sub` =:sub AND `requester` = :requester {$clientQueryPart} {$realmQueryPart} ORDER BY `issued` ASC" );
+		$statement = $this->getPDO()->prepare( "SELECT `realm`, `ca_sub`, `requester`, `usage`, `sub`, `issued`, `expires`, `revoked`, `csr`, `client`, `user_agent`, `ip`, `x509`, `identity` FROM `realm_signing_log` WHERE `sub` =:sub AND `requester` = :requester {$clientQueryPart} {$realmQueryPart} ORDER BY `issued` ASC" );
 		$statement->bindValue( 'sub', $credentialId, PDO::PARAM_STR );
 		$statement->bindValue( 'requester', $this->user->userId, PDO::PARAM_STR );
 		if ( null !== $client ) {
@@ -187,7 +190,7 @@ class CertificateCredentialLog extends CredentialLog
 			$realm = $tenantConfig->getRealm( $row['realm'] );
 
 			return new CertificateCredential(
-				credentialId: $row['sub'],
+				credentialId: $row['identity'],
 				user: $this->user,
 				realm: $realm,
 				provider: $this->provider,
@@ -195,7 +198,6 @@ class CertificateCredentialLog extends CredentialLog
 				issued: $this->dateTimeFromGmt( $row['issued'] ) ?? throw new DomainException( 'Expires cannot be NULL' ),
 				expiry: $this->dateTimeFromGmt( $row['expires'] ) ?? throw new DomainException( 'Expires cannot be NULL' ),
 				revoked: $this->dateTimeFromGmt( $row['revoked'] ),
-				identity: \substr( $row['sub'], 3 ), // DANGEROUS, expect subject has only commonName
 			);
 		}
 
