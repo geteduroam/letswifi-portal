@@ -118,14 +118,13 @@ class EapConfigFormat extends Format
 
 	private function generateHS20NetworkXml( NetworkPasspoint $network ): string
 	{
-		$result = ''
-			. "\r\n\t\t\t<IEEE80211>";
+		$result = '';
 		foreach ( $network->oids as $oid ) {
-			$result .= ''
-			. "\r\n\t\t\t\t<ConsortiumOID>" . $this->e( $oid ) . '</ConsortiumOID>';
+			$result = ''
+				. "\r\n\t\t\t<IEEE80211>"
+				. "\r\n\t\t\t\t<ConsortiumOID>" . $this->e( $oid ) . '</ConsortiumOID>'
+				. "\r\n\t\t\t</IEEE80211>";
 		}
-		$result .= ''
-			. "\r\n\t\t\t</IEEE80211>";
 
 		return $result;
 	}
