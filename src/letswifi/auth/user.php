@@ -25,6 +25,7 @@ class User implements JsonSerializable
 		public readonly array $realms,
 		public readonly array $affiliations,
 		public readonly ?string $clientId = null,
+		public readonly ?string $grantSid = null,
 		public readonly ?string $ip = null,
 		public readonly ?string $userAgent = null,
 	) {
@@ -37,6 +38,7 @@ class User implements JsonSerializable
 			'realms' => \array_keys( $this->realms ),
 			'affiliations' => $this->affiliations,
 			'client_id' => $this->clientId,
+			'grant_sid' => $this->grantSid,
 			'ip' => $this->ip,
 			'user_agent' => $this->userAgent,
 		];

@@ -27,11 +27,10 @@ $credentialLog = $app->getCredentialLog( $user );
 
 if ( 'POST' === ( $_SERVER['REQUEST_METHOD'] ?? '' ) ) {
 	if ( \array_key_exists( 'revoke_credential', $_POST ) && $revokeCredential = \is_string( $_POST['revoke_credential'] ) ? $_POST['revoke_credential'] : null ) {
-		$credential = $credentialLog->getCredential( "CN={$revokeCredential}" );
-		$credential->revoke();
+		$credentialLog->revokeCredential( $revokeCredential );
 	}
-	if ( \array_key_exists( 'revoke_grant', $_POST ) && $revokeGrant = \is_string( $_POST['revoke_grant'] ) ? $_POST['revoke_grant'] : null ) {
-		$oauth->revokeSession( $revokeGrant );
+	if ( \array_key_exists( 'revoke_grant', $_POST ) && $revokeGrantSid = \is_string( $_POST['revoke_grant'] ) ? $_POST['revoke_grant'] : null ) {
+		$oauth->revokeSession( $revokeGrantSid );
 	}
 	\header( "Location: {$indexUrl}" );
 

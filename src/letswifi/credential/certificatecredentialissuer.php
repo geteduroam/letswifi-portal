@@ -68,11 +68,12 @@ class CertificateCredentialIssuer implements CredentialIssuer
 	private function logPreparedUserCredential( X509 $caCert, CSR $csr, DateTimeInterface $expiry, string $ident, string $usage ): int
 	{
 		$csrData = $csr->getCSRPem();
-		$statement = $this->pdo->prepare( 'INSERT INTO `realm_signing_log` (`realm`, `ca_sub`, `requester`, `ident`, `sub`, `usage`, `issued`, `expires`, `csr`, `client`, `user_agent`, `ip`) VALUES (:realm, :ca_sub, :requester, :ident, :sub, :usage, :issued, :expires, :csr, :client, :user_agent, :ip)' );
+		$statement = $this->pdo->prepare( 'INSERT INTO `realm_signing_log` (`realm`, `ca_sub`, `requester`, `ident`, `grant`, `sub`, `usage`, `issued`, `expires`, `csr`, `client`, `user_agent`, `ip`) VALUES (:realm, :ca_sub, :requester, :ident, :grant, :sub, :usage, :issued, :expires, :csr, :client, :user_agent, :ip)' );
 		$statement->bindValue( 'realm', $this->realm->realmId, PDO::PARAM_STR );
 		$statement->bindValue( 'ca_sub', $caCert->getSubject(), PDO::PARAM_STR );
 		$statement->bindValue( 'requester', $this->user->userId, PDO::PARAM_STR );
 		$statement->bindValue( 'ident', $ident, PDO::PARAM_STR );
+		$statement->bindValue( 'grant', $this->user->grantSid, PDO::PARAM_STR );
 		$statement->bindValue( 'sub', $csr->getSubject(), PDO::PARAM_STR );
 		$statement->bindValue( 'usage', $usage, PDO::PARAM_STR );
 		$statement->bindValue( 'issued', \gmdate( static::DATE_FORMAT, $this->now->getTimestamp() ), PDO::PARAM_STR );

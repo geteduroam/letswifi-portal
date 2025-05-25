@@ -16,6 +16,7 @@ use DomainException;
 use Generator;
 use PDO;
 use fyrkat\openssl\PKCS12;
+use letswifi\auth\User;
 use letswifi\configuration\ConfigurationException;
 use letswifi\tenant\Realm;
 use letswifi\tenant\TenantConfig;
@@ -46,7 +47,7 @@ class CertificateCredentialLog extends CredentialLog
 			now: $this->now,
 			pdo: $this->getPDO(),
 			config: $this->config,
-			revoke: fn( string $sub ) => $this->revoke( $realm, $sub ),
+			revoke: fn( string $ident ) => $this->revoke( $realm, $ident ),
 		);
 	}
 
@@ -123,7 +124,7 @@ class CertificateCredentialLog extends CredentialLog
 		$realms = [];
 		$clientQueryPart = null === $client ? '' : 'AND `client` = :client';
 		$realmQueryPart = null === $realm ? '' : 'AND `realm` = :realm';
-		$statement = $this->getPDO()->prepare( "SELECT `realm`, `ca_sub`, `requester`, `usage`, `sub`, `issued`, `expires`, `revoked`, `csr`, `client`, `user_agent`, `ip`, `x509`, `ident` FROM `realm_signing_log` WHERE `requester` = :requester {$clientQueryPart} {$realmQueryPart} AND `expires` > :now AND revoked IS NULL ORDER BY `issued` ASC" );
+		$statement = $this->getPDO()->prepare( "SELECT `realm`, `ca_sub`, `requester`, `ident`, `grant`, `usage`, `sub`, `issued`, `expires`, `revoked`, `csr`, `client`, `user_agent`, `ip`, `x509` FROM `realm_signing_log` WHERE `requester` = :requester {$clientQueryPart} {$realmQueryPart} AND `expires` > :now AND revoked IS NULL ORDER BY `issued` ASC" );
 		$statement->bindValue( 'requester', $this->user->userId, PDO::PARAM_STR );
 		$statement->bindValue( 'now', \gmdate( static::DATE_FORMAT, $this->now->getTimestamp() ), PDO::PARAM_STR );
 		if ( null !== $client ) {
@@ -155,10 +156,18 @@ class CertificateCredentialLog extends CredentialLog
 
 			yield new CertificateCredential(
 				credentialId: $row['ident'],
-				user: $this->user,
+				user: new User(
+					userId: $row['requester'],
+					realms: [], // We cannot use this user object to issue more realms
+					affiliations: [], // We do not record affiliations at issue moment
+					clientId: $row['client'],
+					grantSid: $row['grant'],
+					ip: $row['ip'],
+					userAgent: $row['user_agent'],
+				),
 				realm: $realm,
 				provider: $this->provider,
-				revoke: fn() => $this->revoke( $realm, $row['sub'] ),
+				revoke: fn() => $this->revoke( $realm, $row['ident'] ),
 				issued: $this->dateTimeFromGmt( $row['issued'] ) ?? throw new DomainException( 'Issued cannot be NULL' ),
 				expiry: $this->dateTimeFromGmt( $row['expires'] ) ?? throw new DomainException( 'Expires cannot be NULL' ),
 				revoked: $this->dateTimeFromGmt( $row['revoked'] ),
@@ -174,8 +183,8 @@ class CertificateCredentialLog extends CredentialLog
 
 		$clientQueryPart = null === $client ? '' : 'AND `client` = :client';
 		$realmQueryPart = null === $realm ? '' : 'AND `realm` = :realm';
-		$statement = $this->getPDO()->prepare( "SELECT `realm`, `ca_sub`, `requester`, `usage`, `sub`, `issued`, `expires`, `revoked`, `csr`, `client`, `user_agent`, `ip`, `x509`, `ident` FROM `realm_signing_log` WHERE `sub` =:sub AND `requester` = :requester {$clientQueryPart} {$realmQueryPart} ORDER BY `issued` ASC" );
-		$statement->bindValue( 'sub', $credentialId, PDO::PARAM_STR );
+		$statement = $this->getPDO()->prepare( "SELECT `realm`, `ca_sub`, `requester`, `ident`, `grant`, `usage`, `sub`, `issued`, `expires`, `revoked`, `csr`, `client`, `user_agent`, `ip`, `x509`, `ident` FROM `realm_signing_log` WHERE `ident` = :ident AND `requester` = :requester {$clientQueryPart} {$realmQueryPart} ORDER BY `issued` ASC" );
+		$statement->bindValue( 'ident', $credentialId, PDO::PARAM_STR );
 		$statement->bindValue( 'requester', $this->user->userId, PDO::PARAM_STR );
 		if ( null !== $client ) {
 			$statement->bindParam( 'client', $client, PDO::PARAM_STR );
@@ -194,7 +203,7 @@ class CertificateCredentialLog extends CredentialLog
 				user: $this->user,
 				realm: $realm,
 				provider: $this->provider,
-				revoke: fn() => $this->revoke( $realm, $row['sub'] ),
+				revoke: fn() => $this->revoke( $realm, $row['ident'] ),
 				issued: $this->dateTimeFromGmt( $row['issued'] ) ?? throw new DomainException( 'Expires cannot be NULL' ),
 				expiry: $this->dateTimeFromGmt( $row['expires'] ) ?? throw new DomainException( 'Expires cannot be NULL' ),
 				revoked: $this->dateTimeFromGmt( $row['revoked'] ),
@@ -215,16 +224,16 @@ class CertificateCredentialLog extends CredentialLog
 		return $result ?: null;
 	}
 
-	private function revoke( Realm $realm, string $subject ): void
+	private function revoke( Realm $realm, string $ident ): void
 	{
 		// TODO: Check if this assertion can ever be true
 		\assert( $this->user->canUseRealm( $realm ) );
 
-		$revokeStatement = $this->getPDO()->prepare( 'UPDATE `realm_signing_log` SET `revoked` = :revoked WHERE `sub` = :sub AND `realm` = :realm AND `requester` = :requester AND `revoked` IS NULL' );
+		$revokeStatement = $this->getPDO()->prepare( 'UPDATE `realm_signing_log` SET `revoked` = :revoked WHERE `ident` = :ident AND `realm` = :realm AND `requester` = :requester AND `revoked` IS NULL' );
 		$revokeStatement->bindValue( 'revoked', \gmdate( static::DATE_FORMAT, $this->now->getTimestamp() ), PDO::PARAM_STR );
 		$revokeStatement->bindValue( 'requester', $this->user->userId, PDO::PARAM_STR );
 		$revokeStatement->bindValue( 'realm', $realm->realmId, PDO::PARAM_STR );
-		$revokeStatement->bindParam( 'sub', $subject, PDO::PARAM_STR );
+		$revokeStatement->bindParam( 'ident', $ident, PDO::PARAM_STR );
 		$revokeStatement->execute();
 	}
 

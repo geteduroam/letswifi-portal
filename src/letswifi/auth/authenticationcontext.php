@@ -108,7 +108,13 @@ class AuthenticationContext implements JsonSerializable
 		} else {
 			$userId = $force ? $this->browserAuth->requireAuth() : $this->browserAuth->getUserId();
 
-			return null !== $userId ? $this->constructAuthenticatedUser( $provider, $userId, 'browser' ) : null;
+			return null !== $userId
+				? $this->constructAuthenticatedUser(
+					provider: $provider,
+					userId: $userId,
+					clientId: 'browser',
+					grantSid: null,
+				) : null;
 		}
 
 		return null;
@@ -140,16 +146,18 @@ class AuthenticationContext implements JsonSerializable
 			throw new DomainException( "User {$sub} with realm {$grant->realm} has no client_id" );
 		}
 
+		// NOTE: sid can be NULL when the client does not support refresh tokens
 		return $this->constructAuthenticatedUser(
 			provider: $provider,
 			userId: $sub,
 			clientId: $grant->client_id,
+			grantSid: $grant->__get( 'sid' ),
 			affiliations: $affiliations,
 			realm: $realm,
 		);
 	}
 
-	private function constructAuthenticatedUser( Provider $provider, string $userId, string $clientId, ?array $affiliations = null, ?Realm $realm = null ): User
+	private function constructAuthenticatedUser( Provider $provider, string $userId, string $clientId, ?string $grantSid, ?array $affiliations = null, ?Realm $realm = null ): User
 	{
 		return new User(
 			userId: $userId,
@@ -158,6 +166,7 @@ class AuthenticationContext implements JsonSerializable
 				: [$realm->realmId => $realm],
 			affiliations: $affiliations ?? $this->browserAuth->getAffiliations(),
 			clientId: $clientId,
+			grantSid: $grantSid,
 			ip: $_SERVER['REMOTE_ADDR'] ?? null,
 			userAgent: $_SERVER['HTTP_USER_AGENT'] ?? null,
 		);
