@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare( strict_types=1 );
 
 /*
  * This file is part of letswifi; a system for easy 802.1x device enrollment
@@ -19,7 +19,7 @@ return [
 		'android' => [
 			'name' => 'Android',
 			'match' => 'Android [1-9]',
-			'apps' => ['play-store', /*'f-droid'*/],
+			'apps' => ['play-store', 'f-droid'],
 		],
 		'chromebook' => [
 			'name' => 'ChromeOS',
@@ -33,13 +33,11 @@ return [
 			'apps' => ['app-store'],
 			'profiles' => ['apple-mobileconfig'],
 		],
-		/*
 		'linux' => [
 			'name' => 'Linux',
-			'match' => 'Linux',
-			'apps' => ['linux'],
+			'match' => '(Linux;? *[^A]|X11;? *Linux)',
+			'apps' => [/* 'flathub', */ 'github-linux'],
 		],
-		*/
 		'macos' => [
 			'name' => 'macOS',
 			'match' => 'Mac OS X [1-9][0-9][._][0-9]',
@@ -48,7 +46,7 @@ return [
 		'windows' => [
 			'name' => 'Windows',
 			'match' => 'Windows NT [0-9]',
-			'apps' => [/*'microsoft-store',*/ 'winnt-amd64'/*, 'winnt-arm64'*/],
+			'apps' => [/* 'microsoft-store', */ 'winnt-amd64', 'winnt-arm64'],
 		],
 	],
 
@@ -58,18 +56,21 @@ return [
 			'href' => 'https://apps.apple.com/app/getgovroam/id1570235475',
 			'type' => 'store',
 		],
-		/*
 		'f-droid' => [
 			'name' => 'F-Droid',
 			'type' => 'store',
-			'href' => 'https://f-droid.org/en/packages/app.eduroam.geteduroam',
+			'href' => 'https://f-droid.org/en/packages/app.govroam.getgovroam/',
 		],
-		'linux' => [
+		'flathub' => [
+			'name' => 'Flathub',
+			'href' => 'https://flathub.org/apps/app.govroam.getgovroam/',
+			'type' => 'store',
+		],
+		'github-linux' => [
 			'name' => 'GitHub Release',
-			'href' => 'https://github.com/geteduroam/linux-app/releases',
+			'href' => 'https://github.com/geteduroam/linux-app/releases/',
 			'type' => 'link',
 		],
-		*/
 		'play-store' => [
 			'name' => 'Play Store',
 			'href' => 'https://play.google.com/store/apps/details?id=app.govroam.getgovroam',
@@ -81,19 +82,17 @@ return [
 			'href' => 'https://apps.microsoft.com/detail?mode=direct',
 			'type' => 'store',
 		],
-		*/
+		 */
 		'winnt-amd64' => [
 			'name' => 'x64 EXE',
-			'href' => 'https://getgovroam.nl/app/getgovroam.exe',
+			'href' => 'https://getgovroam.nl/windows/amd64/getgovroam.exe',
 			'type' => 'download',
 		],
-		/*
 		'winnt-arm64' => [
 			'name' => 'arm64 EXE',
-			'href' => 'https://dl.eduroam.app/windows/arm64/geteduroam.exe',
+			'href' => 'https://getgovroam.nl/windows/arm64/getgovroam.exe',
 			'type' => 'download',
 		],
-		*/
 	],
 
 	'profiles' => [

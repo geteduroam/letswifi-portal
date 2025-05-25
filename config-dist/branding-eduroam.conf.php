@@ -19,7 +19,7 @@ return [
 		'android' => [
 			'name' => 'Android',
 			'match' => 'Android [1-9][0-9]+;',
-			'apps' => ['play-store', 'f-droid', 'app-gallery'],
+			'apps' => ['play-store', 'f-droid'],
 		],
 		'chromebook' => [
 			'name' => 'ChromeOS',
@@ -35,8 +35,8 @@ return [
 		],
 		'linux' => [
 			'name' => 'Linux',
-			'match' => 'Linux; [^A]',
-			'apps' => ['flathub', 'linux'],
+			'match' => '(Linux;? *[^A]|X11;? *Linux)',
+			'apps' => ['flathub', 'github-linux'],
 		],
 		'macos' => [
 			'name' => 'macOS',
@@ -46,7 +46,7 @@ return [
 		'windows' => [
 			'name' => 'Windows',
 			'match' => 'Windows NT [0-9]',
-			'apps' => [/*'microsoft-store',*/ 'winnt-amd64', 'winnt-arm64'],
+			'apps' => [/* 'microsoft-store', */ 'winnt-amd64', 'winnt-arm64'],
 		],
 	],
 
@@ -59,21 +59,16 @@ return [
 		'f-droid' => [
 			'name' => 'F-Droid',
 			'type' => 'store',
-			'href' => 'https://f-droid.org/en/packages/app.eduroam.geteduroam',
-		],
-		'app-gallery' => [
-			'name' => 'Huawei AppGallery',
-			'href' => 'https://appgallery.huawei.com/app/C104231893',
-			'type' => 'store',
+			'href' => 'https://f-droid.org/en/packages/app.eduroam.geteduroam/',
 		],
 		'flathub' => [
 			'name' => 'Flathub',
-			'href' => 'https://flathub.org/apps/app.eduroam.geteduroam',
+			'href' => 'https://flathub.org/apps/app.eduroam.geteduroam/',
 			'type' => 'store',
 		],
-		'linux' => [
+		'github-linux' => [
 			'name' => 'GitHub Release',
-			'href' => 'https://github.com/geteduroam/linux-app/releases',
+			'href' => 'https://github.com/geteduroam/linux-app/releases/',
 			'type' => 'link',
 		],
 		'play-store' => [
@@ -87,7 +82,7 @@ return [
 			'href' => 'https://apps.microsoft.com/detail?mode=direct',
 			'type' => 'store',
 		],
-		*/
+		 */
 		'winnt-amd64' => [
 			'name' => 'x64 EXE',
 			'href' => 'https://dl.eduroam.app/windows/amd64/geteduroam.exe',
