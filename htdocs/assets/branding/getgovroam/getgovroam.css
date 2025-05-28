@@ -12,5 +12,6 @@ header #product-name {
 @media (prefers-color-scheme: dark) {
 	:root {
 		--bg-color: #222;
+		--highlight-bg-color: #1a1c1f;
 	}
 }

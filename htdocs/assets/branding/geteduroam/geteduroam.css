@@ -11,6 +11,10 @@ header #product-name {
 }
 
 @media (prefers-color-scheme: dark) {
+	:root {
+		--bg-color: #0e1218;
+		--highlight-bg-color: #1c202a;
+	}
 	header #product-name {
 		background-image: url('eduroam-dark.svg');
 	}

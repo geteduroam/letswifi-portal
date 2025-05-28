@@ -487,11 +487,11 @@ details:has(p) > summary:before {
 
 @media (prefers-color-scheme: dark) {
 	:root {
-		--bg-color: #000;
-		--text-color: #aaa;
+		--bg-color: #0f0e1c;
+		--text-color: #a0a8af;
 
-		--highlight-bg-color: #1a1c1f;
-		--highlight-text-color: #ccc;
+		--highlight-bg-color: #201e2f;
+		--highlight-text-color: #c1c3c4;
 
 		--code-text-color: #e47;
 
