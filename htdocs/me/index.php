@@ -46,7 +46,7 @@ $app->render(
 		'grants' => \iterator_to_array( $oauth->listGrants( $user->userId ) ),
 		'form_action' => $indexUrl,
 		// TODO show realms with credential counts
-	], 'me', $basePath, [
+	], 'me', [
 		Realm::class => static fn( Realm $r ) => [
 			'logo' => $app->jsonOutputDelete,
 			'logo_endpoint' => null === $r->logo

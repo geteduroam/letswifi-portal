@@ -59,7 +59,7 @@ switch ( $_SERVER['REQUEST_METHOD'] ?? null ) {
 			'user' => $user,
 			'realms' => $user->getRealms(),
 			'meta_redirect' => \count( $user->getRealms() ) === 1 ? "{$basePath}/profiles/new/?" . \http_build_query( ['download' => '1', 'format' => $downloadFormat] ) : null,
-		], 'profile-download', $basePath, );
+		], 'profile-download' );
 }
 
 throw new HttpMethodException( ['GET'] );

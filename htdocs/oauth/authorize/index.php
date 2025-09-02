@@ -61,4 +61,4 @@ $app->render( [
 	'realms' => $user->getRealms(),
 	'postField' => POST_FIELD,
 	'postValue' => POST_VALUE,
-], 'authorize', $basePath );
+], 'authorize' );

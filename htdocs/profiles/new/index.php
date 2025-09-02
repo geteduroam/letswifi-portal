@@ -92,7 +92,7 @@ switch ( $overrideMethod ?? $_SERVER['REQUEST_METHOD'] ) {
 			'app' => [
 				'url' => "{$basePath}/app/",
 			],
-		], 'profile-advanced', $basePath, );
+		], 'profile-advanced' );
 		\assert( false, 'Unreachable code' );
 
 		exit; // should not be reached

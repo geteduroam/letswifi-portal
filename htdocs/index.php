@@ -66,4 +66,4 @@ $app->render( [
 	'all_platforms_href' => "{$basePath}/app/",
 	'advanced_href' => "{$basePath}/profiles/new/",
 	'http://letswifi.app/api#v2' => $apiConfiguration,
-], 'start', $basePath );
+], 'start' );

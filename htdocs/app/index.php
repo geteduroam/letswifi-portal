@@ -53,4 +53,4 @@ if ( $installProfiles = $app->getBrandingConfiguration() ) {
 $app->render( [
 	'platforms' => $platforms ?? [],
 	'advanced_href' => "{$basePath}/profiles/new/",
-], 'app', $basePath );
+], 'app' );

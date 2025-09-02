@@ -125,11 +125,7 @@ final class LetsWifiApp
 					if ( \PHP_SAPI === 'cli-server' ) {
 						$data['stacktrace'] = $ex;
 					}
-					$this->render(
-						$data,
-						template: 'error',
-						basePath: $this->basePath,
-					);
+					$this->render( $data, template: 'error' );
 				} catch ( LoaderError $_ ) {
 				}
 			}
@@ -144,7 +140,7 @@ final class LetsWifiApp
 	 *
 	 * @param array<class-string<T>,callable(T):array<string,?recursivearray|stdClass>> $reshape Function to reshape objects of the given type; keys returned by the function override native keys, if value is equal to $jsonOutputDelete, the key is removed
 	 */
-	public function render( array $data, ?string $template = null, ?string $basePath = '/', array $reshape = [] ): never
+	public function render( array $data, ?string $template = null, array $reshape = [] ): never
 	{
 		if ( !$this->crashing ) {
 			$data = $this->deepConvertToJson( $data, $reshape );
@@ -183,7 +179,7 @@ final class LetsWifiApp
 			[
 				'_user' => $user?->userId,
 				'_logout_href' => $provider?->auth->browserAuth->getLogoutURL( $this->getBaseUrl() ),
-				'_basePath' => $basePath,
+				'_basePath' => $this->basePath,
 				'_locale' => $this->getTranslationContext()->primaryLocale,
 				'_supportedLocales' => $supportedLocales,
 				'_product_name' => $branding?->getStringOrNull( 'product_name' ) ?? "Let's Wi-Fi",

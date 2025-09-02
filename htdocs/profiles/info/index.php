@@ -28,4 +28,4 @@ if ( null !== $profileInfo['logo'] ) {
 $app->render(
 	[
 		'http://letswifi.app/profile#v2' => $profileInfo,
-	], null, $basePath );
+	], null );
