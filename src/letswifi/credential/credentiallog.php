@@ -15,6 +15,7 @@ use DomainException;
 use Generator;
 use letswifi\auth\User;
 use letswifi\configuration\Dictionary;
+use letswifi\error\RealmMismatchException;
 use letswifi\tenant\Provider;
 use letswifi\tenant\Realm;
 
@@ -29,6 +30,11 @@ abstract class CredentialLog
 		protected readonly Dictionary $config,
 		public readonly DateTimeImmutable $now = new DateTimeImmutable(),
 	) {
+		// TODO: Do we really need the provider here,
+		// it's already in the user object which we should be able to trust here
+		if ( $this->provider->host !== $this->user->provider->host ) {
+			throw new DomainException( 'The provider must match the user provider' );
+		}
 	}
 
 	/**
@@ -41,22 +47,17 @@ abstract class CredentialLog
 		// Ensure that the realm is one that is available for this user
 		$realm = $this->user->getRealm( \is_string( $realm ) ? $realm : $realm->realmId );
 
-		// This should always pass if $provider->getAuthenticatedUser() was called
-		if ( !$this->provider->hasRealm( $realm ) ) {
-			throw new DomainException( "Realm {$realm->realmId} is not valid for the current provider." );
-		}
+		// Should always pass; we just got the realm object checked by $this->user->getRealm()
+		\assert( $this->user->canUseRealm( $realm ), "User {$this->user->userId} cannot use realm {$realm->realmId}" );
 
-		if ( !$this->user->canUseRealm( $realm ) ) {
-			throw new DomainException( "Realm {$realm->realmId} cannot be used by user {$this->user->userId}." );
+		// TODO: We have our own $this->provider, but see the TODO in our constructor
+		// in any case both refer to the same provider
+		if ( !$this->user->provider->hasRealm( $realm ) ) {
+			throw new RealmMismatchException( $realm, provider: $this->user->provider );
 		}
 
 		return $this->createCredentialIssuer( $realm );
 	}
-
-	/**
-	 * @return CredentialIssuer<T>
-	 */
-	abstract public function createCredentialIssuer( Realm $realm ): CredentialIssuer;
 
 	/**
 	 * @return Generator<Credential<T>>
@@ -73,4 +74,9 @@ abstract class CredentialLog
 		$credential = $this->getCredential( $credentialId );
 		$credential->revoke();
 	}
+
+	/**
+	 * @return CredentialIssuer<T>
+	 */
+	abstract protected function createCredentialIssuer( Realm $realm ): CredentialIssuer;
 }

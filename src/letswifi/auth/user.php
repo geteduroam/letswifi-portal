@@ -12,6 +12,7 @@ namespace letswifi\auth;
 
 use JsonSerializable;
 use letswifi\error\RealmMismatchException;
+use letswifi\tenant\Provider;
 use letswifi\tenant\Realm;
 
 class User implements JsonSerializable
@@ -22,6 +23,7 @@ class User implements JsonSerializable
 	 */
 	public function __construct(
 		public readonly string $userId,
+		public readonly Provider $provider,
 		public readonly array $realms,
 		public readonly array $affiliations,
 		public readonly ?string $clientId = null,
@@ -29,12 +31,19 @@ class User implements JsonSerializable
 		public readonly ?string $ip = null,
 		public readonly ?string $userAgent = null,
 	) {
+		foreach ( $realms as $realmId => $realm ) {
+			\assert( $realmId === $realm->realmId );
+			if ( !$provider->hasRealm( $realmId ) ) {
+				throw new RealmMismatchException( $realm, user: $this, provider: $this->provider );
+			}
+		}
 	}
 
 	public function jsonSerialize(): array
 	{
 		return [
 			'user_id' => $this->userId,
+			'provider' => $this->provider->host,
 			'realms' => \array_keys( $this->realms ),
 			'affiliations' => $this->affiliations,
 			'client_id' => $this->clientId,
@@ -69,13 +78,13 @@ class User implements JsonSerializable
 				}
 			}
 
-			throw new RealmMismatchException();
+			throw new RealmMismatchException( provider: $this->provider );
 		}
 
 		if ( \array_key_exists( $realmId, $this->realms ) ) {
 			return $this->realms[$realmId];
 		}
 
-		throw new RealmMismatchException( $realmId );
+		throw new RealmMismatchException( $realmId, user: $this, provider: $this->provider );
 	}
 }

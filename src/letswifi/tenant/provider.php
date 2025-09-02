@@ -10,7 +10,6 @@
 
 namespace letswifi\tenant;
 
-use DomainException;
 use JsonSerializable;
 use fyrkat\multilang\MultiLanguageString;
 use letswifi\auth\AuthenticationContext;
@@ -116,14 +115,12 @@ class Provider implements JsonSerializable
 
 	public function getAuthenticatedUser( ?string $scope = null ): ?User
 	{
-		$user = $this->auth->getAuthenticatedUser( provider: $this, scope: $scope );
-
-		return null === $user ? null : $this->verifyUserRealms( $user );
+		return $this->auth->getAuthenticatedUser( provider: $this, scope: $scope );
 	}
 
 	public function requireAuth( ?string $scope = null ): User
 	{
-		return $this->verifyUserRealms( $this->auth->requireAuth( provider: $this, scope: $scope ) );
+		return $this->auth->requireAuth( provider: $this, scope: $scope );
 	}
 
 	/**
@@ -133,8 +130,6 @@ class Provider implements JsonSerializable
 	 */
 	public function getRealmsByAffiliations( array $affiliations ): array
 	{
-		// TODO: Move this part to its own class, this is too tight a coupling
-		// It might be better in the Realm class, or in the \letswifi\auth namespace.
 		$result = [];
 		foreach ( $this->realmMap as $affiliation => $realms ) {
 			if ( '' === $affiliation || \in_array( $affiliation, $affiliations, true ) ) {
@@ -149,17 +144,5 @@ class Provider implements JsonSerializable
 		}
 
 		return $result;
-	}
-
-	private function verifyUserRealms( User $user ): User
-	{
-		foreach ( $user->getRealms() as $realmId => $realm ) {
-			\assert( $realmId === $realm->realmId );
-			if ( !$this->hasRealm( $realmId ) ) {
-				throw new DomainException( 'Authenticated user has access to a realm that is invalid for this provider' );
-			}
-		}
-
-		return $user;
 	}
 }

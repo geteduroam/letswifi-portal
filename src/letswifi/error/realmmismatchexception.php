@@ -11,11 +11,29 @@
 namespace letswifi\error;
 
 use Throwable;
+use letswifi\auth\User;
+use letswifi\tenant\Provider;
+use letswifi\tenant\Realm;
 
 class RealmMismatchException extends ForbiddenException
 {
-	public function __construct( ?string $realmId = null, ?Throwable $previous = null )
+	public function __construct(
+		Realm|string|null $realm = null,
+		?User $user = null,
+		?Provider $provider = null,
+		?Throwable $previous = null,
+	) {
+		parent::__construct( ( null === $realm
+					? 'No default realm is available'
+					: "Realm {$this->realmToString( $realm )} is not available"
+		)
+		. ( null === $user ? '' : " for user {$user->userId}" )
+		. ( null === $provider ? '' : " at provider {$provider->host}" ),
+			$previous );
+	}
+
+	private function realmToString( Realm|string $realm ): string
 	{
-		parent::__construct( null === $realmId ? 'No default realm is available for the current user' : "Realm {$realmId} is not available for the current user", $previous );
+		return $realm instanceof Realm ? $realm->realmId : $realm;
 	}
 }

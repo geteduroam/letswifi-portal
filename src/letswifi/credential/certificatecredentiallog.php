@@ -34,23 +34,6 @@ class CertificateCredentialLog extends CredentialLog
 
 	private ?PDO $pdo = null;
 
-	public function createCredentialIssuer( Realm $realm ): CertificateCredentialIssuer
-	{
-		// TODO: Check if this assertion can ever fail;
-		// maybe convert to if/throw
-		\assert( $this->user->canUseRealm( $realm ) );
-
-		return new CertificateCredentialIssuer(
-			user: $this->user,
-			realm: $realm,
-			provider: $this->provider,
-			now: $this->now,
-			pdo: $this->getPDO(),
-			config: $this->config,
-			revoke: fn( string $ident ) => $this->revoke( $realm, $ident ),
-		);
-	}
-
 	/**
 	 * @return array<string,statistics> Mapping from realm_id to statistics
 	 *
@@ -158,6 +141,7 @@ class CertificateCredentialLog extends CredentialLog
 				credentialId: $row['ident'],
 				user: new User(
 					userId: $row['requester'],
+					provider: $this->provider,
 					realms: [], // We cannot use this user object to issue more realms
 					affiliations: [], // We do not record affiliations at issue moment
 					clientId: $row['client'],
@@ -167,7 +151,7 @@ class CertificateCredentialLog extends CredentialLog
 				),
 				realm: $realm,
 				provider: $this->provider,
-				revoke: fn() => $this->revoke( $realm, $row['ident'] ),
+				revoke: fn() => $this->revokeCredential( $row['ident'] ),
 				issued: $this->dateTimeFromGmt( $row['issued'] ) ?? throw new DomainException( 'Issued cannot be NULL' ),
 				expiry: $this->dateTimeFromGmt( $row['expires'] ) ?? throw new DomainException( 'Expires cannot be NULL' ),
 				revoked: $this->dateTimeFromGmt( $row['revoked'] ),
@@ -203,7 +187,7 @@ class CertificateCredentialLog extends CredentialLog
 				user: $this->user,
 				realm: $realm,
 				provider: $this->provider,
-				revoke: fn() => $this->revoke( $realm, $row['ident'] ),
+				revoke: fn() => $this->revokeCredential( $row['ident'] ),
 				issued: $this->dateTimeFromGmt( $row['issued'] ) ?? throw new DomainException( 'Expires cannot be NULL' ),
 				expiry: $this->dateTimeFromGmt( $row['expires'] ) ?? throw new DomainException( 'Expires cannot be NULL' ),
 				revoked: $this->dateTimeFromGmt( $row['revoked'] ),
@@ -211,6 +195,32 @@ class CertificateCredentialLog extends CredentialLog
 		}
 
 		throw new DomainException( 'Credential does not exist' );
+	}
+
+	public function revokeCredential( string $credentialId ): void
+	{
+		// Explicitly do not check the realm here,
+		// as the user may have lost access to the realm but still have active credentials
+		// We DO check that the requester is the current user
+
+		$revokeStatement = $this->getPDO()->prepare( 'UPDATE `realm_signing_log` SET `revoked` = :revoked WHERE `ident` = :ident AND `requester` = :requester AND `revoked` IS NULL' );
+		$revokeStatement->bindValue( 'revoked', \gmdate( static::DATE_FORMAT, $this->now->getTimestamp() ), PDO::PARAM_STR );
+		$revokeStatement->bindValue( 'requester', $this->user->userId, PDO::PARAM_STR );
+		$revokeStatement->bindParam( 'ident', $credentialId, PDO::PARAM_STR );
+		$revokeStatement->execute();
+	}
+
+	protected function createCredentialIssuer( Realm $realm ): CertificateCredentialIssuer
+	{
+		return new CertificateCredentialIssuer(
+			user: $this->user,
+			realm: $realm,
+			provider: $this->provider,
+			now: $this->now,
+			pdo: $this->getPDO(),
+			config: $this->config,
+			revoke: fn( string $ident ) => $this->revokeCredential( $ident ),
+		);
 	}
 
 	protected static function dateTimeFromGmt( ?string $datetimeGmt ): ?DateTimeImmutable
@@ -222,19 +232,6 @@ class CertificateCredentialLog extends CredentialLog
 		}
 
 		return $result ?: null;
-	}
-
-	private function revoke( Realm $realm, string $ident ): void
-	{
-		// TODO: Check if this assertion can ever be true
-		\assert( $this->user->canUseRealm( $realm ) );
-
-		$revokeStatement = $this->getPDO()->prepare( 'UPDATE `realm_signing_log` SET `revoked` = :revoked WHERE `ident` = :ident AND `realm` = :realm AND `requester` = :requester AND `revoked` IS NULL' );
-		$revokeStatement->bindValue( 'revoked', \gmdate( static::DATE_FORMAT, $this->now->getTimestamp() ), PDO::PARAM_STR );
-		$revokeStatement->bindValue( 'requester', $this->user->userId, PDO::PARAM_STR );
-		$revokeStatement->bindValue( 'realm', $realm->realmId, PDO::PARAM_STR );
-		$revokeStatement->bindParam( 'ident', $ident, PDO::PARAM_STR );
-		$revokeStatement->execute();
 	}
 
 	private function getPDO(): PDO

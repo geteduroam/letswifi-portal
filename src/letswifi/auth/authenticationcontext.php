@@ -105,19 +105,21 @@ class AuthenticationContext implements JsonSerializable
 			} catch ( BearerException $e ) {
 				return $force ? throw $e : null;
 			}
-		} else {
-			$userId = $force ? $this->browserAuth->requireAuth() : $this->browserAuth->getUserId();
-
-			return null !== $userId
-				? $this->constructAuthenticatedUser(
-					provider: $provider,
-					userId: $userId,
-					clientId: 'browser',
-					grantSid: null,
-				) : null;
 		}
 
-		return null;
+		\assert( null === $scope ); // we do browser auth
+		// TODO: Separate functions for OAuth and browser auth,
+		// instead of discriminating by the $scope parameter
+
+		$userId = $force ? $this->browserAuth->requireAuth() : $this->browserAuth->getUserId();
+
+		return null !== $userId
+			? $this->constructAuthenticatedUser(
+				provider: $provider,
+				userId: $userId,
+				clientId: 'browser',
+				grantSid: null,
+			) : null;
 	}
 
 	public function requireAuth( Provider $provider, ?string $scope = null ): User
@@ -161,6 +163,7 @@ class AuthenticationContext implements JsonSerializable
 	{
 		return new User(
 			userId: $userId,
+			provider: $provider,
 			realms: null === $realm
 				? $provider->getRealmsByAffiliations( $this->browserAuth->getAffiliations() )
 				: [$realm->realmId => $realm],
