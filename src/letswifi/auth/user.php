@@ -11,6 +11,7 @@
 namespace letswifi\auth;
 
 use JsonSerializable;
+use letswifi\error\ForbiddenException;
 use letswifi\error\RealmMismatchException;
 use letswifi\profile\Provider;
 use letswifi\profile\Realm;
@@ -39,10 +40,16 @@ class User implements JsonSerializable
 		}
 	}
 
+	public function isAdmin(): bool
+	{
+		return false;
+	}
+
 	public function jsonSerialize(): array
 	{
-		return [
+		return \array_filter( [
 			'user_id' => $this->userId,
+			'admin' => $this->isAdmin(),
 			'provider' => $this->provider->host,
 			'realms' => \array_keys( $this->realms ),
 			'affiliations' => $this->affiliations,
@@ -50,7 +57,7 @@ class User implements JsonSerializable
 			'grant_sid' => $this->grantSid,
 			'ip' => $this->ip,
 			'user_agent' => $this->userAgent,
-		];
+		] );
 	}
 
 	/** @return array<string,Realm>*/
@@ -59,9 +66,20 @@ class User implements JsonSerializable
 		return $this->realms;
 	}
 
-	public function hasAffiliation( string $affiliation ): bool
+	/**
+	 * @param string ...$affiliations All affiliations that will trigger a match
+	 *
+	 * @return bool At least one of our affiliations or the username matches the given affiliations
+	 */
+	public function hasAffiliations( string ...$affiliations ): bool
 	{
-		return \in_array( $affiliation, $this->affiliations, true );
+		foreach ( $this->affiliations + [-1 => $this->userId] as $affiliation ) {
+			if ( \in_array( $affiliation, $affiliations, true ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	public function canUseRealm( string|Realm $realm ): bool
@@ -91,5 +109,32 @@ class User implements JsonSerializable
 		}
 
 		throw new RealmMismatchException( $realmId, user: $this, provider: $this->provider );
+	}
+
+	public function promote(): Admin
+	{
+		// Check that we are not admin already;
+		// it's not too bad if this happens in
+		\assert( !$this->isAdmin(), 'Attempted to promote admin to admin' );
+
+		// TODO: Don't use affiliations for this, those are too broad
+		// use a separate attribute list for admin access
+		$realms = $this->hasAffiliations( ...$this->provider->admins )
+			? $this->provider->allRealms()
+			: \array_filter( $this->provider->allRealms(), fn( Realm $r ) => $this->hasAffiliations( ...$r->admins ) );
+		if ( empty( $realms ) ) {
+			throw new ForbiddenException( 'Attempted promotion to admin but user is not admin for any requested realm' );
+		}
+
+		return new Admin(
+			userId: $this->userId,
+			provider: $this->provider,
+			realms: $realms,
+			affiliations: $this->affiliations,
+			clientId: $this->clientId,
+			grantSid: $this->grantSid,
+			ip: $this->ip,
+			userAgent: $this->userAgent,
+		);
 	}
 }

@@ -21,6 +21,7 @@ class Provider implements JsonSerializable
 	/**
 	 * @param array<string,array<string>> $realmMap affiliation => realms
 	 * @param array<Location>             $location
+	 * @param array<string>               $admins   Identities that are considered to be admins
 	 */
 	public function __construct(
 		private readonly ProfileConfig $tenantConfig,
@@ -33,6 +34,7 @@ class Provider implements JsonSerializable
 		public readonly ?string $contactId = null,
 		public readonly ?MultiLanguageString $description = null,
 		public readonly ?string $profileSigner = null,
+		public readonly array $admins = [],
 	) {
 	}
 
@@ -79,6 +81,7 @@ class Provider implements JsonSerializable
 			contactId: $providerData->getStringOrNull( 'contact' ),
 			description: $providerData->getMultiLanguageStringOrNull( 'description' ),
 			profileSigner: $providerData->getStringOrNull( 'profile-signer' ),
+			admins: $providerData->has( 'admins' ) ? $providerData->getRawArray( 'admins' ) : [],
 		);
 	}
 
@@ -97,10 +100,13 @@ class Provider implements JsonSerializable
 		return false;
 	}
 
-	/** @return array<Realm> */
+	/** @return array<string,Realm> */
 	public function allRealms(): array
 	{
-		return \array_map( [$this->tenantConfig, 'getRealm'], \array_merge( ...\array_values( $this->realmMap ) ) );
+		$keys = \array_merge( ...\array_values( $this->realmMap ) );
+		$values = \array_map( [$this->tenantConfig, 'getRealm'], $keys );
+
+		return \array_combine( $keys, $values );
 	}
 
 	public function getRealm( string $realm ): ?Realm

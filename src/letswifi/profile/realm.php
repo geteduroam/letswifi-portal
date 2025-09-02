@@ -37,6 +37,7 @@ class Realm implements JsonSerializable
 		public readonly array $location = [],
 		public readonly ?Logo $logo = null,
 		public readonly ?string $contactId = null,
+		public readonly array $admins = [],
 	) {
 	}
 
@@ -57,6 +58,7 @@ class Realm implements JsonSerializable
 			logo: null === $logo ? null : Logo::fromConfig( $logo ),
 			description: $realmData->getMultiLanguageStringOrNull( 'description' ),
 			contactId: $realmData->getStringOrNull( 'contact' ),
+			admins: $realmData->has( 'admins' ) ? $realmData->getRawArray( 'admins' ) : [],
 		);
 	}
 
