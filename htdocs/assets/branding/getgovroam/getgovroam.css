@@ -9,9 +9,17 @@ header #product-name {
 	background: url('govroam.svg') left center / contain no-repeat;
 	color: rgba(0,0,0,0);
 }
+
+picture.screenshot.mac img {
+	filter: drop-shadow(0 .15em .15em rgba(0,0,0,.5)) saturate(75%);
+}
+
 @media (prefers-color-scheme: dark) {
 	:root {
 		--bg-color: #222;
 		--highlight-bg-color: #1a1c1f;
+	}
+	picture.screenshot.mac img {
+		filter: drop-shadow(0 .15em .15em rgba(0,0,0,.5)) saturate(50%);
 	}
 }

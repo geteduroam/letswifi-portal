@@ -167,13 +167,22 @@ header #product-name {
 }
 
 #systray > .dropdown-container > .dropdown > ul.dropdown-menu > li > * {
-	padding: .1em 1em;
+	padding: .2em 1em;
 	margin: 0;
 	display: block;
 	top: 0 !important;
 	color: var(--text-color);
 	text-decoration: none;
 	position: relative;
+}
+#systray > .dropdown-container > .dropdown#languages-dropdown > ul.dropdown-menu > li > * {
+	/*
+	since the languages only use the "check" icon, which is rather narrow,
+	it visually seems more spacious than the other menus
+	Because of this, we make the design slightly more condensed,
+	so that it visually seems similar to the other menus
+	*/
+	padding: .1em 1em;
 }
 #systray > .dropdown-container > .dropdown > ul.dropdown-menu > li > a {
 	color: var(--text-color) !important;
@@ -243,8 +252,18 @@ p picture img {
 	max-width: 100%;
 }
 picture.screenshot.mac img {
-	filter: drop-shadow(0 .15em .15em rgba(0,0,0,.5));
+	filter: drop-shadow(0 .15em .15em rgba(0,0,0,.5)) saturate(50%);
 }
+h1 {
+	font-size: 1.6em;
+}
+h2 {
+	font-size: 1.4em;
+}
+h3 {
+	font-size: 1.2em;
+}
+
 details:has(p), form table {
 	font-size: .8rem;
 }
@@ -316,7 +335,7 @@ fieldset > legend {
 	list-style: none;
 }
 #realm-picker ul input[type=radio] {
-	margin: .2em 0 0 .8em;
+	margin: .4em 0 0 .8em;
 	float: left;
 	clear: left;
 }
@@ -514,7 +533,7 @@ details:has(p) > summary:before {
 		outline: thin solid var(--bg-color);
 	}
 	picture.screenshot.mac img {
-		filter: none;
+		filter: invert(100%) sepia(20%) invert(100%) hue-rotate(18deg);
 	}
 
 	section.highlight {

@@ -1,5 +1,5 @@
 :root {
-	--accent-color: #276cba;
+	--accent-color: #00658d;
 	--button-danger-bg-color: #d14;
 	--button-danger-active-bg-color: #b13;
 }
@@ -12,10 +12,14 @@ header #product-name {
 
 @media (prefers-color-scheme: dark) {
 	:root {
+		--accent-color: #007fa7;
 		--bg-color: #0e1218;
-		--highlight-bg-color: #1c202a;
+		--highlight-bg-color: #14202a;
 	}
 	header #product-name {
 		background-image: url('eduroam-dark.svg');
+	}
+	picture.screenshot.mac img {
+		filter: invert(100%) sepia(20%) invert(100%) hue-rotate(-18deg);
 	}
 }
