@@ -14,8 +14,8 @@ use DateTimeInterface;
 use DomainException;
 use JsonSerializable;
 use letswifi\auth\User;
-use letswifi\tenant\Provider;
-use letswifi\tenant\Realm;
+use letswifi\profile\Provider;
+use letswifi\profile\Realm;
 
 /**
  * @template T

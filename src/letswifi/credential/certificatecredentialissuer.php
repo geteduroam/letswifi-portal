@@ -23,8 +23,8 @@ use fyrkat\openssl\PrivateKey;
 use fyrkat\openssl\X509;
 use letswifi\auth\User;
 use letswifi\configuration\Dictionary;
-use letswifi\tenant\Provider;
-use letswifi\tenant\Realm;
+use letswifi\profile\Provider;
+use letswifi\profile\Realm;
 
 /**
  * @implements CredentialIssuer<PKCS12>

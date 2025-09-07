@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-namespace letswifi\tenant;
+namespace letswifi\profile;
 
 use DateInterval;
 use DomainException;
@@ -26,7 +26,7 @@ class Realm implements JsonSerializable
 	 * @param array<Location> $location
 	 */
 	public function __construct(
-		private readonly TenantConfig $tenantConfig,
+		private readonly ProfileConfig $tenantConfig,
 		public readonly string $realmId,
 		public readonly MultiLanguageString $displayName,
 		public readonly array $serverNames,
@@ -40,7 +40,7 @@ class Realm implements JsonSerializable
 	) {
 	}
 
-	public static function fromConfig( TenantConfig $tenantConfig, Dictionary $realmData ): self
+	public static function fromConfig( ProfileConfig $tenantConfig, Dictionary $realmData ): self
 	{
 		$location = $realmData->getDictionaryList( 'location' );
 		$logo = $realmData->getDictionaryOrNull( 'logo' );

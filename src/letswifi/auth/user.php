@@ -12,8 +12,8 @@ namespace letswifi\auth;
 
 use JsonSerializable;
 use letswifi\error\RealmMismatchException;
-use letswifi\tenant\Provider;
-use letswifi\tenant\Realm;
+use letswifi\profile\Provider;
+use letswifi\profile\Realm;
 
 class User implements JsonSerializable
 {

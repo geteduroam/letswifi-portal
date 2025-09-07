@@ -16,8 +16,8 @@ use Generator;
 use letswifi\auth\User;
 use letswifi\configuration\Dictionary;
 use letswifi\error\RealmMismatchException;
-use letswifi\tenant\Provider;
-use letswifi\tenant\Realm;
+use letswifi\profile\Provider;
+use letswifi\profile\Realm;
 
 /**
  * @template T

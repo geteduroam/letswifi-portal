@@ -15,8 +15,8 @@ use RuntimeException;
 use fyrkat\openssl\PKCS12;
 use fyrkat\openssl\X509;
 use letswifi\credential\CertificateCredential;
-use letswifi\tenant\Network;
-use letswifi\tenant\NetworkSSID;
+use letswifi\profile\Network;
+use letswifi\profile\NetworkSSID;
 
 class GoogleOncFormat extends Format
 {

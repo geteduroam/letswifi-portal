@@ -25,8 +25,8 @@ use fyrkat\oauth\token\Grant;
 use fyrkat\oauth\token\RefreshToken;
 use letswifi\auth\browser\BrowserAuthInterface;
 use letswifi\configuration\Dictionary;
-use letswifi\tenant\Provider;
-use letswifi\tenant\Realm;
+use letswifi\profile\Provider;
+use letswifi\profile\Realm;
 
 class AuthenticationContext implements JsonSerializable
 {

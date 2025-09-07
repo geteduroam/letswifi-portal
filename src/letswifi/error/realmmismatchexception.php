@@ -12,8 +12,8 @@ namespace letswifi\error;
 
 use Throwable;
 use letswifi\auth\User;
-use letswifi\tenant\Provider;
-use letswifi\tenant\Realm;
+use letswifi\profile\Provider;
+use letswifi\profile\Realm;
 
 class RealmMismatchException extends ForbiddenException
 {

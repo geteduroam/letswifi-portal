@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-namespace letswifi\tenant;
+namespace letswifi\profile;
 
 use DomainException;
 use JsonSerializable;

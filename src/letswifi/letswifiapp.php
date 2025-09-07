@@ -28,9 +28,9 @@ use letswifi\credential\CertificateCredentialLog;
 use letswifi\credential\CredentialIssuer;
 use letswifi\credential\CredentialLog;
 use letswifi\error\UserException;
-use letswifi\tenant\Provider;
-use letswifi\tenant\Realm;
-use letswifi\tenant\TenantConfig;
+use letswifi\profile\ProfileConfig;
+use letswifi\profile\Provider;
+use letswifi\profile\Realm;
 use stdClass;
 
 /**
@@ -64,7 +64,7 @@ final class LetsWifiApp
 
 	private ?Environment $twig = null;
 
-	private TenantConfig $tenantConfig;
+	private ProfileConfig $tenantConfig;
 
 	private ?TranslationContext $translationContext = null;
 
@@ -73,7 +73,7 @@ final class LetsWifiApp
 	public function __construct( public readonly string $basePath, ?Dictionary $globalConfig = null )
 	{
 		$this->globalConfig = $globalConfig ?? new DictionaryFile( \dirname( __DIR__, 2 ) . \DIRECTORY_SEPARATOR . 'config' . \DIRECTORY_SEPARATOR . 'letswifi.conf.php' );
-		$this->tenantConfig = new TenantConfig( $this->globalConfig );
+		$this->tenantConfig = new ProfileConfig( $this->globalConfig );
 
 		if ( \PHP_SAPI === 'cli-server' ) {
 			// Ensure that we are setting the recommended CSP when developing,

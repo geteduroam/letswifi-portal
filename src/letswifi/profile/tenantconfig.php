@@ -8,14 +8,14 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-namespace letswifi\tenant;
+namespace letswifi\profile;
 
 use fyrkat\openssl\X509;
 use letswifi\LetsWifiConfig;
 use letswifi\configuration\Dictionary;
 use letswifi\error\MisdirectException;
 
-class TenantConfig
+class ProfileConfig
 {
 	public function __construct( private readonly Dictionary $config )
 	{

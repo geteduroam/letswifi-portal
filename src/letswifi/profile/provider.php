@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-namespace letswifi\tenant;
+namespace letswifi\profile;
 
 use JsonSerializable;
 use fyrkat\multilang\MultiLanguageString;
@@ -23,7 +23,7 @@ class Provider implements JsonSerializable
 	 * @param array<Location>             $location
 	 */
 	public function __construct(
-		private readonly TenantConfig $tenantConfig,
+		private readonly ProfileConfig $tenantConfig,
 		public readonly string $host,
 		public readonly MultiLanguageString $displayName,
 		public readonly AuthenticationContext $auth,
@@ -52,7 +52,7 @@ class Provider implements JsonSerializable
 		];
 	}
 
-	public static function fromConfig( TenantConfig $tenantConfig, Dictionary $providerData ): self
+	public static function fromConfig( ProfileConfig $tenantConfig, Dictionary $providerData ): self
 	{
 		$authData = $providerData->getDictionary( 'auth' );
 		$authService = $authData->getString( 'service' );

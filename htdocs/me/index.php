@@ -11,7 +11,7 @@
 use fyrkat\oauth\token\Grant;
 use letswifi\LetsWifiApp;
 use letswifi\credential\Credential;
-use letswifi\tenant\Realm;
+use letswifi\profile\Realm;
 
 require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 2 ), 'src', '_autoload.php'] );
 $basePath = '..';

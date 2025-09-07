@@ -15,8 +15,8 @@ use DateTimeInterface;
 use DomainException;
 use fyrkat\openssl\PKCS12;
 use letswifi\auth\User;
-use letswifi\tenant\Provider;
-use letswifi\tenant\Realm;
+use letswifi\profile\Provider;
+use letswifi\profile\Realm;
 
 /**
  * @extends Credential<PKCS12>

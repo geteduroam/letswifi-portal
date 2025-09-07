@@ -15,11 +15,11 @@ use fyrkat\multilang\Locale;
 use fyrkat\multilang\MultiLanguageString;
 use letswifi\credential\CertificateCredential;
 use letswifi\credential\Credential;
-use letswifi\tenant\Contact;
-use letswifi\tenant\Location;
-use letswifi\tenant\Network;
-use letswifi\tenant\NetworkPasspoint;
-use letswifi\tenant\NetworkSSID;
+use letswifi\profile\Contact;
+use letswifi\profile\Location;
+use letswifi\profile\Network;
+use letswifi\profile\NetworkPasspoint;
+use letswifi\profile\NetworkSSID;
 
 class EapConfigFormat extends Format
 {

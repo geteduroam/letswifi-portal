@@ -18,8 +18,8 @@ use PDO;
 use fyrkat\openssl\PKCS12;
 use letswifi\auth\User;
 use letswifi\configuration\ConfigurationException;
-use letswifi\tenant\Realm;
-use letswifi\tenant\TenantConfig;
+use letswifi\profile\ProfileConfig;
+use letswifi\profile\Realm;
 
 /**
  * @extends CredentialLog<PKCS12>
@@ -155,7 +155,7 @@ class CertificateCredentialLog extends CredentialLog
 		}
 
 		$statement->execute();
-		$tenantConfig = new TenantConfig( $this->config );
+		$tenantConfig = new ProfileConfig( $this->config );
 		while ( $row = $statement->fetch( PDO::FETCH_ASSOC ) ) {
 			try {
 				$realm = \array_key_exists( $row['realm'], $realms )
@@ -223,7 +223,7 @@ class CertificateCredentialLog extends CredentialLog
 		}
 
 		$statement->execute();
-		$tenantConfig = new TenantConfig( $this->config );
+		$tenantConfig = new ProfileConfig( $this->config );
 		if ( $row = $statement->fetch( PDO::FETCH_ASSOC ) ) {
 			$realm = $tenantConfig->getRealm( $row['realm'] );
 
