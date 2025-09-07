@@ -27,6 +27,7 @@ use letswifi\configuration\DictionaryFile;
 use letswifi\credential\CertificateCredentialLog;
 use letswifi\credential\CredentialIssuer;
 use letswifi\credential\CredentialLog;
+use letswifi\error\UserException;
 use letswifi\tenant\Provider;
 use letswifi\tenant\Realm;
 use letswifi\tenant\TenantConfig;
@@ -114,7 +115,9 @@ final class LetsWifiApp
 			$code = 500;
 		}
 		$codeExplain = static::HTTP_CODES[$code];
-		$message = \preg_replace( '/^.*\\\\/', '', $ex::class ) . ': ' . $ex->getMessage();
+		$message = $ex instanceof UserException
+		? $ex->getMessage()
+		: \preg_replace( '/^.*\\\\/', '', $ex::class ) . ': ' . $ex->getMessage();
 		if ( \PHP_SAPI !== 'cli' && !\headers_sent() ) {
 			\header( 'Content-Type: text/plain', true, $code );
 			if ( !$this->crashing ) {
