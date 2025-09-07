@@ -41,7 +41,20 @@ class CertificateCredentialLog extends CredentialLog
 	 */
 	public function getStatisticsPerRealm(): array
 	{
-		$statement = $this->getPDO()->prepare( 'SELECT `realm` AS `realm_id`, MIN(`issued`) AS `first_issued`, MAX(`issued`) AS `last_issued`, MIN(`expires`) AS `first_expires`, MAX(`expires`) AS `last_expires`, COUNT(*) AS `count` FROM `realm_signing_log` WHERE `requester` = :requester AND `expires` > :now GROUP BY `realm`' );
+		$statement = $this->getPDO()->prepare( <<<SQL
+			SELECT
+				realm AS realm_id,
+				MIN(issued) AS first_issued,
+				MAX(issued) AS last_issued,
+				MIN(expires) AS first_expires,
+				MAX(expires) AS last_expires,
+				COUNT(*) AS count
+			FROM realm_signing_log
+			WHERE
+				requester = :requester
+				AND expires > :now
+			GROUP BY realm
+			SQL );
 		$statement->bindValue( 'now', \gmdate( static::DATE_FORMAT, $this->now->getTimestamp() ), PDO::PARAM_STR );
 		$statement->bindValue( 'requester', $this->user->userId, PDO::PARAM_STR );
 
@@ -72,7 +85,21 @@ class CertificateCredentialLog extends CredentialLog
 		// maybe convert to if/throw
 		\assert( $this->user->canUseRealm( $realm ) );
 
-		$statement = $this->getPDO()->prepare( 'SELECT `client` AS `client_id`, MIN(`issued`) AS `first_issued`, MAX(`issued`) AS `last_issued`, MIN(`expires`) AS `first_expires`, MAX(`expires`) AS `last_expires`, COUNT(*) AS `count` FROM `realm_signing_log` WHERE `realm` = :realm AND `requester` = :requester AND `expires` > :now GROUP BY `client_id`' );
+		$statement = $this->getPDO()->prepare( <<<SQL
+			SELECT
+				client AS client_id,
+				MIN(issued) AS first_issued,
+				MAX(issued) AS last_issued,
+				MIN(expires) AS first_expires,
+				MAX(expires) AS last_expires,
+				COUNT(*) AS count
+			FROM realm_signing_log
+			WHERE
+				realm = :realm
+				AND requester = :requester
+				AND expires > :now
+			GROUP BY client_id
+			SQL );
 		$statement->bindValue( 'now', \gmdate( static::DATE_FORMAT, $this->now->getTimestamp() ), PDO::PARAM_STR );
 		$statement->bindValue( 'realm', $realm->realmId, PDO::PARAM_STR );
 		$statement->bindValue( 'requester', $this->user->userId, PDO::PARAM_STR );
@@ -105,9 +132,18 @@ class CertificateCredentialLog extends CredentialLog
 		\assert( null === $realm || $this->user->canUseRealm( $realm ) );
 
 		$realms = [];
-		$clientQueryPart = null === $client ? '' : 'AND `client` = :client';
-		$realmQueryPart = null === $realm ? '' : 'AND `realm` = :realm';
-		$statement = $this->getPDO()->prepare( "SELECT `realm`, `ca_sub`, `requester`, `ident`, `grant`, `usage`, `sub`, `issued`, `expires`, `revoked`, `csr`, `client`, `user_agent`, `ip`, `x509` FROM `realm_signing_log` WHERE `requester` = :requester {$clientQueryPart} {$realmQueryPart} AND `expires` > :now AND revoked IS NULL ORDER BY `issued` ASC" );
+		$clientQueryPart = null === $client ? '' : 'AND client = :client';
+		$realmQueryPart = null === $realm ? '' : 'AND realm = :realm';
+		$statement = $this->getPDO()->prepare( <<<SQL
+			SELECT realm, ca_sub, requester, ident, "grant", usage, sub, issued, expires, revoked, csr, client, user_agent, ip, x509
+			FROM realm_signing_log
+			WHERE requester = :requester
+				AND expires > :now
+				AND revoked IS NULL
+				{$clientQueryPart}
+				{$realmQueryPart}
+			ORDER BY issued ASC
+			SQL );
 		$statement->bindValue( 'requester', $this->user->userId, PDO::PARAM_STR );
 		$statement->bindValue( 'now', \gmdate( static::DATE_FORMAT, $this->now->getTimestamp() ), PDO::PARAM_STR );
 		if ( null !== $client ) {
@@ -165,9 +201,18 @@ class CertificateCredentialLog extends CredentialLog
 		// maybe convert to if/throw
 		\assert( null === $realm || $this->user->canUseRealm( $realm ) );
 
-		$clientQueryPart = null === $client ? '' : 'AND `client` = :client';
-		$realmQueryPart = null === $realm ? '' : 'AND `realm` = :realm';
-		$statement = $this->getPDO()->prepare( "SELECT `realm`, `ca_sub`, `requester`, `ident`, `grant`, `usage`, `sub`, `issued`, `expires`, `revoked`, `csr`, `client`, `user_agent`, `ip`, `x509`, `ident` FROM `realm_signing_log` WHERE `ident` = :ident AND `requester` = :requester {$clientQueryPart} {$realmQueryPart} ORDER BY `issued` ASC" );
+		$clientQueryPart = null === $client ? '' : 'AND client = :client';
+		$realmQueryPart = null === $realm ? '' : 'AND realm = :realm';
+		$statement = $this->getPDO()->prepare( <<<SQL
+			SELECT realm, requester, ident, "grant", ca_sub, usage, sub, issued, expires, revoked, csr, client, user_agent, ip, x509, ident
+			FROM realm_signing_log
+			WHERE
+				ident = :ident
+				AND requester = :requester
+				{$clientQueryPart}
+				{$realmQueryPart}
+			ORDER BY issued ASC
+			SQL );
 		$statement->bindValue( 'ident', $credentialId, PDO::PARAM_STR );
 		$statement->bindValue( 'requester', $this->user->userId, PDO::PARAM_STR );
 		if ( null !== $client ) {
@@ -203,7 +248,14 @@ class CertificateCredentialLog extends CredentialLog
 		// as the user may have lost access to the realm but still have active credentials
 		// We DO check that the requester is the current user
 
-		$revokeStatement = $this->getPDO()->prepare( 'UPDATE `realm_signing_log` SET `revoked` = :revoked WHERE `ident` = :ident AND `requester` = :requester AND `revoked` IS NULL' );
+		$revokeStatement = $this->getPDO()->prepare( <<<SQL
+			UPDATE realm_signing_log
+			SET revoked = :revoked
+			WHERE
+				ident = :ident
+				AND requester = :requester
+				AND revoked IS NULL
+			SQL );
 		$revokeStatement->bindValue( 'revoked', \gmdate( static::DATE_FORMAT, $this->now->getTimestamp() ), PDO::PARAM_STR );
 		$revokeStatement->bindValue( 'requester', $this->user->userId, PDO::PARAM_STR );
 		$revokeStatement->bindParam( 'ident', $credentialId, PDO::PARAM_STR );
@@ -245,6 +297,12 @@ class CertificateCredentialLog extends CredentialLog
 
 			$this->pdo = new PDO( $dsn, $username, $password );
 			$this->pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+
+			if ( \strstr( $dsn, ':', true ) === 'mysql' ) {
+				// https://dev.mysql.com/doc/refman/8.4/en/set-variable.html
+				// https://dev.mysql.com/doc/refman/8.4/en/sql-mode.html#sqlmode_ansi_quotes
+				$this->pdo->exec( 'SET sql_mode = \'ANSI_QUOTES\';' );
+			}
 		}
 
 		return $this->pdo;
