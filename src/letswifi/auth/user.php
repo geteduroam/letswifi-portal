@@ -64,9 +64,14 @@ class User implements JsonSerializable
 		return \in_array( $affiliation, $this->affiliations, true );
 	}
 
-	public function canUseRealm( Realm $realm ): bool
+	public function canUseRealm( string|Realm $realm ): bool
 	{
-		return \in_array( $realm->realmId, \array_map( static fn( Realm $r ) => $r->realmId, $this->getRealms() ), true );
+		return \in_array(
+			\is_string( $realm ) ? $realm : $realm->realmId,
+			\array_map(
+				static fn( Realm $r ) => $r->realmId,
+				$this->getRealms() ),
+			true );
 	}
 
 	public function getRealm( ?string $realmId = null ): Realm
