@@ -11,10 +11,7 @@
 use letswifi\LetsWifiApp;
 
 require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'src', '_autoload.php'] );
-$basePath = '../..';
-
-$app = new LetsWifiApp( basePath: $basePath );
-$app->registerExceptionHandler();
+$app = new LetsWifiApp( basePath: '../..' );
 $provider = $app->getProvider();
 $profileInfo = (array)$provider->getContact();
 $profileInfo['display_name'] = $provider->displayName;

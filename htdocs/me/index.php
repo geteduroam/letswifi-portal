@@ -14,9 +14,7 @@ use letswifi\credential\Credential;
 use letswifi\profile\Realm;
 
 require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 2 ), 'src', '_autoload.php'] );
-$basePath = '..';
-$app = new LetsWifiApp( basePath: $basePath );
-$app->registerExceptionHandler();
+$app = new LetsWifiApp( basePath: '..' );
 $provider = $app->getProvider();
 $oauth = $provider->auth->oauth;
 $user = $provider->requireAuth();
@@ -50,8 +48,8 @@ $app->render(
 		Realm::class => static fn( Realm $r ) => [
 			'logo' => $app->jsonOutputDelete,
 			'logo_endpoint' => null === $r->logo
-				? ( null === $provider->logo ? $app->jsonOutputDelete : "{$basePath}/profiles/info/logo.php" )
-				: "{$basePath}/profiles/info/logo.php?" . \http_build_query( ['realm' => $r->realmId] ),
+				? ( null === $provider->logo ? $app->jsonOutputDelete : "{$app->basePath}/profiles/info/logo.php" )
+				: "{$app->basePath}/profiles/info/logo.php?" . \http_build_query( ['realm' => $r->realmId] ),
 		],
 		Credential::class => static fn( Credential $c ) => [
 			'user' => $app->jsonOutputDelete,

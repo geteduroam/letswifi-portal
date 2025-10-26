@@ -17,9 +17,7 @@ if ( 'POST' !== ( $_SERVER['REQUEST_METHOD'] ?? null ) ) {
 	// We were planning on just including another file and letting it handle all startup formalities
 	// but since we already have to handle an error here, just do a quick startup sequence here
 	require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'src', '_autoload.php'] );
-	$basePath = '../..';
-	$app = new LetsWifiApp( basePath: $basePath );
-	$app->registerExceptionHandler();
+	$app = new LetsWifiApp( basePath: '../..' );
 
 	throw new HttpMethodException( ['POST'] );
 }

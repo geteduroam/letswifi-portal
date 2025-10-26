@@ -70,7 +70,7 @@ final class LetsWifiApp
 
 	private readonly Dictionary $globalConfig;
 
-	public function __construct( public readonly string $basePath, ?Dictionary $globalConfig = null )
+	public function __construct( public readonly string $basePath, ?Dictionary $globalConfig = null, bool $registerExceptionHandler = true )
 	{
 		$this->globalConfig = $globalConfig ?? new DictionaryFile( \dirname( __DIR__, 2 ) . \DIRECTORY_SEPARATOR . 'config' . \DIRECTORY_SEPARATOR . 'letswifi.conf.php' );
 		$this->tenantConfig = new ProfileConfig( $this->globalConfig );
@@ -80,6 +80,10 @@ final class LetsWifiApp
 			// to prevent nasty surprises later on.
 			\header( "Content-Security-Policy: default-src: 'self'; object-src 'none'; base-uri 'none';" );
 			\header( 'X-Frame-Options: deny' );
+		}
+
+		if ( $registerExceptionHandler ) {
+			$this->registerExceptionHandler();
 		}
 
 		$this->jsonOutputDelete = new stdClass();

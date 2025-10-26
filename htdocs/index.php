@@ -11,10 +11,7 @@
 use letswifi\LetsWifiApp;
 
 require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 1 ), 'src', '_autoload.php'] );
-$basePath = '.';
-
-$app = new LetsWifiApp( basePath: $basePath );
-$app->registerExceptionHandler();
+$app = new LetsWifiApp( basePath: '.' );
 $provider = $app->getProvider();
 
 if ( $installProfiles = $app->getBrandingConfiguration() ) {
@@ -40,7 +37,7 @@ if ( $installProfiles = $app->getBrandingConfiguration() ) {
 			$matchedPlatform['profiles'] = \array_combine(
 				$platform['profiles'] ?? [],
 				\array_map(
-					static fn ( string $profileName ): array => $profiles[$profileName] + ['href' => "{$basePath}/profiles/new/{$profileName}/"],
+					static fn ( string $profileName ): array => $profiles[$profileName] + ['href' => "{$app->basePath}/profiles/new/{$profileName}/"],
 					$platform['profiles'] ?? [],
 				),
 			);
@@ -63,7 +60,7 @@ $apiConfiguration = [
 $app->render( [
 	'platform' => $matchedPlatform ?? null,
 	'provider' => $provider,
-	'all_platforms_href' => "{$basePath}/app/",
-	'advanced_href' => "{$basePath}/profiles/new/",
+	'all_platforms_href' => "{$app->basePath}/app/",
+	'advanced_href' => "{$app->basePath}/profiles/new/",
 	'http://letswifi.app/api#v2' => $apiConfiguration,
 ], 'start' );

@@ -12,10 +12,7 @@ use letswifi\LetsWifiApp;
 use letswifi\error\NotFoundException;
 
 require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'src', '_autoload.php'] );
-$basePath = '../..';
-
-$app = new LetsWifiApp( basePath: $basePath );
-$app->registerExceptionHandler();
+$app = new LetsWifiApp( basePath: '../..' );
 $provider = $app->getProvider();
 $logo = $provider->logo;
 

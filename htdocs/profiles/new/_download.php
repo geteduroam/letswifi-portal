@@ -24,7 +24,6 @@ if ( !isset( $downloadFormat ) || !isset( $basePath ) ) {
 $href = "{$basePath}/profiles/new/{$downloadFormat}/";
 
 $app = new LetsWifiApp( basePath: $basePath );
-$app->registerExceptionHandler();
 $provider = $app->getProvider();
 $user = $provider->requireAuth();
 
