@@ -43,6 +43,8 @@ abstract class CredentialAdmin
 	 */
 	abstract public function listRequesters( array $realms = [], ?DateTimeInterface $validOn = null, ?string $requester = null ): Generator;
 
+	abstract public function listCredentials( array $realms = [], ?DateTimeInterface $validOn = null, ?string $requester = null ): Generator;
+
 	abstract public function revokeCredential( string $credentialId, ?string $requester = null ): void;
 
 	abstract public function revokeRequester( ?string $requester, ?DateTimeInterface $validOn = null, string|Realm|null $realm = null ): void;

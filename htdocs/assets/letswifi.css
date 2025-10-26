@@ -298,6 +298,10 @@ summary, button {
 form table {
 	width: 100%;
 }
+form table td {
+	/* works as min-height, https://stackoverflow.com/a/25329017/951387 */
+	height: 2.1em;
+}
 form table td:last-child, form table td.number, form table th.number {
 	text-align: right;
 }

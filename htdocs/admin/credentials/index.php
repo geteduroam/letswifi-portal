@@ -9,7 +9,7 @@
  */
 
 use letswifi\LetsWifiApp;
-use letswifi\credential\RequesterAggregate;
+use letswifi\credential\Credential;
 
 require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'src', '_autoload.php'] );
 $app = new LetsWifiApp( basePath: '../..' );
@@ -19,40 +19,27 @@ $credentialLog = $app->getCredentialLog( $user );
 $credentialAdmin = $credentialLog->getCredentialAdministrator();
 $admin = $user->promote();
 
+$validOn = \array_key_exists( 'valid_on', $_GET ) && \is_string( $_GET['valid_on'] )
+	? DateTimeImmutable::createFromFormat( '!Y-m-d\\TH:i:s', $_GET['valid_on'] ?? '' ) ?: null
+	: null;
+
 /** @psalm-suppress PossiblyUndefinedArrayOffset */
 if ( 'POST' === $_SERVER['REQUEST_METHOD'] ) {
-	$validOn = \array_key_exists( 'valid_on', $_POST ) && \is_string( $_POST['valid_on'] )
-		? DateTimeImmutable::createFromFormat( '!Y-m-d\\TH:i:s', $_POST['valid_on'] ?? '' ) ?: null
-		: null;
-
-	if ( \array_key_exists( 'revoke_requester', $_POST ) ) {
-		$value = \explode( '@', \is_string( $_POST['revoke_requester'] ) ? $_POST['revoke_requester'] : '' );
-		if ( \count( $value ) !== 2 || null === $validOn ) {
-			throw new DomainException( 'Incorrect format for requester to revoke' );
-		}
-		$requester = \base64_decode( $value[0], true );
-		$realm = \base64_decode( $value[1], true );
-		$credentialAdmin->revokeRequester(
-			requester: $requester,
-			realm: $realm,
-			validOn: $validOn,
+	if ( \array_key_exists( 'revoke_credential', $_POST ) && \is_string( $_POST['revoke_credential'] ) ) {
+		$credentialAdmin->revokeCredential(
+			credentialId: $_POST['revoke_credential'],
 		);
 	}
 	\header( 'Location: ?' . \http_build_query( $_GET ) );
 
 	exit;
 }
-
 if ( \array_key_exists( 'realms', $_GET ) && \is_array( $_GET['realms'] ) ) {
 	/** @psalm-suppress InvalidArgument */
 	\header( 'Location: ?' . \http_build_query( ['realms' => \implode( ',', $_GET['realms'] )] + $_GET ) );
 
 	exit;
 }
-
-$validOn = \array_key_exists( 'valid_on', $_GET ) && \is_string( $_GET['valid_on'] )
-	? DateTimeImmutable::createFromFormat( '!Y-m-d\\TH:i:s', $_GET['valid_on'] ?? '' ) ?: null
-	: null;
 
 $realms = \array_key_exists( 'realms', $_GET )
 	? \array_filter( \explode( ',', $_GET['realms'] ?? '' ) )
@@ -72,18 +59,17 @@ $app->render( [
 
 	'admin_menu' => [
 		'Credentials' => '../credentials/',
-		'Realms' => '../realms/',
 		'Requesters' => '../requesters/',
-		'Revocations' => '../revocations/',
 	],
 
-	'requesters' => \iterator_to_array( $credentialAdmin->listRequesters( $realms, $validOn, requester: $requester ) ),
-], 'admin-requesters', [
-	RequesterAggregate::class => static fn ( RequesterAggregate $ra ) => [
-		'requester_href' => '?' . \http_build_query( ['requester' => $ra->requester->name] + $_GET ),
-		'realm_href' => '?' . \http_build_query( ['realms' => $ra->requester->realm] + $_GET ),
-		'revoke_id' => \rtrim( \base64_encode( $ra->requester->name ), '=' ) . '@' . \rtrim( \base64_encode( $ra->requester->realm ), '=' ),
-		'earliest_valid' => $ra->earliestValid->format( 'Y-m-d' ),
-		'last_valid' => $ra->lastValid->format( 'Y-m-d' ),
+	'credentials' => \iterator_to_array( $credentialAdmin->listCredentials( $realms, $validOn, requester: $requester ) ),
+], 'admin-credentials', [
+	Credential::class => static fn ( Credential $c ) => [
+		'not_before' => $c->getIssued()->format( 'Y-m-d' ),
+		'not_after' => $c->getExpiry()?->format( 'Y-m-d' ),
+		'revoked' => $c->getRevoked()?->format( 'Y-m-d' ),
+
+		'requester_href' => '?' . \http_build_query( ['requester' => $c->userId] + $_GET ),
+		'realm_href' => '?' . \http_build_query( ['realms' => $c->realm->realmId] + $_GET ),
 	],
 ] );

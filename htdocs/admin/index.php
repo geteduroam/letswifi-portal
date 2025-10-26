@@ -23,6 +23,7 @@ $app->render( [
 	'provider' => $provider,
 
 	'admin_menu' => [
+		'Credentials' => 'credentials/',
 		'Requesters' => 'requesters/',
 	],
 ], 'admin' );

@@ -11,6 +11,7 @@
 namespace letswifi\credential;
 
 use DateTimeInterface;
+use DomainException;
 use Generator;
 use PDO;
 use letswifi\error\RealmMismatchException;
@@ -32,18 +33,7 @@ class CertificateCredentialAdmin extends CredentialAdmin
 			$validOn = $this->now;
 		}
 		$pdo = $this->getPDO();
-		$extraConditions = '';
-		if ( empty( $realms ) ) {
-			$realms = $this->admin->realms;
-		} else {
-			foreach ( $realms as $realm ) {
-				if ( !$this->admin->canUseRealm( $realm ) ) {
-					throw new RealmMismatchException( $realm, provider: $this->admin->provider );
-				}
-			}
-		}
-		$realms = \array_map( static fn( Realm|string $r ) => $pdo->quote( $r instanceof Realm ? $r->realmId : $r ), $realms );
-		$extraConditions = ' AND realm IN (' . \implode( ', ', $realms ) . ')';
+		$extraConditions = $this->getRealmConditions( $realms, static fn( $s ) => $pdo->quote( $s ) );
 		if ( null !== $requester ) {
 			$extraConditions .= ' AND requester = :requester';
 		}
@@ -57,7 +47,8 @@ class CertificateCredentialAdmin extends CredentialAdmin
 				FROM realm_signing_log
 				WHERE expires > :valid_on AND issued < :valid_on
 					{$extraConditions}
-				GROUP BY requester, realm;
+				GROUP BY requester, realm
+				ORDER BY issued DESC;
 			SQL );
 		$stmt->bindValue( 'valid_on', \gmdate( static::DATE_FORMAT, $validOn->getTimestamp() ), PDO::PARAM_STR );
 		if ( null !== $requester ) {
@@ -67,6 +58,7 @@ class CertificateCredentialAdmin extends CredentialAdmin
 		while ( $row = $stmt->fetch( PDO::FETCH_ASSOC ) ) {
 			$earliestValid = $this->dateTimeFromGmt( $row['earliest_valid'] );
 			$lastValid = $this->dateTimeFromGmt( $row['last_valid'] );
+
 			\assert( null !== $earliestValid );
 			\assert( null !== $lastValid );
 
@@ -90,16 +82,16 @@ class CertificateCredentialAdmin extends CredentialAdmin
 	{
 		$requesterCondition = null === $requester ? '' : 'AND requester = :requester';
 		$revokeStatement = $this->getPDO()->prepare( <<<SQL
-			UPDATE realm_signing_log
-			SET revoked = :revoked
-			WHERE
-				ident = :ident
-				{$requesterCondition}
-				AND revoked IS NULL
+				UPDATE realm_signing_log
+				SET revoked = :revoked
+				WHERE
+					ident = :ident
+					{$requesterCondition}
+					AND revoked IS NULL
 			SQL );
 		$revokeStatement->bindValue( 'revoked', \gmdate( static::DATE_FORMAT, $this->now->getTimestamp() ), PDO::PARAM_STR );
 		$revokeStatement->bindParam( 'ident', $credentialId, PDO::PARAM_STR );
-		if ( null === $requester ) {
+		if ( null !== $requester ) {
 			$revokeStatement->bindValue( 'requester', $requester, PDO::PARAM_STR );
 		}
 		$revokeStatement->execute();
@@ -132,5 +124,78 @@ class CertificateCredentialAdmin extends CredentialAdmin
 			$revokeStatement->bindValue( 'realm', $realm, PDO::PARAM_STR );
 		}
 		$revokeStatement->execute();
+	}
+
+	public function listCredentials( array $realms = [], ?DateTimeInterface $validOn = null, ?string $requester = null ): Generator
+	{
+		if ( null === $validOn ) {
+			$validOn = $this->now;
+		}
+		$pdo = $this->getPDO();
+		$extraConditions = $this->getRealmConditions( $realms, static fn( $s ) => $pdo->quote( $s ) );
+		if ( null !== $requester ) {
+			$extraConditions .= ' AND requester = :requester';
+		}
+		$stmt = $this->getPDO()->prepare( <<<SQL
+				SELECT
+					"serial",realm,ca_sub,requester,sub,issued,expires,revoked,usage,client,user_agent,ip,"grant",ident
+					,requester, realm
+				FROM realm_signing_log
+				WHERE expires > :valid_on AND issued < :valid_on
+					{$extraConditions}
+				ORDER BY issued DESC;
+			SQL );
+		$stmt->bindValue( 'valid_on', \gmdate( static::DATE_FORMAT, $validOn->getTimestamp() ), PDO::PARAM_STR );
+		if ( null !== $requester ) {
+			$stmt->bindValue( 'requester', $requester, PDO::PARAM_STR );
+		}
+		$stmt->execute();
+		while ( $row = $stmt->fetch( PDO::FETCH_ASSOC ) ) {
+			$expiry = $this->dateTimeFromGmt( $row['expires'] );
+			$issued = $this->dateTimeFromGmt( $row['issued'] );
+			$revoked = $this->dateTimeFromGmt( $row['revoked'] );
+
+			\assert( null !== $expiry );
+			\assert( null !== $issued );
+
+			yield new CertificateCredential(
+				credentialId: $row['ident'],
+				userId: $row['requester'],
+				clientId: $row['client'],
+				grantSid: $row['grant'],
+				ip: $row['ip'],
+				userAgent: $row['user_agent'],
+				realm: $this->admin->getRealm( $row['realm'] ),
+				provider: $this->admin->provider,
+				revoke: fn() => $this->revokeCredential( $row['ident'] ),
+				expiry: $expiry,
+				issued: $issued,
+				revoked: $revoked,
+			);
+		}
+	}
+
+	/**
+	 * @param array<Realm|string>             $realms
+	 * @param callable(string):(false|string) $sqlEscape
+	 */
+	private function getRealmConditions( array $realms, $sqlEscape ): string
+	{
+		if ( empty( $realms ) ) {
+			$realms = $this->admin->realms;
+		} else {
+			foreach ( $realms as $realm ) {
+				if ( !$this->admin->canUseRealm( $realm ) ) {
+					throw new RealmMismatchException( $realm, provider: $this->admin->provider );
+				}
+			}
+		}
+		$realms = \array_map( static fn( Realm|string $r ) => $sqlEscape( $r instanceof Realm ? $r->realmId : $r ), $realms );
+		if ( \in_array( false, $realms, true ) ) {
+			throw new DomainException( 'Unable to escape realm value' );
+		}
+		$extraConditions = ' AND realm IN (' . \implode( ', ', $realms ) . ')';
+
+		return $extraConditions;
 	}
 }
