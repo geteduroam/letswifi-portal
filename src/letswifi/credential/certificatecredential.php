@@ -14,7 +14,6 @@ use Closure;
 use DateTimeInterface;
 use DomainException;
 use fyrkat\openssl\PKCS12;
-use letswifi\auth\User;
 use letswifi\profile\Provider;
 use letswifi\profile\Realm;
 
@@ -32,7 +31,11 @@ class CertificateCredential extends Credential
 	 */
 	public function __construct(
 		?string $credentialId,
-		User $user,
+		string $userId,
+		?string $clientId,
+		?string $grantSid,
+		?string $ip,
+		?string $userAgent,
 		Realm $realm,
 		Provider $provider,
 		?Closure $revoke = null,
@@ -44,7 +47,11 @@ class CertificateCredential extends Credential
 	) {
 		parent::__construct(
 			credentialId: $credentialId,
-			user: $user,
+			userId: $userId,
+			clientId: $clientId,
+			grantSid: $grantSid,
+			ip: $ip,
+			userAgent: $userAgent,
 			realm: $realm,
 			provider: $provider,
 			revoke: $revoke,
@@ -79,7 +86,7 @@ class CertificateCredential extends Credential
 		}
 	}
 
-	public function getExpiry(): ?DateTimeInterface
+	public function getExpiry(): DateTimeInterface
 	{
 		return $this->expiry;
 	}

@@ -11,7 +11,7 @@
 namespace letswifi\credential;
 
 /**
- * @template T
+ * @template T Credential type
  */
 interface CredentialIssuer
 {

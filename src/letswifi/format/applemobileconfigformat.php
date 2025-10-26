@@ -25,7 +25,7 @@ class AppleMobileconfigFormat extends Format
 	{
 		$uuid = static::uuidgen();
 		$identifier = $this->getIdentifier();
-		\assert( $this->credential instanceof CertificateCredential ); // We don't support anything else yet
+		\assert( $this->credential instanceof CertificateCredential ); // TODO: We don't support anything else yet
 
 		$tlsAuthMethodUuid = static::uuidgen();
 		$defaultPassphrase = 'pkcs12';
@@ -59,6 +59,8 @@ class AppleMobileconfigFormat extends Format
 				. "\n	<string>" . $this::e( $description ) . '</string>'
 				. "\n";
 		}
+
+		/** @psalm-suppress RedundantCondition Always set for certificate, may be unset for other types */
 		if ( null !== $expiry = $this->credential->getExpiry() ) {
 			$expiryString = \gmdate( 'Y-m-d\\TH:i:s\\Z', $expiry->getTimestamp() );
 			$result .= '	<key>RemovalDate</key>'

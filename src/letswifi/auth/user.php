@@ -19,6 +19,8 @@ use letswifi\profile\Realm;
 class User implements JsonSerializable
 {
 	/**
+	 * @internal
+	 *
 	 * @param array<string,Realm> $realms
 	 * @param array<string>       $affiliations
 	 */
@@ -40,16 +42,10 @@ class User implements JsonSerializable
 		}
 	}
 
-	public function isAdmin(): bool
-	{
-		return false;
-	}
-
 	public function jsonSerialize(): array
 	{
 		return \array_filter( [
 			'user_id' => $this->userId,
-			'admin' => $this->isAdmin(),
 			'provider' => $this->provider->host,
 			'realms' => \array_keys( $this->realms ),
 			'affiliations' => $this->affiliations,
@@ -57,10 +53,15 @@ class User implements JsonSerializable
 			'grant_sid' => $this->grantSid,
 			'ip' => $this->ip,
 			'user_agent' => $this->userAgent,
+			'admin' => $this->canPromote(),
 		] );
 	}
 
-	/** @return array<string,Realm>*/
+	/**
+	 * @return array<string,Realm>
+	 *
+	 * @@deprecated Use User::$realms
+	 */
 	public function getRealms(): array
 	{
 		return $this->realms;
@@ -111,17 +112,15 @@ class User implements JsonSerializable
 		throw new RealmMismatchException( $realmId, user: $this, provider: $this->provider );
 	}
 
+	public function canPromote(): bool
+	{
+		return !empty( $this->getAdminRealms() );
+	}
+
 	public function promote(): Admin
 	{
-		// Check that we are not admin already;
-		// it's not too bad if this happens in
-		\assert( !$this->isAdmin(), 'Attempted to promote admin to admin' );
+		$realms = $this->getAdminRealms();
 
-		// TODO: Don't use affiliations for this, those are too broad
-		// use a separate attribute list for admin access
-		$realms = $this->hasAffiliations( ...$this->provider->admins )
-			? $this->provider->allRealms()
-			: \array_filter( $this->provider->allRealms(), fn( Realm $r ) => $this->hasAffiliations( ...$r->admins ) );
 		if ( empty( $realms ) ) {
 			throw new ForbiddenException( 'Attempted promotion to admin but user is not admin for any requested realm' );
 		}
@@ -136,5 +135,20 @@ class User implements JsonSerializable
 			ip: $this->ip,
 			userAgent: $this->userAgent,
 		);
+	}
+
+	/**
+	 * @return array<Realm>
+	 */
+	private function getAdminRealms(): array
+	{
+		// TODO: Don't use affiliations for this, those are too broad
+		// use a separate attribute list for admin access
+		return $this->hasAffiliations( ...$this->provider->admins )
+		// Check that one of our affiliations is set either on the provider level (gives all realms within the provider),
+		// or check each realm individually.
+
+			? $this->provider->allRealms()
+			: \array_filter( $this->provider->allRealms(), fn( Realm $r ) => $this->hasAffiliations( ...$r->admins ) );
 	}
 }

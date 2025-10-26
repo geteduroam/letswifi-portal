@@ -20,7 +20,7 @@ use letswifi\profile\Provider;
 use letswifi\profile\Realm;
 
 /**
- * @template T
+ * @template T Credential type
  */
 abstract class CredentialLog
 {
@@ -74,6 +74,8 @@ abstract class CredentialLog
 		$credential = $this->getCredential( $credentialId );
 		$credential->revoke();
 	}
+
+	abstract public function getCredentialAdministrator(): CredentialAdmin;
 
 	/**
 	 * @return CredentialIssuer<T>

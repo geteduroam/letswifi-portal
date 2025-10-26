@@ -10,10 +10,40 @@
 
 namespace letswifi\auth;
 
+use LogicException;
+use letswifi\profile\Provider;
+
 class Admin extends User
 {
-	public function isAdmin(): bool
+	protected function __construct(
+		string $userId,
+		Provider $provider,
+		array $realms,
+		array $affiliations,
+		?string $clientId = null,
+		?string $grantSid = null,
+		?string $ip = null,
+		?string $userAgent = null,
+	) {
+		parent::__construct(
+			$userId,
+			$provider,
+			$realms,
+			$affiliations,
+			$clientId,
+			$grantSid,
+			$ip,
+			$userAgent,
+		);
+	}
+
+	public function jsonSerialize(): array
 	{
-		return true;
+		return ['admin' => true] + parent::jsonSerialize();
+	}
+
+	public function promote(): never
+	{
+		throw new LogicException( 'Attempted to promote admin to admin' );
 	}
 }

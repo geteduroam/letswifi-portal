@@ -54,7 +54,11 @@ class CertificateCredentialIssuer implements CredentialIssuer
 
 		return new CertificateCredential(
 			credentialId: $credentialId,
-			user: $this->user,
+			userId: $this->user->userId,
+			clientId: $this->user->clientId,
+			grantSid: $this->user->grantSid,
+			ip: $this->user->ip,
+			userAgent: $this->user->userAgent,
 			realm: $this->realm,
 			provider: $this->provider,
 			pkcs12: $pkcs12,

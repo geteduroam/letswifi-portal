@@ -10,13 +10,10 @@
 
 namespace letswifi\credential;
 
-use DateTimeImmutable;
-use DateTimeZone;
 use DomainException;
 use Generator;
 use PDO;
 use fyrkat\openssl\PKCS12;
-use letswifi\auth\User;
 use letswifi\configuration\ConfigurationException;
 use letswifi\profile\ProfileConfig;
 use letswifi\profile\Realm;
@@ -30,95 +27,10 @@ use letswifi\profile\Realm;
  */
 class CertificateCredentialLog extends CredentialLog
 {
+	use Database;
+	use GMT;
+
 	public const DATE_FORMAT = 'Y-m-d H:i:s';
-
-	private ?PDO $pdo = null;
-
-	/**
-	 * @return array<string,statistics> Mapping from realm_id to statistics
-	 *
-	 * @deprecated Not currently in use, might be useful for a dashboard
-	 */
-	public function getStatisticsPerRealm(): array
-	{
-		$statement = $this->getPDO()->prepare( <<<SQL
-			SELECT
-				realm AS realm_id,
-				MIN(issued) AS first_issued,
-				MAX(issued) AS last_issued,
-				MIN(expires) AS first_expires,
-				MAX(expires) AS last_expires,
-				COUNT(*) AS count
-			FROM realm_signing_log
-			WHERE
-				requester = :requester
-				AND expires > :now
-			GROUP BY realm
-			SQL );
-		$statement->bindValue( 'now', \gmdate( static::DATE_FORMAT, $this->now->getTimestamp() ), PDO::PARAM_STR );
-		$statement->bindValue( 'requester', $this->user->userId, PDO::PARAM_STR );
-
-		$statement->execute();
-		$result = [];
-		while ( $row = $statement->fetch( PDO::FETCH_ASSOC ) ) {
-			$result[$row['realm_id']] = [
-				'realm_id' => $row['realm_id'],
-				'first_issued' => static::dateTimeFromGmt( $row['first_issued'] ),
-				'last_issued' => static::dateTimeFromGmt( $row['last_issued'] ),
-				'first_expires' => static::dateTimeFromGmt( $row['first_expires'] ),
-				'last_expires' => static::dateTimeFromGmt( $row['last_expires'] ),
-				'count' => (int)$row['count'],
-			];
-		}
-
-		return $result;
-	}
-
-	/**
-	 * @return array<string,statistics> Mapping from client_id to statistics
-	 *
-	 * @deprecated Not currently in use, might be useful for a dashboard
-	 */
-	public function getStatisticsPerClient( Realm $realm ): array
-	{
-		// TODO: Check if this assertion can ever fail;
-		// maybe convert to if/throw
-		\assert( $this->user->canUseRealm( $realm ) );
-
-		$statement = $this->getPDO()->prepare( <<<SQL
-			SELECT
-				client AS client_id,
-				MIN(issued) AS first_issued,
-				MAX(issued) AS last_issued,
-				MIN(expires) AS first_expires,
-				MAX(expires) AS last_expires,
-				COUNT(*) AS count
-			FROM realm_signing_log
-			WHERE
-				realm = :realm
-				AND requester = :requester
-				AND expires > :now
-			GROUP BY client_id
-			SQL );
-		$statement->bindValue( 'now', \gmdate( static::DATE_FORMAT, $this->now->getTimestamp() ), PDO::PARAM_STR );
-		$statement->bindValue( 'realm', $realm->realmId, PDO::PARAM_STR );
-		$statement->bindValue( 'requester', $this->user->userId, PDO::PARAM_STR );
-
-		$statement->execute();
-		$result = [];
-		while ( $row = $statement->fetch( PDO::FETCH_ASSOC ) ) {
-			$result[$row['client_id']] = [
-				'client_id' => $row['client_id'],
-				'first_issued' => static::dateTimeFromGmt( $row['first_issued'] ),
-				'last_issued' => static::dateTimeFromGmt( $row['last_issued'] ),
-				'first_expires' => static::dateTimeFromGmt( $row['first_expires'] ),
-				'last_expires' => static::dateTimeFromGmt( $row['last_expires'] ),
-				'count' => (int)$row['count'],
-			];
-		}
-
-		return $result;
-	}
 
 	/**
 	 * @param string $client Client ID to filter, all clients if null
@@ -173,24 +85,25 @@ class CertificateCredentialLog extends CredentialLog
 				continue;
 			}
 
-			yield new CertificateCredential(
+			$issued = $this->dateTimeFromGmt( $row['issued'] );
+			$expiry = $this->dateTimeFromGmt( $row['expires'] );
+			$revoked = $this->dateTimeFromGmt( $row['revoked'] );
+			\assert( null !== $issued );
+			\assert( null !== $expiry );
+
+			yield $row['ident'] => new CertificateCredential(
 				credentialId: $row['ident'],
-				user: new User(
-					userId: $row['requester'],
-					provider: $this->provider,
-					realms: [], // We cannot use this user object to issue more realms
-					affiliations: [], // We do not record affiliations at issue moment
-					clientId: $row['client'],
-					grantSid: $row['grant'],
-					ip: $row['ip'],
-					userAgent: $row['user_agent'],
-				),
+				userId: $row['requester'],
+				clientId: $row['client'],
+				grantSid: $row['grant'],
+				ip: $row['ip'],
+				userAgent: $row['user_agent'],
 				realm: $realm,
 				provider: $this->provider,
 				revoke: fn() => $this->revokeCredential( $row['ident'] ),
-				issued: $this->dateTimeFromGmt( $row['issued'] ) ?? throw new DomainException( 'Issued cannot be NULL' ),
-				expiry: $this->dateTimeFromGmt( $row['expires'] ) ?? throw new DomainException( 'Expires cannot be NULL' ),
-				revoked: $this->dateTimeFromGmt( $row['revoked'] ),
+				issued: $issued,
+				expiry: $expiry,
+				revoked: $revoked,
 			);
 		}
 	}
@@ -226,16 +139,25 @@ class CertificateCredentialLog extends CredentialLog
 		$tenantConfig = new ProfileConfig( $this->config );
 		if ( $row = $statement->fetch( PDO::FETCH_ASSOC ) ) {
 			$realm = $tenantConfig->getRealm( $row['realm'] );
+			$issued = $this->dateTimeFromGmt( $row['issued'] );
+			$expiry = $this->dateTimeFromGmt( $row['expires'] );
+			$revoked = $this->dateTimeFromGmt( $row['revoked'] );
+			\assert( null !== $issued );
+			\assert( null !== $expiry );
 
 			return new CertificateCredential(
 				credentialId: $row['ident'],
-				user: $this->user,
+				userId: $row['requester'],
+				clientId: $row['client'],
+				grantSid: $row['grant'],
+				ip: $row['ip'],
+				userAgent: $row['user_agent'],
 				realm: $realm,
 				provider: $this->provider,
 				revoke: fn() => $this->revokeCredential( $row['ident'] ),
-				issued: $this->dateTimeFromGmt( $row['issued'] ) ?? throw new DomainException( 'Expires cannot be NULL' ),
-				expiry: $this->dateTimeFromGmt( $row['expires'] ) ?? throw new DomainException( 'Expires cannot be NULL' ),
-				revoked: $this->dateTimeFromGmt( $row['revoked'] ),
+				issued: $issued,
+				expiry: $expiry,
+				revoked: $revoked,
 			);
 		}
 
@@ -244,10 +166,6 @@ class CertificateCredentialLog extends CredentialLog
 
 	public function revokeCredential( string $credentialId ): void
 	{
-		// Explicitly do not check the realm here,
-		// as the user may have lost access to the realm but still have active credentials
-		// We DO check that the requester is the current user
-
 		$revokeStatement = $this->getPDO()->prepare( <<<SQL
 			UPDATE realm_signing_log
 			SET revoked = :revoked
@@ -257,9 +175,19 @@ class CertificateCredentialLog extends CredentialLog
 				AND revoked IS NULL
 			SQL );
 		$revokeStatement->bindValue( 'revoked', \gmdate( static::DATE_FORMAT, $this->now->getTimestamp() ), PDO::PARAM_STR );
-		$revokeStatement->bindValue( 'requester', $this->user->userId, PDO::PARAM_STR );
 		$revokeStatement->bindParam( 'ident', $credentialId, PDO::PARAM_STR );
+		$revokeStatement->bindValue( 'requester', $this->user->userId, PDO::PARAM_STR );
 		$revokeStatement->execute();
+	}
+
+	public function getCredentialAdministrator(): CredentialAdmin
+	{
+		return new CertificateCredentialAdmin(
+			admin: $this->user->promote(),
+			provider: $this->provider,
+			config: $this->config,
+			now: $this->now,
+		);
 	}
 
 	protected function createCredentialIssuer( Realm $realm ): CertificateCredentialIssuer
@@ -273,38 +201,5 @@ class CertificateCredentialLog extends CredentialLog
 			config: $this->config,
 			revoke: fn( string $ident ) => $this->revokeCredential( $ident ),
 		);
-	}
-
-	protected static function dateTimeFromGmt( ?string $datetimeGmt ): ?DateTimeImmutable
-	{
-		$result = false;
-		if ( null !== $datetimeGmt ) {
-			$gmt = new DateTimeZone( 'GMT' );
-			$result = DateTimeImmutable::createFromFormat( static::DATE_FORMAT, $datetimeGmt, $gmt );
-		}
-
-		return $result ?: null;
-	}
-
-	private function getPDO(): PDO
-	{
-		if ( null === $this->pdo ) {
-			$providers = $this->config->getDictionary( 'provider' );
-			$pdoData = $providers->getDictionary( $this->provider->host )->getDictionary( 'pdo' );
-			$dsn = $pdoData->getString( 'dsn' );
-			$username = $pdoData->getStringOrNull( 'username' );
-			$password = $pdoData->getStringOrNull( 'password' );
-
-			$this->pdo = new PDO( $dsn, $username, $password );
-			$this->pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
-
-			if ( \strstr( $dsn, ':', true ) === 'mysql' ) {
-				// https://dev.mysql.com/doc/refman/8.4/en/set-variable.html
-				// https://dev.mysql.com/doc/refman/8.4/en/sql-mode.html#sqlmode_ansi_quotes
-				$this->pdo->exec( 'SET sql_mode = \'ANSI_QUOTES\';' );
-			}
-		}
-
-		return $this->pdo;
 	}
 }
