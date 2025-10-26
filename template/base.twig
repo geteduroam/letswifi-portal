@@ -22,11 +22,12 @@
 			<dialog popover class="dropdown" id="languages-dropdown">
 				<ul class="dropdown-menu">
 				{% for locale in _supportedLocales|sort %}
-					<li lang="{{ locale }}"><a draggable="false" href="{{ locale.href }}"><small class="oojs-icon{{ locale.active ? ' oojs-icon-check' : '' }}"></small>{{ locale.display_name }}</a></li>
+					<li lang="{{ locale.locale }}"><a draggable="false" href="{{ locale.href }}"><small class="oojs-icon{{ locale.active ? ' oojs-icon-check' : '' }}"></small>{{ locale.display_name }}</a></li>
 				{% endfor %}
 				</ul>
 			</dialog>
 		</div>
+		{% block userMenu %}
 		{% if _user %}
 		<div class="dropdown-container">
 			<button class="dropdown-header" popovertarget="user-dropdown">
@@ -35,13 +36,15 @@
 			</button>
 			<dialog popover class="dropdown" id="user-dropdown">
 				<ul class="dropdown-menu">
-					<li><a draggable="false" class="oojs-icon oojs-icon-userContributions" href="{{ _basePath }}/me/">{{ 'Account information'|t }}</a></li>
+					<li><a draggable="false" href="{{ _basePath }}/me/"><small class="oojs-icon oojs-icon-userContributions"></small>{{ 'Account information'|t }}</a></li>
 					{% if _admin_href %}
-					<li><a draggable="false" class="oojs-icon oojs-icon-settings" href="{{ _admin_href }}">{{ 'Administration panel'|t }}</a></li>
+					<li><a draggable="false" href="{{ _admin_href }}"><small class="oojs-icon oojs-icon-settings"></small>{{ 'Administration panel'|t }}</a></li>
 					{% endif %}
 					{% if _logout_href %}
-					<li><a draggable="false" class="oojs-icon oojs-icon-logout" href="{{ _logout_href }}">{{ 'Logout'|t }}</a></li>
+					<li><a draggable="false" href="{{ _logout_href }}"><small class="oojs-icon oojs-icon-logout"></small>{{ 'Logout'|t }}</a></li>
 					{% endif %}
+					<li><hr>
+					<li><a draggable="false" href="{{ _basePath }}/app/"><small class="oojs-icon oojs-icon-download dropdown-header-collapse"></small>{{ 'Download the app'|t }}</a></li>
 				</ul>
 			</dialog>
 		</div>
@@ -50,6 +53,7 @@
 			<a draggable="false" class="dropdown-header" href="{{ _login_href ?? _basePath ~ '/me/' }}"><span class="oojs-icon oojs-icon-userAvatarOutline"></span>{{ 'Login'|t }}</a>
 		</div>
 		{% endif -%}
+		{% endblock %}
 	</div>
 </header>
 {% block layout %}{% endblock %}

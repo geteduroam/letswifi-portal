@@ -167,7 +167,7 @@ header #product-name {
 }
 
 #systray > .dropdown-container > .dropdown > ul.dropdown-menu > li > * {
-	padding: .2em 1em;
+	padding: .1em 1em;
 	margin: 0;
 	display: block;
 	top: 0 !important;
@@ -175,14 +175,8 @@ header #product-name {
 	text-decoration: none;
 	position: relative;
 }
-#systray > .dropdown-container > .dropdown#languages-dropdown > ul.dropdown-menu > li > * {
-	/*
-	since the languages only use the "check" icon, which is rather narrow,
-	it visually seems more spacious than the other menus
-	Because of this, we make the design slightly more condensed,
-	so that it visually seems similar to the other menus
-	*/
-	padding: .1em 1em;
+#systray > .dropdown-container > .dropdown > ul.dropdown-menu > li > hr {
+	margin-top: .2em;
 }
 #systray > .dropdown-container > .dropdown > ul.dropdown-menu > li > a {
 	color: var(--text-color) !important;
@@ -323,7 +317,7 @@ hr {
 }
 input[type=datetime-local], input[type=text], input[type=password] {
 	border: solid;
-	border-width: thin;
+	border-width: 2px;
 	border-color: var(--text-color);
 	background: inherit;
 	color: inherit;
@@ -334,16 +328,9 @@ input[type=datetime-local], input[type=text], input[type=password] {
 	border-radius: .02em;
 	margin-top: .1em;
 }
-input[type=datetime-local]:focus, input[type=text]:focus, input[type=password]:focus {
-	border-color: var(--highlight-text-color);
-	box-shadow: 0 2px 0 var(--accent-color);
-}
-input[type=datetime-local]:focus-visible, input[type=text]:focus-visible, input[type=password]:focus-visible {
-	outline-offset: .3em;
-	outline: solid 1px var(--text-color);
-}
-input[type=radio]:focus-visible + label, input[type=checkbox]:focus-visible + label, label:focus-visible {
-	outline-bottom: 2px solid var(--highlight-text-color);
+input[type=radio]:focus + label, label:focus, input[type=datetime-local]:focus-visible, input[type=text]:focus-visible, input[type=password]:focus-visible {
+	outline-offset: .2em;
+	outline: solid 2px var(--accent-color);
 }
 input[type=radio] {
 	outline: none;
@@ -459,7 +446,7 @@ fieldset > legend {
 	border: 1px solid var(--text-color);
 	box-sizing: border-box;
 }
-.apps .download a {
+.apps .download a, .apps .link a {
 	border: 1px solid var(--text-color);
 	display: inline-block;
 	line-height: 2.2em;
@@ -477,6 +464,7 @@ fieldset > legend {
 	position: relative;
 	top: .4em;
 	padding: 0 .3rem;
+	color: var(--highlight-text-color);
 }
 .apps .download a span > span.platform {
 	font-weight: bold;
@@ -487,7 +475,7 @@ fieldset > legend {
 }
 .oojs-icon:before, .apps .link a:after, .apps .download a:before,
 details:has(p) > summary:before {
-	padding: .1em .2em .1em 1.5em;
+	padding: .1em .5em .1em 1.5em;
 	background-repeat: no-repeat;
 	background-position: 0 50%;
 	background-size: contain;
@@ -504,8 +492,9 @@ details:has(p) > summary:before {
 .apps .download a:before {
 	background-image: url('oojs-ui/images/icons/download.svg');
 	position: relative;
-	top: -.2em;
+	top: .3em;
 	padding: 0 1.5em 0 0;
+	background-size: 1.5em;
 }
 
 .oojs-icon-check:before {
@@ -531,6 +520,9 @@ details:has(p) > summary:before {
 }
 .oojs-icon-settings:before {
 	background-image: url('oojs-ui/images/icons/settings.svg');
+}
+.oojs-icon-download:before {
+	background-image: url('oojs-ui/images/icons/download.svg');
 }
 
 .col-menu {
@@ -578,7 +570,7 @@ nav.side-menu ul li.active a {
 		--text-color: #a0a8af;
 
 		--highlight-bg-color: #201e2f;
-		--highlight-text-color: #c1c3c4;
+		--highlight-text-color: #e1e3e4;
 
 		--code-text-color: #e47;
 
