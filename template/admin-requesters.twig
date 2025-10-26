@@ -1,0 +1,65 @@
+{% extends 'admin.twig' %}
+
+{% block title %}{{ 'Administration panel'|translate_raw }}{% endblock %}
+
+{% block admin_content %}
+	<section class="highlight">
+	<form>
+		<details open class="form">
+		<summary>{{ 'Search'|t }}</summary>
+			<dl>
+				<dt>{{ 'Valid on'|t }}</dt>
+				<dd><input type="datetime-local" name="valid_on" value="{{ filter_valid_on|split('+')|first }}"></dd>
+			</dl>
+			<dl>
+				<dt>{{ 'Username'|t }}</dt>
+				<dd>
+					<input type="text" name="requester" value="{{ filter_requester }}">
+				</dd>
+			</dl>
+			<dl>
+				<dt>{{ 'Realms'|t }}</dt>
+				<dd class="realm-checkboxes">
+					{% for realm in realms %}
+					<span class="realm-checkbox">
+					<input type="checkbox" id="realm_{{ realm.realm_id }}" name="realms[]" value="{{ realm.realm_id }}"{{ not filter_realms or realm.realm_id in filter_realms ? ' checked' : '' }}>
+					<label for="realm_{{ realm.realm_id }}">{{ realm.realm_id }}</label>
+					</span>
+					{% endfor %}
+				</dd>
+			</dl>
+
+			<p><button type="submit">{{ 'Search'|t }}</button>
+		</details>
+	</form>
+	</section>
+
+	<hr>
+
+	{% if requesters %}
+	<form method="POST"><input type="hidden" name="valid_on" value="{{ filter_valid_on|split('+')|first }}">
+		<table>
+			<tr>
+				<th>{{ 'Requester'|t }}</th>
+				<th>{{ 'Earliest'|t }}</th>
+				<th>{{ 'Expires'|t }}</th>
+				<th class="number">{{ 'Valid creds'|t }}</th>
+				<th class="number">{{ 'Total creds'|t }}</th>
+				<th></th>
+			</tr>
+			{% for requester in requesters %}
+			<tr>
+				<td><a href="{{ requester.requester_href }}">{{ requester.requester.name }}</a>@<a href="{{ requester.realm_href }}">{{ requester.requester.realm }}</a></td>
+				<td>{{ requester.earliest_valid }}</td>
+				<td>{{ requester.last_valid }}</td>
+				<td class="number">{{ requester.valid_accounts }}</td>
+				<td class="number">{{ requester.total_accounts }}</td>
+				<td><button class="btn-danger" name="revoke_requester" value="{{ requester.revoke_id }}">{{ 'Revoke'|t }}</button></td>
+			</tr>
+			{% endfor %}
+		</table>
+	</form>
+	{% else %}
+	<p>{{ 'No results'|t }}
+	{% endif %}
+{% endblock %}

@@ -264,6 +264,21 @@ h3 {
 	font-size: 1.2em;
 }
 
+.form dl {
+	display: flex;
+	justify-content: flex-start;
+}
+
+.form dl dt {
+	min-width: 5em;
+	font-weight: bold;
+}
+.form dl dt, .form dl dd {
+}
+.form dl dd {
+	grow: 2;
+}
+
 details:has(p), form table {
 	font-size: .8rem;
 }
@@ -289,6 +304,9 @@ summary, button {
 form table {
 	width: 100%;
 }
+form table td:last-child, form table td.number, form table th.number {
+	text-align: right;
+}
 hr {
 	border: none;
 	border-top: thin solid;
@@ -303,21 +321,29 @@ hr {
 .fieldsets > * {
 	flex-grow: 1;
 }
-input[type=text], input[type=password] {
+input[type=datetime-local], input[type=text], input[type=password] {
 	border: solid;
 	border-width: thin;
 	border-color: var(--text-color);
-	border-radius: .3em;
 	background: inherit;
 	color: inherit;
-	padding: .3em;
+	border-top: none;
+	border-left: none;
+	border-right: none;
+	padding: .2em;
+	border-radius: .02em;
+	margin-top: .1em;
 }
-input[type=text]:focus, input[type=password]:focus {
-	border-color: var(--accent-color);
-	outline: thin solid var(--text-color);
+input[type=datetime-local]:focus, input[type=text]:focus, input[type=password]:focus {
+	border-color: var(--highlight-text-color);
+	box-shadow: 0 2px 0 var(--accent-color);
 }
-input[type=radio]:focus + label, label:focus {
-	outline: 2px solid var(--highlight-text-color);
+input[type=datetime-local]:focus-visible, input[type=text]:focus-visible, input[type=password]:focus-visible {
+	outline-offset: .3em;
+	outline: solid 1px var(--text-color);
+}
+input[type=radio]:focus-visible + label, input[type=checkbox]:focus-visible + label, label:focus-visible {
+	outline-bottom: 2px solid var(--highlight-text-color);
 }
 input[type=radio] {
 	outline: none;
@@ -502,6 +528,48 @@ details:has(p) > summary:before {
 }
 .oojs-icon-userContributions:before {
 	background-image: url('oojs-ui/images/icons/userContributions-ltr.svg');
+}
+.oojs-icon-settings:before {
+	background-image: url('oojs-ui/images/icons/settings.svg');
+}
+
+.col-menu {
+	display: flex;
+	gap: 2em;
+	/*
+	max-width: 68rem;
+	justify-content: center;
+	*/
+}
+.col-menu > nav {
+	margin-top: 1.2rem;
+	min-width: 10em;
+}
+.col-menu > main {
+	flex-grow: 2;
+}
+.col-menu > main > * {
+	margin: 2em 0;
+}
+
+nav.side-menu ul {
+	list-style: none;
+	padding: 0;
+}
+nav.side-menu ul li a {
+	display: block;
+	padding: .4em 0 .4em .6em;
+	margin: 1em 0 0 0;
+	text-decoration: none;
+	color: var(--text-color);
+	border-left: medium solid rgba(0,0,0,0);
+}
+nav.side-menu ul li a:hover, nav.side-menu ul li.active a {
+	border-left: medium solid var(--accent-color);
+	color: var(--highlight-text-color);
+}
+nav.side-menu ul li.active a {
+	background: var(--highlight-bg-color);
 }
 
 @media (prefers-color-scheme: dark) {

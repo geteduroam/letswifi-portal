@@ -145,7 +145,7 @@ final class LetsWifiApp
 	/**
 	 * @template T
 	 *
-	 * @param array<class-string<T>,callable(T):array<string,?recursivearray|stdClass>> $reshape Function to reshape objects of the given type; keys returned by the function override native keys, if value is equal to $jsonOutputDelete, the key is removed
+	 * @param array<class-string<T>,callable(T):array<string,?recursivearray|scalar|stdClass>> $reshape Function to reshape objects of the given type; keys returned by the function override native keys, if value is equal to $jsonOutputDelete, the key is removed
 	 */
 	public function render( array $data, ?string $template = null, array $reshape = [] ): never
 	{
@@ -185,6 +185,7 @@ final class LetsWifiApp
 		exit( $template->render(
 			[
 				'_user' => $user?->userId,
+				'_admin_href' => $user?->canPromote() ? "{$this->basePath}/admin/" : null,
 				'_logout_href' => $provider?->auth->browserAuth->getLogoutURL( $this->getBaseUrl() ),
 				'_basePath' => $this->basePath,
 				'_locale' => $this->getTranslationContext()->primaryLocale,
@@ -381,8 +382,8 @@ final class LetsWifiApp
 	/**
 	 * @template T
 	 *
-	 * @param array<mixed>                                                              $data
-	 * @param array<class-string<T>,callable(T):array<string,?recursivearray|stdClass>> $reshape Function to reshape objects of the given type; keys returned by the function override native keys, if value is equal to $jsonOutputDelete, the key is removed
+	 * @param array<mixed>                                                                     $data
+	 * @param array<class-string<T>,callable(T):array<string,?recursivearray|scalar|stdClass>> $reshape Function to reshape objects of the given type; keys returned by the function override native keys, if value is equal to $jsonOutputDelete, the key is removed
 	 *
 	 * @return array<mixed>
 	 */

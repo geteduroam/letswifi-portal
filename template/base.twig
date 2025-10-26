@@ -28,7 +28,7 @@
 			</dialog>
 		</div>
 		{% if _user %}
-		<div class="dropdown-container" id="user-chooser">
+		<div class="dropdown-container">
 			<button class="dropdown-header" popovertarget="user-dropdown">
 				<span class="oojs-icon oojs-icon-userAvatar dropdown-header-collapse"></span>
 				{{ 'Account'|t }}
@@ -36,6 +36,9 @@
 			<dialog popover class="dropdown" id="user-dropdown">
 				<ul class="dropdown-menu">
 					<li><a draggable="false" class="oojs-icon oojs-icon-userContributions" href="{{ _basePath }}/me/">{{ 'Account information'|t }}</a></li>
+					{% if _admin_href %}
+					<li><a draggable="false" class="oojs-icon oojs-icon-settings" href="{{ _admin_href }}">{{ 'Administration panel'|t }}</a></li>
+					{% endif %}
 					{% if _logout_href %}
 					<li><a draggable="false" class="oojs-icon oojs-icon-logout" href="{{ _logout_href }}">{{ 'Logout'|t }}</a></li>
 					{% endif %}

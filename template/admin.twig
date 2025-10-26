@@ -1,0 +1,45 @@
+{% extends 'menu.twig' %}
+
+{% block title %}{{ 'Administration panel'|translate_raw }}{% endblock %}
+
+{% block content %}
+<div class="col-menu">
+<nav class="side-menu">
+	<section>
+		<p><strong>{{ 'Administration panel'|t }}</strong>
+		<p>{{ provider.display_name|t }}
+	</section>
+	<hr>
+	<ul>
+	{% for caption, href in admin_menu %}
+		<li><a href="{{ href }}">{{ caption|t }}</a></li>
+	{% endfor %}
+	</ul>
+</nav>
+<main>
+{% block admin_content %}
+<h1>{{ 'Administration panel'|t }}</h1>
+
+<section class="highlight form">
+	<dl>
+		<dt>{{ 'Provider name'|t }}</dt>
+		<dd>{{ provider.display_name|t }}</dd>
+	</dl>
+	<dl>
+		<dt>{{ 'Provider host'|t }}</dt>
+		<dd><code>{{ provider.host }}</code></dd>
+	</dl>
+	<dl>
+		<dt>{{ 'Provider contact information'|t }}</dt>
+		<dd><ul>
+			<li>{{ provider.contact.mail }}</li>
+			<li>{{ provider.contact.web }}</li>
+			<li>{{ provider.contact.phone }}</li>
+		</ul></dd>
+	</dl>
+</section>
+{% endblock %}
+
+</main>
+</div>
+{% endblock %}
