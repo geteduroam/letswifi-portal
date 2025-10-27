@@ -47,7 +47,7 @@ class CertificateCredentialLog extends CredentialLog
 		$clientQueryPart = null === $client ? '' : 'AND client = :client';
 		$realmQueryPart = null === $realm ? '' : 'AND realm = :realm';
 		$statement = $this->getPDO()->prepare( <<<SQL
-			SELECT realm, ca_sub, requester, ident, "grant", usage, sub, issued, expires, revoked, csr, client, user_agent, ip, x509
+			SELECT realm, ca_sub, requester, ident, "grant", "usage", sub, issued, expires, revoked, csr, client, user_agent, ip, x509
 			FROM realm_signing_log
 			WHERE requester = :requester
 				AND expires > :now
@@ -117,7 +117,7 @@ class CertificateCredentialLog extends CredentialLog
 		$clientQueryPart = null === $client ? '' : 'AND client = :client';
 		$realmQueryPart = null === $realm ? '' : 'AND realm = :realm';
 		$statement = $this->getPDO()->prepare( <<<SQL
-			SELECT realm, requester, ident, "grant", ca_sub, usage, sub, issued, expires, revoked, csr, client, user_agent, ip, x509, ident
+			SELECT realm, requester, ident, "grant", ca_sub, "usage", sub, issued, expires, revoked, csr, client, user_agent, ip, x509, ident
 			FROM realm_signing_log
 			WHERE
 				ident = :ident

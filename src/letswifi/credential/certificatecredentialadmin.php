@@ -138,8 +138,8 @@ class CertificateCredentialAdmin extends CredentialAdmin
 		}
 		$stmt = $this->getPDO()->prepare( <<<SQL
 				SELECT
-					"serial",realm,ca_sub,requester,sub,issued,expires,revoked,usage,client,user_agent,ip,"grant",ident
-					,requester, realm
+					"serial", realm, ca_sub, requester, sub, issued, expires, revoked, "usage", client, user_agent, ip, "grant", ident
+					, requester, realm
 				FROM realm_signing_log
 				WHERE expires > :valid_on AND issued < :valid_on
 					{$extraConditions}

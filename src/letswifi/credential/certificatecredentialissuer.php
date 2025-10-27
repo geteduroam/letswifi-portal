@@ -74,7 +74,7 @@ class CertificateCredentialIssuer implements CredentialIssuer
 		$csrData = $csr->getCSRPem();
 		$statement = $this->pdo->prepare( <<<SQL
 			INSERT INTO realm_signing_log
-				(realm, requester, ident, "grant", ca_sub, sub, usage, issued, expires, csr, client, user_agent, ip)
+				(realm, requester, ident, "grant", ca_sub, sub, "usage", issued, expires, csr, client, user_agent, ip)
 			VALUES
 				(:realm, :requester, :ident, :grant, :ca_sub, :sub, :usage, :issued, :expires, :csr, :client, :user_agent, :ip)
 			SQL );
