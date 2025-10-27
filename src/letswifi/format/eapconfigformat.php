@@ -25,6 +25,8 @@ class EapConfigFormat extends Format
 {
 	public function generate(): string
 	{
+		$contact = $this->credential->realm->getContact() ?? $this->provider->getContact();
+
 		$result = '<?xml version="1.0" encoding="utf-8"?>';
 		$result .= ''
 			. "\r\n" . '<EAPIdentityProviderList xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="eap-metadata.xsd">'
@@ -55,7 +57,7 @@ class EapConfigFormat extends Format
 			$result .= ''
 				. "\r\n\t\t\t<Description lang=\"" . $this->e( $data['lang'] ) . '">' . $this->e( $data['display'] ) . '</Description>';
 		}
-		foreach ( $this->credential->provider->getContact()?->location ?? [] as $location ) {
+		foreach ( $contact?->location ?? [] as $location ) {
 			$result .= $this->generateLocationXml( $location );
 		}
 		if ( null !== $logo = $this->credential->provider->logo ?? $this->credential->realm->logo ) {
@@ -68,7 +70,7 @@ class EapConfigFormat extends Format
 				. "\r\n\t\t\t" . '<TermsOfUse>' . $this->e( $tos ) . '</TermsOfUse>';
 		}
 		 */
-		if ( null !== $contact = $this->credential->provider->getContact() ) {
+		if ( null !== $contact ) {
 			$result .= $this->generateHelpdeskXml( $contact );
 		}
 		$result .= ''

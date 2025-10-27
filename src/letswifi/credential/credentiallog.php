@@ -69,11 +69,7 @@ abstract class CredentialLog
 	 */
 	abstract public function getCredential( string $credentialId, ?Realm $realm = null, ?string $client = null ): Credential;
 
-	public function revokeCredential( string $credentialId ): void
-	{
-		$credential = $this->getCredential( $credentialId );
-		$credential->revoke();
-	}
+	abstract public function revokeCredential( string $credentialId ): void;
 
 	abstract public function getCredentialAdministrator(): CredentialAdmin;
 

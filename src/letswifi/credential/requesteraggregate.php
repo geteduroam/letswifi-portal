@@ -10,7 +10,6 @@
 
 namespace letswifi\credential;
 
-use Closure;
 use DateTimeInterface;
 use JsonSerializable;
 
@@ -24,14 +23,7 @@ class RequesterAggregate implements JsonSerializable
 		public readonly DateTimeInterface $lastValid,
 		public readonly int $totalAccounts,
 		public readonly int $validAccounts,
-		protected readonly Closure $revoke,
 	) {
-	}
-
-	public function revoke(): void
-	{
-		$f = $this->revoke;
-		$f();
 	}
 
 	public function jsonSerialize(): array

@@ -66,14 +66,12 @@ class CertificateCredentialAdmin extends CredentialAdmin
 				requester: new Requester(
 					name: $row['requester'],
 					realm: $row['realm'],
-					revoke: fn() => $this->revokeRequester( $row['requester'] ),
 				),
 				earliestValid: $earliestValid,
 				lastValid: $lastValid,
 				validOn: $validOn,
 				totalAccounts: $row['total_accounts'],
 				validAccounts: $row['valid_accounts'],
-				revoke: fn() => $this->revokeRequester( $row['requester'], $validOn ),
 			);
 		}
 	}
@@ -166,8 +164,6 @@ class CertificateCredentialAdmin extends CredentialAdmin
 				ip: $row['ip'],
 				userAgent: $row['user_agent'],
 				realm: $this->admin->getRealm( $row['realm'] ),
-				provider: $this->admin->provider,
-				revoke: fn() => $this->revokeCredential( $row['ident'] ),
 				expiry: $expiry,
 				issued: $issued,
 				revoked: $revoked,

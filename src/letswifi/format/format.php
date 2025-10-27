@@ -15,11 +15,13 @@ use fyrkat\multilang\MultiLanguageString;
 use fyrkat\multilang\TranslationContext;
 use fyrkat\openssl\PKCS7;
 use letswifi\credential\Credential;
+use letswifi\profile\Provider;
 
 abstract class Format
 {
 	final public function __construct(
 		protected readonly Credential $credential,
+		protected readonly Provider $provider,
 		protected readonly TranslationContext $translator,
 		protected readonly ?PKCS7 $profileSigner = null,
 		protected readonly ?string $passphrase = null,
@@ -29,10 +31,21 @@ abstract class Format
 	public static function getFormatter(
 		string $type,
 		Credential $credential,
+		Provider $provider,
 		TranslationContext $translator,
 		?PKCS7 $profileSigner = null,
 		?string $passphrase = null,
 	): self {
+		// Check if the provider has access to the realm in the credential
+		// This is not a security check, the credential was already issued,
+		// so if we weren't supposed to be here, the issue occurred earlier.
+		// If there's a mismatch, the profile can contain a credential from one provider,
+		// but have the name, logo and contact info of another provider.
+		\assert(
+			$provider->hasRealm( $credential->realm ),
+			'Attempt to format a credential from a realm that is not valid for the current provider',
+		);
+
 		// Convert "class-name" to "\letswifi\format\ClassNameFormat"
 		if ( !\preg_match( '/[^0-9a-z\\-]|--|^[0-9]|^-|-$/m', $type ) ) {
 			$className = \sprintf( '\\letswifi\\format\\%sFormat', \ucfirst(
@@ -41,7 +54,7 @@ abstract class Format
 					static fn( $m ) => \strtoupper( \ltrim( $m[1], '-' ) ), $type ),
 			) );
 			if ( !\str_contains( $className, '-' ) && \class_exists( $className ) && \is_subclass_of( $className, self::class ) ) {
-				return new $className( $credential, $translator, $profileSigner, $passphrase );
+				return new $className( $credential, $provider, $translator, $profileSigner, $passphrase );
 			}
 		}
 

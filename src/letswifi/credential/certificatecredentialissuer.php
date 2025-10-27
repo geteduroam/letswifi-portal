@@ -60,7 +60,6 @@ class CertificateCredentialIssuer implements CredentialIssuer
 			ip: $this->user->ip,
 			userAgent: $this->user->userAgent,
 			realm: $this->realm,
-			provider: $this->provider,
 			pkcs12: $pkcs12,
 		);
 	}

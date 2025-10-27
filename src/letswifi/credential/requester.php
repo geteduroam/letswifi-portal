@@ -10,8 +10,6 @@
 
 namespace letswifi\credential;
 
-use Closure;
-use DomainException;
 use JsonSerializable;
 
 class Requester implements JsonSerializable
@@ -20,17 +18,7 @@ class Requester implements JsonSerializable
 	public function __construct(
 		public readonly string $name,
 		public readonly string $realm,
-		protected readonly ?Closure $revoke = null,
 	) {
-	}
-
-	public function revoke(): void
-	{
-		$f = $this->revoke;
-		if ( null === $f ) {
-			throw new DomainException( 'Aggregated credential cannot be revoked' );
-		}
-		$f();
 	}
 
 	public function jsonSerialize(): array

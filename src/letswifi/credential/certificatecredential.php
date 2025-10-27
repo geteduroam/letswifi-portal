@@ -14,7 +14,6 @@ use Closure;
 use DateTimeInterface;
 use DomainException;
 use fyrkat\openssl\PKCS12;
-use letswifi\profile\Provider;
 use letswifi\profile\Realm;
 
 /**
@@ -37,8 +36,6 @@ class CertificateCredential extends Credential
 		?string $ip,
 		?string $userAgent,
 		Realm $realm,
-		Provider $provider,
-		?Closure $revoke = null,
 		?DateTimeInterface $expiry = null,
 		?DateTimeInterface $issued = null,
 		private readonly ?DateTimeInterface $revoked = null,
@@ -53,8 +50,6 @@ class CertificateCredential extends Credential
 			ip: $ip,
 			userAgent: $userAgent,
 			realm: $realm,
-			provider: $provider,
-			revoke: $revoke,
 		);
 
 		if ( null === $pkcs12 ) {

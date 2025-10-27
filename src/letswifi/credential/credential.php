@@ -11,9 +11,7 @@
 namespace letswifi\credential;
 
 use DateTimeInterface;
-use DomainException;
 use JsonSerializable;
-use letswifi\profile\Provider;
 use letswifi\profile\Realm;
 
 /**
@@ -32,8 +30,6 @@ abstract class Credential implements JsonSerializable
 		public readonly ?string $ip,
 		public readonly ?string $userAgent,
 		public readonly Realm $realm,
-		public readonly Provider $provider,
-		protected readonly ?\Closure $revoke = null,
 	) {
 	}
 
@@ -51,7 +47,6 @@ abstract class Credential implements JsonSerializable
 				'user_agent' => $this->userAgent,
 			],
 			'realm' => $this->realm,
-			'provider' => $this->provider,
 		];
 	}
 
@@ -65,15 +60,6 @@ abstract class Credential implements JsonSerializable
 
 	/** @return T */
 	abstract public function getPayload();
-
-	public function revoke(): void
-	{
-		$f = $this->revoke;
-		if ( null === $f ) {
-			throw new DomainException( 'Credential cannot be revoked' );
-		}
-		$f();
-	}
 
 	abstract public function getAnonymousIdentity(): ?string;
 }
