@@ -92,7 +92,7 @@ then
 			-e "         'cron' => true,\\"	\
 			/etc/simplesamlphp/config.php
 	crontab -u www-data -l || crontab -u www-data - <<EOF
-4 51 * * * php /usr/share/simplesamlphp/modules/cron/bin/cron.php -t hourly
+51 4 * * * php /usr/share/simplesamlphp/modules/cron/bin/cron.php -t hourly
 EOF
 else
 	# SimpleSAMLphp changes the output of pwgen.php over the versions,
@@ -204,7 +204,7 @@ EOF
 	su acme -c "/usr/bin/acme.sh --no-color --server '$acme_server' --issue -d '$fqdn' --webroot /var/www/html"
 	a2ensite letswifi-portal
 	crontab -u acme -l || crontab -u acme - <<EOF
-4 17 * * * /usr/bin/acme.sh/acme.sh --cron --home /var/lib/acme > /dev/null
+17 4 * * * /usr/bin/acme.sh/acme.sh --cron --home /var/lib/acme > /dev/null
 EOF
 fi
 mkdir -p "/var/lib/acme/certs/$fqdn"
