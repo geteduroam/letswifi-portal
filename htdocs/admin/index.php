@@ -13,17 +13,15 @@ use letswifi\LetsWifiApp;
 require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 2 ), 'src', '_autoload.php'] );
 $app = new LetsWifiApp( basePath: '..' );
 $provider = $app->getProvider();
-$oauth = $provider->auth->oauth;
 $user = $provider->requireAuth();
 $admin = $user->promote();
 
 $app->render( [
-	'user' => $user,
-	'admin' => $admin,
-	'provider' => $provider,
+	'_user' => $user,
+	'_admin' => $admin,
+	'_provider' => $provider,
 
-	'admin_menu' => [
-		'Credentials' => 'credentials/',
-		'Requesters' => 'requesters/',
-	],
+	'__admin_menu_prefix' => '',
+	'__admin_menu_active' => '',
+	'__admin_menu' => ( require '_menu.php' ),
 ], 'admin' );

@@ -35,17 +35,37 @@ abstract class CredentialAdmin
 	}
 
 	/**
-	 * @param array<Realm|string> $realms
-	 * @param DateTimeInterface   $validOn   Consider credentials that are valid on this point in time
+	 * @param array<Realm|string> $realms    Only return from these realms, if empty all available realms are used
+	 * @param ?DateTimeInterface  $validOn   Consider credentials that are valid on this point in time
 	 * @param ?string             $requester Filter requester
 	 *
 	 * @return Generator<string,RequesterAggregate>
 	 */
 	abstract public function listRequesters( array $realms = [], ?DateTimeInterface $validOn = null, ?string $requester = null ): Generator;
 
-	abstract public function listCredentials( array $realms = [], ?DateTimeInterface $validOn = null, ?string $requester = null ): Generator;
+	/**
+	 * @param array<Realm|string> $realms        Only return from these realms, if empty all available realms are used
+	 * @param ?DateTimeInterface  $validOn       Consider credentials that are valid on this point in time
+	 * @param ?string             $requester     Filter requester
+	 * @param bool                $unrevokedOnly Only return credentials that are not revoked
+	 *
+	 * @return Generator<string,Credential>
+	 */
+	abstract public function listCredentials( array $realms = [], ?DateTimeInterface $validOn = null, ?string $requester = null, bool $unrevokedOnly = false ): Generator;
+
+	/**
+	 * @param array<Realm|string> $realms Only return from these realms, if empty all available realms are used
+	 */
+	abstract public function getCredential( string $ident, array $realms = [] ): ?Credential;
 
 	abstract public function revokeCredential( string $credentialId, ?string $requester = null ): void;
 
-	abstract public function revokeRequester( ?string $requester, ?DateTimeInterface $validOn = null, string|Realm|null $realm = null ): void;
+	/**
+	 * Revoke all credentials matching the query
+	 *
+	 * @param string              $requester Requester to revoke
+	 * @param ?DateTimeInterface  $validOn   Consider credentials that are valid on this point in time
+	 * @param array<Realm|string> $realms    Only revoke credentials within these realms
+	 */
+	abstract public function revokeRequester( string $requester, ?DateTimeInterface $validOn = null, array $realms = [] ): void;
 }

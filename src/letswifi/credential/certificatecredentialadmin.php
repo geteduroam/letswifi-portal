@@ -23,9 +23,7 @@ use letswifi\profile\Realm;
 class CertificateCredentialAdmin extends CredentialAdmin
 {
 	use Database;
-	use GMT;
-
-	public const DATE_FORMAT = 'Y-m-d H:i:s';
+	use UTC;
 
 	public function listRequesters( array $realms = [], ?DateTimeInterface $validOn = null, ?string $requester = null ): Generator
 	{
@@ -50,14 +48,14 @@ class CertificateCredentialAdmin extends CredentialAdmin
 				GROUP BY requester, realm
 				ORDER BY issued DESC;
 			SQL );
-		$stmt->bindValue( 'valid_on', \gmdate( static::DATE_FORMAT, $validOn->getTimestamp() ), PDO::PARAM_STR );
+		$stmt->bindValue( 'valid_on', $this->formatUtc( $validOn ), PDO::PARAM_STR );
 		if ( null !== $requester ) {
 			$stmt->bindValue( 'requester', $requester, PDO::PARAM_STR );
 		}
 		$stmt->execute();
 		while ( $row = $stmt->fetch( PDO::FETCH_ASSOC ) ) {
-			$earliestValid = $this->dateTimeFromGmt( $row['earliest_valid'] );
-			$lastValid = $this->dateTimeFromGmt( $row['last_valid'] );
+			$earliestValid = $this->dateTimeFromUtc( $row['earliest_valid'] );
+			$lastValid = $this->dateTimeFromUtc( $row['last_valid'] );
 
 			\assert( null !== $earliestValid );
 			\assert( null !== $lastValid );
@@ -87,7 +85,7 @@ class CertificateCredentialAdmin extends CredentialAdmin
 					{$requesterCondition}
 					AND revoked IS NULL
 			SQL );
-		$revokeStatement->bindValue( 'revoked', \gmdate( static::DATE_FORMAT, $this->now->getTimestamp() ), PDO::PARAM_STR );
+		$revokeStatement->bindValue( 'revoked', $this->formatUtc( $this->now ), PDO::PARAM_STR );
 		$revokeStatement->bindParam( 'ident', $credentialId, PDO::PARAM_STR );
 		if ( null !== $requester ) {
 			$revokeStatement->bindValue( 'requester', $requester, PDO::PARAM_STR );
@@ -95,18 +93,13 @@ class CertificateCredentialAdmin extends CredentialAdmin
 		$revokeStatement->execute();
 	}
 
-	public function revokeRequester( ?string $requester, ?DateTimeInterface $validOn = null, string|Realm|null $realm = null ): void
+	public function revokeRequester( string $requester, ?DateTimeInterface $validOn = null, array $realms = [] ): void
 	{
 		if ( null === $validOn ) {
 			$validOn = $this->now;
 		}
-		if ( $realm instanceof Realm ) {
-			$realm = $realm->realmId;
-		}
-		$extraConditions = '';
-		if ( null !== $realm ) {
-			$extraConditions = ' AND realm = :realm';
-		}
+		$pdo = $this->getPDO();
+		$extraConditions = $this->getRealmConditions( $realms, static fn( $s ) => $pdo->quote( $s ) );
 		$revokeStatement = $this->getPDO()->prepare( <<<SQL
 				UPDATE realm_signing_log
 				SET revoked = :revoked
@@ -115,16 +108,53 @@ class CertificateCredentialAdmin extends CredentialAdmin
 					AND revoked IS NULL
 					{$extraConditions}
 			SQL );
-		$revokeStatement->bindValue( 'valid_on', \gmdate( static::DATE_FORMAT, $validOn->getTimestamp() ), PDO::PARAM_STR );
-		$revokeStatement->bindValue( 'revoked', \gmdate( static::DATE_FORMAT, $this->now->getTimestamp() ), PDO::PARAM_STR );
+		$revokeStatement->bindValue( 'valid_on', $this->formatUtc( $validOn ), PDO::PARAM_STR );
+		$revokeStatement->bindValue( 'revoked', $this->formatUtc( $this->now ), PDO::PARAM_STR );
 		$revokeStatement->bindValue( 'requester', $requester, PDO::PARAM_STR );
-		if ( null !== $realm ) {
-			$revokeStatement->bindValue( 'realm', $realm, PDO::PARAM_STR );
-		}
 		$revokeStatement->execute();
 	}
 
-	public function listCredentials( array $realms = [], ?DateTimeInterface $validOn = null, ?string $requester = null ): Generator
+	public function getCredential( string $ident, array $realms = [] ): ?Credential
+	{
+		$pdo = $this->getPDO();
+		$extraConditions = $this->getRealmConditions( $realms, static fn( $s ) => $pdo->quote( $s ) );
+		$stmt = $this->getPDO()->prepare( <<<SQL
+				SELECT
+					"serial", realm, ca_sub, requester, sub, issued, expires, revoked, "usage", client, user_agent, ip, "grant", ident
+					, requester, realm
+				FROM realm_signing_log
+				WHERE ident = :ident
+					{$extraConditions}
+				;
+			SQL );
+		$stmt->bindValue( 'ident', $ident, PDO::PARAM_STR );
+		$stmt->execute();
+		if ( $row = $stmt->fetch( PDO::FETCH_ASSOC ) ) {
+			$expiry = $this->dateTimeFromUtc( $row['expires'] );
+			$issued = $this->dateTimeFromUtc( $row['issued'] );
+			$revoked = $this->dateTimeFromUtc( $row['revoked'] );
+
+			\assert( null !== $expiry );
+			\assert( null !== $issued );
+
+			return new CertificateCredential(
+				credentialId: $row['ident'],
+				userId: $row['requester'],
+				clientId: $row['client'],
+				grantSid: $row['grant'],
+				ip: $row['ip'],
+				userAgent: $row['user_agent'],
+				realm: $this->admin->getRealm( $row['realm'] ),
+				expiry: $expiry,
+				issued: $issued,
+				revoked: $revoked,
+			);
+		}
+
+		return null;
+	}
+
+	public function listCredentials( array $realms = [], ?DateTimeInterface $validOn = null, ?string $requester = null, bool $unrevokedOnly = false ): Generator
 	{
 		if ( null === $validOn ) {
 			$validOn = $this->now;
@@ -133,6 +163,9 @@ class CertificateCredentialAdmin extends CredentialAdmin
 		$extraConditions = $this->getRealmConditions( $realms, static fn( $s ) => $pdo->quote( $s ) );
 		if ( null !== $requester ) {
 			$extraConditions .= ' AND requester = :requester';
+		}
+		if ( $unrevokedOnly ) {
+			$extraConditions .= ' AND revoked IS NULL';
 		}
 		$stmt = $this->getPDO()->prepare( <<<SQL
 				SELECT
@@ -143,20 +176,20 @@ class CertificateCredentialAdmin extends CredentialAdmin
 					{$extraConditions}
 				ORDER BY issued DESC;
 			SQL );
-		$stmt->bindValue( 'valid_on', \gmdate( static::DATE_FORMAT, $validOn->getTimestamp() ), PDO::PARAM_STR );
+		$stmt->bindValue( 'valid_on', $this->formatUtc( $validOn ), PDO::PARAM_STR );
 		if ( null !== $requester ) {
 			$stmt->bindValue( 'requester', $requester, PDO::PARAM_STR );
 		}
 		$stmt->execute();
 		while ( $row = $stmt->fetch( PDO::FETCH_ASSOC ) ) {
-			$expiry = $this->dateTimeFromGmt( $row['expires'] );
-			$issued = $this->dateTimeFromGmt( $row['issued'] );
-			$revoked = $this->dateTimeFromGmt( $row['revoked'] );
+			$expiry = $this->dateTimeFromUtc( $row['expires'] );
+			$issued = $this->dateTimeFromUtc( $row['issued'] );
+			$revoked = $this->dateTimeFromUtc( $row['revoked'] );
 
 			\assert( null !== $expiry );
 			\assert( null !== $issued );
 
-			yield new CertificateCredential(
+			yield $row['ident'] => new CertificateCredential(
 				credentialId: $row['ident'],
 				userId: $row['requester'],
 				clientId: $row['client'],
@@ -175,7 +208,7 @@ class CertificateCredentialAdmin extends CredentialAdmin
 	 * @param array<Realm|string>             $realms
 	 * @param callable(string):(false|string) $sqlEscape
 	 */
-	private function getRealmConditions( array $realms, $sqlEscape ): string
+	private function getRealmConditions( array $realms, callable $sqlEscape ): string
 	{
 		if ( empty( $realms ) ) {
 			$realms = $this->admin->realms;

@@ -152,10 +152,22 @@ final class LetsWifiApp
 		if ( !$this->crashing ) {
 			$data = $this->deepConvertToJson( $data, $reshape );
 		}
-		if ( null === $template || \array_key_exists( 'json', $_GET ) || !$this->isBrowser() ) {
+		$forceJson = \array_key_exists( 'json', $_GET );
+		$forceDebug = \array_key_exists( 'debug', $_GET );
+		if ( null === $template || $forceJson || !$this->isBrowser() ) {
+			$filter = $forceDebug
+				? static fn( string $k ): bool => true
+				: static fn( string $k ): bool => $k && !\str_starts_with( $k, '_' );
 			\header( 'Content-Type: application/json' );
 
-			exit( \json_encode( $data, \JSON_UNESCAPED_SLASHES ) . "\r\n" );
+			exit( \json_encode(
+				\array_filter(
+					$data,
+					$filter,
+					\ARRAY_FILTER_USE_KEY,
+				),
+				\JSON_UNESCAPED_SLASHES,
+			) . "\r\n" );
 		}
 		\header( 'Content-Type: text/html;charset=utf8' );
 

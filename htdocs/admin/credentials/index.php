@@ -36,40 +36,53 @@ if ( 'POST' === $_SERVER['REQUEST_METHOD'] ) {
 }
 if ( \array_key_exists( 'realms', $_GET ) && \is_array( $_GET['realms'] ) ) {
 	/** @psalm-suppress InvalidArgument */
-	\header( 'Location: ?' . \http_build_query( ['realms' => \implode( ',', $_GET['realms'] )] + $_GET ) );
+	$realms = \implode( ',', $_GET['realms'] );
+	\header( 'Location: ?' . \http_build_query( \array_filter( ['realms' => $realms] + $_GET ) ) );
+	\setcookie(
+		'filter_admin_realms',
+		\array_diff( \array_keys( $admin->realms ), $_GET['realms'] ) ? $realms : '',
+		['path' => '/admin/', 'httponly' => true],
+	);
 
 	exit;
 }
 
-$realms = \array_key_exists( 'realms', $_GET )
-	? \array_filter( \explode( ',', $_GET['realms'] ?? '' ) )
-	: [];
+$realms = \array_filter( \explode( ',', $_GET['realms'] ?? $_COOKIE['filter_admin_realms'] ?? '' ) );
 $requester = \array_key_exists( 'requester', $_GET ) && \is_string( $_GET['requester'] )
-? \trim( $_GET['requester'] ) ?: null
-:null;
+	? \trim( $_GET['requester'] ) ?: null
+	: null;
+$ident = \array_key_exists( 'ident', $_GET ) && \is_string( $_GET['ident'] )
+	? \trim( $_GET['ident'] ) ?: null
+	: null;
+$revoked = !\array_key_exists( 'revoked', $_GET ) || ( '0' !== $_GET['revoked'] && 'off' !== $_GET['revoked'] );
+
 $app->render( [
-	'user' => $user,
-	'admin' => $admin,
-	'provider' => $provider,
+	'_user' => $user,
+	'_admin' => $admin,
+	'_provider' => $provider,
+	'_realms' => $admin->realms,
 
-	'realms' => $admin->realms,
-	'filter_valid_on' => $validOn ?? new DateTimeImmutable(),
-	'filter_realms' => $realms,
-	'filter_requester' => $requester,
+	'__filter_valid_on' => $validOn ?? new DateTimeImmutable(),
+	'__filter_realms' => $realms,
+	'__filter_requester' => $requester,
+	'__filter_ident' => $ident,
+	'__filter_revoked' => !$revoked,
 
-	'admin_menu' => [
-		'Credentials' => '../credentials/',
-		'Requesters' => '../requesters/',
-	],
+	'__admin_menu_prefix' => '../',
+	'__admin_menu_active' => 'credentials/',
+	'__admin_menu' => ( require '../_menu.php' ),
 
-	'credentials' => \iterator_to_array( $credentialAdmin->listCredentials( $realms, $validOn, requester: $requester ) ),
+	'credentials' => isset( $ident )
+		? \array_filter( [$credentialAdmin->getCredential( $ident )] )
+		: \iterator_to_array( $credentialAdmin->listCredentials( $realms, $validOn, requester: $requester, unrevokedOnly: !$revoked ) ),
 ], 'admin-credentials', [
 	Credential::class => static fn ( Credential $c ) => [
 		'not_before' => $c->getIssued()->format( 'Y-m-d' ),
 		'not_after' => $c->getExpiry()?->format( 'Y-m-d' ),
 		'revoked' => $c->getRevoked()?->format( 'Y-m-d' ),
 
-		'requester_href' => '?' . \http_build_query( ['requester' => $c->userId] + $_GET ),
-		'realm_href' => '?' . \http_build_query( ['realms' => $c->realm->realmId] + $_GET ),
+		'requester_href' => '?' . \http_build_query( ['ident' => null, 'requester' => $c->userId] + $_GET ),
+		'ident_href' => '?' . \http_build_query( ['ident' => $c->credentialId] + $_GET ),
+		'realm_href' => '?' . \http_build_query( ['ident' => null, 'realms' => $c->realm->realmId] + $_GET ),
 	],
 ] );

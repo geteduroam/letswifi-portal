@@ -1,0 +1,18 @@
+{% if realms|length > 1 %}
+			<fieldset id="realm-picker">
+				<legend accesskey="r">{{ 'Realms'|t }}</legend>
+				<ul>
+
+{% for realm in realms %}
+					<li>
+						<input type="checkbox" id="realm_{{ realm.realm_id }}" name="realms[]" value="{{ realm.realm_id }}"{{ not __filter_realms is defined or not __filter_realms or realm.realm_id in __filter_realms ? ' checked' : '' }}>
+						<label for="realm_{{ realm.realm_id }}"><strong>{{ realm.display_name|t }}</strong> <small>{{ realm.realm_id }}</small>
+{% if realm.description %}
+							<br>{{ realm.description|t }}
+{% endif %}
+						</label>
+					</li>
+{% endfor %}
+				</ul>
+			</fieldset>
+{% endif %}

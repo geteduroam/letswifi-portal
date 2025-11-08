@@ -3,32 +3,27 @@
 {% block title %}{{ 'Administration panel'|translate_raw }}{% endblock %}
 
 {% block admin_content %}
+	<h1>{{ 'Requesters by realm'|t }}</h1>
 	<section class="highlight">
 	<form>
-		<details open class="form">
-		<summary>{{ 'Search'|t }}</summary>
-			<dl>
-				<dt>{{ 'Valid on'|t }}</dt>
-				<dd><input type="datetime-local" name="valid_on" value="{{ filter_valid_on|split('+')|first }}"></dd>
-			</dl>
-			<dl>
-				<dt>{{ 'Username'|t }}</dt>
-				<dd>
-					<input type="text" name="requester" value="{{ filter_requester }}">
-				</dd>
-			</dl>
-			<dl>
-				<dt>{{ 'Realms'|t }}</dt>
-				<dd class="realm-checkboxes">
-					{% for realm in realms %}
-					<span class="realm-checkbox">
-					<input type="checkbox" id="realm_{{ realm.realm_id }}" name="realms[]" value="{{ realm.realm_id }}"{{ not filter_realms or realm.realm_id in filter_realms ? ' checked' : '' }}>
-					<label for="realm_{{ realm.realm_id }}">{{ realm.realm_id }}</label>
-					</span>
-					{% endfor %}
-				</dd>
-			</dl>
-
+		<details {{ __filter_requester or __filter_realms ? 'open ' : '' }}class="form">
+		<summary>{{ 'Filter'|t }}</summary>
+			<div class="cols">
+				<div>
+					<dl>
+						<dt>{{ 'Valid on'|t }}</dt>
+						<dd><input type="datetime-local" name="valid_on" value="{{ __filter_valid_on|split('+')|first }}"> UTC</dd>
+					</dl>
+					<dl>
+						<dt>{{ 'Requester'|t }}</dt>
+						<dd>
+							<input type="text" name="requester" value="{{ __filter_requester }}">
+						</dd>
+					</dl>
+				</div>
+				{% set realms = _realms %}
+				{{ include('_realms-picker.twig') }}
+			</div>
 			<p><button type="submit">{{ 'Search'|t }}</button>
 		</details>
 	</form>
@@ -37,34 +32,67 @@
 	<hr>
 
 	{% if requesters %}
-	<form method="POST"><input type="hidden" name="valid_on" value="{{ filter_valid_on|split('+')|first }}">
-		<table>
-			<tr>
-				<th>{{ 'Requester'|t }}</th>
-				<th>{{ 'Realm'|t }}</th>
-				<th>{{ 'Earliest'|t }}</th>
-				<th>{{ 'Expires'|t }}</th>
-				<th class="number">{{ 'Valid creds'|t }}</th>
-				<th class="number">{{ 'Total creds'|t }}</th>
-				<th></th>
-			</tr>
-			{% for requester in requesters %}
-			<tr>
-				<td><a href="{{ requester.requester_href }}">{{ requester.requester.name }}</a></td>
-				<td><a href="{{ requester.realm_href }}">{{ requester.requester.realm }}</a></td>
-				<td>{{ requester.earliest_valid }}</td>
-				<td>{{ requester.last_valid }}</td>
-				<td class="number">{{ requester.valid_accounts }}</td>
-				<td class="number">{{ requester.total_accounts }}</td>
-				<td>
-					{% if requester.valid_accounts > 0 %}
-					<button class="btn-danger" name="revoke_requester" value="{{ requester.revoke_id }}">{{ 'Revoke'|t }}</button>
-					{% endif %}
-				</td>
-			</tr>
-			{% endfor %}
-		</table>
-	</form>
+	<table>
+		<tr>
+			<th>{{ 'Requester'|t }}</th>
+			<th>{{ 'Realm'|t }}</th>
+			<th>{{ 'Earliest'|t }}</th>
+			<th>{{ 'Expires'|t }}</th>
+			<th class="number">{{ 'Valid creds'|t }}</th>
+			<th class="number">{{ 'Total creds'|t }}</th>
+			<th></th>
+		</tr>
+		{% for requester in requesters %}
+		<tr>
+			<td><a href="{{ requester.requester_href }}">{{ requester.requester.name }}</a></td>
+			<td><a href="{{ requester.realm_href }}">{{ requester.requester.realm }}</a></td>
+			<td>{{ requester.earliest_valid }}</td>
+			<td>{{ requester.last_valid }}</td>
+			<td class="number">
+				<a href="{{ requester.credential_unrevoked_href }}">{{ requester.valid_accounts }}
+					<small class="oojs-icon oojs-icon-funnel"></small>
+				</a>
+			</td>
+			<td class="number">
+				<a href="{{ requester.credential_href }}">{{ requester.total_accounts }}
+					<small class="oojs-icon oojs-icon-funnel"></small>
+				</a>
+			</td>
+			<td>
+				{% if requester.valid_accounts > 0 %}
+				<button type="button" class="btn-danger" name="revoke_requester" value="{{ requester.requester.name }}" popovertarget="revoke_{{ requester.requester.name }}">{{ 'Revoke all'|t }}</button>
+
+				<dialog class="modal" id="revoke_{{ requester.requester.name }}" popover>
+					<form method="POST">
+						<input type="hidden" name="valid_on" value="{{ __filter_valid_on|split('+')|first }}">
+						<input type="hidden" name="realms" value="{{ requester.requester.realm }}">
+						<h2>Are you sure you want to revoke all credentials for the following requester?</h2>
+						<div class="form">
+						<dl>
+							<dt>Requester</dt>
+							<dd>{{ requester.requester.name }}</dd>
+						</dl>
+						<dl>
+							<dt>Realm</dt>
+							<dd>{{ requester.requester.realm }}</dd>
+						</dl>
+						<dl>
+							<dt>Credentials to be revoked</dt>
+							<dd>{{ requester.valid_accounts }}</dd>
+						</dl>
+						</div>
+						<div class="buttons">
+						<button type="submit" class="btn-danger" name="revoke_requester" value="{{ requester.requester.name }}" popovertarget="revoke_{{ requester.requester.name }}">{{ 'Revoke'|t }}</button>
+						<button type="button" class="btn-boring" popovertarget="revoke_{{ requester.requester.name }}">{{ 'Cancel'|t }}</button>
+						</div>
+					</form>
+				</dialog>
+
+				{% endif %}
+			</td>
+		</tr>
+		{% endfor %}
+	</table>
 	{% else %}
 	<p>{{ 'No results'|t }}
 	{% endif %}

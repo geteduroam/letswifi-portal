@@ -176,7 +176,7 @@ header #product-name {
 	position: relative;
 }
 #systray > .dropdown-container > .dropdown > ul.dropdown-menu > li > hr {
-	margin-top: .2em;
+	margin: .4em 0 .2em 0;
 }
 #systray > .dropdown-container > .dropdown > ul.dropdown-menu > li > a {
 	color: var(--text-color) !important;
@@ -281,7 +281,7 @@ h3 {
 	white-space: nowrap;
 }
 
-details:has(p), form table {
+details:has(p), table {
 	font-size: .8rem;
 }
 details:has(p) > summary {
@@ -303,14 +303,14 @@ details[open]:has(p) > summary:before {
 summary, button {
 	cursor: pointer;
 }
-form table {
+table {
 	width: 100%;
 }
-form table td {
+table td {
 	/* works as min-height, https://stackoverflow.com/a/25329017/951387 */
 	height: 2.1em;
 }
-form table td:last-child, form table td.number, form table th.number {
+table td.number, table th.number {
 	text-align: right;
 }
 hr {
@@ -340,13 +340,45 @@ input[type=datetime-local], input[type=text], input[type=password] {
 	border-radius: .02em;
 	margin-top: .1em;
 }
-input[type=radio]:focus + label, label:focus, input[type=datetime-local]:focus-visible, input[type=text]:focus-visible, input[type=password]:focus-visible {
+input[type=radio]:focus + label,
+input[type=checkbox]:focus + label,
+input[type=datetime-local]:focus-visible,
+input[type=text]:focus-visible,
+input[type=password]:focus-visible,
+label:focus {
 	outline-offset: .2em;
 	outline: solid 2px var(--accent-color);
 }
-input[type=radio] {
+input[type=radio], input[type=checkbox] {
 	outline: none;
 }
+dialog.modal::backdrop {
+	background-color: rgba(0,0,0,.5);
+}
+dialog.modal {
+	background: var(--highlight-bg-color);
+	color: var(--highlight-text-color);
+	border-color: var(--accent-color);
+	padding: 1px;
+}
+dialog.modal > *, dialog.modal > form > * {
+	padding: 1em;
+}
+dialog.modal > form {
+	padding: 0;
+}
+dialog.modal > .buttons, dialog.modal > form > .buttons {
+	flex-direction: row-reverse;
+	justify-content: flex-start;
+	background: rgba(0,0,0,.05);
+}
+dialog.modal h2 {
+	margin: 0;
+	padding: 1em;
+	padding-bottom: 0;
+	font-size: 1em;
+}
+
 fieldset {
 	border: thin solid var(--light-border-color);
 	border-radius: .15em;
@@ -359,13 +391,17 @@ fieldset > legend {
 	padding: 0;
 	list-style: none;
 }
-#realm-picker ul input[type=radio] {
-	margin: .4em 0 0 .8em;
+#realm-picker ul input[type=radio], #realm-picker ul input[type=checkbox] {
+	margin: .3rem 0 0 .3em;
 	float: left;
 	clear: left;
 }
+#realm-picker ul input[type=checkbox] {
+	margin-top: .2rem;
+}
 #realm-picker ul label {
-	padding-left: 2.3em;
+	padding-left: 1.8em;
+	padding-right: .5em;
 	display: block;
 	margin-bottom: .8em;
 	border-radius: .2em;
@@ -416,6 +452,14 @@ fieldset > legend {
 }
 .btn.btn-danger:active, button.btn-danger:active {
 	background: var(--button-danger-active-bg-color);
+	color: var(--button-text-color);
+}
+.btn.btn-boring, button.btn-boring {
+	background: #777;
+	color: var(--button-text-color);
+}
+.btn.btn-boring:active, button.btn-boring:active {
+	background: #666;
 	color: var(--button-text-color);
 }
 .btn-txt {
@@ -536,8 +580,15 @@ details:has(p) > summary:before {
 .oojs-icon-download:before {
 	background-image: url('oojs-ui/images/icons/download.svg');
 }
-
+.oojs-icon-funnel:before {
+	background-image: url('oojs-ui/images/icons/funnel-ltr.svg');
 }
+
+a .oojs-icon-funnel {
+	opacity: 0;
+}
+a:focus .oojs-icon-funnel, a:hover .oojs-icon-funnel {
+	opacity: .5;
 }
 
 .cols > main {
@@ -552,14 +603,26 @@ body > .cols {
 	margin: 0 auto;
 }
 
+nav.side-menu {
+	line-height: 1.8em;
+	font-size: .9em;
+}
+nav.side-menu h2 {
+	font-size: 1em;
+	font-variant-caps: all-small-caps;
+	margin: 0;
+}
 nav.side-menu ul {
 	list-style: none;
 	padding: 0;
+	margin: 0;
+}
+nav.side-menu li {
+	margin: .4em 0;
 }
 nav.side-menu ul li a {
 	display: block;
-	padding: .4em 0 .4em .6em;
-	margin: 1em 0 0 0;
+	padding: 0 0 0 .6em;
 	text-decoration: none;
 	color: var(--text-color);
 	border-left: medium solid rgba(0,0,0,0);
@@ -602,6 +665,10 @@ nav.side-menu ul li.active a {
 	}
 	picture.screenshot.mac img {
 		filter: invert(100%) sepia(20%) invert(100%) hue-rotate(18deg);
+	}
+
+	dialog.modal > .buttons, dialog.modal > form > .buttons {
+		background: rgba(255,255,255,.1);
 	}
 
 	section.highlight {

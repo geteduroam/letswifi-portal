@@ -6,15 +6,19 @@
 <div class="cols">
 <nav class="side-menu">
 	<section>
-		<p><strong>{{ 'Administration panel'|t }}</strong>
-		<p>{{ provider.display_name|t }}
+		<h1><strong>{{ 'Administration panel'|t }}</strong></h1>
+		<p>{{ _provider.display_name|t }}
 	</section>
 	<hr>
+
+	{% for category, submenu in __admin_menu %}
+	<h2>{{ category|t }}</h2>
 	<ul>
-	{% for caption, href in admin_menu %}
-		<li><a href="{{ href }}">{{ caption|t }}</a></li>
-	{% endfor %}
+		{% for caption, href in submenu %}
+		<li {{ href == __admin_menu_active ? ' class="active"' : '' }}><a href="{{ __admin_menu_prefix }}{{ href }}">{{ caption|t }}</a></li>
+		{% endfor %}
 	</ul>
+	{% endfor %}
 </nav>
 <main>
 {% block admin_content %}
@@ -23,11 +27,11 @@
 <section class="highlight form">
 	<dl>
 		<dt>{{ 'Provider name'|t }}</dt>
-		<dd>{{ provider.display_name|t }}</dd>
+		<dd>{{ _provider.display_name|t }}</dd>
 	</dl>
 	<dl>
 		<dt>{{ 'Provider host'|t }}</dt>
-		<dd><code>{{ provider.host }}</code></dd>
+		<dd><code>{{ _provider.host }}</code></dd>
 	</dl>
 </section>
 {% endblock %}

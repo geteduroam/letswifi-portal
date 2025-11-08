@@ -28,9 +28,7 @@ use letswifi\profile\Realm;
 class CertificateCredentialLog extends CredentialLog
 {
 	use Database;
-	use GMT;
-
-	public const DATE_FORMAT = 'Y-m-d H:i:s';
+	use UTC;
 
 	/**
 	 * @param string $client Client ID to filter, all clients if null
@@ -47,17 +45,17 @@ class CertificateCredentialLog extends CredentialLog
 		$clientQueryPart = null === $client ? '' : 'AND client = :client';
 		$realmQueryPart = null === $realm ? '' : 'AND realm = :realm';
 		$statement = $this->getPDO()->prepare( <<<SQL
-			SELECT realm, ca_sub, requester, ident, "grant", "usage", sub, issued, expires, revoked, csr, client, user_agent, ip, x509
-			FROM realm_signing_log
-			WHERE requester = :requester
-				AND expires > :now
-				AND revoked IS NULL
-				{$clientQueryPart}
-				{$realmQueryPart}
-			ORDER BY issued ASC
+				SELECT realm, ca_sub, requester, ident, "grant", "usage", sub, issued, expires, revoked, csr, client, user_agent, ip, x509
+				FROM realm_signing_log
+				WHERE requester = :requester
+					AND expires > :now
+					AND revoked IS NULL
+					{$clientQueryPart}
+					{$realmQueryPart}
+				ORDER BY issued DESC;
 			SQL );
 		$statement->bindValue( 'requester', $this->user->userId, PDO::PARAM_STR );
-		$statement->bindValue( 'now', \gmdate( static::DATE_FORMAT, $this->now->getTimestamp() ), PDO::PARAM_STR );
+		$statement->bindValue( 'now', $this->formatUtc( $this->now ), PDO::PARAM_STR );
 		if ( null !== $client ) {
 			$statement->bindParam( 'client', $client, PDO::PARAM_STR );
 		}
@@ -85,9 +83,9 @@ class CertificateCredentialLog extends CredentialLog
 				continue;
 			}
 
-			$issued = $this->dateTimeFromGmt( $row['issued'] );
-			$expiry = $this->dateTimeFromGmt( $row['expires'] );
-			$revoked = $this->dateTimeFromGmt( $row['revoked'] );
+			$issued = $this->dateTimeFromUtc( $row['issued'] );
+			$expiry = $this->dateTimeFromUtc( $row['expires'] );
+			$revoked = $this->dateTimeFromUtc( $row['revoked'] );
 			\assert( null !== $issued );
 			\assert( null !== $expiry );
 
@@ -115,14 +113,14 @@ class CertificateCredentialLog extends CredentialLog
 		$clientQueryPart = null === $client ? '' : 'AND client = :client';
 		$realmQueryPart = null === $realm ? '' : 'AND realm = :realm';
 		$statement = $this->getPDO()->prepare( <<<SQL
-			SELECT realm, requester, ident, "grant", ca_sub, "usage", sub, issued, expires, revoked, csr, client, user_agent, ip, x509, ident
-			FROM realm_signing_log
-			WHERE
-				ident = :ident
-				AND requester = :requester
-				{$clientQueryPart}
-				{$realmQueryPart}
-			ORDER BY issued ASC
+				SELECT realm, requester, ident, "grant", ca_sub, "usage", sub, issued, expires, revoked, csr, client, user_agent, ip, x509, ident
+				FROM realm_signing_log
+				WHERE
+					ident = :ident
+					AND requester = :requester
+					{$clientQueryPart}
+					{$realmQueryPart}
+				ORDER BY issued ASC
 			SQL );
 		$statement->bindValue( 'ident', $credentialId, PDO::PARAM_STR );
 		$statement->bindValue( 'requester', $this->user->userId, PDO::PARAM_STR );
@@ -137,9 +135,9 @@ class CertificateCredentialLog extends CredentialLog
 		$tenantConfig = new ProfileConfig( $this->config );
 		if ( $row = $statement->fetch( PDO::FETCH_ASSOC ) ) {
 			$realm = $tenantConfig->getRealm( $row['realm'] );
-			$issued = $this->dateTimeFromGmt( $row['issued'] );
-			$expiry = $this->dateTimeFromGmt( $row['expires'] );
-			$revoked = $this->dateTimeFromGmt( $row['revoked'] );
+			$issued = $this->dateTimeFromUtc( $row['issued'] );
+			$expiry = $this->dateTimeFromUtc( $row['expires'] );
+			$revoked = $this->dateTimeFromUtc( $row['revoked'] );
 			\assert( null !== $issued );
 			\assert( null !== $expiry );
 
@@ -163,14 +161,14 @@ class CertificateCredentialLog extends CredentialLog
 	public function revokeCredential( string $credentialId ): void
 	{
 		$revokeStatement = $this->getPDO()->prepare( <<<SQL
-			UPDATE realm_signing_log
-			SET revoked = :revoked
-			WHERE
-				ident = :ident
-				AND requester = :requester
-				AND revoked IS NULL
+				UPDATE realm_signing_log
+				SET revoked = :revoked
+				WHERE
+					ident = :ident
+					AND requester = :requester
+					AND revoked IS NULL
 			SQL );
-		$revokeStatement->bindValue( 'revoked', \gmdate( static::DATE_FORMAT, $this->now->getTimestamp() ), PDO::PARAM_STR );
+		$revokeStatement->bindValue( 'revoked', $this->formatUtc( $this->now ), PDO::PARAM_STR );
 		$revokeStatement->bindParam( 'ident', $credentialId, PDO::PARAM_STR );
 		$revokeStatement->bindValue( 'requester', $this->user->userId, PDO::PARAM_STR );
 		$revokeStatement->execute();
