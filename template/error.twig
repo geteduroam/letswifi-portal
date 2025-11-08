@@ -7,7 +7,7 @@
 <h1>{{ code }} {{ code_explain }}</h1>
 <p>{{ 'An error occurred'|t }}
 <p><code>{{ message }}</code>
-{% if stacktrace %}
+{% if stacktrace is defined %}
 <p>{{ 'Debug info'|t }}
 <pre>{{ stacktrace }}
 

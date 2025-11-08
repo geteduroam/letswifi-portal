@@ -3,7 +3,7 @@
 {% block title %}{{ 'Administration panel'|translate_raw }}{% endblock %}
 
 {% block content %}
-<div class="col-menu">
+<div class="cols">
 <nav class="side-menu">
 	<section>
 		<p><strong>{{ 'Administration panel'|t }}</strong>
@@ -28,14 +28,6 @@
 	<dl>
 		<dt>{{ 'Provider host'|t }}</dt>
 		<dd><code>{{ provider.host }}</code></dd>
-	</dl>
-	<dl>
-		<dt>{{ 'Provider contact information'|t }}</dt>
-		<dd><ul>
-			<li>{{ provider.contact.mail }}</li>
-			<li>{{ provider.contact.web }}</li>
-			<li>{{ provider.contact.phone }}</li>
-		</ul></dd>
 	</dl>
 </section>
 {% endblock %}

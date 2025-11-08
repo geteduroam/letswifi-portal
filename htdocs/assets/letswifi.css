@@ -218,14 +218,19 @@ html.dialog main > p.fullwidth {
 }
 
 section {
-	padding: 0 .8em .4em .8em;
+	/*padding: 0 .8em .4em .8em;*/
+	padding-bottom: .4em;
 }
 section.highlight {
+	padding: .4em .8em;
 	box-shadow: 0 .1em .2em rgba(0,0,0,.4);
 	border-radius: .1em;
 	border-left: thick solid var(--accent-color);
 	background: var(--highlight-bg-color);
 	color: var(--highlight-text-color);
+}
+section h1, section h2 {
+	margin-top: 0;
 }
 
 pre {
@@ -271,6 +276,9 @@ h3 {
 }
 .form dl dd {
 	grow: 2;
+}
+.form dd {
+	white-space: nowrap;
 }
 
 details:has(p), form table {
@@ -529,23 +537,19 @@ details:has(p) > summary:before {
 	background-image: url('oojs-ui/images/icons/download.svg');
 }
 
-.col-menu {
-	display: flex;
-	gap: 2em;
-	/*
-	max-width: 68rem;
-	justify-content: center;
-	*/
 }
-.col-menu > nav {
-	margin-top: 1.2rem;
-	min-width: 10em;
 }
-.col-menu > main {
+
+.cols > main {
 	flex-grow: 2;
 }
-.col-menu > main > * {
-	margin: 2em 0;
+body > .cols {
+	max-width: 68rem;
+}
+.cols {
+	display: flex;
+	gap: 2em;
+	margin: 0 auto;
 }
 
 nav.side-menu ul {

@@ -10,7 +10,7 @@
 			<dt>{{ 'User ID'|t }}</dt>
 			<dd><code>{{ user.user_id }}</code></dd>
 		</dl>
-{% if user.affiliations %}
+{% if user.affiliations ?? [] %}
 		<dl>
 			<dt>{{ 'Affiliations'|t }}</dt>
 			<dd>
@@ -33,7 +33,7 @@
 
 {% for realm in realms %}
 				<li>
-{% if realm.logo_endpoint %}
+{% if realm.logo_endpoint is defined %}
 					<img src="{{ realm.logo_endpoint }}" alt="Logo" aria-hidden="true">
 {% endif %}
 					<strong>{{ realm.display_name|t }}</strong>

@@ -363,6 +363,8 @@ final class LetsWifiApp
 				[\implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 2 ), 'template'] )],
 			);
 			$this->twig = new Environment( $loader, [
+				'strict_variables' => true,
+				'use_yield' => true,
 				// 'cache' => '/path/to/compilation_cache',
 			] );
 			$this->twig->addFilter( new TwigFilter(

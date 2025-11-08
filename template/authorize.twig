@@ -4,7 +4,7 @@
 
 {% block content %}
 <form method="post">
-{% if logoutUrl %}
+{% if logoutUrl is defined %}
 <header>
 	<p class="logout">
 		<a href="{{ logoutUrl }}" class="btn-txt">

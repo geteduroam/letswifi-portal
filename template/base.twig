@@ -8,7 +8,7 @@
 <link rel="icon" href="{{ _basePath }}/assets/branding/{{ _product_shortname }}/{{ _branding_favicon_file }}">
 {% endif %}
 <meta name="viewport" content="width=device-width, initial-scale=1">
-{% if meta_redirect %}
+{% if meta_redirect ?? '' %}
 <meta http-equiv="refresh" content="0; url={{ meta_redirect }}">
 {% endif %}
 <title>{{ _product_name }} - {% block title %}{% endblock %}</title>
