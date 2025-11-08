@@ -19,8 +19,8 @@ $app->registerExceptionHandler();
 $realmManager = $app->getRealmManager();
 
 $stdin = \file_get_contents( 'php://stdin' );
-\preg_match_all( '/(^|\n)-----BEGIN( EC)? PRIVATE KEY-----\n.*?\n-----END\1 PRIVATE KEY-----($|\n)/sm', $stdin, $keys );
-\preg_match_all( '/(^|\n)-----BEGIN CERTIFICATE-----\n.*?\n-----END CERTIFICATE-----($|\n)/sm', $stdin, $certificates );
+\preg_match_all( '/^-----BEGIN( EC)? PRIVATE KEY-----\n.*?\n-----END\1 PRIVATE KEY-----$/sm', $stdin, $keys );
+\preg_match_all( '/^-----BEGIN CERTIFICATE-----\n.*?\n-----END CERTIFICATE-----$/sm', $stdin, $certificates );
 
 $keys = \array_map( static function ( string $key ) {
 	return new PrivateKey( $key );
