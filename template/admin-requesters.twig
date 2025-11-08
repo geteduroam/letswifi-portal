@@ -41,6 +41,7 @@
 		<table>
 			<tr>
 				<th>{{ 'Requester'|t }}</th>
+				<th>{{ 'Realm'|t }}</th>
 				<th>{{ 'Earliest'|t }}</th>
 				<th>{{ 'Expires'|t }}</th>
 				<th class="number">{{ 'Valid creds'|t }}</th>
@@ -49,7 +50,8 @@
 			</tr>
 			{% for requester in requesters %}
 			<tr>
-				<td><a href="{{ requester.requester_href }}">{{ requester.requester.name }}</a>@<a href="{{ requester.realm_href }}">{{ requester.requester.realm }}</a></td>
+				<td><a href="{{ requester.requester_href }}">{{ requester.requester.name }}</a></td>
+				<td><a href="{{ requester.realm_href }}">{{ requester.requester.realm }}</a></td>
 				<td>{{ requester.earliest_valid }}</td>
 				<td>{{ requester.last_valid }}</td>
 				<td class="number">{{ requester.valid_accounts }}</td>
