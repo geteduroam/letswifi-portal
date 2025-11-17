@@ -28,8 +28,8 @@ class DictionaryFile extends Dictionary
 			throw new DomainException( 'Configuration file should return array' );
 		}
 		parent::__construct( $conf );
-		$this->dir = \dirname( $file );
-		$this->baseDir = \realpath( $this->dir );
+		$this->dir = \dirname( $file ) . \DIRECTORY_SEPARATOR;
+		$this->baseDir = \realpath( $this->dir ) . \DIRECTORY_SEPARATOR;
 	}
 
 	public function offsetExists( mixed $offset ): bool
@@ -123,10 +123,14 @@ class DictionaryFile extends Dictionary
 
 	protected function safePath( string $path, string $key ): string
 	{
-		if ( !\file_exists( $this->dir . \DIRECTORY_SEPARATOR . $path ) ) {
-			throw new ConfigurationException( $this->getConfigPath( $key ) . ": {$path}: Path not found" );
+		$candidatePath = $this->dir . $path;
+		if ( !\file_exists( $candidatePath ) ) {
+			$candidatePath = $this->baseDir . $path;
+			if ( !\file_exists( $candidatePath ) ) {
+				throw new ConfigurationException( $this->getConfigPath( $key ) . ": {$path}: Path not found" );
+			}
 		}
-		$realPath = \realpath( $this->dir . \DIRECTORY_SEPARATOR . $path );
+		$realPath = \realpath( $candidatePath );
 		if ( false === $realPath || !\str_starts_with( $realPath, $this->baseDir ) ) {
 			throw new ConfigurationException( $this->getConfigPath( $key ) . ": Invalid path \"{$path}\"" );
 		}

@@ -25,14 +25,14 @@ class DictionaryDir extends DictionaryFile
 	public function __construct( string $dir, ?string $extension = null )
 	{
 		$this->extension = $extension ?? static::EXTENSION;
-		$this->dir = $dir;
+		$this->dir = \rtrim( $dir, \DIRECTORY_SEPARATOR ) . \DIRECTORY_SEPARATOR;
 		$this->baseDir = $dir;
 		$conf = static::createList( $dir, $this->extension );
 		Dictionary::__construct( $conf );
 		$this->data = $conf; // Psalm doesn't seem to understand that the constructor already does this
 	}
 
-	public static function createList( string $dir, ?string $extension = null, ?string $sigil = null ): array
+	protected static function createList( string $dir, ?string $extension = null, ?string $sigil = null ): array
 	{
 		$extension ??= static::EXTENSION;
 		$sigil ??= static::SIGIL;
