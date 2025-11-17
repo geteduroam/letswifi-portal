@@ -157,7 +157,7 @@ return [
 			// At least one SSID or OID must be provided.
 			// Not supported for Google-ONC profiles.
 			// OPTIONAL: Array of strings, containing hexadecimal OID
-			'oid' => ['5a03ba0800'],
+			'oids' => ['5a03ba0800'],
 		],
 	],
 

@@ -225,7 +225,7 @@ return [
 			// OID to configure for the network profile on the client.
 			// At least one SSID or OID must be provided.
 			// OPTIONAL: Array of strings, containing hexadecimal OID
-			'oid' => ['5a03ba0800'],
+			'oids' => ['5a03ba0800'],
 		],
 	],
 
