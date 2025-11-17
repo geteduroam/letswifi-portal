@@ -1,0 +1,50 @@
+{% extends 'admin.twig' %}
+
+{% block title %}{{ 'Control panel'|translate_raw }}{% endblock %}
+
+{% block admin_content %}
+	<h1>{{ 'Realms'|t }}</h1>
+
+	{% if realms %}
+		<table>
+			<tr>
+				<th>{{ 'Realm'|t }}</th>
+				<th>{{ 'Display name'|t }}</th>
+				<th>{{ 'Signer'|t }}</th>
+				<th class="right-col">{{ 'Requesters'|t }}</th>
+				<th class="right-col">{{ 'Valid creds'|t }}</th>
+				<th class="right-col">{{ 'Total creds'|t }}</th>
+			</tr>
+			{% for realm in realms %}
+			<tr>
+				<td><a href="{{ realm.href }}">{{ realm.realm_id }}</a></td>
+				<td class="overflow">{{ realm.display_name|t }}</td>
+				<td class="overflow">{{ realm.signer }}</td>
+				<td class="right-col">
+					{% if realm.total_requesters is defined %}
+					<a href="{{ realm.requester_href }}">{{ realm.total_requesters }}
+						<small class="oojs-icon oojs-icon-funnel"></small>
+					</a>
+					{% else %}—{% endif %}
+				</td>
+				<td class="right-col">
+					{% if realm.valid_accounts is defined %}
+					<a href="{{ realm.credential_unrevoked_href }}">{{ realm.valid_accounts }}
+						<small class="oojs-icon oojs-icon-funnel"></small>
+					</a>
+					{% else %}—{% endif %}
+				</td>
+				<td class="right-col">
+					{% if realm.total_accounts is defined %}
+					<a href="{{ realm.credential_href }}">{{ realm.total_accounts }}
+						<small class="oojs-icon oojs-icon-funnel"></small>
+					</a>
+					{% else %}—{% endif %}
+				</td>
+			</tr>
+			{% endfor %}
+		</table>
+	{% else %}
+	<p>{{ 'No results'|t }}
+	{% endif %}
+{% endblock %}

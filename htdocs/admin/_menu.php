@@ -9,6 +9,10 @@
  */
 
 return [
+	'General' => [
+		'Introduction' => '',
+		'Realms' => 'realms/',
+	],
 	'Credentials' => [
 		'Pseudocredentials' => 'credentials/',
 		'Requesters' => 'requesters/',

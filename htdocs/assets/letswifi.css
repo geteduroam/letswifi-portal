@@ -43,7 +43,7 @@ header {
 	display: flex;
 	justify-content: space-between;
 }
-header, header * {
+header, header *, nav.side-menu {
 	user-select: none;
 	-webkit-user-select: none;
 	-webkit-touch-callout: none;
@@ -309,9 +309,18 @@ table {
 table td {
 	/* works as min-height, https://stackoverflow.com/a/25329017/951387 */
 	height: 2.1em;
+
+	white-space: nowrap;
 }
-table td.number, table th.number {
+table td.right-col, table th.right-col {
 	text-align: right;
+}
+table td.center-col, table th.center-col {
+	text-align: center;
+}
+table td.overflow, table th.overflow {
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 hr {
 	border: none;
@@ -353,7 +362,7 @@ input[type=radio], input[type=checkbox] {
 	outline: none;
 }
 dialog.modal::backdrop {
-	background-color: rgba(0,0,0,.5);
+	background-color: rgba(255,255,255,.5);
 }
 dialog.modal {
 	background: var(--highlight-bg-color);
@@ -437,6 +446,11 @@ fieldset > legend {
 	border-radius: .2em;
 	display: inline-block;
 	text-decoration: none;
+	white-space: nowrap;
+}
+button:not(.dropdown-header) .oojs-icon:before, button:not(.dropdown-header) .oojs-icon:before {
+	filter: invert(100%);
+	-webkit-filter: invert(100%);
 }
 .btn.btn-default, button {
 	background: var(--accent-color);
@@ -587,6 +601,13 @@ details:has(p) > summary:before {
 a .oojs-icon-funnel {
 	opacity: 0;
 }
+a .oojs-icon-funnel:last-child {
+	margin: 0 0 0 .3em;
+}
+a .oojs-icon-funnel:last-child:before {
+	padding: .1em .7em;
+}
+
 a:focus .oojs-icon-funnel, a:hover .oojs-icon-funnel {
 	opacity: .5;
 }
@@ -606,6 +627,14 @@ body > .cols {
 nav.side-menu {
 	line-height: 1.8em;
 	font-size: .9em;
+	cursor: default;
+}
+nav.side-menu img {
+	width: 3.2em;
+	max-height: 3.2em;
+}
+nav.side-menu hr {
+	margin: 0 0 1em 0;
 }
 nav.side-menu h2 {
 	font-size: 1em;
@@ -627,12 +656,13 @@ nav.side-menu ul li a {
 	color: var(--text-color);
 	border-left: medium solid rgba(0,0,0,0);
 }
-nav.side-menu ul li a:hover, nav.side-menu ul li.active a {
+nav.side-menu ul li a:hover, nav.side-menu ul li a:active, nav.side-menu ul li.active a {
 	border-left: medium solid var(--accent-color);
 	color: var(--highlight-text-color);
 }
 nav.side-menu ul li.active a {
 	background: var(--highlight-bg-color);
+	cursor: default;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -669,6 +699,9 @@ nav.side-menu ul li.active a {
 
 	dialog.modal > .buttons, dialog.modal > form > .buttons {
 		background: rgba(255,255,255,.1);
+	}
+	dialog.modal::backdrop {
+		background-color: rgba(0,0,0,.7);
 	}
 
 	section.highlight {

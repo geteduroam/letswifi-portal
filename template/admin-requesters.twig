@@ -1,6 +1,6 @@
 {% extends 'admin.twig' %}
 
-{% block title %}{{ 'Administration panel'|translate_raw }}{% endblock %}
+{% block title %}{{ 'Control panel'|translate_raw }}{% endblock %}
 
 {% block admin_content %}
 	<h1>{{ 'Requesters by realm'|t }}</h1>
@@ -24,7 +24,9 @@
 				{% set realms = _realms %}
 				{{ include('_realms-picker.twig') }}
 			</div>
-			<p><button type="submit">{{ 'Search'|t }}</button>
+			<p><button type="submit">
+				<small class="oojs-icon oojs-icon-funnel"></small>
+				{{ 'Filter'|t }}
 		</details>
 	</form>
 	</section>
@@ -36,24 +38,24 @@
 		<tr>
 			<th>{{ 'Requester'|t }}</th>
 			<th>{{ 'Realm'|t }}</th>
-			<th>{{ 'Earliest'|t }}</th>
-			<th>{{ 'Expires'|t }}</th>
-			<th class="number">{{ 'Valid creds'|t }}</th>
-			<th class="number">{{ 'Total creds'|t }}</th>
+			<th class="center-col">{{ 'Earliest'|t }}</th>
+			<th class="center-col">{{ 'Expires'|t }}</th>
+			<th class="right-col">{{ 'Valid creds'|t }}</th>
+			<th class="right-col">{{ 'Total creds'|t }}</th>
 			<th></th>
 		</tr>
 		{% for requester in requesters %}
 		<tr>
-			<td><a href="{{ requester.requester_href }}">{{ requester.requester.name }}</a></td>
+			<td class="overflow"><a href="{{ requester.requester_href }}">{{ requester.requester.name }}</a></td>
 			<td><a href="{{ requester.realm_href }}">{{ requester.requester.realm }}</a></td>
-			<td>{{ requester.earliest_valid }}</td>
-			<td>{{ requester.last_valid }}</td>
-			<td class="number">
+			<td class="center-col">{{ requester.earliest_valid }}</td>
+			<td class="center-col">{{ requester.last_valid }}</td>
+			<td class="right-col">
 				<a href="{{ requester.credential_unrevoked_href }}">{{ requester.valid_accounts }}
 					<small class="oojs-icon oojs-icon-funnel"></small>
 				</a>
 			</td>
-			<td class="number">
+			<td class="right-col">
 				<a href="{{ requester.credential_href }}">{{ requester.total_accounts }}
 					<small class="oojs-icon oojs-icon-funnel"></small>
 				</a>

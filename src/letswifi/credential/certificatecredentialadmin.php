@@ -24,7 +24,7 @@ class CertificateCredentialAdmin extends CredentialAdmin
 {
 	use UTC;
 
-	public function listRequesters( array $realms = [], ?DateTimeInterface $validOn = null, ?string $requester = null ): Generator
+	public function listRequesters( array $realms = [], ?string $requester = null, ?DateTimeInterface $validOn = null ): Generator
 	{
 		if ( null === $validOn ) {
 			$validOn = $this->now;
@@ -73,6 +73,47 @@ class CertificateCredentialAdmin extends CredentialAdmin
 		}
 	}
 
+	public function getRealmStats( array $realms = [], ?DateTimeInterface $validOn = null ): Generator
+	{
+		if ( null === $validOn ) {
+			$validOn = $this->now;
+		}
+		$pdo = $this->profileService->getPDO();
+		$extraConditions = $this->getRealmConditions( $realms, static fn( $s ) => $pdo->quote( $s ) );
+		$stmt = $pdo->prepare( <<<SQL
+				SELECT
+					realm,
+					MIN(issued) earliest_valid,
+					MAX(expires) last_valid,
+					COUNT("serial") total_accounts,
+					COUNT(CASE WHEN revoked IS NULL THEN "serial" END) valid_accounts,
+					COUNT(DISTINCT requester) total_requesters
+				FROM realm_signing_log
+				WHERE expires > :valid_on AND issued < :valid_on
+					{$extraConditions}
+				GROUP BY realm
+				ORDER BY issued DESC;
+			SQL );
+		$stmt->bindValue( 'valid_on', $this->formatUtc( $validOn ), PDO::PARAM_STR );
+		$stmt->execute();
+		while ( $row = $stmt->fetch( PDO::FETCH_ASSOC ) ) {
+			$earliestValid = $this->dateTimeFromUtc( $row['earliest_valid'] );
+			$lastValid = $this->dateTimeFromUtc( $row['last_valid'] );
+
+			\assert( null !== $earliestValid );
+			\assert( null !== $lastValid );
+
+			yield $row['realm'] => [
+				'realm' => $row['realm'],
+				'earliest_valid' => $earliestValid,
+				'last_valid' => $lastValid,
+				'total_accounts' => $row['total_accounts'],
+				'valid_accounts' => $row['valid_accounts'],
+				'total_requesters' => $row['total_requesters'],
+			];
+		}
+	}
+
 	public function revokeCredential( string $credentialId, ?string $requester = null ): void
 	{
 		$requesterCondition = null === $requester ? '' : 'AND requester = :requester';
@@ -92,7 +133,7 @@ class CertificateCredentialAdmin extends CredentialAdmin
 		$revokeStatement->execute();
 	}
 
-	public function revokeRequester( string $requester, ?DateTimeInterface $validOn = null, array $realms = [] ): void
+	public function revokeRequester( string $requester, array $realms = [], ?DateTimeInterface $validOn = null ): void
 	{
 		if ( null === $validOn ) {
 			$validOn = $this->now;
@@ -153,7 +194,7 @@ class CertificateCredentialAdmin extends CredentialAdmin
 		return null;
 	}
 
-	public function listCredentials( array $realms = [], ?DateTimeInterface $validOn = null, ?string $requester = null, bool $unrevokedOnly = false ): Generator
+	public function listCredentials( array $realms = [], ?string $requester = null, ?DateTimeInterface $validOn = null, bool $unrevokedOnly = false ): Generator
 	{
 		if ( null === $validOn ) {
 			$validOn = $this->now;

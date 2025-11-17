@@ -1,14 +1,24 @@
 {% extends 'menu.twig' %}
 
-{% block title %}{{ 'Administration panel'|translate_raw }}{% endblock %}
+{% block title %}{{ 'Control panel'|translate_raw }}{% endblock %}
+
+{% block viewport %}
+<meta name="viewport" content="width=800">
+{% endblock %}
 
 {% block content %}
 <div class="cols">
 <nav class="side-menu">
-	<section>
-		<h1><strong>{{ 'Administration panel'|t }}</strong></h1>
-		<p>{{ _provider.display_name|t }}
-	</section>
+	<div>
+		<h1><strong>{{ 'Control panel'|t }}</strong></h1>
+		<div class="cols">
+			<p>{{ _provider.display_name|t }}
+				<br><code>{{ _provider.host }}</code>
+			{% if _provider.logo %}
+			<p><img src="{{ __admin_menu_prefix }}../profiles/info/logo.php" alt="">
+			{% endif %}
+		</div>
+	</div>
 	<hr>
 
 	{% for category, submenu in __admin_menu %}
@@ -22,7 +32,7 @@
 </nav>
 <main>
 {% block admin_content %}
-<h1>{{ 'Administration panel'|t }}</h1>
+<h1>{{ 'Control panel'|t }}</h1>
 
 <section class="highlight form">
 	<dl>

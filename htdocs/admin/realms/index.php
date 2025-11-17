@@ -9,17 +9,34 @@
  */
 
 use letswifi\LetsWifiApp;
+use letswifi\profile\Realm;
 
 require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'src', '_autoload.php'] );
 $app = new LetsWifiApp( basePath: '../..' );
 $provider = $app->getProvider();
 $user = $provider->requireAuth();
 $admin = $user->promote();
+$credentialLog = $app->getCredentialLog( $user );
+$credentialAdmin = $credentialLog->getCredentialAdministrator();
 
+$stats = \iterator_to_array( $credentialAdmin->getRealmStats() );
+
+/** @psalm-suppress InvalidArgument https://github.com/vimeo/psalm/issues/11287 */
 $app->render( [
-	'user' => $user,
-	'admin' => $admin,
-	'provider' => $provider,
+	'_user' => $user,
+	'_admin' => $admin,
+	'_provider' => $provider,
+
+	'__admin_menu_prefix' => '../',
+	'__admin_menu_active' => 'realms/',
+	'__admin_menu' => ( require '../_menu.php' ),
 
 	'realms' => $admin->getRealms(),
+], 'admin-realms', [
+	Realm::class => static fn( Realm $r ): array => ( $stats[$r->realmId] ?? [] ) + [
+		'href' => '?' . \http_build_query( ['realm' => $r->realmId] ),
+		'credential_href' => 'credentials/?' . \http_build_query( ['realms' => $r->realmId] ),
+		'credential_unrevoked_href' => 'credentials/?' . \http_build_query( ['revoked' => 'off', 'realms' => $r->realmId] ),
+		'requester_href' => 'requesters/?' . \http_build_query( ['realms' => $r->realmId] ),
+	],
 ] );
