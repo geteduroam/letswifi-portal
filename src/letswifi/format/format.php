@@ -126,11 +126,17 @@ abstract class Format
 	/**
 	 * @see https://stackoverflow.com/a/15875555
 	 */
-	protected static function uuidgen(): string
+	protected static function uuidgen( ?string $data = null ): string
 	{
-		$data = \random_bytes( 16 );
-		$data[6] = \chr( \ord( $data[6] ) & 0x0F | 0x40 ); // set version to 0100
-		$data[8] = \chr( \ord( $data[8] ) & 0x3F | 0x80 ); // set bits 6-7 to 10
+		if ( null === $data ) {
+			$data = \random_bytes( 16 );
+			$version = 0x40;
+		} else {
+			$data = \substr( \hash( 'sha1', $data, true ), 0, 16 );
+			$version = 0x50;
+		}
+		$data[6] = \chr( \ord( $data[6] ) & 0x0F | $version ); // set version bits to b0100 or b0101
+		$data[8] = \chr( \ord( $data[8] ) & 0x3F | 0x80 ); // set bits 6-7 to b10
 
 		return \vsprintf( '%s%s-%s-%s-%s-%s%s%s', \str_split( \bin2hex( $data ), 4 ) );
 	}

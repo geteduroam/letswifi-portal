@@ -23,7 +23,10 @@ class AppleMobileconfigFormat extends Format
 	 */
 	public function generate(): string
 	{
-		$uuid = static::uuidgen();
+		// Use a SHA1-based UUID for the profile, so that we can "update"
+		// the profile by installing a newer one within the same realm.
+		$uuid = static::uuidgen( $this->credential->realm->realmId );
+
 		$identifier = $this->getIdentifier();
 		\assert( $this->credential instanceof CertificateCredential ); // TODO: We don't support anything else yet
 
