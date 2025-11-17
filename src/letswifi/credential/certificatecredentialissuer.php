@@ -22,7 +22,7 @@ use fyrkat\openssl\PKCS12;
 use fyrkat\openssl\PrivateKey;
 use fyrkat\openssl\X509;
 use letswifi\auth\User;
-use letswifi\configuration\Dictionary;
+use letswifi\profile\ProfileService;
 use letswifi\profile\Provider;
 use letswifi\profile\Realm;
 
@@ -41,8 +41,7 @@ class CertificateCredentialIssuer implements CredentialIssuer
 		public readonly Realm $realm,
 		public readonly Provider $provider,
 		public readonly DateTimeImmutable $now,
-		private readonly PDO $pdo,
-		private readonly Dictionary $config,
+		private readonly ProfileService $profileService,
 		private readonly \Closure $revoke,
 	) {
 	}
@@ -71,7 +70,8 @@ class CertificateCredentialIssuer implements CredentialIssuer
 	private function logPreparedUserCredential( X509 $caCert, CSR $csr, DateTimeInterface $expiry, string $ident, string $usage ): int
 	{
 		$csrData = $csr->getCSRPem();
-		$statement = $this->pdo->prepare( <<<SQL
+		$pdo = $this->profileService->getPDO();
+		$statement = $pdo->prepare( <<<SQL
 			INSERT INTO realm_signing_log
 				(realm, requester, ident, "grant", ca_sub, sub, "usage", issued, expires, csr, client, user_agent, ip)
 			VALUES
@@ -91,7 +91,7 @@ class CertificateCredentialIssuer implements CredentialIssuer
 		$statement->bindValue( 'user_agent', $this->user->userAgent, PDO::PARAM_STR );
 		$statement->bindValue( 'ip', $this->user->ip, PDO::PARAM_STR );
 		$statement->execute();
-		$last = $this->pdo->lastInsertId();
+		$last = $pdo->lastInsertId();
 		$lastId = (int)$last;
 		if ( 0 < $lastId && (string)$lastId === $last ) {
 			return $lastId;
@@ -106,7 +106,8 @@ class CertificateCredentialIssuer implements CredentialIssuer
 	 */
 	private function logCompletedUserCredential( X509 $userCert, string $usage ): void
 	{
-		$statement = $this->pdo->prepare( <<<SQL
+		$pdo = $this->profileService->getPDO();
+		$statement = $pdo->prepare( <<<SQL
 			UPDATE realm_signing_log
 				SET
 					issued = :issued,
@@ -144,14 +145,11 @@ class CertificateCredentialIssuer implements CredentialIssuer
 		$dn = new DN( ['CN' => $ident] );
 		$csr = CSR::generate( $dn, $userKey );
 
-		$signerData = $this->config->getDictionary( 'certificate' )->getDictionary(
-			$this->config->getDictionary( 'realm' )->getDictionary( $this->realm->realmId )->getString( 'signer' ),
-		);
-		$caCert = new X509( $signerData->getString( 'x509' ) );
+		$caCert = $this->realm->getSignerCertificate();
 
 		$serial = $this->logPreparedUserCredential( $caCert, $csr, $expiry, $ident, 'client' );
 
-		$caKey = new PrivateKey( $signerData->getString( 'key' ), $signerData->getStringOrNull( 'passphrase' ) );
+		$caKey = $this->profileService->getPrivateKey( $this->realm->signer );
 
 		$conf = new OpenSSLConfig( x509Extensions: OpenSSLConfig::X509_EXTENSION_CLIENT );
 		$userCert = $csr->sign( $caCert, $caKey, $expiry, $conf, $serial );

@@ -28,7 +28,7 @@ use letswifi\credential\CertificateCredentialLog;
 use letswifi\credential\CredentialIssuer;
 use letswifi\credential\CredentialLog;
 use letswifi\error\UserException;
-use letswifi\profile\ProfileConfig;
+use letswifi\profile\ProfileService;
 use letswifi\profile\Provider;
 use letswifi\profile\Realm;
 use stdClass;
@@ -59,12 +59,12 @@ final class LetsWifiApp
 	/** Object to indicate that a JSON key must be deleted from the output */
 	public readonly stdClass $jsonOutputDelete;
 
+	public readonly ProfileService $profileService;
+
 	/** Prevent endless loop if an exception occurs when rendering the error page */
 	private bool $crashing = false;
 
 	private ?Environment $twig = null;
-
-	private ProfileConfig $tenantConfig;
 
 	private ?TranslationContext $translationContext = null;
 
@@ -73,7 +73,7 @@ final class LetsWifiApp
 	public function __construct( public readonly string $basePath, ?Dictionary $globalConfig = null, bool $registerExceptionHandler = true )
 	{
 		$this->globalConfig = $globalConfig ?? new DictionaryFile( \dirname( __DIR__, 2 ) . \DIRECTORY_SEPARATOR . 'config' . \DIRECTORY_SEPARATOR . 'letswifi.conf.php' );
-		$this->tenantConfig = new ProfileConfig( $this->globalConfig );
+		$this->profileService = new ProfileService( $this->globalConfig, $this->getHttpHost() );
 
 		if ( \PHP_SAPI === 'cli-server' ) {
 			// Ensure that we are setting the recommended CSP when developing,
@@ -292,7 +292,7 @@ final class LetsWifiApp
 
 	public function getProvider(): Provider
 	{
-		return $this->tenantConfig->getProvider( $this->getHttpHost() );
+		return $this->profileService->getProvider();
 	}
 
 	public function getCredentialLog( User $user ): CredentialLog
@@ -301,7 +301,7 @@ final class LetsWifiApp
 		return new CertificateCredentialLog(
 			user: $user,
 			provider: $this->getProvider(),
-			config: $this->globalConfig,
+			profileService: $this->profileService,
 		);
 	}
 

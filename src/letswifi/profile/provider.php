@@ -24,7 +24,7 @@ class Provider implements JsonSerializable
 	 * @param array<string>               $admins   Identities that are considered to be admins
 	 */
 	public function __construct(
-		private readonly ProfileConfig $tenantConfig,
+		private readonly ProfileService $tenantConfig,
 		public readonly string $host,
 		public readonly MultiLanguageString $displayName,
 		public readonly AuthenticationContext $auth,
@@ -54,7 +54,7 @@ class Provider implements JsonSerializable
 		];
 	}
 
-	public static function fromConfig( ProfileConfig $tenantConfig, Dictionary $providerData ): self
+	public static function fromConfig( ProfileService $tenantConfig, Dictionary $providerData ): self
 	{
 		$authData = $providerData->getDictionary( 'auth' );
 		$authService = $authData->getString( 'service' );

@@ -168,7 +168,7 @@ class EapConfigFormat extends Format
 			. "\r\n\t\t\t\t\t<Type>13</Type>"
 			. "\r\n\t\t\t\t</EAPMethod>"
 			. "\r\n\t\t\t\t<ServerSideCredential>";
-		foreach ( $this->credential->realm->trust as $ca ) {
+		foreach ( $this->credential->realm->getTrustedCACertificates() as $ca ) {
 			$result .= ''
 				. "\r\n\t\t\t\t\t" . '<CA format="X.509" encoding="base64">' . \base64_encode( $ca->getX509Der() ) . '</CA>';
 		}

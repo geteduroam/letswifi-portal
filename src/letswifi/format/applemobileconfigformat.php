@@ -30,8 +30,7 @@ class AppleMobileconfigFormat extends Format
 		$tlsAuthMethodUuid = static::uuidgen();
 		$defaultPassphrase = 'pkcs12';
 
-		/** @var array<X509> */
-		$caCertificates = $this->credential->realm->trust;
+		$caCertificates = $this->credential->realm->getTrustedCACertificates();
 
 		// If we include the CA, MacOS will also trust that CA for HTTPS traffic
 		// MacOS needs the bundle to be 3DES encoded

@@ -22,7 +22,6 @@ use letswifi\profile\Realm;
  */
 class CertificateCredentialAdmin extends CredentialAdmin
 {
-	use Database;
 	use UTC;
 
 	public function listRequesters( array $realms = [], ?DateTimeInterface $validOn = null, ?string $requester = null ): Generator
@@ -30,12 +29,12 @@ class CertificateCredentialAdmin extends CredentialAdmin
 		if ( null === $validOn ) {
 			$validOn = $this->now;
 		}
-		$pdo = $this->getPDO();
+		$pdo = $this->profileService->getPDO();
 		$extraConditions = $this->getRealmConditions( $realms, static fn( $s ) => $pdo->quote( $s ) );
 		if ( null !== $requester ) {
 			$extraConditions .= ' AND requester = :requester';
 		}
-		$stmt = $this->getPDO()->prepare( <<<SQL
+		$stmt = $pdo->prepare( <<<SQL
 				SELECT
 					requester, realm,
 					MIN(issued) earliest_valid,
@@ -77,7 +76,7 @@ class CertificateCredentialAdmin extends CredentialAdmin
 	public function revokeCredential( string $credentialId, ?string $requester = null ): void
 	{
 		$requesterCondition = null === $requester ? '' : 'AND requester = :requester';
-		$revokeStatement = $this->getPDO()->prepare( <<<SQL
+		$revokeStatement = $this->profileService->getPDO()->prepare( <<<SQL
 				UPDATE realm_signing_log
 				SET revoked = :revoked
 				WHERE
@@ -98,9 +97,9 @@ class CertificateCredentialAdmin extends CredentialAdmin
 		if ( null === $validOn ) {
 			$validOn = $this->now;
 		}
-		$pdo = $this->getPDO();
+		$pdo = $this->profileService->getPDO();
 		$extraConditions = $this->getRealmConditions( $realms, static fn( $s ) => $pdo->quote( $s ) );
-		$revokeStatement = $this->getPDO()->prepare( <<<SQL
+		$revokeStatement = $pdo->prepare( <<<SQL
 				UPDATE realm_signing_log
 				SET revoked = :revoked
 				WHERE requester = :requester
@@ -116,9 +115,9 @@ class CertificateCredentialAdmin extends CredentialAdmin
 
 	public function getCredential( string $ident, array $realms = [] ): ?Credential
 	{
-		$pdo = $this->getPDO();
+		$pdo = $this->profileService->getPDO();
 		$extraConditions = $this->getRealmConditions( $realms, static fn( $s ) => $pdo->quote( $s ) );
-		$stmt = $this->getPDO()->prepare( <<<SQL
+		$stmt = $pdo->prepare( <<<SQL
 				SELECT
 					"serial", realm, ca_sub, requester, sub, issued, expires, revoked, "usage", client, user_agent, ip, "grant", ident
 					, requester, realm
@@ -159,7 +158,7 @@ class CertificateCredentialAdmin extends CredentialAdmin
 		if ( null === $validOn ) {
 			$validOn = $this->now;
 		}
-		$pdo = $this->getPDO();
+		$pdo = $this->profileService->getPDO();
 		$extraConditions = $this->getRealmConditions( $realms, static fn( $s ) => $pdo->quote( $s ) );
 		if ( null !== $requester ) {
 			$extraConditions .= ' AND requester = :requester';
@@ -167,7 +166,7 @@ class CertificateCredentialAdmin extends CredentialAdmin
 		if ( $unrevokedOnly ) {
 			$extraConditions .= ' AND revoked IS NULL';
 		}
-		$stmt = $this->getPDO()->prepare( <<<SQL
+		$stmt = $pdo->prepare( <<<SQL
 				SELECT
 					"serial", realm, ca_sub, requester, sub, issued, expires, revoked, "usage", client, user_agent, ip, "grant", ident
 					, requester, realm

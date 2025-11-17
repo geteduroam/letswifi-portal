@@ -14,8 +14,8 @@ use DateTimeImmutable;
 use DomainException;
 use Generator;
 use letswifi\auth\User;
-use letswifi\configuration\Dictionary;
 use letswifi\error\RealmMismatchException;
+use letswifi\profile\ProfileService;
 use letswifi\profile\Provider;
 use letswifi\profile\Realm;
 
@@ -27,7 +27,7 @@ abstract class CredentialLog
 	public function __construct(
 		public readonly User $user,
 		public readonly Provider $provider,
-		protected readonly Dictionary $config,
+		protected readonly ProfileService $profileService,
 		public readonly DateTimeImmutable $now = new DateTimeImmutable(),
 	) {
 		// TODO: Do we really need the provider here,

@@ -15,7 +15,6 @@ use Generator;
 use PDO;
 use fyrkat\openssl\PKCS12;
 use letswifi\configuration\ConfigurationException;
-use letswifi\profile\ProfileConfig;
 use letswifi\profile\Realm;
 
 /**
@@ -27,7 +26,6 @@ use letswifi\profile\Realm;
  */
 class CertificateCredentialLog extends CredentialLog
 {
-	use Database;
 	use UTC;
 
 	/**
@@ -44,7 +42,7 @@ class CertificateCredentialLog extends CredentialLog
 		$realms = [];
 		$clientQueryPart = null === $client ? '' : 'AND client = :client';
 		$realmQueryPart = null === $realm ? '' : 'AND realm = :realm';
-		$statement = $this->getPDO()->prepare( <<<SQL
+		$statement = $this->profileService->getPDO()->prepare( <<<SQL
 				SELECT realm, ca_sub, requester, ident, "grant", "usage", sub, issued, expires, revoked, csr, client, user_agent, ip, x509
 				FROM realm_signing_log
 				WHERE requester = :requester
@@ -65,12 +63,11 @@ class CertificateCredentialLog extends CredentialLog
 		}
 
 		$statement->execute();
-		$tenantConfig = new ProfileConfig( $this->config );
 		while ( $row = $statement->fetch( PDO::FETCH_ASSOC ) ) {
 			try {
 				$realm = \array_key_exists( $row['realm'], $realms )
 				? $realms[$row['realm']]
-				: $realms[$row['realm']] = $tenantConfig->getRealm( $row['realm'] );
+				: $realms[$row['realm']] = $this->profileService->getRealm( $row['realm'] );
 			} catch ( ConfigurationException $_ ) {
 				// If the realm was removed, but there are lingering credentials
 				$realm = $realms[$row['realm']] = null;
@@ -112,7 +109,7 @@ class CertificateCredentialLog extends CredentialLog
 
 		$clientQueryPart = null === $client ? '' : 'AND client = :client';
 		$realmQueryPart = null === $realm ? '' : 'AND realm = :realm';
-		$statement = $this->getPDO()->prepare( <<<SQL
+		$statement = $this->profileService->getPDO()->prepare( <<<SQL
 				SELECT realm, requester, ident, "grant", ca_sub, "usage", sub, issued, expires, revoked, csr, client, user_agent, ip, x509, ident
 				FROM realm_signing_log
 				WHERE
@@ -132,9 +129,8 @@ class CertificateCredentialLog extends CredentialLog
 		}
 
 		$statement->execute();
-		$tenantConfig = new ProfileConfig( $this->config );
 		if ( $row = $statement->fetch( PDO::FETCH_ASSOC ) ) {
-			$realm = $tenantConfig->getRealm( $row['realm'] );
+			$realm = $this->profileService->getRealm( $row['realm'] );
 			$issued = $this->dateTimeFromUtc( $row['issued'] );
 			$expiry = $this->dateTimeFromUtc( $row['expires'] );
 			$revoked = $this->dateTimeFromUtc( $row['revoked'] );
@@ -160,7 +156,7 @@ class CertificateCredentialLog extends CredentialLog
 
 	public function revokeCredential( string $credentialId ): void
 	{
-		$revokeStatement = $this->getPDO()->prepare( <<<SQL
+		$revokeStatement = $this->profileService->getPDO()->prepare( <<<SQL
 				UPDATE realm_signing_log
 				SET revoked = :revoked
 				WHERE
@@ -179,7 +175,7 @@ class CertificateCredentialLog extends CredentialLog
 		return new CertificateCredentialAdmin(
 			admin: $this->user->promote(),
 			provider: $this->provider,
-			config: $this->config,
+			profileService: $this->profileService,
 			now: $this->now,
 		);
 	}
@@ -191,8 +187,7 @@ class CertificateCredentialLog extends CredentialLog
 			realm: $realm,
 			provider: $this->provider,
 			now: $this->now,
-			pdo: $this->getPDO(),
-			config: $this->config,
+			profileService: $this->profileService,
 			revoke: fn( string $ident ) => $this->revokeCredential( $ident ),
 		);
 	}

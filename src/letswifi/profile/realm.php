@@ -21,16 +21,17 @@ class Realm implements JsonSerializable
 {
 	/**
 	 * @param array<string>   $serverNames
-	 * @param array<X509>     $trust
+	 * @param array<string>   $trust
 	 * @param array<Network>  $networks
 	 * @param array<Location> $location
 	 */
 	public function __construct(
-		private readonly ProfileConfig $tenantConfig,
+		private readonly ProfileService $profileService,
 		public readonly string $realmId,
 		public readonly MultiLanguageString $displayName,
 		public readonly array $serverNames,
 		public readonly array $trust,
+		public readonly string $signer,
 		public readonly DateInterval $validity,
 		public readonly array $networks,
 		public readonly ?MultiLanguageString $description = null,
@@ -41,19 +42,20 @@ class Realm implements JsonSerializable
 	) {
 	}
 
-	public static function fromConfig( ProfileConfig $tenantConfig, Dictionary $realmData ): self
+	public static function fromConfig( ProfileService $profileService, Dictionary $realmData ): self
 	{
 		$location = $realmData->getDictionaryList( 'location' );
 		$logo = $realmData->getDictionaryOrNull( 'logo' );
 
 		return new self(
-			tenantConfig: $tenantConfig,
+			profileService: $profileService,
 			realmId: $realmData->getParentKey(),
 			displayName: $realmData->getMultiLanguageString( 'display_name' ),
 			serverNames: $realmData->getRawArray( 'server_names' ),
-			trust: $tenantConfig->getCertificatesWithChain( ...$realmData->getRawArray( 'trust' ) ),
+			trust: $realmData->getRawArray( 'trust' ),
+			signer: $realmData->getString( 'signer' ),
 			validity: static::getValidity( $realmData->getInteger( 'validity' ) ),
-			networks: $tenantConfig->getNetworks( ...$realmData->getRawArray( 'networks' ) ),
+			networks: $profileService->getNetworks( ...$realmData->getRawArray( 'networks' ) ),
 			location: \array_map( [Location::class, 'fromConfig'], $location ),
 			logo: null === $logo ? null : Logo::fromConfig( $logo ),
 			description: $realmData->getMultiLanguageStringOrNull( 'description' ),
@@ -63,7 +65,20 @@ class Realm implements JsonSerializable
 	}
 
 	/**
-	 * @return array{realm_id:string,display_name:MultiLanguageString,description:?MultiLanguageString,contact:?Contact,location:array<Location>,logo:bool}
+	 * @return array<X509>
+	 */
+	public function getTrustedCACertificates(): array
+	{
+		return $this->profileService->getCertificatesWithChain( ...$this->trust );
+	}
+
+	public function getSignerCertificate(): X509
+	{
+		return $this->profileService->getCertificate( $this->signer );
+	}
+
+	/**
+	 * @return array{realm_id:string,display_name:MultiLanguageString,description:?MultiLanguageString,contact:?Contact,location:array<Location>,logo:bool,signer:string,trust:array<string>}
 	 */
 	public function jsonSerialize(): array
 	{
@@ -74,12 +89,14 @@ class Realm implements JsonSerializable
 			'contact' => $this->getContact(),
 			'location' => $this->location,
 			'logo' => isset( $this->logo ),
+			'signer' => $this->signer,
+			'trust' => $this->trust,
 		];
 	}
 
 	public function getContact(): ?Contact
 	{
-		return null === $this->contactId ? null : $this->tenantConfig->getContact( $this->contactId );
+		return null === $this->contactId ? null : $this->profileService->getContact( $this->contactId );
 	}
 
 	protected static function getValidity( int|float|string|DateInterval $in ): DateInterval

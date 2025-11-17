@@ -15,7 +15,7 @@ use DateTimeInterface;
 use DomainException;
 use Generator;
 use letswifi\auth\Admin;
-use letswifi\configuration\Dictionary;
+use letswifi\profile\ProfileService;
 use letswifi\profile\Provider;
 use letswifi\profile\Realm;
 
@@ -24,7 +24,7 @@ abstract class CredentialAdmin
 	public function __construct(
 		public readonly Admin $admin,
 		public readonly Provider $provider,
-		protected readonly Dictionary $config,
+		protected readonly ProfileService $profileService,
 		public readonly DateTimeImmutable $now = new DateTimeImmutable(),
 	) {
 		// TODO: Do we really need the provider here,

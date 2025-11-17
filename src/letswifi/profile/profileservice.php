@@ -10,24 +10,23 @@
 
 namespace letswifi\profile;
 
+use PDO;
+use fyrkat\openssl\PrivateKey;
 use fyrkat\openssl\X509;
-use letswifi\LetsWifiConfig;
 use letswifi\configuration\Dictionary;
 use letswifi\error\MisdirectException;
 
-class ProfileConfig
+class ProfileService
 {
-	public function __construct( private readonly Dictionary $config )
+	private ?PDO $pdo = null;
+
+	public function __construct( private readonly Dictionary $config, public string $httpHost )
 	{
 	}
 
-	public function getProvider( string $httpHost ): Provider
+	public function getProvider(): Provider
 	{
-		$providers = $this->config->getDictionary( 'provider' );
-
-		return Provider::fromConfig( $this, $providers->getDictionaryOrNull( $httpHost )
-			?? $providers->getDictionaryOrNull( '_default' )
-			?? throw new MisdirectException( $httpHost ) );
+		return Provider::fromConfig( $this, $this->getProviderDictionary() );
 	}
 
 	public function getContact( string $contactId ): Contact
@@ -46,8 +45,6 @@ class ProfileConfig
 	 * This function filters away the private key, disallowing consumers of this class
 	 * to sign certificates or leak the key.  In order to get access to the private keys,
 	 * direct access to the inner $this->config, as provided in the constructor, is needed.
-	 *
-	 * @see LetsWifiConfig#getCertificateData(string)
 	 *
 	 * @return array<X509>
 	 */
@@ -70,6 +67,22 @@ class ProfileConfig
 		return $result;
 	}
 
+	public function getCertificate( string $sub ): X509
+	{
+		$certificates = $this->config->getDictionary( 'certificate' );
+		$certificateData = $certificates->getDictionary( $sub );
+
+		return new X509( $certificateData->getString( 'x509' ) );
+	}
+
+	public function getPrivateKey( string $sub ): PrivateKey
+	{
+		$certificates = $this->config->getDictionary( 'certificate' );
+		$certificateData = $certificates->getDictionary( $sub );
+
+		return new PrivateKey( $certificateData->getString( 'key' ), $certificateData->getStringOrNull( 'passphrase' ) );
+	}
+
 	/**
 	 * @return array<Network>
 	 */
@@ -81,5 +94,38 @@ class ProfileConfig
 			static fn( string $n ) => Network::allFromConfig( $networkData->getDictionary( $n ) ),
 			$networks,
 		) ) );
+	}
+
+	public function getPDO(): PDO
+	{
+		if ( null !== $this->pdo ) {
+			return $this->pdo;
+		}
+		$providerData = $this->getProviderDictionary();
+		$pdoData = $providerData->getDictionary( 'pdo' );
+		$dsn = $pdoData->getString( 'dsn' );
+		$username = $pdoData->getStringOrNull( 'username' );
+		$password = $pdoData->getStringOrNull( 'password' );
+
+		$pdo = new PDO( $dsn, $username, $password );
+		$pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+
+		if ( \strstr( $dsn, ':', true ) === 'mysql' ) {
+			// https://dev.mysql.com/doc/refman/8.4/en/set-variable.html
+			// https://dev.mysql.com/doc/refman/8.4/en/sql-mode.html#sqlmode_ansi_quotes
+			// TODO do we override existing modes this way, do we want to keep them, how?
+			$pdo->exec( 'SET SESSION sql_mode = \'ANSI_QUOTES\';' );
+		}
+
+		return $this->pdo = $pdo;
+	}
+
+	private function getProviderDictionary(): Dictionary
+	{
+		$allProviders = $this->config->getDictionary( 'provider' );
+
+		return $allProviders->getDictionaryOrNull( $this->httpHost )
+			?? $allProviders->getDictionaryOrNull( '_default' )
+			?? throw new MisdirectException( $this->httpHost );
 	}
 }
