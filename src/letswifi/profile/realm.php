@@ -78,7 +78,7 @@ class Realm implements JsonSerializable
 	}
 
 	/**
-	 * @return array{realm_id:string,display_name:MultiLanguageString,description:?MultiLanguageString,contact:?Contact,location:array<Location>,logo:bool,signer:string,trust:array<string>}
+	 * @return array{realm_id:string,display_name:MultiLanguageString,description:?MultiLanguageString,contact:?Contact,location:array<Location>,logo:bool,signer:string,trust:array<string>,networks:array<Network>}
 	 */
 	public function jsonSerialize(): array
 	{
@@ -91,6 +91,7 @@ class Realm implements JsonSerializable
 			'logo' => isset( $this->logo ),
 			'signer' => $this->signer,
 			'trust' => $this->trust,
+			'networks' => $this->networks,
 		];
 	}
 
