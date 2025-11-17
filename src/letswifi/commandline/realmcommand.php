@@ -54,9 +54,9 @@ class RealmCommand extends Command
 		foreach ( $realms as $name => $realm ) {
 			$displayName = $realm->getMultiLanguageString( 'display_name' )->jsonSerialize();
 			$contact = $realm->getStringOrNull( 'contact' ) ?? '-';
-			$network = $realm->getRawArray( 'networks' )[0];
+			$network = $realm->getStringArray( 'networks' )[0];
 			$validity = $realm->getInteger( 'validity' );
-			$serverName = $realm->getRawArray( 'server_names' )[0];
+			$serverName = $realm->getStringArray( 'server_names' )[0];
 			echo "{$name}\t" . \reset( $displayName )['display'] . "\t{$contact}\t{$network}\t{$validity}\t{$serverName}" . \PHP_EOL;
 		}
 	}

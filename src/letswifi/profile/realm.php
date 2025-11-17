@@ -51,16 +51,16 @@ class Realm implements JsonSerializable
 			profileService: $profileService,
 			realmId: $realmData->getParentKey(),
 			displayName: $realmData->getMultiLanguageString( 'display_name' ),
-			serverNames: $realmData->getRawArray( 'server_names' ),
-			trust: $realmData->getRawArray( 'trust' ),
+			serverNames: $realmData->getStringArray( 'server_names' ),
+			trust: $realmData->getStringArray( 'trust' ),
 			signer: $realmData->getString( 'signer' ),
 			validity: static::getValidity( $realmData->getInteger( 'validity' ) ),
-			networks: $profileService->getNetworks( ...$realmData->getRawArray( 'networks' ) ),
+			networks: $profileService->getNetworks( ...$realmData->getStringArray( 'networks' ) ),
 			location: \array_map( [Location::class, 'fromConfig'], $location ),
 			logo: null === $logo ? null : Logo::fromConfig( $logo ),
 			description: $realmData->getMultiLanguageStringOrNull( 'description' ),
 			contactId: $realmData->getStringOrNull( 'contact' ),
-			admins: $realmData->has( 'admins' ) ? $realmData->getRawArray( 'admins' ) : [],
+			admins: $realmData->has( 'admins' ) ? $realmData->getStringArray( 'admins' ) : [],
 		);
 	}
 

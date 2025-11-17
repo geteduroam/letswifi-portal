@@ -134,6 +134,12 @@ class Dictionary implements ArrayAccess
 		return $this->has( $key ) ? $this->getString( $key ) : null;
 	}
 
+	/** @return array<string> */
+	public function getStringArray( string $key ): array
+	{
+		return $this->getList( $key, '' );
+	}
+
 	public function getRawArray( string $key ): array
 	{
 		return $this->get( $key, [] );

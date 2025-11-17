@@ -46,8 +46,8 @@ class NetworkPasspoint extends Network
 		return new self(
 			networkId: $networkConfig->getParentKey(),
 			displayName: $networkConfig->getMultiLanguageString( 'display_name' ),
-			oids: $networkConfig->getRawArray( 'oid' ),
-			naiRealms: $networkConfig->has( 'nai_realm' ) ? $networkConfig->getRawArray( 'nai_realm' ) : [],
+			oids: $networkConfig->getStringArray( 'oids' ),
+			naiRealms: $networkConfig->has( 'nai_realms' ) ? $networkConfig->getStringArray( 'nai_realms' ) : [],
 		);
 	}
 }

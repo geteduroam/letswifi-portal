@@ -81,7 +81,7 @@ class Provider implements JsonSerializable
 			contactId: $providerData->getStringOrNull( 'contact' ),
 			description: $providerData->getMultiLanguageStringOrNull( 'description' ),
 			profileSigner: $providerData->getStringOrNull( 'profile-signer' ),
-			admins: $providerData->has( 'admins' ) ? $providerData->getRawArray( 'admins' ) : [],
+			admins: $providerData->has( 'admins' ) ? $providerData->getStringArray( 'admins' ) : [],
 		);
 	}
 
