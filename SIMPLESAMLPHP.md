@@ -6,14 +6,15 @@ recommends you install it in `/var`, but following
 [The Filesystem Hierarchy Standard](https://www.man7.org/linux/man-pages/man7/hier.7.html),
 we think you should install it in `/usr/local/share` instead.
 
-Debian and Ubuntu have packages for SimpleSAMLphp, but they're outdated.
-We need to use at least version 2.x the packages provided are for 1.x.
-SimpleSAMLphp 1.x **WILL NOT WORK** with this application.
-Configuration files from SimpleSAMLphp 1.x **ARE NOT COMPATIBLE** with SimpleSAMLphp 2.x.
-If you set up SimpleSAMLphp 1.x for Let's Wi-Fi, you'll have to do it again from scratch for 2.x.
+>[!IMPORTANT]
+> Debian and Ubuntu have packages for SimpleSAMLphp, but they're outdated.
+> We need to use at least version 2.x the packages provided are for 1.x.
+> SimpleSAMLphp 1.x **WILL NOT WORK** with this application.
+> Configuration files from SimpleSAMLphp 1.x **ARE NOT COMPATIBLE** with SimpleSAMLphp 2.x.
 
-Here is a script for installing SimpleSAMLphp easily.
-It assumes Debian/Ubuntu.  For FreeBSD, replace `www-data` with `www` and replace `/var/lib` with `/var/db`.
+>[!TIP]
+> The guide assumes Debian/Ubuntu.
+> For FreeBSD, replace `www-data` with `www` and replace `/var/lib` with `/var/db`.
 
 ## Installation
 
@@ -62,6 +63,10 @@ For Apache, you can add this snippet to your VirtualHost:
 	</Directory>
 </VirtualHost>
 ```
+
+>[!TIP]
+> We already added these lines to the example vhost in the installation guide for letswifi-portal,
+> so you don't have to add them if you use that example.
 
 ## /etc/simplesamlphp/config.php
 
@@ -130,7 +135,8 @@ $config = [
 
 Replace the file to add URLs for your IdP metadata.
 
-**Update the URL to the metadata URL for your IdP**
+>[!IMPORTANT]
+> Update the URL to the metadata URL for your IdP
 
 ```php
 <?php
@@ -142,7 +148,7 @@ $config = ['sets' => [[
 		// ['src' => '…other URL'],
 	],
 
-	'expireAfter' => 34560060, // Maximum 4 days cache time (3600*24*4)
+	'expireAfter' => 604800, // Maximum one week cache time (3600*24*7)
 	'outputDir' => 'config/metadata/',
 
 	'outputFormat' => 'flatfile',

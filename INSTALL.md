@@ -13,9 +13,10 @@ There may be easier installation methods available.
 
 ### Deployment considerations
 
-Before installing the software, please read the [deployment considerations](DEPLOY.md)
-and make sure you know how you want to setup the software.
-This document will provide you with instructions how to set up lets
+>[!IMPORTANT]
+> Before installing the software, please read the [deployment considerations](DEPLOY.md)
+> and make sure you know how you want to setup the software.
+> This document will provide you with instructions how to set up lets
 
 ## Requirements
 
@@ -43,7 +44,7 @@ systemctl restart apache2
 pkg install \
 	apache24 \
 	git-lite \
-	php84-dom php84-sqlite3 php84-curl php84-mbstring composer \
+	php84-dom php84-sqlite3 php84-curl php84-mbstring php84-composer \
 	sqlite3
 ```
 </details>
@@ -63,7 +64,7 @@ Remember to enable HTTPS.
 
 ```html
 <VirtualHost *:443>
-	ServerName  	example.com
+	ServerName  	letswifi
 	DocumentRoot	/usr/local/share/letswifi-portal/htdocs
 	Alias       	/simplesaml	/usr/local/share/simplesamlphp/public
 
@@ -98,7 +99,7 @@ Remember to enable HTTPS.
 cd /usr/local/share
 git clone -b beta https://github.com/geteduroam/letswifi-portal
 cd letswifi-portal
-composer --quiet install
+composer --no-dev --quiet install
 cp -a config-dist /etc/letswifi
 ln -s /etc/letswifi/ config
 
@@ -122,9 +123,9 @@ chmod +x ../../bin/letswifi
 cd /etc/letswifi
 chmod o-rwx *
 chgrp -R www-data .
-mv letswifi.conf.dist.php letswifi.conf.php
-mv clients.conf.dist.php clients.conf.php
-mv branding.conf.dist-eduroam.php branding.conf.php
+mv realms/example.com.conf.dist.php realms/example.com.conf.php
+mv realms/staff.example.com.conf.dist.php realms/staff.example.com.conf.dist.php
+mv realms/student.example.com.conf.dist.php realms/student.example.com.conf.dist.php
 sed -e"s@^\(\s*'dsn'\).*\$@\1 => 'sqlite:/var/lib/letswifi/letswifi.sqlite',@" \
 	<database.conf.dist-sqlite.php >database.conf.php
 
@@ -135,29 +136,27 @@ chgrp www-data oauthsecret.txt
 cd /usr/local/share/letswifi-portal
 mkdir -p var
 sqlite3 var/letswifi.sqlite <sql/letswifi.sqlite.sql
+chown www-data var/letswifi.sqlite
 chown -R www-data var
 ```
 
 This will configure most defaults.
 You might want to change **database.conf.php** if you don't want to use SQLite.
 
-You can remove all files containing **.dist**,
-these are examples and are never read by the application.
+>[!TIP]
+> You can remove all files containing **.dist**,
+> these are examples and are never read by the application.
 
 #### RADIUS certificate
 
 You need to configure the CA certificate that you use on your RADIUS server.
-While it's possible to use a self-signed CA here,
-we recommend that you use a publicly trusted certificate.
+
+>[!IMPORTANT]
+> While it's possible to use a self-signed CA here,
+> we recommend that you use a publicly trusted certificate.
 
 Import the certificate by piping it in the import script.
 
-<details><summary>Buypass Class 2 Root</summary>
-
-```sh
-curl -fsS https://crt.buypass.no/crt/BPClass2Rot.cer | openssl x509 -inform DER -outform PEM | letswifi ca import
-```
-</details>
 <details><summary>Hellenic Academic and Research Institutions</summary>
 
 ```sh
@@ -183,10 +182,13 @@ they are only provided for readability.
 If you want to use newlines, please write a backslash `\` before each newline
 to prevent the command from running before it's complete.
 
+>[!IMPORTANT]
+> Please select one method for creating the initial realm.
+> We recommend the first option, where the signing CA is created by the script.
+
 <details open><summary><strong>Realm with new signing CA and existing trust CA</strong></summary>
 
-This option is recommended; the signing CA can be long lived and the RADIUS certificate can be one that's signed by a public CA.
-In this step you'll specify which public CA is used, but the actual RADIUS server certificate does not need to be known to the portal; the client will verify it from the trusted CA you specify here.
+This is the recommended option; the signing CA can be long lived and the RADIUS certificate can be one that's signed by a public CA.
 
 ```sh
 letswifi realm example.com \
@@ -196,7 +198,6 @@ letswifi realm example.com \
 	--lang en-GB --name 'Office Wi-Fi' \
 	--lang nl-NL --name 'Kantoor-Wi-Fi' \
 	--validity 366 \
-	--trust 'C=NO, O=Buypass AS-983163327, CN=Buypass Class 2 Root CA' \
 	--trust 'C=GR, L=Athens, O=Hellenic Academic and Research Institutions Cert. Authority, CN=Hellenic Academic and Research Institutions ECC RootCA 2015' \
 	--trust 'C=US, O=Internet Security Research Group, CN=ISRG Root X1' \
 	--trust 'C=US, O=Internet Security Research Group, CN=ISRG Root X2' \
@@ -205,14 +206,17 @@ letswifi realm example.com \
 
 </details>
 
-<details><summary><strong>Realm with existing signing CA and existing trust CA</strong></summary>
+<details><summary><strong>Realm with existing signing CA</strong></summary>
 
 This is a slightly more advanced set-up, where you provide your own signing CA.
 You may want to do this if you want to use a common root CA,
-and provide an intermediate CA for client certificates.
-It's recommended for larger setups.
+and provide letswifi-portal with an intermediate CA for issuing client certificates.
+It's recommended for larger setups and administrators comfortable with managing certificates.
 
-Letswifi-portal will need the private key for the intermediate, but not for the root.
+>[!IMPORTANT]
+> Letswifi-portal will need the private key for the immediate signing CA (`--signer`).
+> The private key for the server certificate (`--trust`) is not needed,
+> but it is possible to use the same CA for both.
 
 We will assume a file **bundle.pem** to contain the root certificate, intermediate certificate and intermediate key.  The subject of this intermediate is **CN=Let's Wi-Fi CA**.
 
@@ -230,10 +234,13 @@ letswifi realm example.com \
 
 </details>
 
-Remove the `--trust` arguments you don't need.
-If you use them, make sure you imported them in the previous section.
+>[!NOTE]
+> All `--trust` CAs must have been imported in the previous step.
+> Import the CA that signed your RADIUS server certificate,
+> but consider also adding any public CA that you might use in the near future.
 
-If you don't provide `--trust` at all, the trust will be set to the same CA that's used for signing.
+If you don't provide `--trust` at all, the trust will be set to the same CA that's used for signing,
+which may be a CA that is created when running the command.
 
 #### Provider setup
 
@@ -245,5 +252,6 @@ Review the provider settings, especially:
 * Realms
 * Authentication settings
 
-If you want to avoid the SimpleSAMLphp *Select your identity provider* screen when logging in, set the `idpList` setting in the provider to a list with one element,
-namely the EntityID of the IdP you want to use.
+>[!TIP]
+> If you want to avoid the SimpleSAMLphp *Select your identity provider* screen when logging in, set the `idpList` setting in the provider to a list with one element,
+> namely the EntityID of the IdP you want to use.
