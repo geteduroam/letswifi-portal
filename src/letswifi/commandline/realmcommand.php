@@ -50,14 +50,13 @@ class RealmCommand extends Command
 	private function listRealms(): void
 	{
 		$realms = $this->config->getDictionaryList( 'realm' );
-		echo "HTTP HOST\tDISPLAY NAME\tCONTACT\tNETWORK\tVALIDITY\tSERVER NAME" . \PHP_EOL;
+		echo "HTTP HOST\tDISPLAY NAME\tCONTACT\tVALIDITY\tSERVER NAME" . \PHP_EOL;
 		foreach ( $realms as $name => $realm ) {
 			$displayName = $realm->getMultiLanguageString( 'display_name' )->jsonSerialize();
 			$contact = $realm->getStringOrNull( 'contact' ) ?? '-';
-			$network = $realm->getStringArray( 'networks' )[0];
 			$validity = $realm->getInteger( 'validity' );
 			$serverName = $realm->getStringArray( 'server_names' )[0];
-			echo "{$name}\t" . \reset( $displayName )['display'] . "\t{$contact}\t{$network}\t{$validity}\t{$serverName}" . \PHP_EOL;
+			echo "{$name}\t" . \reset( $displayName )['display'] . "\t{$contact}\t{$validity}\t{$serverName}" . \PHP_EOL;
 		}
 	}
 
