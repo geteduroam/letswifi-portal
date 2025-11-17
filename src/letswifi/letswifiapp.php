@@ -121,7 +121,7 @@ final class LetsWifiApp
 		$codeExplain = static::HTTP_CODES[$code];
 		$message = $ex instanceof UserException
 		? $ex->getMessage()
-		: \preg_replace( '/^.*\\\\/', '', $ex::class ) . ': ' . $ex->getMessage();
+		: ( \preg_replace( '/^.*\\\\/', '', $ex::class ) ?? $ex::class ) . ': ' . $ex->getMessage();
 		if ( \PHP_SAPI !== 'cli' && !\headers_sent() ) {
 			\header( 'Content-Type: text/plain', true, $code );
 			if ( !$this->crashing ) {
@@ -160,7 +160,7 @@ final class LetsWifiApp
 				: static fn( string $k ): bool => $k && !\str_starts_with( $k, '_' );
 			\header( 'Content-Type: application/json' );
 
-			exit( \json_encode(
+			exit( (string)\json_encode(
 				\array_filter(
 					$data,
 					$filter,

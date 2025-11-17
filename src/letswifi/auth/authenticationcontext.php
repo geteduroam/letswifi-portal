@@ -63,7 +63,7 @@ class AuthenticationContext implements JsonSerializable
 		if ( \strlen( $oauthSecret ) === 44 || \strlen( $oauthSecret ) === 43 ) {
 			$oauthSecret = \base64_decode( \strtr( $oauthSecret, '_-', '/+' ), true );
 		}
-		if ( empty( \trim( $oauthSecret, "\0" ) ) ) {
+		if ( !$oauthSecret || empty( \trim( $oauthSecret, "\0" ) ) ) {
 			throw new DomainException( 'NULL OAuth secret provided' );
 		}
 

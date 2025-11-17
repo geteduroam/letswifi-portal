@@ -51,7 +51,7 @@ abstract class Format
 			$className = \sprintf( '\\letswifi\\format\\%sFormat', \ucfirst(
 				\preg_replace_callback(
 					'/(\\-[a-z])/',
-					static fn( $m ) => \strtoupper( \ltrim( $m[1], '-' ) ), $type ),
+					static fn( $m ) => \strtoupper( \ltrim( $m[1], '-' ) ), $type ) ?? '-',
 			) );
 			if ( !\str_contains( $className, '-' ) && \class_exists( $className ) && \is_subclass_of( $className, self::class ) ) {
 				return new $className( $credential, $provider, $translator, $profileSigner, $passphrase );

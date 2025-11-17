@@ -21,7 +21,7 @@ class DictionaryPemDir extends DictionaryDir
 	public function __construct( string $dir, ?string $extension = null )
 	{
 		parent::__construct( $dir, $extension );
-		if ( \fileperms( $dir ) & 0o07 ) {
+		if ( (int)\fileperms( $dir ) & 0o07 ) {
 			throw new ConfigurationException( "Directory {$dir} has too wide permissions" );
 		}
 	}

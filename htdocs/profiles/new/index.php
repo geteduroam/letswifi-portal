@@ -70,6 +70,7 @@ if ( 'GET' === $_SERVER['REQUEST_METHOD'] && isset( $_GET['download'] ) ) {
 	// If we're not willing to fake a POST,
 	// also remove the GET parameters that attempted this from the URL
 	if ( !isset( $overrideMethod ) && \array_key_exists( 'REQUEST_URI', $_SERVER ) ) {
+		/** @psalm-suppress PossiblyFalseOperand */
 		\header( 'Location: ' . \strstr( $_SERVER['REQUEST_URI'], '?', true ) );
 
 		exit; // Stop after redirect

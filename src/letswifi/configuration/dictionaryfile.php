@@ -29,7 +29,7 @@ class DictionaryFile extends Dictionary
 		}
 		parent::__construct( $conf );
 		$this->dir = \dirname( $file ) . \DIRECTORY_SEPARATOR;
-		$this->baseDir = \realpath( $this->dir ) . \DIRECTORY_SEPARATOR;
+		$this->baseDir = ( \realpath( $this->dir ) ?: $this->dir ) . \DIRECTORY_SEPARATOR;
 	}
 
 	public function offsetExists( mixed $offset ): bool
@@ -130,15 +130,16 @@ class DictionaryFile extends Dictionary
 				throw new ConfigurationException( $this->getConfigPath( $key ) . ": {$path}: Path not found" );
 			}
 		}
+
 		$realPath = \realpath( $candidatePath );
-		if ( false === $realPath || !\str_starts_with( $realPath, $this->baseDir ) ) {
-			throw new ConfigurationException( $this->getConfigPath( $key ) . ": Invalid path \"{$path}\"" );
+		if ( false !== $realPath && \str_starts_with( $realPath, $this->baseDir ) ) {
+			return $realPath;
 		}
 
-		return $realPath;
+		throw new ConfigurationException( $this->getConfigPath( $key ) . ": Invalid path \"{$path}\"" );
 	}
 
-	private function offsetGetDir( mixed $offset ): array
+	private function offsetGetDir( string $offset ): array
 	{
 		$dir = parent::get( "{$offset}#dir", '' );
 		$list = DictionaryDir::createList( $this->safePath( $dir, $offset ) );

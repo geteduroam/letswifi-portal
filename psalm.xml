@@ -19,11 +19,6 @@
 		</ignoreFiles>
 	</projectFiles>
 	<issueHandlers>
-		<MissingPropertyType>
-			<errorLevel type="suppress">
-				<file name="src/letswifi/auth/browser/simplesamlauth.php"/>
-			</errorLevel>
-		</MissingPropertyType>
 		<RiskyTruthyFalsyComparison>
 			<errorLevel type="suppress">
 				<directory name="src"/>
@@ -34,8 +29,25 @@
 			<errorLevel type="suppress">
 				<directory name="bin"/>
 				<directory name="htdocs"/>
-				<file name="src/_autoload.php"/><!-- because Composer -->
+				<file name="src/_autoload.php"/>
 			</errorLevel>
 		</UnresolvableInclude>
+		<PossiblyFalseOperand>
+			<errorLevel type="suppress">
+				<file name="src/_autoload.php"/>
+			</errorLevel>
+		</PossiblyFalseOperand>
+		<PossiblyFalseArgument>
+			<errorLevel type="suppress">
+				<directory name="src/letswifi/commandline"/>
+			</errorLevel>
+		</PossiblyFalseArgument>
+		<PossiblyInvalidArrayAccess>
+			<errorLevel type="suppress">
+				<!-- Temporary fix, should be fixed upstream with more precise type declaration -->
+				<file name="src/letswifi/commandline/realmcommand.php"/>
+				<file name="src/letswifi/commandline/providercommand.php"/>
+			</errorLevel>
+		</PossiblyInvalidArrayAccess>
 	</issueHandlers>
 </psalm>

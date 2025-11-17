@@ -277,6 +277,6 @@ class GoogleOncFormat extends Format
 			'/^\\s+/m',
 			static fn ( array $match ): string => \str_replace( \str_repeat( ' ', $indentSize ), "\t", $match[0] ),
 			$document,
-		);
+		) ?? $document;
 	}
 }

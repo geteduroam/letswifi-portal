@@ -111,7 +111,9 @@ class Realm implements JsonSerializable
 			return new DateInterval( "P{$in}D" );
 		}
 		if ( \is_string( $in ) ) {
-			return DateInterval::createFromDateString( $in );
+			if ( $result = DateInterval::createFromDateString( $in ) ) {
+				return $result;
+			}
 		}
 
 		throw new DomainException( 'Invalid validity ' . $in );
