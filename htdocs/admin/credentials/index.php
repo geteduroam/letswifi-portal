@@ -14,7 +14,7 @@ use letswifi\credential\Credential;
 require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'src', '_autoload.php'] );
 $app = new LetsWifiApp( basePath: '../..' );
 $provider = $app->getProvider();
-$user = $provider->requireAuth();
+$user = $provider->getAuthenticatedUser( scope: 'admin' ) ?? $provider->requireAuth();
 $credentialLog = $app->getCredentialLog( $user );
 $credentialAdmin = $credentialLog->getCredentialAdministrator();
 $admin = $user->promote();

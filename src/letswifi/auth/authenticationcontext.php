@@ -134,13 +134,13 @@ class AuthenticationContext implements JsonSerializable
 	private function getAuthenticatedUserFromGrant( Provider $provider, Grant $grant ): User
 	{
 		$sub = $grant->getSub();
-		if ( null === $grant->realm ) {
-			throw new DomainException( "User {$sub} has no realm" );
-		}
 
-		$realm = $provider->getRealm( $grant->realm );
-		if ( null === $realm ) {
-			throw new DomainException( "Realm {$grant->realm} is not available at this provider" );
+		$realm = null;
+		if ( null !== $grant->realm ) {
+			$realm = $provider->getRealm( $grant->realm );
+			if ( null === $realm ) {
+				throw new DomainException( "Realm {$grant->realm} is not available at this provider" );
+			}
 		}
 		$affiliations = \explode( ',', $grant->__get( 'affiliations' ) ?? '' );
 
