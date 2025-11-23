@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "895901f65f5580191e4256b0173a2951",
+    "content-hash": "268e587fb51681bc82f3e9c2ff7539f3",
     "packages": [
         {
             "name": "fyrkat/multilang",
@@ -44,11 +44,11 @@
         },
         {
             "name": "fyrkat/oauth-server",
-            "version": "v1.2.2",
+            "version": "v1.2.3",
             "source": {
                 "type": "git",
                 "url": "https://git.sr.ht/~jornane/php-oauth-server",
-                "reference": "cf3865b9cb4897b99da9b113e66746408b237bd8"
+                "reference": "555029cf3aa209af74e7cfa8fd2962c9d607bb79"
             },
             "require": {
                 "php": ">=7.1"
@@ -61,7 +61,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "AGPL-3.0"
+                "BSD-3-Clause"
             ],
             "authors": [
                 {
@@ -69,15 +69,15 @@
                     "email": "git@jornane.no"
                 }
             ],
-            "time": "2025-02-17T20:08:36+00:00"
+            "time": "2025-05-25T17:28:50+00:00"
         },
         {
             "name": "fyrkat/openssl",
-            "version": "v2.1.1",
+            "version": "v2.2.0",
             "source": {
                 "type": "git",
                 "url": "https://git.sr.ht/~jornane/php-openssl",
-                "reference": "91cde8397ef408da2008fea670f4d537d5bee647"
+                "reference": "992e1075dca87e5beaa855584f1bc16f487326ab"
             },
             "require": {
                 "ext-openssl": "*",
@@ -97,7 +97,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "AGPL-3.0"
+                "BSD-3-Clause"
             ],
             "authors": [
                 {
@@ -106,7 +106,7 @@
                 }
             ],
             "description": "Class wrappers for PHPs built-in openssl_* functions",
-            "time": "2025-05-12T12:33:20+00:00"
+            "time": "2025-05-25T18:08:14+00:00"
         },
         {
             "name": "symfony/deprecation-contracts",
