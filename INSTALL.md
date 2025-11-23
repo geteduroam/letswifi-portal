@@ -255,3 +255,17 @@ Review the provider settings, especially:
 >[!TIP]
 > If you want to avoid the SimpleSAMLphp *Select your identity provider* screen when logging in, set the `idpList` setting in the provider to a list with one element,
 > namely the EntityID of the IdP you want to use.
+
+#### Administrators
+
+If you want to add an administrator, you can add the following the following to either your provider or realm configuration:
+
+```php
+	'admins' => [
+		'johndoe', // by username
+		'staff', // by affiliation
+		'my.api.client', // by ClientID for an OAuth application with client secret
+	],
+```
+
+If you want to use the API for administrative purposes, check the [API documentation](API.md).
