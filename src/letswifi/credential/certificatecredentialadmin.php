@@ -104,7 +104,7 @@ class CertificateCredentialAdmin extends CredentialAdmin
 			\assert( null !== $lastValid );
 
 			yield $row['realm'] => [
-				'realm' => $row['realm'],
+				'realm_id' => $row['realm'],
 				'earliest_valid' => $earliestValid,
 				'last_valid' => $lastValid,
 				'total_accounts' => $row['total_accounts'],
@@ -185,6 +185,8 @@ class CertificateCredentialAdmin extends CredentialAdmin
 				ip: $row['ip'],
 				userAgent: $row['user_agent'],
 				realm: $this->admin->getRealm( $row['realm'] ),
+				subject: $row['sub'],
+				serial: $row['serial'],
 				expiry: $expiry,
 				issued: $issued,
 				revoked: $revoked,
@@ -237,6 +239,8 @@ class CertificateCredentialAdmin extends CredentialAdmin
 				ip: $row['ip'],
 				userAgent: $row['user_agent'],
 				realm: $this->admin->getRealm( $row['realm'] ),
+				subject: $row['sub'],
+				serial: (string)$row['serial'],
 				expiry: $expiry,
 				issued: $issued,
 				revoked: $revoked,

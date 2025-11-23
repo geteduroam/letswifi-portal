@@ -1,0 +1,108 @@
+{% extends 'admin.twig' %}
+
+{% block title %}{{ 'Control panel'|translate_raw }}{% endblock %}
+
+{% block admin_content %}
+	<h1>{{ realm.display_name|t }}</h1>
+
+	<p>{{ realm.description|t }}
+
+	<h2>{{ 'Contact'|t }}</h2>
+
+	<p>{{ 'Contact information to be included in profile'|t }}
+
+{% if realm.contact.mail ?? '' %}
+	<dl>
+		<dt>{{ 'E-mail'|t }}</dt>
+		<dd>{{ realm.contact.mail }}
+	</dl>
+{% if realm.contact.web ?? '' %}
+{% endif %}
+	<dl>
+		<dt>{{ 'Website'|t }}</dt>
+		<dd>{{ realm.contact.web }}
+	</dl>
+{% if realm.contact.phone ?? '' %}
+{% endif %}
+	<dl>
+		<dt>{{ 'Phone'|t }}</dt>
+		<dd>{{ realm.contact.phone }}
+	</dl>
+{% endif %}
+
+	<h2>{{ 'Certificates'|t }}</h2>
+
+	<h3>{{ 'Signing certificate'|t }}</h3>
+	<table>
+		<tr>
+			<th colspan="3">{{ 'Common name'|t }}</th>
+		</tr>
+		<tr>
+			<td>{{ realm.signer }}</td>
+			<td><a href="{{ signer_crl_href }}"><small class="oojs-icon oojs-icon-download"></small>
+			{{ 'CRL'|t }}</a>
+			</td>
+			<td><a href="{{ signer_crt_href }}"><small class="oojs-icon oojs-icon-download"></small>
+				{{ 'CRT'|t }}</a>
+			</td>
+		</tr>
+	</table>
+
+	<h3>{{ 'Trusted server CAs'|t }}</h3>
+	<table>
+		<tr>
+			<th colspan="2">{{ 'Common name'|t }}</th>
+		</tr>
+{% for trust_crt in realm.trust_crt %}
+		<tr>
+			<td>{{ trust_crt.cn }}</td>
+			<td><a href="{{ trust_crt.href }}"><small class="oojs-icon oojs-icon-download"></small>
+				{{ 'CRT'|t }}</a>
+			</td>
+		</tr>
+{% endfor %}
+	</table>
+
+	<h2>{{ 'Network'|t }}</h2>
+
+	<p>{{ 'Networks to be included in profile'|t }}
+
+	<table>
+		<tr>
+			<th>{{ 'Network ID'|t }}</th>
+			<th>{{ 'Display name'|t }}</th>
+			<th>{{ 'SSID'|t }}</th>
+			<th>{{ 'OIDs'|t }}</th>
+			<th>{{ 'NAI realms'|t }}</th>
+		</tr>
+{% for network_id, network in realm.networks %}
+		<tr>
+			<td><code>{{ network_id }}</code></td>
+			<td>{{ network.display_name|t }}</td>
+			<td>{{ network.ssid }}</td>
+			<td>
+			{% if network.oids|length < 2 %}
+				<code>{{ network.oids|join() }}</code>
+			{% else %}
+				<ul>
+{% for oid in network.oids %}
+					<li><code>{{ oid }}</code></li>
+{% endfor %}
+				</ul>
+				{% endif %}
+			</td>
+			<td>
+			{% if network.nai_realms|length < 2 %}
+				{{ network.nai_realms|join() }}
+			{% else %}
+				<ul>
+{% for nai_realm in network.nai_realms %}
+					<li><code>{{ nai_realm }}</code></li>
+{% endfor %}
+				</ul>
+				{% endif %}
+			</td>
+		</tr>
+{% endfor %}
+	</table>
+{% endblock %}

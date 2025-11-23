@@ -78,7 +78,7 @@ class Realm implements JsonSerializable
 	}
 
 	/**
-	 * @return array{realm_id:string,display_name:MultiLanguageString,description:?MultiLanguageString,contact:?Contact,location:array<Location>,logo:bool,signer:string,trust:array<string>,networks:array<Network>}
+	 * @return array{realm_id:string,display_name:MultiLanguageString,description:?MultiLanguageString,contact:?Contact,location:array<Location>,logo:bool,signer:string,trust:array<string>,networks:array<string,array{oids?:array<string>,nai_realms?:array<string>,ssid?:string,display_name:MultiLanguageString}>}
 	 */
 	public function jsonSerialize(): array
 	{
@@ -91,7 +91,14 @@ class Realm implements JsonSerializable
 			'logo' => isset( $this->logo ),
 			'signer' => $this->signer,
 			'trust' => $this->trust,
-			'networks' => $this->networks,
+			'networks' => \array_reduce( $this->networks, static fn ( array $carry, Network $network ): array => [
+				$network->networkId => ['display_name' => $network->displayName]
+				+ ( $network instanceof NetworkPasspoint
+					? ['oids' => $network->oids, 'nai_realms' => $network->naiRealms] : [] )
+				+ ( $network instanceof NetworkSSID
+					? ['ssid' => $network->ssid] : [] )
+				+ ( $carry[$network->networkId] ?? [] ),
+			] + $carry, [] ),
 		];
 	}
 

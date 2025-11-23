@@ -13,6 +13,7 @@ namespace letswifi\credential;
 use Closure;
 use DateTimeInterface;
 use DomainException;
+use fyrkat\openssl\DN;
 use fyrkat\openssl\PKCS12;
 use letswifi\profile\Realm;
 
@@ -21,9 +22,13 @@ use letswifi\profile\Realm;
  */
 class CertificateCredential extends Credential
 {
-	private readonly DateTimeInterface $expiry;
+	public readonly string|DN $subject;
 
-	private readonly DateTimeInterface $issued;
+	public readonly string $serial;
+
+	public readonly DateTimeInterface $expiry;
+
+	public readonly DateTimeInterface $issued;
 
 	/**
 	 * @param Closure():void $revoke
@@ -36,9 +41,11 @@ class CertificateCredential extends Credential
 		?string $ip,
 		?string $userAgent,
 		Realm $realm,
+		?string $subject = null,
+		?string $serial = null,
 		?DateTimeInterface $expiry = null,
 		?DateTimeInterface $issued = null,
-		private readonly ?DateTimeInterface $revoked = null,
+		public readonly ?DateTimeInterface $revoked = null,
 		?string $anonymousIdentity = null,
 		private readonly ?PKCS12 $pkcs12 = null,
 	) {
@@ -53,9 +60,13 @@ class CertificateCredential extends Credential
 		);
 
 		if ( null === $pkcs12 ) {
-			$this->expiry = $expiry ?? throw new DomainException( 'Expiry not provided' );
-			$this->issued = $issued ?? throw new DomainException( 'Issued not provided' );
+			$this->subject = $subject ?: throw new DomainException( 'Subject not provided' );
+			$this->serial = $serial ?: throw new DomainException( 'Serial not provided' );
+			$this->expiry = $expiry ?: throw new DomainException( 'Expiry not provided' );
+			$this->issued = $issued ?: throw new DomainException( 'Issued not provided' );
 		} else {
+			$this->subject = $pkcs12->x509->getSubject();
+			$this->serial = $pkcs12->x509->getSerialNumber();
 			$this->expiry = $pkcs12->x509->getValidTo();
 			$this->issued = $pkcs12->x509->getValidFrom();
 		}
