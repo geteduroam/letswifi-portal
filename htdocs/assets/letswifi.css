@@ -309,7 +309,8 @@ table {
 table td {
 	/* works as min-height, https://stackoverflow.com/a/25329017/951387 */
 	height: 2.1em;
-
+}
+table td.nowrap-col, table th.nowrap-col {
 	white-space: nowrap;
 }
 table td.right-col, table th.right-col {

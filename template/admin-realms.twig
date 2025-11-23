@@ -20,21 +20,21 @@
 				<td><a href="{{ realm.href }}">{{ realm.realm_id }}</a></td>
 				<td class="overflow">{{ realm.display_name|t }}</td>
 				<td class="overflow">{{ realm.signer }}</td>
-				<td class="right-col">
+				<td class="right-col nowrap-col">
 					{% if realm.total_requesters is defined %}
 					<a href="{{ realm.requester_href }}">{{ realm.total_requesters }}
 						<small class="oojs-icon oojs-icon-funnel"></small>
 					</a>
 					{% else %}—{% endif %}
 				</td>
-				<td class="right-col">
+				<td class="right-col nowrap-col">
 					{% if realm.valid_accounts is defined %}
 					<a href="{{ realm.credential_unrevoked_href }}">{{ realm.valid_accounts }}
 						<small class="oojs-icon oojs-icon-funnel"></small>
 					</a>
 					{% else %}—{% endif %}
 				</td>
-				<td class="right-col">
+				<td class="right-col nowrap-col">
 					{% if realm.total_accounts is defined %}
 					<a href="{{ realm.credential_href }}">{{ realm.total_accounts }}
 						<small class="oojs-icon oojs-icon-funnel"></small>
