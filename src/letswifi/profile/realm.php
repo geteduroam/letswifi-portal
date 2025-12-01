@@ -94,9 +94,9 @@ class Realm implements JsonSerializable
 			'networks' => \array_reduce( $this->networks, static fn ( array $carry, Network $network ): array => [
 				$network->networkId => ['display_name' => $network->displayName]
 				+ ( $network instanceof NetworkPasspoint
-					? ['oids' => $network->oids, 'nai_realms' => $network->naiRealms] : [] )
+					? ['ssid' => $network->ssid,'oids' => $network->oids, 'nai_realms' => $network->naiRealms] : [] )
 				+ ( $network instanceof NetworkSSID
-					? ['ssid' => $network->ssid] : [] )
+					? ['ssid' => $network->ssid,'oids' => $network->oids, 'nai_realms' => $network->naiRealms] : [] )
 				+ ( $carry[$network->networkId] ?? [] ),
 			] + $carry, [] ),
 		];
