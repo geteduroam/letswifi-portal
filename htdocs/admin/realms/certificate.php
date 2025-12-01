@@ -38,46 +38,47 @@ function getIndex( string $realmId ): CADB
 	return $index;
 }
 if ( \array_key_exists( 'realm_id', $_GET ) && $realm = $admin->getRealm( $_GET['realm_id'] ) ) {
-	$ca = $_GET['ca'] ?? null;
-	$fileType = $_GET['file'] ?? null;
-	if ( !\is_string( $ca ) || $ca !== $realm->signer && !\in_array( $ca, $realm->trust, true ) ) {
-		throw new NotFoundException();
-	}
-	$caCertificate = $app->profileService->getCertificate( $ca );
+        $ca = $_GET['ca'] ?? null;
+        $fileType = $_GET['file'] ?? null;
+        if ( !\is_string( $ca ) || $ca !== $realm->signer && !\in_array( $ca, $realm->trust, true ) ) {
+                throw new NotFoundException();
+        }
+        $caCertificate = $app->profileService->getCertificate( $ca );
 
-	switch ( $fileType ) {
-		case 'crt-der':
-			\header( 'Content-Type: application/x-x509-ca-cert' );
-			\header( "Content-Disposition: attachment; filename*=UTF-8''{$ca}.crt" );
-			echo $caCertificate->getX509Der();
+        $caExportName = str_replace (",", "_", str_replace(array("'", " "),"",$ca));
+        switch ( $fileType ) {
+                case 'crt-der':
+                        \header( 'Content-Type: application/x-x509-ca-cert' );
+                        \header( "Content-Disposition: attachment; filename*=UTF-8''{$caExportName}.crt" );
+                        echo $caCertificate->getX509Der();
 
-			exit;
-		case 'crt-pem':
-			\header( 'Content-Type: application/x-pem-file' );
-			\header( "Content-Disposition: inline; filename*=UTF-8''{$ca}.crt.pem" );
-			echo $caCertificate->getX509Pem( withText: true );
+                        exit;
+                case 'crt-pem':
+                        \header( 'Content-Type: application/x-pem-file' );
+                        \header( "Content-Disposition: inline; filename*=UTF-8''{$caExportName}.crt.pem" );
+                        echo $caCertificate->getX509Pem( withText: true );
 
-			exit;
-		case 'index':
-			$index = \getIndex( $realm->realmId );
-			\header( 'Content-Type: text/plain' );
-			\header( "Content-Disposition: inline; filename*=UTF-8''{$ca}.index.txt" );
-			echo $index->export();
+                        exit;
+                case 'index':
+                        $index = \getIndex( $realm->realmId );
+                        \header( 'Content-Type: text/plain' );
+                        \header( "Content-Disposition: inline; filename*=UTF-8''{$caExportName}.index.txt" );
+                        echo $index->export();
 
-			exit;
-		case 'crl-der':
-			// Not implemented yet
-		case 'crl-pem':
-			$index = \getIndex( $realm->realmId );
-			$privateKey = $app->profileService->getPrivateKey( $ca );
-			$crl = new CRL( $privateKey, $caCertificate );
-			\header( 'Content-Type: application/x-pkcs7-crl' );
-			\header( "Content-Disposition: inline; filename*=UTF-8''{$ca}.crl.pem" );
-			// TODO: Prints in PEM format, do we want to allow DER too?
-			echo $crl->generateCrl( $index, validDays: 7 );
+                        exit;
+                case 'crl-der':
+                        // Not implemented yet
+                case 'crl-pem':
+                        $index = \getIndex( $realm->realmId );
+                        $privateKey = $app->profileService->getPrivateKey( $ca );
+                        $crl = new CRL( $privateKey, $caCertificate );
+                        \header( 'Content-Type: application/x-pkcs7-crl' );
+                        \header( "Content-Disposition: inline; filename*=UTF-8''{$caExportName}.crl.pem" );
+                        // TODO: Prints in PEM format, do we want to allow DER too?
+                        echo $crl->generateCrl( $index, validDays: 7 );
 
-			exit;
-	}
+                        exit;
+        }
 }
 
 throw new NotFoundException();
