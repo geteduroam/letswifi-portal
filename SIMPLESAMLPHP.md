@@ -21,7 +21,7 @@ we think you should install it in `/usr/local/share` instead.
 <details open><summary>Fresh installation</summary>
 
 ```sh
-export SSPVER=2.3.6
+export SSPVER=2.4.4
 cd /usr/local/share
 curl -L https://github.com/simplesamlphp/simplesamlphp/releases/download/v$SSPVER/simplesamlphp-$SSPVER-full.tar.gz | tar xzvf -
 mv simplesamlphp-$SSPVER simplesamlphp
@@ -36,7 +36,7 @@ chown www-data /var/lib/simplesamlphp /var/cache/simplesamlphp /etc/simplesamlph
 <details><summary>Upgrade</summary>
 
 ```sh
-export SSPVER=2.3.6
+export SSPVER=2.4.4
 cd /usr/local/share
 curl -L https://github.com/simplesamlphp/simplesamlphp/releases/download/v$SSPVER/simplesamlphp-$SSPVER-full.tar.gz | tar xzvf -
 mv simplesamlphp simplesamlphp-old

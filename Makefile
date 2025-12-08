@@ -1,7 +1,7 @@
 
 REALM := example.com
 PHP := php
-SIMPLESAMLPHP_VERSION := 2.2.1
+SIMPLESAMLPHP_VERSION := 2.4.4
 SIMPLESAMLPHP_FLAVOUR := slim
 
 camera-ready-dev: camera-ready dev
