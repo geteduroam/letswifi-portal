@@ -186,7 +186,7 @@ class CertificateCredentialAdmin extends CredentialAdmin
 				userAgent: $row['user_agent'],
 				realm: $this->admin->getRealm( $row['realm'] ),
 				subject: $row['sub'],
-				serial: $row['serial'],
+				serial: (string)$row['serial'],
 				expiry: $expiry,
 				issued: $issued,
 				revoked: $revoked,
