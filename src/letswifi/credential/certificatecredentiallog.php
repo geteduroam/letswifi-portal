@@ -43,14 +43,14 @@ class CertificateCredentialLog extends CredentialLog
 		$clientQueryPart = null === $client ? '' : 'AND client = :client';
 		$realmQueryPart = null === $realm ? '' : 'AND realm = :realm';
 		$statement = $this->profileService->getPDO()->prepare( <<<SQL
-				SELECT "serial", realm, ca_sub, requester, ident, "grant", "usage", sub, issued, expires, revoked, csr, client, user_agent, ip, x509
-				FROM realm_signing_log
-				WHERE requester = :requester
-					AND expires > :now
-					AND revoked IS NULL
+				SELECT "serial", "realm", "ca_sub", "requester", "ident", "grant", "usage", "sub", "issued", "expires", "revoked", "csr", "client", "user_agent", "ip", "x509"
+				FROM "realm_signing_log"
+				WHERE "requester" = :requester
+					AND "expires" > :now
+					AND "revoked" IS NULL
 					{$clientQueryPart}
 					{$realmQueryPart}
-				ORDER BY issued DESC;
+				ORDER BY "issued" DESC;
 			SQL );
 		$statement->bindValue( 'requester', $this->user->userId, PDO::PARAM_STR );
 		$statement->bindValue( 'now', $this->formatUtc( $this->now ), PDO::PARAM_STR );
@@ -112,14 +112,14 @@ class CertificateCredentialLog extends CredentialLog
 		$clientQueryPart = null === $client ? '' : 'AND client = :client';
 		$realmQueryPart = null === $realm ? '' : 'AND realm = :realm';
 		$statement = $this->profileService->getPDO()->prepare( <<<SQL
-				SELECT "serial", realm, requester, ident, "grant", ca_sub, "usage", sub, issued, expires, revoked, csr, client, user_agent, ip, x509, ident
-				FROM realm_signing_log
+				SELECT "serial", "realm", "requester", "ident", "grant", "ca_sub", "usage", "sub", "issued", "expires", "revoked", "csr", "client", "user_agent", "ip", "x509", "ident"
+				FROM "realm_signing_log"
 				WHERE
-					ident = :ident
-					AND requester = :requester
+					"ident" = :ident
+					AND "requester" = :requester
 					{$clientQueryPart}
 					{$realmQueryPart}
-				ORDER BY issued ASC
+				ORDER BY "issued" ASC
 			SQL );
 		$statement->bindValue( 'ident', $credentialId, PDO::PARAM_STR );
 		$statement->bindValue( 'requester', $this->user->userId, PDO::PARAM_STR );
@@ -161,12 +161,12 @@ class CertificateCredentialLog extends CredentialLog
 	public function revokeCredential( string $credentialId ): void
 	{
 		$revokeStatement = $this->profileService->getPDO()->prepare( <<<SQL
-				UPDATE realm_signing_log
-				SET revoked = :revoked
+				UPDATE "realm_signing_log"
+				SET "revoked" = :revoked
 				WHERE
-					ident = :ident
-					AND requester = :requester
-					AND revoked IS NULL
+					"ident" = :ident
+					AND "requester" = :requester
+					AND "revoked" IS NULL
 			SQL );
 		$revokeStatement->bindValue( 'revoked', $this->formatUtc( $this->now ), PDO::PARAM_STR );
 		$revokeStatement->bindParam( 'ident', $credentialId, PDO::PARAM_STR );

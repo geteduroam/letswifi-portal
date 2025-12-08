@@ -36,16 +36,16 @@ class CertificateCredentialAdmin extends CredentialAdmin
 		}
 		$stmt = $pdo->prepare( <<<SQL
 				SELECT
-					requester, realm,
-					MIN(issued) earliest_valid,
-					MAX(expires) last_valid,
-					COUNT("serial") total_accounts,
-					COUNT(CASE WHEN revoked IS NULL THEN "serial" END) valid_accounts
-				FROM realm_signing_log
-				WHERE expires > :valid_on AND issued < :valid_on
+					"requester", "realm",
+					MIN("issued") "earliest_valid",
+					MAX("expires") "last_valid",
+					COUNT("serial") "total_accounts",
+					COUNT(CASE WHEN "revoked" IS NULL THEN "serial" END) "valid_accounts"
+				FROM "realm_signing_log"
+				WHERE "expires" > :valid_on AND "issued" < :valid_on
 					{$extraConditions}
-				GROUP BY requester, realm
-				ORDER BY issued DESC;
+				GROUP BY "requester", "realm"
+				ORDER BY "issued" DESC;
 			SQL );
 		$stmt->bindValue( 'valid_on', $this->formatUtc( $validOn ), PDO::PARAM_STR );
 		if ( null !== $requester ) {
@@ -82,17 +82,17 @@ class CertificateCredentialAdmin extends CredentialAdmin
 		$extraConditions = $this->getRealmConditions( $realms, static fn( $s ) => $pdo->quote( $s ) );
 		$stmt = $pdo->prepare( <<<SQL
 				SELECT
-					realm,
-					MIN(issued) earliest_valid,
-					MAX(expires) last_valid,
-					COUNT("serial") total_accounts,
-					COUNT(CASE WHEN revoked IS NULL THEN "serial" END) valid_accounts,
-					COUNT(DISTINCT requester) total_requesters
-				FROM realm_signing_log
-				WHERE expires > :valid_on AND issued < :valid_on
+					"realm",
+					MIN("issued") "earliest_valid",
+					MAX("expires") "last_valid",
+					COUNT("serial") "total_accounts",
+					COUNT(CASE WHEN "revoked" IS NULL THEN "serial" END) "valid_accounts",
+					COUNT(DISTINCT "requester") "total_requesters"
+				FROM "realm_signing_log"
+				WHERE "expires" > :valid_on AND "issued" < :valid_on
 					{$extraConditions}
-				GROUP BY realm
-				ORDER BY issued DESC;
+				GROUP BY "realm"
+				ORDER BY "issued" DESC;
 			SQL );
 		$stmt->bindValue( 'valid_on', $this->formatUtc( $validOn ), PDO::PARAM_STR );
 		$stmt->execute();
@@ -118,10 +118,10 @@ class CertificateCredentialAdmin extends CredentialAdmin
 	{
 		$requesterCondition = null === $requester ? '' : 'AND requester = :requester';
 		$revokeStatement = $this->profileService->getPDO()->prepare( <<<SQL
-				UPDATE realm_signing_log
-				SET revoked = :revoked
+				UPDATE "realm_signing_log"
+				SET "revoked" = :revoked
 				WHERE
-					ident = :ident
+					"ident" = :ident
 					{$requesterCondition}
 					AND revoked IS NULL
 			SQL );
@@ -141,11 +141,11 @@ class CertificateCredentialAdmin extends CredentialAdmin
 		$pdo = $this->profileService->getPDO();
 		$extraConditions = $this->getRealmConditions( $realms, static fn( $s ) => $pdo->quote( $s ) );
 		$revokeStatement = $pdo->prepare( <<<SQL
-				UPDATE realm_signing_log
-				SET revoked = :revoked
-				WHERE requester = :requester
-					AND expires > :valid_on AND issued < :valid_on
-					AND revoked IS NULL
+				UPDATE "realm_signing_log"
+				SET "revoked" = :revoked
+				WHERE "requester" = :requester
+					AND "expires" > :valid_on AND "issued" < :valid_on
+					AND "revoked" IS NULL
 					{$extraConditions}
 			SQL );
 		$revokeStatement->bindValue( 'valid_on', $this->formatUtc( $validOn ), PDO::PARAM_STR );
@@ -160,10 +160,9 @@ class CertificateCredentialAdmin extends CredentialAdmin
 		$extraConditions = $this->getRealmConditions( $realms, static fn( $s ) => $pdo->quote( $s ) );
 		$stmt = $pdo->prepare( <<<SQL
 				SELECT
-					"serial", realm, ca_sub, requester, sub, issued, expires, revoked, "usage", client, user_agent, ip, "grant", ident
-					, requester, realm
-				FROM realm_signing_log
-				WHERE ident = :ident
+					"serial", "realm", "ca_sub", "requester", "sub", "issued", "expires", "revoked", "usage", "client", "user_agent", "ip", "grant", "ident", "requester", "realm"
+				FROM "realm_signing_log"
+				WHERE "ident" = :ident
 					{$extraConditions}
 				;
 			SQL );
@@ -211,12 +210,11 @@ class CertificateCredentialAdmin extends CredentialAdmin
 		}
 		$stmt = $pdo->prepare( <<<SQL
 				SELECT
-					"serial", realm, ca_sub, requester, sub, issued, expires, revoked, "usage", client, user_agent, ip, "grant", ident
-					, requester, realm
-				FROM realm_signing_log
-				WHERE expires > :valid_on AND issued < :valid_on
+					"serial", "realm", "ca_sub", "requester", "sub", "issued", "expires", "revoked", "usage", "client", "user_agent", "ip", "grant", "ident", "requester", "realm"
+				FROM "realm_signing_log"
+				WHERE "expires" > :valid_on AND "issued" < :valid_on
 					{$extraConditions}
-				ORDER BY issued DESC;
+				ORDER BY "issued" DESC;
 			SQL );
 		$stmt->bindValue( 'valid_on', $this->formatUtc( $validOn ), PDO::PARAM_STR );
 		if ( null !== $requester ) {

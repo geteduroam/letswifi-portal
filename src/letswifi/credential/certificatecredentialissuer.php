@@ -72,8 +72,8 @@ class CertificateCredentialIssuer implements CredentialIssuer
 		$csrData = $csr->getCSRPem();
 		$pdo = $this->profileService->getPDO();
 		$statement = $pdo->prepare( <<<SQL
-			INSERT INTO realm_signing_log
-				(realm, requester, ident, "grant", ca_sub, sub, "usage", issued, expires, csr, client, user_agent, ip)
+			INSERT INTO "realm_signing_log"
+				("realm", "requester", "ident", "grant", "ca_sub", "sub", "usage", "issued", "expires", "csr", "client", "user_agent", "ip")
 			VALUES
 				(:realm, :requester, :ident, :grant, :ca_sub, :sub, :usage, :issued, :expires, :csr, :client, :user_agent, :ip)
 			SQL );
@@ -108,17 +108,17 @@ class CertificateCredentialIssuer implements CredentialIssuer
 	{
 		$pdo = $this->profileService->getPDO();
 		$statement = $pdo->prepare( <<<SQL
-			UPDATE realm_signing_log
+			UPDATE "realm_signing_log"
 				SET
-					issued = :issued,
-					expires = :expires,
-					x509 = :x509
+					"issued" = :issued,
+					"expires" = :expires,
+					"x509" = :x509
 				WHERE
 					"serial" = :serial
-					AND realm = :realm
-					AND requester = :requester
-					AND usage = :usage
-					AND ca_sub = :ca_sub
+					AND "realm" = :realm
+					AND "requester" = :requester
+					AND "usage" = :usage
+					AND "ca_sub" = :ca_sub
 			SQL );
 		$statement->bindValue( 'issued', \gmdate( static::DATE_FORMAT, $userCert->getValidFrom()->getTimestamp() ), PDO::PARAM_STR );
 		$statement->bindValue( 'expires', \gmdate( static::DATE_FORMAT, $userCert->getValidTo()->getTimestamp() ), PDO::PARAM_STR );
