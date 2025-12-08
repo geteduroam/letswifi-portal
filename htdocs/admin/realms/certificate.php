@@ -27,10 +27,6 @@ function getIndex( string $realmId ): CADB
 	$index = new CADB();
 	foreach ( $credentialAdmin->listCredentials( [$realmId], unrevokedOnly: false ) as $credential ) {
 		if ( $credential instanceof CertificateCredential && $credential->revoked ) {
-			// TODO: Report and fix; upstream should use interface
-			\assert( $credential->revoked instanceof DateTimeImmutable );
-			\assert( $credential->expiry instanceof DateTimeImmutable );
-
 			$index->revoked( $credential->subject, $credential->revoked, $credential->serial, $credential->expiry );
 		}
 	}

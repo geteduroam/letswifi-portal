@@ -42,12 +42,5 @@
 				<directory name="src/letswifi/commandline"/>
 			</errorLevel>
 		</PossiblyFalseArgument>
-		<PossiblyInvalidArrayAccess>
-			<errorLevel type="suppress">
-				<!-- Temporary fix, should be fixed upstream with more precise type declaration -->
-				<file name="src/letswifi/commandline/realmcommand.php"/>
-				<file name="src/letswifi/commandline/providercommand.php"/>
-			</errorLevel>
-		</PossiblyInvalidArrayAccess>
 	</issueHandlers>
 </psalm>
