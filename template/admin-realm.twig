@@ -79,9 +79,10 @@
 		<tr>
 			<td><code>{{ network_id }}</code></td>
 			<td>{{ network.display_name|t }}</td>
-			<td>{{ network.ssid }}</td>
+			<td>{{ network.ssid ?? '' }}</td>
 			<td>
-			{% if network.oids|length < 2 %}
+			{% if not network.oids is defined %}
+			{% elseif network.oids|length < 2 %}
 				<code>{{ network.oids|join() }}</code>
 			{% else %}
 				<ul>
@@ -92,7 +93,8 @@
 				{% endif %}
 			</td>
 			<td>
-			{% if network.nai_realms|length < 2 %}
+			{% if not network.nai_realms is defined %}
+			{% elseif network.nai_realms|length < 2 %}
 				{{ network.nai_realms|join() }}
 			{% else %}
 				<ul>
