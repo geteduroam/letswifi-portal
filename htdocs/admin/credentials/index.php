@@ -73,8 +73,8 @@ $app->render( [
 	'__admin_menu_active' => 'credentials/',
 	'__admin_menu' => ( require '../_menu.php' ),
 
-	'credentials' => isset( $ident )
-		? \array_filter( [$credentialAdmin->getCredential( $ident )] )
+	'credentials' => isset( $identFilter )
+		? \array_filter( [$credentialAdmin->getCredential( $identFilter )] )
 		: \iterator_to_array( $credentialAdmin->listCredentials( $realmsFilter, requester: $requesterFilter, validOn: $validOn, unrevokedOnly: !$revokedFilter ) ),
 ], 'admin-credentials', [
 	Credential::class => static fn ( Credential $c ) => [
