@@ -69,8 +69,8 @@ $app->render( [
 ], 'admin-realms', [
 	Realm::class => static fn( Realm $r ): array => ( $stats[$r->realmId] ?? [] ) + [
 		'href' => '?' . \http_build_query( ['realm_id' => $r->realmId] ),
-		'credential_href' => 'credentials/?' . \http_build_query( ['realms' => $r->realmId] ),
-		'credential_unrevoked_href' => 'credentials/?' . \http_build_query( ['revoked' => 'off', 'realms' => $r->realmId] ),
-		'requester_href' => 'requesters/?' . \http_build_query( ['realms' => $r->realmId] ),
+		'credential_href' => '../credentials/?' . \http_build_query( ['realms' => $r->realmId] ),
+		'credential_unrevoked_href' => '../credentials/?' . \http_build_query( ['revoked' => 'off', 'realms' => $r->realmId] ),
+		'requester_href' => '../requesters/?' . \http_build_query( ['realms' => $r->realmId] ),
 	],
 ] );
