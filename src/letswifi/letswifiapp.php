@@ -76,10 +76,12 @@ final class LetsWifiApp
 		$this->profileService = new ProfileService( $this->globalConfig, $this->getHttpHost() );
 
 		if ( \PHP_SAPI === 'cli-server' ) {
-			// Ensure that we are setting the recommended CSP when developing,
+			// Ensure that we are setting restrictive security headers when developing,
 			// to prevent nasty surprises later on.
-			\header( "Content-Security-Policy: default-src: 'self'; object-src 'none'; base-uri 'none';" );
-			\header( 'X-Frame-Options: deny' );
+			\header( 'Content-Security-Policy: "default-src: \'none\'; img-src \'self\'; style-src: \'self\', font-src \'self\', form-action: \'self\', base-uri \'none\'; frame-ancestors \'none\';"' );
+			\header( 'Referrer-Policy: "no-referrer"' );
+			\header( 'X-Frame-Options: "DENY"' );
+			\header( 'X-Content-Type-Options: "nosniff"' );
 		}
 
 		if ( $registerExceptionHandler ) {
