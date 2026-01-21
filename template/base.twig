@@ -46,15 +46,15 @@
 			</button>
 			<dialog popover class="dropdown" id="user-dropdown">
 				<ul class="dropdown-menu">
+					<li><a draggable="false" href="{{ _basePath }}/app/"><small class="oojs-icon oojs-icon-specialPages dropdown-header-collapse"></small>{{ 'Set up your device'|t }}</a></li>
 					<li><a draggable="false" href="{{ _basePath }}/me/"><small class="oojs-icon oojs-icon-userContributions"></small>{{ 'Account information'|t }}</a></li>
 					{% if _admin_href %}
 					<li><a draggable="false" href="{{ _admin_href }}"><small class="oojs-icon oojs-icon-settings"></small>{{ 'Control panel'|t }}</a></li>
 					{% endif %}
 					{% if _logout_href %}
+					<li><hr>
 					<li><a draggable="false" href="{{ _logout_href }}"><small class="oojs-icon oojs-icon-logout"></small>{{ 'Logout'|t }}</a></li>
 					{% endif %}
-					<li><hr>
-					<li><a draggable="false" href="{{ _basePath }}/app/"><small class="oojs-icon oojs-icon-download dropdown-header-collapse"></small>{{ 'Download the app'|t }}</a></li>
 				</ul>
 			</dialog>
 		</div>

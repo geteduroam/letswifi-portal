@@ -598,6 +598,9 @@ details:has(p) > summary:before {
 .oojs-icon-funnel:before {
 	background-image: url('oojs-ui/images/icons/funnel-ltr.svg');
 }
+.oojs-icon-specialPages:before {
+	background-image: url('oojs-ui/images/icons/specialPages-ltr.svg');
+}
 
 a .oojs-icon-funnel {
 	opacity: 0;

@@ -6,44 +6,47 @@
 <main>
 	<h1>{{ 'Welcome to %1$s at %2$s'|t(_product_name, provider.display_name) }}</h1>
 	<p>{{ 'To use %1$s at %2$s, download the app or profile for your device below.'|t(_network_name, provider.display_name) }}
+
 	{% if platform %}
-		<section class="platform-jumbotron highlight">
-		<h2>{{ platform.name }}</h2>
+	<section class="platform-jumbotron highlight">
+	<h2>{{ platform.name }}</h2>
+	{% if platform.apps %}
+		<p>{{ 'Download the %s app to configure your device.'|t(platform.name) }}
+		<ul class="apps buttons">
+		{{ include('_app-button.twig') }}
+		</ul>
+	{% endif %}
+
+	{% if platform.profiles %}
 		{% if platform.apps %}
-			<p>{{ 'Download the %s app to configure your device.'|t(platform.name) }}
-			<ul class="apps buttons">
-			{{ include('_app-button.twig') }}
-			</ul>
+			<details><summary>{{ 'If you cannot use the official app, you can download an installation profile for manual installation.'|t }}</summary>
+			<p>
+		{% else %}
+			<p>
+				{{ 'There is no app available for %s.'|t(platform.name) }}<br>
+				{{ 'Download an installation profile for manual installation.'|t }}
 		{% endif %}
-
-		{% if platform.profiles %}
-			{% if platform.apps %}
-				<details><summary>{{ 'If you cannot use the official app, you can download an installation profile for manual installation.'|t }}</summary>
-				<p>
-			{% else %}
-				<p>
-					{{ 'There is no app available for %s.'|t(platform.name) }}<br>
-					{{ 'Download an installation profile for manual installation.'|t }}
-			{% endif %}
-			{% for profile in platform.profiles %}
-				<p>
-					<a href="{{ profile.href }}">{{ profile.name }}</a> ({{ 'login required'|t }})
-			{% endfor %}
-			{% if platform.apps %}
-				</details>
-			{% endif %}
+		{% for profile in platform.profiles %}
+			<p>
+				<a href="{{ profile.href }}">{{ profile.name }}</a> ({{ 'login required'|t }})
+		{% endfor %}
+		{% if platform.apps %}
+			</details>
 		{% endif %}
-		</section>
+	{% endif %}
+	</section>
+	{% endif %}
 
-		<section class="platform-other">
-		<h2>{{ 'Other options'|t }}</h2>
+	<section class="platform-other">
+	{% if platform %}
+	<h2>{{ 'Other options'|t }}</h2>
 	{% endif %}
 	<p><a href="{{ all_platforms_href }}">{{ 'View apps and profiles for all platforms'|t }}</a>
 	<details>
 		<summary>{{ 'Options for professional users'|t }}</summary>
 		<p><a href="{{ advanced_href }}">{{ 'Generate a certificate for manual use'|t }}</a></p>
-		</section>
 	</details>
+	</section>
 
 </main>
 {% endblock %}
