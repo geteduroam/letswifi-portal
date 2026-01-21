@@ -138,7 +138,7 @@ class CertificateCredentialIssuer implements CredentialIssuer
 		// TODO check that $expiry is not too far in the future,
 		// during some test we ended up with the date 88363-05-14 and MySQL didn't like
 		$expiry = $this->now->add( $this->realm->validity );
-		$userKey = new PrivateKey( new OpenSSLConfig( privateKeyType: OpenSSLKey::KEYTYPE_RSA ) );
+		$userKey = new PrivateKey( new OpenSSLConfig( privateKeyType: OpenSSLKey::KEYTYPE_EC ) );
 		$ident = $this->generateIdent();
 		$dn = new DN( ['CN' => $ident] );
 		$csr = CSR::generate( $dn, $userKey );
