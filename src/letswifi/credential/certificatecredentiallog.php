@@ -189,7 +189,6 @@ class CertificateCredentialLog extends CredentialLog
 		return new CertificateCredentialIssuer(
 			user: $this->user,
 			realm: $realm,
-			provider: $this->provider,
 			now: $this->now,
 			profileService: $this->profileService,
 			revoke: fn( string $ident ) => $this->revokeCredential( $ident ),

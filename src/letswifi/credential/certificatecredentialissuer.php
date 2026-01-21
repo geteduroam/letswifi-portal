@@ -23,7 +23,6 @@ use fyrkat\openssl\PrivateKey;
 use fyrkat\openssl\X509;
 use letswifi\auth\User;
 use letswifi\profile\ProfileService;
-use letswifi\profile\Provider;
 use letswifi\profile\Realm;
 
 /**
@@ -39,7 +38,6 @@ class CertificateCredentialIssuer implements CredentialIssuer
 	public function __construct(
 		public readonly User $user,
 		public readonly Realm $realm,
-		public readonly Provider $provider,
 		public readonly DateTimeImmutable $now,
 		private readonly ProfileService $profileService,
 		private readonly \Closure $revoke,
