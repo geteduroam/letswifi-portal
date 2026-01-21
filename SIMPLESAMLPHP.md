@@ -33,7 +33,12 @@ mkdir -p /var/lib/simplesamlphp /var/cache/simplesamlphp /etc/simplesamlphp/meta
 chown www-data /var/lib/simplesamlphp /var/cache/simplesamlphp /etc/simplesamlphp/metadata
 ```
 </details>
-<details><summary>Upgrade</summary>
+
+>![!DANGER]
+> It's important to keep SimpleSAMLphp updated, so be sure to run the upgrade process often.
+> Failing to do so may leave you exposed to security problems
+
+<details><summary>Upgrade process</summary>
 
 ```sh
 export SSPVER=2.4.4
