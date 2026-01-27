@@ -36,10 +36,11 @@ function getIndex( string $realmId ): CADB
 if ( \array_key_exists( 'realm_id', $_GET ) && $realm = $admin->getRealm( $_GET['realm_id'] ) ) {
 	$ca = $_GET['ca'] ?? null;
 	$fileType = $_GET['file'] ?? null;
-	if ( !\is_string( $ca ) || $ca !== $realm->signer && !\in_array( $ca, $realm->trust, true ) ) {
+	if ( !\is_string( $fileType ) || !\is_string( $ca ) || $ca !== $realm->signer && !\in_array( $ca, $realm->trust, true ) ) {
 		throw new NotFoundException();
 	}
-	$safeFileName = \preg_replace( '/[a-z0-9._-]/i', '', $ca );
+
+	$safeFileName = \preg_replace( '/[a-z0-9._-]/i', '', $ca ) ?: $fileType;
 	$encodedFileName = \rawurlencode( $ca );
 	$caCertificate = $app->profileService->getCertificate( $ca );
 
