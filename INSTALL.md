@@ -123,9 +123,6 @@ chmod +x ../../bin/letswifi
 cd /etc/letswifi
 chmod o-rwx *
 chgrp -R www-data .
-mv realms/example.com.conf.dist.php realms/example.com.conf.php
-mv realms/staff.example.com.conf.dist.php realms/staff.example.com.conf.dist.php
-mv realms/student.example.com.conf.dist.php realms/student.example.com.conf.dist.php
 sed -e"s@^\(\s*'dsn'\).*\$@\1 => 'sqlite:/var/lib/letswifi/letswifi.sqlite',@" \
 	<database.conf.dist-sqlite.php >database.conf.php
 
@@ -144,8 +141,10 @@ This will configure most defaults.
 You might want to change **database.conf.php** if you don't want to use SQLite.
 
 >[!TIP]
-> You can remove all files containing **.dist**,
+> You can remove all config files containing **.dist**, **.dev** and **README.md**;
 > these are examples and are never read by the application.
+>
+> `rm /etc/letswifi/*.dev* /etc/letswifi/*.dist* /etc/letswifi/README.md /etc/letswifi/*/README.md`
 
 #### RADIUS certificate
 
