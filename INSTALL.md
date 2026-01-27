@@ -157,13 +157,13 @@ You need to configure the CA certificate that you use on your RADIUS server.
 
 Import the certificate by piping it in the import script.
 
-<details><summary>Hellenic Academic and Research Institutions</summary>
+<details><summary>HARICA (Hellenic Academic and Research Institutions)</summary>
 
 ```sh
-curl -fsS https://www.tbs-certificats.com/issuerdata/HaricaECCRootCA2015.crt | letswifi ca import
+curl -fsS https://repo.harica.gr/certs/HARICA-TLS-Root-2021-ECC.pem | letswifi ca import
 ```
 </details>
-<details><summary>Let's Encrypt, aka ISRG Root</summary>
+<details><summary>Let's Encrypt (ISRG)</summary>
 
 ```sh
 curl -fsS https://letsencrypt.org/certs/isrg{rootx1,-root-x2}.pem | letswifi ca import
@@ -198,7 +198,7 @@ letswifi realm example.com \
 	--lang en-GB --name 'Office Wi-Fi' \
 	--lang nl-NL --name 'Kantoor-Wi-Fi' \
 	--validity 366 \
-	--trust 'C=GR, L=Athens, O=Hellenic Academic and Research Institutions Cert. Authority, CN=Hellenic Academic and Research Institutions ECC RootCA 2015' \
+	--trust 'C=GR, O=Hellenic Academic and Research Institutions CA, CN=HARICA TLS ECC Root CA 2021' \
 	--trust 'C=US, O=Internet Security Research Group, CN=ISRG Root X1' \
 	--trust 'C=US, O=Internet Security Research Group, CN=ISRG Root X2' \
 	--server-name 'radius.example.com'
