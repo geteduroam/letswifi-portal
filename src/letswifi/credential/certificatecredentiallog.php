@@ -95,7 +95,7 @@ class CertificateCredentialLog extends CredentialLog
 				userAgent: $row['user_agent'],
 				realm: $realm,
 				subject: $row['sub'],
-				serial: (string)$row['serial'],
+				serial: $this->convertSerial( $row['serial'] ),
 				issued: $issued,
 				expiry: $expiry,
 				revoked: $revoked,
@@ -148,7 +148,7 @@ class CertificateCredentialLog extends CredentialLog
 				userAgent: $row['user_agent'],
 				realm: $realm,
 				subject: $row['sub'],
-				serial: (string)$row['serial'],
+				serial: $this->convertSerial( $row['serial'] ),
 				issued: $issued,
 				expiry: $expiry,
 				revoked: $revoked,
@@ -193,5 +193,18 @@ class CertificateCredentialLog extends CredentialLog
 			profileService: $this->profileService,
 			revoke: fn( string $ident ) => $this->revokeCredential( $ident ),
 		);
+	}
+
+	private static function convertSerial( int|string $decimalSerial ): int
+	{
+		if ( \is_int( $decimalSerial ) ) {
+			return $decimalSerial;
+		}
+		$result = (int)$decimalSerial;
+		if ( (string)$result !== $decimalSerial ) {
+			throw new DomainException( 'Serial number cannot be represented as integer' );
+		}
+
+		return $result;
 	}
 }

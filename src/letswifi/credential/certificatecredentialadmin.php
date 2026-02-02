@@ -185,7 +185,7 @@ class CertificateCredentialAdmin extends CredentialAdmin
 				userAgent: $row['user_agent'],
 				realm: $this->admin->getRealm( $row['realm'] ),
 				subject: $row['sub'],
-				serial: (string)$row['serial'],
+				serial: $this->convertSerial( $row['serial'] ),
 				expiry: $expiry,
 				issued: $issued,
 				revoked: $revoked,
@@ -238,7 +238,7 @@ class CertificateCredentialAdmin extends CredentialAdmin
 				userAgent: $row['user_agent'],
 				realm: $this->admin->getRealm( $row['realm'] ),
 				subject: $row['sub'],
-				serial: (string)$row['serial'],
+				serial: $this->convertSerial( $row['serial'] ),
 				expiry: $expiry,
 				issued: $issued,
 				revoked: $revoked,
@@ -268,5 +268,18 @@ class CertificateCredentialAdmin extends CredentialAdmin
 		$extraConditions = ' AND realm IN (' . \implode( ', ', $realms ) . ')';
 
 		return $extraConditions;
+	}
+
+	private static function convertSerial( int|string $decimalSerial ): int
+	{
+		if ( \is_int( $decimalSerial ) ) {
+			return $decimalSerial;
+		}
+		$result = (int)$decimalSerial;
+		if ( (string)$result !== $decimalSerial ) {
+			throw new DomainException( 'Serial number cannot be represented as integer' );
+		}
+
+		return $result;
 	}
 }

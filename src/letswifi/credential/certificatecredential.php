@@ -24,7 +24,7 @@ class CertificateCredential extends Credential
 {
 	public readonly string|DN $subject;
 
-	public readonly string $serial;
+	public readonly int $serial;
 
 	public readonly DateTimeInterface $expiry;
 
@@ -42,7 +42,7 @@ class CertificateCredential extends Credential
 		?string $userAgent,
 		Realm $realm,
 		?string $subject = null,
-		?string $serial = null,
+		?int $serial = null,
 		?DateTimeInterface $expiry = null,
 		?DateTimeInterface $issued = null,
 		public readonly ?DateTimeInterface $revoked = null,
@@ -66,7 +66,7 @@ class CertificateCredential extends Credential
 			$this->issued = $issued ?: throw new DomainException( 'Issued not provided' );
 		} else {
 			$this->subject = $pkcs12->x509->getSubject();
-			$this->serial = $pkcs12->x509->getSerialNumber();
+			$this->serial = (int)$pkcs12->x509->getSerialNumber();
 			$this->expiry = $pkcs12->x509->getValidTo();
 			$this->issued = $pkcs12->x509->getValidFrom();
 		}
