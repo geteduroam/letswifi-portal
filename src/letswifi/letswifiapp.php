@@ -215,10 +215,14 @@ final class LetsWifiApp
 
 	public static function getHttpHost(): string
 	{
+        if ( ! empty( $_SERVER['HTTP_X_FORWARDED_HOST'] ) ) {
+             return $_SERVER['HTTP_X_FORWARDED_HOST'];
+        }
+		
 		if ( !\array_key_exists( 'HTTP_HOST', $_SERVER ) ) {
 			throw new RuntimeException( 'No HTTP Host header provided' );
 		}
-
+		
 		return $_SERVER['HTTP_HOST'];
 	}
 
@@ -248,7 +252,8 @@ final class LetsWifiApp
 	{
 		return
 			( !empty( $_SERVER['HTTPS'] ) && 'off' !== $_SERVER['HTTPS'] )
-			|| '443' === ( $_SERVER['SERVER_PORT'] ?? '' );
+			|| '443' === ( $_SERVER['SERVER_PORT'] ?? '' )
+			|| (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https');
 	}
 
 	public function getTranslationContext(): TranslationContext
