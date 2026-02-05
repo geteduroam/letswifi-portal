@@ -215,10 +215,6 @@ final class LetsWifiApp
 
 	public static function getHttpHost(): string
 	{
-        if ( ! empty( $_SERVER['HTTP_X_FORWARDED_HOST'] ) ) {
-             return $_SERVER['HTTP_X_FORWARDED_HOST'];
-        }
-		
 		if ( !\array_key_exists( 'HTTP_HOST', $_SERVER ) ) {
 			throw new RuntimeException( 'No HTTP Host header provided' );
 		}
