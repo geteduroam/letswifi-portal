@@ -114,6 +114,6 @@ class CertificateCredential extends Credential
 
 	public function getAnonymousIdentity(): ?string
 	{
-		return null;
+		return substr($this->credentialId,3);
 	}
 }
