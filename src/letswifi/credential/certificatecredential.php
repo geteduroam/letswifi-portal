@@ -34,7 +34,7 @@ class CertificateCredential extends Credential
 	 * @param Closure():void $revoke
 	 */
 	public function __construct(
-		?string $credentialId,
+		string $credentialId,
 		string $userId,
 		?string $clientId,
 		?string $grantSid,
@@ -46,7 +46,6 @@ class CertificateCredential extends Credential
 		?DateTimeInterface $expiry = null,
 		?DateTimeInterface $issued = null,
 		public readonly ?DateTimeInterface $revoked = null,
-		?string $anonymousIdentity = null,
 		private readonly ?PKCS12 $pkcs12 = null,
 	) {
 		parent::__construct(
@@ -112,8 +111,8 @@ class CertificateCredential extends Credential
 		return null !== $this->revoked;
 	}
 
-	public function getAnonymousIdentity(): ?string
+	public function getOuterIdentity(): ?string
 	{
-		return null;
+		return $this->credentialId;
 	}
 }

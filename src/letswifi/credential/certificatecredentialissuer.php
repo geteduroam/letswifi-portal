@@ -46,11 +46,14 @@ class CertificateCredentialIssuer implements CredentialIssuer
 
 	public function issue(): CertificateCredential
 	{
-		$pkcs12 = $this->generateClientCertificate();
-		$credentialId = (string)$pkcs12->x509->getSubject();
+		$ident = $this->generateIdent();
+
+		// TODO: handle case where ident is already used (must be unique)
+		// Currently it's 16 bytes random data, collisions will be extremely rare
+		$pkcs12 = $this->generateClientCertificate( $ident );
 
 		return new CertificateCredential(
-			credentialId: $credentialId,
+			credentialId: $ident,
 			userId: $this->user->userId,
 			clientId: $this->user->clientId,
 			grantSid: $this->user->grantSid,
@@ -133,13 +136,12 @@ class CertificateCredentialIssuer implements CredentialIssuer
 		}
 	}
 
-	private function generateClientCertificate(): PKCS12
+	private function generateClientCertificate( string $ident ): PKCS12
 	{
 		// TODO check that $expiry is not too far in the future,
 		// during some test we ended up with the date 88363-05-14 and MySQL didn't like
 		$expiry = $this->now->add( $this->realm->validity );
 		$userKey = new PrivateKey( new OpenSSLConfig( privateKeyType: OpenSSLKey::KEYTYPE_EC ) );
-		$ident = $this->generateIdent();
 		$dn = new DN( ['CN' => $ident] );
 		$csr = CSR::generate( $dn, $userKey );
 

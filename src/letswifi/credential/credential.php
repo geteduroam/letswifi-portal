@@ -61,5 +61,8 @@ abstract class Credential implements JsonSerializable
 	/** @return T */
 	abstract public function getPayload();
 
-	abstract public function getAnonymousIdentity(): ?string;
+	public function getOuterIdentity(): ?string
+	{
+		return \rawurlencode( $this->credentialId ?: 'anonymous' ) . "@{$this->realm->realmId}";
+	}
 }
