@@ -130,6 +130,11 @@ return [
 					// OPTIONAL: String home org attribute
 					'homeOrgAttribute' => 'schacHomeOrganization',
 				],
+				// When generating a OAuth Token for the Apps,
+				// set the validity this many days in the future
+				// OPTIONAL: Integer, number of days of validity
+				// DEFAULT: If not set tokenValidity is 6 Months
+				//'tokenValidity' => 60,
 			],
 
 			// Database for logging pseudocredentials and OAuth credentials
