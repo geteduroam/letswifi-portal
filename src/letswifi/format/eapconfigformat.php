@@ -190,10 +190,10 @@ class EapConfigFormat extends Format
 				. "\r\n\t\t\t\t\t<OuterIdentity>" . $this->e( $identity ) . '</OuterIdentity>';
 		}
 		$result .= ''
-			. "\r\n\t\t\t\t" . '<ClientCertificate format="PKCS12" encoding="base64">' . \base64_encode( $pkcs12->getPKCS12Bytes( $this->passphrase ?: $defaultPassphrase ) ) . '</ClientCertificate>';
+			. "\r\n\t\t\t\t\t" . '<ClientCertificate format="PKCS12" encoding="base64">' . \base64_encode( $pkcs12->getPKCS12Bytes( $this->passphrase ?: $defaultPassphrase ) ) . '</ClientCertificate>';
 		if ( !$this->passphrase ) {
 			$result .= ''
-				. "\r\n\t\t\t\t<Passphrase>" . $this->e( $defaultPassphrase ) . '</Passphrase>';
+				. "\r\n\t\t\t\t\t<Passphrase>" . $this->e( $defaultPassphrase ) . '</Passphrase>';
 		}
 		$result .= ''
 			. "\r\n\t\t\t\t</ClientSideCredential>";
