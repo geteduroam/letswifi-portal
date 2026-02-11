@@ -159,7 +159,7 @@ Import the certificate by piping it in the import script.
 <details><summary>HARICA (Hellenic Academic and Research Institutions)</summary>
 
 ```sh
-curl -fsS https://repo.harica.gr/certs/HARICA-TLS-Root-2021-ECC.pem | letswifi ca import
+curl -fsS https://www.tbs-certificats.com/issuerdata/HaricaECCRootCA2015.crt | letswifi ca import
 ```
 </details>
 <details><summary>Let's Encrypt (ISRG)</summary>
@@ -197,7 +197,7 @@ letswifi realm example.com \
 	--lang en-GB --name 'Office Wi-Fi' \
 	--lang nl-NL --name 'Kantoor-Wi-Fi' \
 	--validity 366 \
-	--trust 'C=GR, O=Hellenic Academic and Research Institutions CA, CN=HARICA TLS ECC Root CA 2021' \
+	--trust 'C=GR, L=Athens, O=Hellenic Academic and Research Institutions Cert. Authority, CN=Hellenic Academic and Research Institutions ECC RootCA 2015' \
 	--trust 'C=US, O=Internet Security Research Group, CN=ISRG Root X1' \
 	--trust 'C=US, O=Internet Security Research Group, CN=ISRG Root X2' \
 	--server-name 'radius.example.com'
