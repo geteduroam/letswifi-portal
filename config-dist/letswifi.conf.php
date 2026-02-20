@@ -130,11 +130,13 @@ return [
 					// OPTIONAL: String home org attribute
 					'homeOrgAttribute' => 'schacHomeOrganization',
 				],
-				// When generating a OAuth Token for the Apps,
-				// set the validity this many days in the future
+				// When generating a long-lasting OAuth Token for geteduroam Apps,
+				// set the grant validity this many days in the future
+				// HINT: If this is set longer than certificate lifetime
+				// renewal will be possible without additional idp authentication
 				// OPTIONAL: Integer, number of days of validity
 				// DEFAULT: If not set tokenValidity is 6 Months
-				//'tokenValidity' => 60,
+				//'longLivedGrantTokenValidity' => 60,
 			],
 
 			// Database for logging pseudocredentials and OAuth credentials
