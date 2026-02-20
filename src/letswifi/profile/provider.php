@@ -60,10 +60,10 @@ class Provider implements JsonSerializable
 		$authData = $providerData->getDictionary( 'auth' );
 		$authService = $authData->getString( 'service' );
 		$authServiceParams = $authData->getRawArray( 'param' );
-		$authtokenValidity = new DateInterval( "P6M" );
-        if($authData->has( 'tokenValidity' ))
+		$longLivedGrantTokenValidity = new DateInterval( "P6M" );
+        if($authData->has( 'longLivedGrantTokenValidity' ))
 		{
-        	$authtokenValidity = static::getTokenValidity($authData->getInteger( 'tokenValidity' ));
+        	$longLivedGrantTokenValidity = static::getTokenValidity($authData->getInteger( 'longLivedGrantTokenValidity' ));
         }
 		$auth = new AuthenticationContext(
 			authService: $authService,
@@ -71,7 +71,7 @@ class Provider implements JsonSerializable
 			oauthSecret: $providerData->getString( 'oauthsecret' ),
 			oauthClients: $providerData->getRawArray( 'clients' ),
 			pdoData: $providerData->getDictionary( 'pdo' ),
-			authtokenValidity: $authtokenValidity,
+			longLivedGrantTokenValidity: $longLivedGrantTokenValidity,
 		);
 
 		$location = $providerData->getDictionaryList( 'location' );
