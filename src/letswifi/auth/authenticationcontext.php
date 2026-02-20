@@ -46,7 +46,7 @@ class AuthenticationContext implements JsonSerializable
 		array $oauthClients,
 		Dictionary $pdoData,
 		protected readonly DateTimeImmutable $now = new DateTimeImmutable(),
-		DateInterval $authtokenValidity = new DateInterval('P6M'),
+		DateInterval $longLivedGrantTokenValidity = new DateInterval('P6M'),
 	) {
 		if ( !\preg_match( '/^[A-Z][A-Za-z0-9]+$/', $authService ) ) {
 			throw new DomainException( 'Illegal auth.service specified in config' );
@@ -78,7 +78,7 @@ class AuthenticationContext implements JsonSerializable
 			$accessTokenSealer,
 			$authorizationCodeSealer,
 			$refreshTokenSealer,
-			$authtokenValidity,
+			$longLivedGrantTokenValidity,
 		);
 
 		foreach ( $oauthClients as $client ) {
