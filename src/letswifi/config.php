@@ -97,4 +97,17 @@ class Config
 
 		return $data;
 	}
+
+	public function getBoolOrNull( string $key ): ?bool
+	{
+		if ( !isset( $this->conf[$key] ) ) {
+			return null;
+		}
+		$data = $this->conf[$key];
+		if ( !\is_bool( $data ) ) {
+			throw new DomainException( "Expecting config key ${key} to be boolean, but is " . \gettype( $data ) );
+		}
+
+		return $data;
+	}
 }
