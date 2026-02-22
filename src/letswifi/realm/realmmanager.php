@@ -454,6 +454,17 @@ class RealmManager extends DatabaseStorage
 	/**
 	 * @suppress PhanPossiblyNonClassMethodCall Phan doesn't understand PDO
 	 */
+	public function removeSignerCa( string $realm, string $sub): void
+	{
+		$statement = $this->pdo->prepare( 'DELETE FROM `realm_signer` WHERE `realm` = :realm AND signer_ca_sub = :sub' );
+		$statement->bindValue( 'realm', $realm );
+		$statement->bindValue( 'sub', $sub );
+		$statement->execute();
+	}
+
+	/**
+	 * @suppress PhanPossiblyNonClassMethodCall Phan doesn't understand PDO
+	 */
 	public function addServer( string $realm, string $serverName ): void
 	{
 		$statement = $this->pdo->prepare( 'INSERT INTO `realm_server_name` (`realm`, `server_name`) VALUES (:realm, :server_name)' );
