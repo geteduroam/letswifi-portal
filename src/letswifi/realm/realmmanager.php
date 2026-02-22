@@ -478,7 +478,7 @@ class RealmManager extends DatabaseStorage
 	 */
 	public function addVhost( string $realm, string $httpHost ): void
 	{
-		$statement = $this->pdo->prepare( 'INSERT INTO `realm_vhost` (`realm`, `server_name`) VALUES (:realm, :server_name)' );
+		$statement = $this->pdo->prepare( 'INSERT INTO `realm_vhost` (`realm`, `http_host`) VALUES (:realm, :http_host)' );
 		$statement->bindValue( 'realm', $realm );
 		$statement->bindValue( 'http_host', $httpHost );
 		$statement->execute();
