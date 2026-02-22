@@ -170,6 +170,9 @@ class RealmManager extends DatabaseStorage
 	public function getSignerCa( string $realm ): CA
 	{
 		$sub = $this->getSingleFieldFromTableWhere( 'realm_signer', 'signer_ca_sub', ['realm' => $realm] );
+		if (null === $sub) {
+			throw new DomainException( 'Signer CA not found' );
+		}
 		$ca = $this->getCA( $sub );
 		if ( null === $ca ) {
 			throw new DomainException( 'Signer CA not found' );
