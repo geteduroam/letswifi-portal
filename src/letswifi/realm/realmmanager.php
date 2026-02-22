@@ -146,12 +146,22 @@ class RealmManager extends DatabaseStorage
 	/**
 	 * @internal
 	 *
+	 * @return array<string>
+	 */
+	public function getTrustedCaNames ( string $realm ): array
+	{
+		return $this->getFieldsFromTableWhere( 'realm_trust', 'trusted_ca_sub', ['realm' => $realm] );
+	}
+
+	/**
+	 * @internal
+	 *
 	 * @return array<CA>
 	 */
 	public function getTrustedCas( string $realm ): array
 	{
 		$result = [];
-		foreach ( $this->getFieldsFromTableWhere( 'realm_trust', 'trusted_ca_sub', ['realm' => $realm] ) as $sub ) {
+		foreach ( $this->getTrustedCaNames($realm) as $sub ) {
 			$ca = $this->getCA( $sub );
 			// TODO throw exception?
 			if ( null !== $ca ) {
