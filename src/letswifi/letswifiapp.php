@@ -315,7 +315,7 @@ class LetsWifiApp
 			$username = $this->config->getStringOrNull( 'pdo.username' );
 			$password = $this->config->getStringOrNull( 'pdo.password' );
 
-			$this->pdo = new PDO( $dsn, $username, $password );
+			$this->pdo = new PDO( $dsn, $username, $password, $this->getPDOOptions() );
 			$this->pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 		}
 
@@ -339,5 +339,23 @@ class LetsWifiApp
 		}
 
 		return $realm;
+	}
+
+	private function getPDOOptions(): array
+	{
+		$options = [];
+
+		$ssl_ca_option = $this->config->getStringOrNull( 'pdo.sslca' );
+		$ssl_verify_option = $this->config->getBoolOrNull( 'pdo.sslverify' );
+
+		if ( null !== $ssl_ca_option ) {
+			$options[PDO::MYSQL_ATTR_SSL_CA] = $ssl_ca_option;
+		}
+
+		if ( null !== $ssl_verify_option ) {
+			$options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = $ssl_verify_option;
+		}
+
+		return $options;
 	}
 }
