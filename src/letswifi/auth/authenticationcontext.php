@@ -77,13 +77,21 @@ class AuthenticationContext implements JsonSerializable
 			$authorizationCodeSealer,
 			$refreshTokenSealer,
 		);
+		foreach ( $oauthClients as $name => $client ) {
+			// TODO: Temporary workaround until configuration code is improved
+			// If clients are set with #dir, a syntethic array is created with full paths
+			// However, this code will fail with manual created #inc entries,
+			// because we're most likely in a different working directory.
+			if ( \str_ends_with( $name, '#inc' ) ) {
+				/** @psalm-suppress UnresolvableInclude */
+				$client = require $client;
+			}
 
-		foreach ( $oauthClients as $client ) {
 			$this->oauth->registerClient( new Client(
 				$client['clientId'],
-				$client['redirectUris'] ?? [],
+				$client['redirectUris'] ?: [],
 				$client['scopes'],
-				$client['refresh'] ?? false,
+				$client['refresh'] ?: false,
 				$client['clientSecret'] ?? null,
 			) );
 		}
