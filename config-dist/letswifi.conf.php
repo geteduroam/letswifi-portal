@@ -64,6 +64,13 @@ return [
 			// OPTIONAL: String, ID of contact, references contact in configuration
 			'contact' => 'example.com',
 
+			// Administrators for this provider
+			// OPTIONAL: Array userId
+			'admins' => [
+				// 'userid1',
+				// 'userid2',
+			],
+
 			// Authentication configuration
 			// Choose a authentication service and parameters.
 			// The service must match one of the supported services,

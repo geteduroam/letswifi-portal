@@ -27,6 +27,13 @@ return [
 		'nl-NL' => 'Netwerk voor personeel',
 	],
 
+	// Administrators for this realm
+	// OPTIONAL: Array userId
+	'admins' => [
+		// 'userid1',
+		// 'userid2',
+	],
+
 	// The client requires that the RADIUS server presents a certificate
 	// containing at least one of these server names.
 	// For old Android versions that don't support multiple server names,
