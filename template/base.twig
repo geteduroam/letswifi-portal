@@ -60,7 +60,7 @@
 		</div>
 		{% else -%}
 		<div class="dropdown-container">
-			<a draggable="false" class="dropdown-header" href="{{ _login_href ?? _basePath ~ '/me/' }}"><span class="oojs-icon oojs-icon-userAvatarOutline"></span>{{ 'Login'|t }}</a>
+			<a draggable="false" class="dropdown-header" href="{{ _login_href ?? (_basePath ~ '/me/') }}"><span class="oojs-icon oojs-icon-userAvatarOutline"></span>{{ 'Login'|t }}</a>
 		</div>
 		{% endif -%}
 		{% endblock %}
