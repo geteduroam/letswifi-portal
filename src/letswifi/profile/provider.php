@@ -159,13 +159,10 @@ class Provider implements JsonSerializable
 		return $result;
 	}
 
-	protected static function getTokenValidity( int|float|string|DateInterval $in ): DateInterval
+	protected static function getTokenValidity( int|string|DateInterval $in ): DateInterval
 	{
 		if ( $in instanceof DateInterval ) {
 			return $in;
-		}
-		if ( \is_float( $in ) ) {
-			$in = (int)\round( $in );
 		}
 		if ( \is_int( $in ) && 0 < $in ) {
 			return new DateInterval( "P{$in}D" );
