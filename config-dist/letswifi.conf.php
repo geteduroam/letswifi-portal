@@ -136,7 +136,7 @@ return [
 				// renewal will be possible without additional idp authentication
 				// OPTIONAL: Integer, number of days of validity
 				// DEFAULT: If not set tokenValidity is 6 Months
-				//'longLivedGrantTokenValidity' => 60,
+				// 'longLivedGrantTokenValidity' => 60,
 			],
 
 			// Database for logging pseudocredentials and OAuth credentials
