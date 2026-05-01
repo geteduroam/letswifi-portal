@@ -10,6 +10,8 @@
 
 namespace letswifi\profile;
 
+use DateInterval;
+use DomainException;
 use JsonSerializable;
 use fyrkat\multilang\MultiLanguageString;
 use letswifi\auth\AuthenticationContext;
@@ -59,12 +61,17 @@ class Provider implements JsonSerializable
 		$authData = $providerData->getDictionary( 'auth' );
 		$authService = $authData->getString( 'service' );
 		$authServiceParams = $authData->getRawArray( 'param' );
+		$longLivedGrantTokenValidity = new DateInterval( 'P6M' );
+		if ( $authData->has( 'longLivedGrantTokenValidity' ) ) {
+			$longLivedGrantTokenValidity = static::getTokenValidity( $authData->getInteger( 'longLivedGrantTokenValidity' ) );
+		}
 		$auth = new AuthenticationContext(
 			authService: $authService,
 			authServiceParams: $authServiceParams,
 			oauthSecret: $providerData->getString( 'oauthsecret' ),
 			oauthClients: $providerData->getRawArray( 'clients' ),
 			pdoData: $providerData->getDictionary( 'pdo' ),
+			longLivedGrantTokenValidity: $longLivedGrantTokenValidity,
 		);
 
 		$location = $providerData->getDictionaryList( 'location' );
@@ -150,5 +157,25 @@ class Provider implements JsonSerializable
 		}
 
 		return $result;
+	}
+
+	protected static function getTokenValidity( int|float|string|DateInterval $in ): DateInterval
+	{
+		if ( $in instanceof DateInterval ) {
+			return $in;
+		}
+		if ( \is_float( $in ) ) {
+			$in = (int)\round( $in );
+		}
+		if ( \is_int( $in ) && 0 < $in ) {
+			return new DateInterval( "P{$in}D" );
+		}
+		if ( \is_string( $in ) ) {
+			if ( $result = DateInterval::createFromDateString( $in ) ) {
+				return $result;
+			}
+		}
+
+		throw new DomainException( 'Invalid validity ' . $in );
 	}
 }

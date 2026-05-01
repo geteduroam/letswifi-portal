@@ -10,6 +10,7 @@
 
 namespace letswifi\auth;
 
+use DateInterval;
 use DateTimeImmutable;
 use DomainException;
 use JsonSerializable;
@@ -45,6 +46,7 @@ class AuthenticationContext implements JsonSerializable
 		array $oauthClients,
 		Dictionary $pdoData,
 		protected readonly DateTimeImmutable $now = new DateTimeImmutable(),
+		DateInterval $longLivedGrantTokenValidity = new DateInterval( 'P6M' ),
 	) {
 		if ( !\preg_match( '/^[A-Z][A-Za-z0-9]+$/', $authService ) ) {
 			throw new DomainException( 'Illegal auth.service specified in config' );
@@ -76,6 +78,7 @@ class AuthenticationContext implements JsonSerializable
 			$accessTokenSealer,
 			$authorizationCodeSealer,
 			$refreshTokenSealer,
+			$longLivedGrantTokenValidity,
 		);
 		foreach ( $oauthClients as $name => $client ) {
 			// TODO: Temporary workaround until configuration code is improved
