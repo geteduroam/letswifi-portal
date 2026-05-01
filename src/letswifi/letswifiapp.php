@@ -38,6 +38,16 @@ use stdClass;
  */
 final class LetsWifiApp
 {
+	/**
+	 * Version number of the application, null means development build
+	 *
+	 * This is always NULL in source control, even in tags.
+	 * In a build pipeline it can be changed to a semver string with v-prefix.
+	 *
+	 * @var ?string Semver tag name, such as "v2.0.0"
+	 */
+	public const RELEASE = null;
+
 	public const HTTP_CODES = [
 		400 => 'Bad Request',
 		401 => 'Unauthorized',
@@ -155,7 +165,7 @@ final class LetsWifiApp
 			$data = $this->deepConvertToJson( $data, $reshape );
 		}
 		$forceJson = \array_key_exists( 'json', $_GET );
-		$forceDebug = \array_key_exists( 'debug', $_GET );
+		$forceDebug = self::RELEASE === null && \array_key_exists( 'debug', $_GET );
 		if ( null === $template || $forceJson || !$this->isBrowser() ) {
 			$filter = $forceDebug
 				? static fn( string $k ): bool => true
@@ -198,6 +208,7 @@ final class LetsWifiApp
 
 		exit( $template->render(
 			[
+				'_release' => self::RELEASE,
 				'_user' => $user?->userId,
 				'_admin_href' => $user?->canPromote() ? "{$this->basePath}/admin/" : null,
 				'_logout_href' => $provider?->auth->browserAuth->getLogoutURL( $this->getBaseUrl() ),

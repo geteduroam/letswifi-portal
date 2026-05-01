@@ -7,6 +7,9 @@
 /.phpunit.result.cache
 /.twig-cs-fixer.cache
 
+# Build artefacts
+/build
+
 # Removed in earlier versions
 /etc
 /fifo
@@ -16,6 +19,6 @@
 
 # Often manually created by developers
 /simplesamlphp*
-/www/simplesaml
+/htdocs/simplesaml
 *.eap-config
 .geteduroam-refresh-*
