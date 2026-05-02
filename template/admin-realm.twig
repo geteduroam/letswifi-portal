@@ -35,9 +35,11 @@
 	<h2>{{ 'Certificates'|t }}</h2>
 
 	<h3>{{ 'Signing certificate'|t }}</h3>
-	<table>
+	<section class="highlight"><table>
 		<tr>
-			<th colspan="3">{{ 'Common name'|t }}</th>
+			<th>{{ 'Common name'|t }}</th>
+			<th>{{ 'Download'|t }}</th>
+			<th>{{ 'Download'|t }}</th>
 		</tr>
 		<tr>
 			<td>{{ realm.signer }}</td>
@@ -48,12 +50,13 @@
 				{{ 'CRT'|t }}</a>
 			</td>
 		</tr>
-	</table>
+	</table></section>
 
 	<h3>{{ 'Trusted server CAs'|t }}</h3>
-	<table>
+	<section class="highlight"><table>
 		<tr>
-			<th colspan="2">{{ 'Common name'|t }}</th>
+			<th>{{ 'Common name'|t }}</th>
+			<th>{{ 'Download'|t }}</th>
 		</tr>
 {% for trust_crt in realm.trust_crt %}
 		<tr>
@@ -63,10 +66,11 @@
 			</td>
 		</tr>
 {% endfor %}
-	</table>
+	</table></section>
 
 	<h2>{{ 'Network'|t }}</h2>
 
+	<section class="highlight">
 	<p>{{ 'Networks to be included in profile'|t }}
 
 	<table>
@@ -109,4 +113,5 @@
 		</tr>
 {% endfor %}
 	</table>
+	</section>
 {% endblock %}
