@@ -86,15 +86,16 @@ class AuthenticationContext implements JsonSerializable
 			// However, this code will fail with manual created #inc entries,
 			// because we're most likely in a different working directory.
 			if ( \str_ends_with( $name, '#inc' ) ) {
-				/** @psalm-suppress UnresolvableInclude */
+				/** @psalm-suppress UnresolvableInclude temporary fix */
 				$client = require $client;
 			}
 
+			/** @psalm-suppress PossiblyNullArgument null coalescing prevents this */
 			$this->oauth->registerClient( new Client(
 				$client['clientId'],
-				$client['redirectUris'] ?: [],
+				$client['redirectUris'] ?? [],
 				$client['scopes'],
-				$client['refresh'] ?: false,
+				$client['refresh'] ?? false,
 				$client['clientSecret'] ?? null,
 			) );
 		}
