@@ -29,6 +29,7 @@ do
 done
 cp vendor/twig/twig/LICENSE "$WORKDIR/src/twig/"
 sed "/const RELEASE/ s/null/'${TAG:-"v$VERSION"}'/" src/letswifi/letswifiapp.php >"$WORKDIR/src/letswifi/letswifiapp.php"
+printf '%s\n' "${TAG:-"v$VERSION"}" >"$WORKDIR/VERSION"
 
 if [ "$(uname)" = Darwin ]
 then
