@@ -7,6 +7,7 @@
 
 	<p>{{ realm.description|t }}
 
+{% if (realm.contact.mail ?? '') ~ (realm.contact.web ?? '') ~ (realm.contact.phone ?? '') %}
 	<h2>{{ 'Contact'|t }}</h2>
 
 	<p>{{ 'Contact information to be included in profile'|t }}
@@ -28,6 +29,7 @@
 		<dt>{{ 'Phone'|t }}</dt>
 		<dd>{{ realm.contact.phone }}
 	</dl>
+{% endif %}
 {% endif %}
 
 	<h2>{{ 'Certificates'|t }}</h2>
