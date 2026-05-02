@@ -34,7 +34,22 @@
 {% block admin_content %}
 <h1>{{ 'Control panel'|t }}</h1>
 
-<section class="highlight form">
+<h2>{{ 'Ident search'|t }}</h2>
+<section class="highlight form"><form action="credentials/">
+	<p>{{ 'Search for an ident from your RADIUS log'|t }}
+	<dl>
+		<dt>{{ 'Ident'|t }}</dt>
+		<dd>
+			<input type="text" name="ident" placeholder="id@realm">
+			<small><button type="submit">
+				<small class="oojs-icon oojs-icon-funnel"></small>
+				{{ 'Filter'|t }}
+			</button></small>
+		</dd>
+	</dl>
+</section>
+
+<section class="form">
 	<dl>
 		<dt>{{ 'Provider name'|t }}</dt>
 		<dd>{{ _provider.display_name|t }}</dd>
