@@ -36,8 +36,10 @@ then
 	# MacOS tar needs an arcane enchantment spell to behave itself
 	# Otherwise you'd get extended header keyword LIBARCHIVE.xattr.com.apple.provenance
 	# or resource forks which are named after any file with ._ prefixed to it
-	tar -C "$TARGET" -cz --no-xattrs --no-mac-metadata --exclude ".*" -f "$TARGET/$PRODUCT-$VERSION.tar.gz" "$PRODUCT"
+	tar -C "$TARGET" -cz --no-xattrs --no-mac-metadata --exclude ".*" -f "$TARGET/$PRODUCT-${TAG:-"v$VERSION"}.tar.gz" "$PRODUCT"
 else
 	# For non-MacOS we don't expect their tar binary to support these enchantment spells
-	tar -C "$TARGET" -cz --exclude ".*" -f "$TARGET/$PRODUCT-$VERSION.tar.gz" "$PRODUCT"
+	tar -C "$TARGET" -cz --exclude ".*" -f "$TARGET/$PRODUCT-${TAG:-"v$VERSION"}.tar.gz" "$PRODUCT"
 fi
+
+printf '%s\n' "$TARGET/$PRODUCT-${TAG:-"v$VERSION"}.tar.gz"
