@@ -14,7 +14,7 @@ use letswifi\profile\Realm;
 require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'src', '_autoload.php'] );
 $app = new LetsWifiApp( basePath: '../..' );
 $provider = $app->getProvider();
-$user = $provider->getAuthenticatedUser( scope: 'admin' ) ?? $provider->requireAuth();
+$user = $provider->requireAuth( scope: 'admin' );
 $admin = $user->promote();
 $credentialLog = $app->getCredentialLog( $user );
 $credentialAdmin = $credentialLog->getCredentialAdministrator();

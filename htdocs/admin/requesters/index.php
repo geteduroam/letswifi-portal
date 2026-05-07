@@ -14,7 +14,7 @@ use letswifi\credential\RequesterAggregate;
 require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'src', '_autoload.php'] );
 $app = new LetsWifiApp( basePath: '../..' );
 $provider = $app->getProvider();
-$user = $provider->getAuthenticatedUser( scope: 'admin' ) ?? $provider->requireAuth();
+$user = $provider->requireAuth( scope: 'admin' );
 $credentialLog = $app->getCredentialLog( $user );
 $credentialAdmin = $credentialLog->getCredentialAdministrator();
 $admin = $user->promote();

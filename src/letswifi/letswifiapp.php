@@ -106,14 +106,14 @@ final class LetsWifiApp
 		return $this->globalConfig->getDictionaryOrNull( 'branding' );
 	}
 
-	public function getIP(): string
+	public static function getIP(): string
 	{
 		\assert( \array_key_exists( 'REMOTE_ADDR', $_SERVER ) );
 
 		return $_SERVER['REMOTE_ADDR'];
 	}
 
-	public function isBrowser(): bool
+	public static function isBrowser(): bool
 	{
 		return \str_starts_with( $_SERVER['HTTP_ACCEPT'] ?? '', 'text/html' );
 	}

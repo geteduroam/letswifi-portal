@@ -17,7 +17,7 @@ require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'src', '_autolo
 
 $app = new LetsWifiApp( basePath: '../..' );
 $provider = $app->getProvider();
-$user = $provider->getAuthenticatedUser( scope: 'eap-metadata' ) ?? $provider->requireAuth();
+$user = $provider->requireAuth( scope: 'eap-metadata' );
 
 // Workaround for MacOS/ChromeOS flow; we want to provide the download through a meta refresh,
 // but the refresh should only work once.

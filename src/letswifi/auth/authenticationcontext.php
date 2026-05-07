@@ -24,8 +24,10 @@ use fyrkat\oauth\token\AccessToken;
 use fyrkat\oauth\token\AuthorizationCode;
 use fyrkat\oauth\token\Grant;
 use fyrkat\oauth\token\RefreshToken;
+use letswifi\LetsWifiApp;
 use letswifi\auth\browser\BrowserAuthInterface;
 use letswifi\configuration\Dictionary;
+use letswifi\error\UnauthorizedException;
 use letswifi\profile\Provider;
 use letswifi\profile\Realm;
 
@@ -108,30 +110,32 @@ class AuthenticationContext implements JsonSerializable
 
 	public function getAuthenticatedUser( Provider $provider, ?string $scope = null, bool $force = false ): ?User
 	{
-		if ( null !== $scope ) {
-			try {
-				$token = $this->oauth->getAccessTokenFromRequest( $scope );
-				$grant = $token->getGrant();
+		// TODO: provide a flag to indicate that browser auth is not acceptable;
+		// only Bearer token will be considered
 
-				return $this->getAuthenticatedUserFromGrant( $provider, $grant );
-			} catch ( BearerException $e ) {
-				return $force ? throw $e : null;
-			}
-		}
+		$userId = ( $force && LetsWifiApp::isBrowser() ) ? $this->browserAuth->requireAuth() : $this->browserAuth->getUserId();
 
-		\assert( null === $scope ); // we do browser auth
-		// TODO: Separate functions for OAuth and browser auth,
-		// instead of discriminating by the $scope parameter
-
-		$userId = $force ? $this->browserAuth->requireAuth() : $this->browserAuth->getUserId();
-
-		return null !== $userId
-			? $this->constructAuthenticatedUser(
+		if ( $userId ) {
+			return $this->constructAuthenticatedUser(
 				provider: $provider,
 				userId: $userId,
 				clientId: 'browser',
 				grantSid: null,
-			) : null;
+			);
+		}
+
+		if ( null === $scope ) {
+			return null;
+		}
+
+		try {
+			$token = $this->oauth->getAccessTokenFromRequest( $scope );
+			$grant = $token->getGrant();
+
+			return $this->getAuthenticatedUserFromGrant( $provider, $grant );
+		} catch ( BearerException $e ) {
+			throw new UnauthorizedException( 'Invalid credential provided', $e );
+		}
 	}
 
 	public function requireAuth( Provider $provider, ?string $scope = null ): User
@@ -140,7 +144,7 @@ class AuthenticationContext implements JsonSerializable
 			return $user;
 		}
 
-		throw new DomainException( 'Exhausted all available authentication methods without success' );
+		throw new UnauthorizedException( 'No credential provided' );
 	}
 
 	private function getAuthenticatedUserFromGrant( Provider $provider, Grant $grant ): User
