@@ -80,10 +80,17 @@ final class LetsWifiApp
 
 	private readonly Dictionary $globalConfig;
 
-	public function __construct( public readonly string $basePath, ?Dictionary $globalConfig = null, bool $registerExceptionHandler = true )
-	{
+	private readonly string $localeDirectory;
+
+	public function __construct(
+		public readonly string $urlRelativeBase,
+		?Dictionary $globalConfig = null,
+		string $localeDirectory = '',
+		bool $registerExceptionHandler = true,
+	) {
 		$this->globalConfig = $globalConfig ?? new DictionaryFile( \dirname( __DIR__, 2 ) . \DIRECTORY_SEPARATOR . 'config' . \DIRECTORY_SEPARATOR . 'letswifi.conf.php' );
 		$this->profileService = new ProfileService( $this->globalConfig, $this->getHttpHost() );
+		$this->localeDirectory = $localeDirectory ?: \dirname( __DIR__, 2 ) . \DIRECTORY_SEPARATOR . 'locale';
 
 		if ( \PHP_SAPI === 'cli-server' ) {
 			// Ensure that we are setting restrictive security headers when developing,
@@ -210,9 +217,9 @@ final class LetsWifiApp
 			[
 				'_release' => self::RELEASE,
 				'_user' => $user?->userId,
-				'_admin_href' => $user?->canPromote() ? "{$this->basePath}/admin/" : null,
+				'_admin_href' => $user?->canPromote() ? "{$this->urlRelativeBase}/admin/" : null,
 				'_logout_href' => $provider?->auth->browserAuth->getLogoutURL( $this->getBaseUrl() ),
-				'_basePath' => $this->basePath,
+				'_basePath' => $this->urlRelativeBase,
 				'_locale' => $this->getTranslationContext()->primaryLocale,
 				'_supportedLocales' => $supportedLocales,
 				'_product_name' => $branding?->getStringOrNull( 'product_name' ) ?? "Let's Wi-Fi",
@@ -250,7 +257,7 @@ final class LetsWifiApp
 	public function getBaseUrl(): string
 	{
 		$vhost = self::getHttpHost();
-		$path = $this->getBasePath();
+		$path = $this->getUrlAbsolutePath();
 
 		return ( self::isHttps() ? 'https://' : 'http://' ) . $vhost . $path;
 	}
@@ -272,7 +279,7 @@ final class LetsWifiApp
 				$url .= '?' . \http_build_query( $get );
 			}
 			\setcookie( 'lang', $_GET['lang'], [
-				'path' => $this->getBasePath(),
+				'path' => $this->getUrlAbsolutePath(),
 				'secure' => $this->isHttps(),
 				'samesite' => $this->isHttps() ? 'None' : 'Lax', // Some browser require HTTPS for 'None'
 				// https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#controlling_third-party_cookies_with_samesite
@@ -295,7 +302,7 @@ final class LetsWifiApp
 		if ( null === $this->translationContext ) {
 			$this->translationContext = new TranslationContext(
 				userLocale: $_COOKIE['lang'] ?? null,
-				localeDirectory: \dirname( __DIR__, 2 ) . \DIRECTORY_SEPARATOR . 'locale',
+				localeDirectory: $this->localeDirectory,
 				localeDirectoryType: 'php',
 			);
 		}
@@ -364,11 +371,11 @@ final class LetsWifiApp
 		return \strstr( $requestUri, '?', true ) ?: $requestUri;
 	}
 
-	protected function getBasePath(): string
+	protected function getUrlAbsolutePath(): string
 	{
 		$requestUri = $_SERVER['REQUEST_URI'] ?? '';
 		$path = \explode( '/', \rtrim( $this->getIndexPath(), '/' ) );
-		$baseParts = \explode( '/', $this->basePath );
+		$baseParts = \explode( '/', $this->urlRelativeBase );
 		while ( !empty( $baseParts ) ) {
 			$element = \array_shift( $baseParts );
 			if ( '..' === $element ) {

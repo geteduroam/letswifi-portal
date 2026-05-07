@@ -12,10 +12,10 @@ use letswifi\LetsWifiApp;
 use letswifi\error\HttpMethodException;
 use letswifi\format\Format;
 
-require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'src', '_autoload.php'] );
+require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'autoload.php'] );
 \assert( \array_key_exists( 'REQUEST_METHOD', $_SERVER ) );
 
-$app = new LetsWifiApp( basePath: '../..' );
+$app = new LetsWifiApp( urlRelativeBase: '../..' );
 $provider = $app->getProvider();
 $user = $provider->requireAuth( scope: 'eap-metadata' );
 
@@ -89,7 +89,7 @@ switch ( $overrideMethod ?? $_SERVER['REQUEST_METHOD'] ) {
 			'user' => $user,
 			'realms' => $user->getRealms(),
 			'app' => [
-				'url' => "{$app->basePath}/app/",
+				'url' => "{$app->urlRelativeBase}/app/",
 			],
 		], 'profile-advanced' );
 		\assert( false, 'Unreachable code' );

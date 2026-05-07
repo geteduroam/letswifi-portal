@@ -20,6 +20,7 @@ cp -a bin htdocs locale src template "$WORKDIR"
 cp -a config-dist/. "$WORKDIR/config"
 cp -a vendor/fyrkat/{multilang,oauth-server,openssl}/src/fyrkat "$WORKDIR/src/"
 cat src/_autoload.php | grep -v Composer | grep -v /vendor/ >"$WORKDIR/src/_autoload.php"
+ln -s src/_autoload.php "$WORKDIR/autoload.php"
 
 ( cd vendor/twig/twig/src; find . -path Resources -prune -o -type f; ) | while read file
 do

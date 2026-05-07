@@ -13,7 +13,7 @@ use letswifi\LetsWifiApp;
 use letswifi\auth\browser\MismatchIdpException;
 use letswifi\error\ForbiddenException;
 
-require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'src', '_autoload.php'] );
+require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'autoload.php'] );
 \assert( \array_key_exists( 'REQUEST_METHOD', $_SERVER ) ); // Psalm
 
 const POST_FIELD = 'approve';
@@ -22,7 +22,7 @@ const POST_VALUE = 'yes';
 // Test this file by serving it on http://[::1]:1080/oauth/authorize/ and point your browser to:
 // http://[::1]:1080/oauth/authorize/?response_type=code&code_challenge_method=S256&scope=testscope&code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM&redirect_uri=http://[::1]:1234/callback/&client_id=no.fyrkat.oauth&state=0
 
-$app = new LetsWifiApp( basePath: '../..' );
+$app = new LetsWifiApp( urlRelativeBase: '../..' );
 $provider = $app->getProvider();
 $oauth = $provider->auth->oauth;
 

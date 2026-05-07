@@ -11,7 +11,7 @@
 use letswifi\LetsWifiApp;
 use letswifi\error\HttpMethodException;
 
-if ( !isset( $downloadFormat ) || !isset( $basePath ) ) {
+if ( !isset( $downloadFormat ) || !isset( $urlRelativeBase ) ) {
 	// Do not throw an exception here, because we haven't properly initialized;
 	// the autoloader may not even be available
 	// Just abort the old fashioned way.
@@ -21,9 +21,9 @@ if ( !isset( $downloadFormat ) || !isset( $basePath ) ) {
 	exit( "400 Bad Request\r\n\r\nInvalid request\r\n" );
 }
 
-$href = "{$basePath}/profiles/new/{$downloadFormat}/";
+$href = "{$urlRelativeBase}/profiles/new/{$downloadFormat}/";
 
-$app = new LetsWifiApp( basePath: $basePath );
+$app = new LetsWifiApp( urlRelativeBase: $urlRelativeBase );
 $provider = $app->getProvider();
 $user = $provider->requireAuth();
 
@@ -53,11 +53,11 @@ switch ( $_SERVER['REQUEST_METHOD'] ?? null ) {
 	case 'GET': $app->render(
 		[
 			'passphrase' => ( $passphrase ?? null ) ?: null,
-			'action' => "{$basePath}/profiles/new/",
+			'action' => "{$urlRelativeBase}/profiles/new/",
 			'format' => $downloadFormat,
 			'user' => $user,
 			'realms' => $user->getRealms(),
-			'meta_redirect' => \count( $user->getRealms() ) === 1 ? "{$basePath}/profiles/new/?" . \http_build_query( ['download' => '1', 'format' => $downloadFormat] ) : null,
+			'meta_redirect' => \count( $user->getRealms() ) === 1 ? "{$urlRelativeBase}/profiles/new/?" . \http_build_query( ['download' => '1', 'format' => $downloadFormat] ) : null,
 		], 'profile-download' );
 }
 

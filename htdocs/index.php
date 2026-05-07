@@ -10,8 +10,8 @@
 
 use letswifi\LetsWifiApp;
 
-require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 1 ), 'src', '_autoload.php'] );
-$app = new LetsWifiApp( basePath: '.' );
+require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 1 ), 'autoload.php'] );
+$app = new LetsWifiApp( urlRelativeBase: '.' );
 $provider = $app->getProvider();
 
 if ( $installProfiles = $app->getBrandingConfiguration() ) {
@@ -37,7 +37,7 @@ if ( $installProfiles = $app->getBrandingConfiguration() ) {
 			$matchedPlatform['profiles'] = \array_combine(
 				$platform['profiles'] ?? [],
 				\array_map(
-					static fn ( string $profileName ): array => $profiles[$profileName] + ['href' => "{$app->basePath}/profiles/new/{$profileName}/"],
+					static fn ( string $profileName ): array => $profiles[$profileName] + ['href' => "{$app->urlRelativeBase}/profiles/new/{$profileName}/"],
 					$platform['profiles'] ?? [],
 				),
 			);
@@ -60,7 +60,7 @@ $apiConfiguration = [
 $app->render( [
 	'platform' => $matchedPlatform ?? null,
 	'provider' => $provider,
-	'all_platforms_href' => "{$app->basePath}/app/",
-	'advanced_href' => "{$app->basePath}/profiles/new/",
+	'all_platforms_href' => "{$app->urlRelativeBase}/app/",
+	'advanced_href' => "{$app->urlRelativeBase}/profiles/new/",
 	'http://letswifi.app/api#v2' => $apiConfiguration,
 ], 'start' );

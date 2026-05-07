@@ -10,8 +10,8 @@
 
 use letswifi\LetsWifiApp;
 
-require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 2 ), 'src', '_autoload.php'] );
-$app = new LetsWifiApp( basePath: '..' );
+require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 2 ), 'autoload.php'] );
+$app = new LetsWifiApp( urlRelativeBase: '..' );
 
 // Temporary read file directly, add facility in Provider for this later
 if ( $installProfiles = $app->getBrandingConfiguration() ) {
@@ -37,7 +37,7 @@ if ( $installProfiles = $app->getBrandingConfiguration() ) {
 		$platform['profiles'] = \array_combine(
 			$platform['profiles'] ?? [],
 			\array_map(
-				static fn ( string $profileName ): array => $profiles[$profileName] + ['href' => "{$app->basePath}/profiles/new/{$profileName}/"],
+				static fn ( string $profileName ): array => $profiles[$profileName] + ['href' => "{$app->urlRelativeBase}/profiles/new/{$profileName}/"],
 				$platform['profiles'] ?? [],
 			),
 		);
@@ -49,5 +49,5 @@ if ( $installProfiles = $app->getBrandingConfiguration() ) {
 
 $app->render( [
 	'platforms' => $platforms ?? [],
-	'advanced_href' => "{$app->basePath}/profiles/new/",
+	'advanced_href' => "{$app->urlRelativeBase}/profiles/new/",
 ], 'app' );

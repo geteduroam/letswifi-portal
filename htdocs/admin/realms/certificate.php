@@ -14,8 +14,8 @@ use letswifi\LetsWifiApp;
 use letswifi\credential\CertificateCredential;
 use letswifi\error\NotFoundException;
 
-require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'src', '_autoload.php'] );
-$app = new LetsWifiApp( basePath: '../..' );
+require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'autoload.php'] );
+$app = new LetsWifiApp( urlRelativeBase: '../..' );
 $provider = $app->getProvider();
 $user = $provider->requireAuth( scope: 'admin' );
 $admin = $user->promote();

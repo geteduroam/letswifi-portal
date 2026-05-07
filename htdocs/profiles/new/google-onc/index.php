@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 4 ), 'src', '_autoload.php'] );
-$basePath = '../../..';
+require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 4 ), 'autoload.php'] );
+$urlRelativeBase = '../../..';
 \assert( \array_key_exists( 'REQUEST_METHOD', $_SERVER ) );
 
 $downloadFormat = 'google-onc';
