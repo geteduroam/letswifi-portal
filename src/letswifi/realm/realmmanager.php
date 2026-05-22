@@ -489,7 +489,7 @@ class RealmManager extends DatabaseStorage
 	 */
 	public function removeVhost( string $realm, string $httpHost ): void
 	{
-		$statement = $this->pdo->prepare( 'DELETE FROM `realm_vhost` WHERE `realm` = :realm AND `http_host` = :httpHost' );
+		$statement = $this->pdo->prepare( 'DELETE FROM `realm_vhost` WHERE `realm` = :realm AND `http_host` = :http_host' );
 		$statement->bindValue( 'realm', $realm );
 		$statement->bindValue( 'http_host', $httpHost );
 		$statement->execute();
