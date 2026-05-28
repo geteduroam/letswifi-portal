@@ -101,7 +101,7 @@ class Realm
 	 */
 	public function generateServerCertificate( User $requester, string $commonName, DateTimeInterface $expiry ): PKCS12
 	{
-		if ( !\filter_var( $commonName, \FILTER_VALIDATE_DOMAIN | \FILTER_NULL_ON_FAILURE ) ) {
+		if ( !\filter_var( $commonName, \FILTER_VALIDATE_DOMAIN, \FILTER_NULL_ON_FAILURE ) ) {
 			throw new InvalidArgumentException( 'Common name for a server certificate must be a hostname' );
 		}
 		$serverKey = new PrivateKey( new OpenSSLConfig( OpenSSLConfig::KEY_EC ) );
