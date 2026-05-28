@@ -146,12 +146,22 @@ class RealmManager extends DatabaseStorage
 	/**
 	 * @internal
 	 *
+	 * @return array<string>
+	 */
+	public function getTrustedCaNames ( string $realm ): array
+	{
+		return $this->getFieldsFromTableWhere( 'realm_trust', 'trusted_ca_sub', ['realm' => $realm] );
+	}
+
+	/**
+	 * @internal
+	 *
 	 * @return array<CA>
 	 */
 	public function getTrustedCas( string $realm ): array
 	{
 		$result = [];
-		foreach ( $this->getFieldsFromTableWhere( 'realm_trust', 'trusted_ca_sub', ['realm' => $realm] ) as $sub ) {
+		foreach ( $this->getTrustedCaNames($realm) as $sub ) {
 			$ca = $this->getCA( $sub );
 			// TODO throw exception?
 			if ( null !== $ca ) {
@@ -170,6 +180,9 @@ class RealmManager extends DatabaseStorage
 	public function getSignerCa( string $realm ): CA
 	{
 		$sub = $this->getSingleFieldFromTableWhere( 'realm_signer', 'signer_ca_sub', ['realm' => $realm] );
+		if (null === $sub) {
+			throw new DomainException( 'Signer CA not found' );
+		}
 		$ca = $this->getCA( $sub );
 		if ( null === $ca ) {
 			throw new DomainException( 'Signer CA not found' );
@@ -454,6 +467,17 @@ class RealmManager extends DatabaseStorage
 	/**
 	 * @suppress PhanPossiblyNonClassMethodCall Phan doesn't understand PDO
 	 */
+	public function removeSignerCa( string $realm, string $sub): void
+	{
+		$statement = $this->pdo->prepare( 'DELETE FROM `realm_signer` WHERE `realm` = :realm AND signer_ca_sub = :sub' );
+		$statement->bindValue( 'realm', $realm );
+		$statement->bindValue( 'sub', $sub );
+		$statement->execute();
+	}
+
+	/**
+	 * @suppress PhanPossiblyNonClassMethodCall Phan doesn't understand PDO
+	 */
 	public function addServer( string $realm, string $serverName ): void
 	{
 		$statement = $this->pdo->prepare( 'INSERT INTO `realm_server_name` (`realm`, `server_name`) VALUES (:realm, :server_name)' );
@@ -478,7 +502,7 @@ class RealmManager extends DatabaseStorage
 	 */
 	public function addVhost( string $realm, string $httpHost ): void
 	{
-		$statement = $this->pdo->prepare( 'INSERT INTO `realm_vhost` (`realm`, `server_name`) VALUES (:realm, :server_name)' );
+		$statement = $this->pdo->prepare( 'INSERT INTO `realm_vhost` (`realm`, `http_host`) VALUES (:realm, :http_host)' );
 		$statement->bindValue( 'realm', $realm );
 		$statement->bindValue( 'http_host', $httpHost );
 		$statement->execute();
@@ -489,7 +513,7 @@ class RealmManager extends DatabaseStorage
 	 */
 	public function removeVhost( string $realm, string $httpHost ): void
 	{
-		$statement = $this->pdo->prepare( 'DELETE FROM `realm_vhost` WHERE `realm` = :realm AND `http_host` = :httpHost' );
+		$statement = $this->pdo->prepare( 'DELETE FROM `realm_vhost` WHERE `realm` = :realm AND `http_host` = :http_host' );
 		$statement->bindValue( 'realm', $realm );
 		$statement->bindValue( 'http_host', $httpHost );
 		$statement->execute();
