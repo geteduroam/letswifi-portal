@@ -30,7 +30,7 @@ In order to automatically install dependencies, run:
 
 ```bash
 composer update
-make vendo
+make vendor
 ```
 
 ## Running a development server
