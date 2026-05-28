@@ -90,8 +90,33 @@ Create the realm with a default client certificate validity of one year
 bin/add-realm.php example.com 365
 ```
 
-Write metadata of your SAML IdP to `simplesamlphp/metadata/saml20-idp-remote.php`
-Format of the file can be found: [File format info](https://simplesamlphp.org/docs/stable/simplesamlphp-reference-idp-remote)
+## Configuring simplesamlphp
+
+```bash
+cp simplesamlphp/config/authsources.php.dist simplesamlphp/config/authsources.php
+```
+
+Edit `simplesampphp/config/authsources.php`
+
+Set  `'entityID'` (usually this is the URL for the webserver `https://eample.com`)
+
+Request the metadata for our SAML IdP from your Identity and Access Management team.
+
+```bash
+cp simplesamlphp/metadata/saml20-idp-remote.php.dist  simplesamlphp/metadata/saml20-idp-remote.php
+```
+
+Edit`simplesamlphp/metadata/saml20-idp-remote.php` and add the metadata from your IAM team.
+
+The format of the file can be found: [File format info](https://simplesamlphp.org/docs/stable/simplesamlphp-reference-idp-remote)
+
+```bash
+cp simplesamlphp/config/config.php.dist simplesamlphp/config/config.php
+```
+
+Edit `simplesamlphp/config/config.php`
+
+Modify `'cachedir' => '/var/cache/simplesamlphp'` - Remove the `/` from `/var`
 
 Navigate to [https://example.com/simplesaml/module.php/saml/sp/metadata.php/default-sp?output=xhtml] to get the metadata of the service, and register it in your IdP
 
