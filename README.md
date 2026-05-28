@@ -68,7 +68,7 @@ Upload this whole project to a webserver, and make `www/` accessible as the top 
 This quick'n'dirty guide assumes you'll be using SimpleSAMLphp (the only authentication method supported for production)
 
 ```bash
-make SIMPLESAMLPHP_VERSION=2.1.1 simplesamlphp
+make SIMPLESAMLPHP_VERSION=2.2.6 simplesamlphp
 ```
 
 Initialize the SQLite database (MySQL is also supported, this should be straightforward from the config file)
