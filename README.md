@@ -12,51 +12,23 @@ This is the reference CA for geteduroam.  It is intended to be used with an app 
 
 ## Install dependencies
 
-### Linux packages you will need to install
-
-```bash
-sudo apt-get install apache2
-sudo apt-get install php
-sudo apt install php libapache2-mod-php
-sudo apt install make
-sudo apt-get install 7zip
-sudo apt-get install php-xml
-sudo apt-get install sqlite3
-sudo apt-get install php-sqlite3
-sudo apt-get install composer
-```
-
 In order to automatically install dependencies, run:
 
-```bash
-composer update
-make vendor
-```
+    composer update
+    make vendor
 
 ## Running a development server
 
-```bash
-rm -rf etc/letswifi.conf.php var
-make dev
-```
+    rm -rf etc/letswifi.conf.php var
+    make dev
 
 The realm being used is `example.com`
 
 ### Testing manually
 
-For those of us 'unenlightened' and not running IPv6, edit the `Makefile` and change references to the IPv6 localhost (`[::1]`) to IPv4 (`127.0.0.1`)
-
 There is a [shell script to initiate an OAuth flow](https://github.com/geteduroam/geteduroam-sh)
 
-```bash
-./geteduroam.sh 'http://[::1]:1080' example.com >test.eap-config 
-```
-
-or for IPv4
-
-```bash
-./geteduroam.sh 'http://126.0.0.1:1080' example.com >test.eap-config 
-```
+    ./geteduroam.sh 'http://localhost:1080' example.com >test.eap-config 
 
 * If everything went fine, you get an eap-config XML payload in test.eap-config
 * You will see the public key material logged in the `tlscredential` SQL table
@@ -67,34 +39,24 @@ Upload this whole project to a webserver, and make `www/` accessible as the top 
 
 This quick'n'dirty guide assumes you'll be using SimpleSAMLphp (the only authentication method supported for production)
 
-```bash
-make SIMPLESAMLPHP_VERSION=2.2.6 simplesamlphp
-```
+    make SIMPLESAMLPHP_VERSION=2.2.6 simplesamlphp
 
 Initialize the SQLite database (MySQL is also supported, this should be straightforward from the config file)
 
-```bash
-mkdir var
-sqlite3 var/letswifi-dev.sqlite <sql/letswifi-dev.sqlite.sql
-```
+    mkdir var
+    sqlite3 var/letswifi-dev.sqlite <sql/letswifi-dev.sqlite.sql
 
 Copy etc/letswifi.conf.simplesaml.php etc/letswifi.conf.php and change `userIdAttribute` to match your setup.
 
-```bash
-cp etc/letswifi.conf.simplesaml.php etc/letswifi.conf.php
-```
+    cp etc/letswifi.conf.simplesaml.php etc/letswifi.conf.php
 
 Create the realm with a default client certificate validity of one year
 
-```bash
-bin/add-realm.php example.com 365
-```
+    bin/add-realm.php example.com 365
 
 ## Configuring simplesamlphp
 
-```bash
-cp simplesamlphp/config/authsources.php.dist simplesamlphp/config/authsources.php
-```
+    cp simplesamlphp/config/authsources.php.dist simplesamlphp/config/authsources.php
 
 Edit `simplesampphp/config/authsources.php`
 
@@ -102,17 +64,13 @@ Set  `'entityID'` (usually this is the URL for the webserver `https://eample.com
 
 Request the metadata for our SAML IdP from your Identity and Access Management team.
 
-```bash
-cp simplesamlphp/metadata/saml20-idp-remote.php.dist  simplesamlphp/metadata/saml20-idp-remote.php
-```
+    cp simplesamlphp/metadata/saml20-idp-remote.php.dist  simplesamlphp/metadata/saml20-idp-remote.php
 
 Edit`simplesamlphp/metadata/saml20-idp-remote.php` and add the metadata from your IAM team.
 
 The format of the file can be found: [File format info](https://simplesamlphp.org/docs/stable/simplesamlphp-reference-idp-remote)
 
-```bash
-cp simplesamlphp/config/config.php.dist simplesamlphp/config/config.php
-```
+    cp simplesamlphp/config/config.php.dist simplesamlphp/config/config.php
 
 Edit `simplesamlphp/config/config.php`
 
@@ -129,4 +87,4 @@ All paths inside the application are relative, so this should work without any i
 
 Before committing, please run
 
-`make camera-ready`
+    make camera-ready
