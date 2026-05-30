@@ -88,7 +88,7 @@ final class LetsWifiApp
 		if ( \PHP_SAPI === 'cli-server' ) {
 			// Ensure that we are setting restrictive security headers when developing,
 			// to prevent nasty surprises later on.
-			\header( 'Content-Security-Policy: "default-src: \'none\'; img-src \'self\'; style-src: \'self\', font-src \'self\', form-action: \'self\', base-uri \'none\'; frame-ancestors \'none\';"' );
+			\header( 'Content-Security-Policy: default-src \'none\'; img-src \'self\'; style-src \'self\'; font-src \'self\'; form-action \'self\'; base-uri \'none\'; frame-ancestors \'none\';' );
 			\header( 'Referrer-Policy: "no-referrer"' );
 			\header( 'X-Frame-Options: "DENY"' );
 			\header( 'X-Content-Type-Options: "nosniff"' );
