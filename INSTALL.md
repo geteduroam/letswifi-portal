@@ -32,7 +32,7 @@ apt-get install \
 	php-fpm php-dom php-sqlite3 php-mbstring php-curl composer \
 	apache2 \
 	sqlite3
-a2enmod proxy_fcgi setenvif
+a2enmod proxy_fcgi setenvif headers
 a2enconf "$(basename /etc/apache2/conf-available/php*-fpm.conf)"
 a2dismod status
 systemctl restart apache2
@@ -71,10 +71,15 @@ Remember to enable HTTPS.
 	SetEnv	SIMPLESAMLPHP_CONFIG_DIR	/etc/simplesamlphp
 	SetEnv	LETSWIFI_CONFIG_DIR     	/etc/letswifi
 
-	SSLEngine              	on
-	SSLCertificateFile     	/etc/ssl/certs/ssl-cert-snakeoil.pem
-	SSLCertificateKeyFile  	/etc/ssl/private/ssl-cert-snakeoil.key
+	SSLEngine               	on
+	SSLCertificateFile      	/etc/ssl/certs/ssl-cert-snakeoil.pem
+	SSLCertificateKeyFile   	/etc/ssl/private/ssl-cert-snakeoil.key
 	#SSLCertificateChainFile	…
+
+	Header always set Content-Security-Policy	"default-src 'self'; form-action 'self'; base-uri 'none'; frame-ancestors 'none';"
+	Header always set Referrer-Policy        	"no-referrer"
+	Header always set X-Frame-Options        	"DENY"
+	Header always set X-Content-Type-Options 	"nosniff"
 
 	<Directory /usr/local/share/letswifi-portal/htdocs>
 		Require all granted
@@ -84,6 +89,20 @@ Remember to enable HTTPS.
 	</Directory>
 </VirtualHost>
 ```
+</details>
+
+<details><summary>Information on security hardening</summary>
+
+For extra hardening, you can explicitly only allow image, style and font resources:
+
+	Header always set Content-Security-Policy	"default-src 'none'; img-src 'self'; style-src 'self'; font-src 'self'; form-action 'self'; base-uri 'none'; frame-ancestors 'none';"
+
+This forbids all [directives that were implicitly allowed](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Security-Policy/default-src)
+by `"default-src" 'self'`, such as `script-src` (JavaScript).
+
+Note that this policy may be too strict for SimpleSAMLphp,
+so you may need to loosen it if you also need to use the SimpleSAMLphp web UI.
+
 </details>
 
 
