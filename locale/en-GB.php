@@ -16,8 +16,8 @@ return [
 	'There is no app available for %s.' => 'There is no app available for %s.',
 	'Download an installation profile for manual installation.' => 'Download an installation profile for manual installation.',
 	'Other options' => 'Other options',
-	'Options for professional users' => 'Options for professional users',
-	'Options for other platforms and professional users' => 'Options for other platforms and professional users',
+	'Advanced options' => 'Advanced options',
+	'Other platforms and advanced options' => 'Other platforms and advanced options',
 	'Generate a certificate for manual use' => 'Generate a certificate for manual use',
 
 	// base.twig

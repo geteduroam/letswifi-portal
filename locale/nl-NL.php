@@ -16,8 +16,8 @@ return [
 	'There is no app available for %s.' => 'Er is geen app beschikbaar voor %s.',
 	'Download an installation profile for manual installation.' => 'Download een installatieprofiel voor handmatige installatie.',
 	'Other options' => 'Andere opties',
-	'Options for professional users' => 'Opties voor professionele gebruikers',
-	'Options for other platforms and professional users' => 'Opties voor andere platformen en professionele gebruikers',
+	'Advanced options' => 'Opties voor professionele gebruikers',
+	'Other platforms and advanced options' => 'Opties voor andere platformen en professionele gebruikers',
 	'Generate a certificate for manual use' => 'Maak een certificaat voor handmatige installatie',
 
 	// base.twig
