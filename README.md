@@ -1,5 +1,11 @@
 # Let's Wifi Certificate Authority
 
+>[!NOTE]
+> This is the **main** branch
+> We currently recommend all new installations to use the beta ("v2") branch,
+> but existing installations should remain on the main ("v1") branch for now.
+> Both branches are supported and an upgrade path will be published in the future.
+
 This is the reference CA for geteduroam.  It is intended to be used with an app such as [ionic-app](https://github.com/geteduroam/ionic-app).  The process is as follows:
 
 * The app sends the user to /oauth/authorize/ with additional GET parameters
