@@ -1,5 +1,11 @@
 # Let's Wi-fi Portal Server
 
+>[!NOTE]
+> This is the **beta** branch
+> We currently recommend all new installations to use the beta ("v2") branch,
+> but existing installations should remain on the main ("v1") branch for now.
+> Both branches are supported and an upgrade path will be published in the future.
+
 This is the reference portal server for Let's Wi-Fi, geteduroam and getgovroam.
 It's function is to issue certificates (“pseudo-credentials”) after user authentication,
 which can be used to connect to a wireless network such as eduroam, govroam or OpenRoaming.
