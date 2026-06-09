@@ -30,7 +30,11 @@ if ( 'POST' === $_SERVER['REQUEST_METHOD'] ) {
 			credentialId: $_POST['revoke_credential'],
 		);
 	}
-	\header( 'Location: ?' . \http_build_query( $_GET ) );
+	if ( $_POST['http_form_post_redirect'] ?? 0 ) {
+		\header( 'Location: ?' . \http_build_query( $_GET ), true, 303 );
+	} else {
+		\header( 'Content-Type: application/x-zerosize', true, 204 );
+	}
 
 	exit;
 }

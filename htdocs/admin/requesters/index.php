@@ -34,7 +34,11 @@ if ( 'POST' === $_SERVER['REQUEST_METHOD'] ) {
 	if ( \array_key_exists( 'revoke_requester', $_POST ) && \is_string( $_POST['revoke_requester'] ) ) {
 		$credentialAdmin->revokeRequester( $_POST['revoke_requester'], $realms, $validOn );
 	}
-	\header( 'Location: ?' . \http_build_query( $_GET ) );
+	if ( $_POST['http_form_post_redirect'] ?? 0 ) {
+		\header( 'Location: ?' . \http_build_query( $_GET ), true, 303 );
+	} else {
+		\header( 'Content-Type: application/x-zerosize', true, 204 );
+	}
 
 	exit;
 }

@@ -66,6 +66,7 @@
 
 				<dialog class="modal" id="revoke_{{ requester.requester.name }}" popover>
 					<form method="POST">
+						<input type="hidden" name="http_form_post_redirect" value="1">
 						<input type="hidden" name="valid_on" value="{{ __filter_valid_on|split('+')|first }}">
 						<input type="hidden" name="realms" value="{{ requester.requester.realm }}">
 						<h2>Are you sure you want to revoke all credentials for the following requester?</h2>
