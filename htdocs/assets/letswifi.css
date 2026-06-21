@@ -629,6 +629,7 @@ body > .cols {
 }
 
 nav.side-menu {
+	max-width: 16em;
 	line-height: 1.8em;
 	font-size: .9em;
 	cursor: default;
