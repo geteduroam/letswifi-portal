@@ -251,12 +251,19 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 	/**
 	 * Check that the saml:AuthenticatingAuthority contains the IdPList used in scoping
 	 *
+	 * @param non-empty-array<string> $expectedIdPList
+	 * @param array<string>           $authenticatingAuthority
+	 *
 	 * @throws MismatchIdpException If the IdPList is not entirely present in the saml:AuthenticatingAuthority
 	 */
 	private static function checkIdPList( array $expectedIdPList, array $authenticatingAuthority ): void
 	{
-		if ( \array_intersect( $expectedIdPList, $authenticatingAuthority ) !== $expectedIdPList ) {
-			throw new MismatchIdpException( $expectedIdPList[0], $authenticatingAuthority[0] );
+		$firstIdP = \reset( $expectedIdPList );
+		// Psalm thinks reset() can return false if we use it inline
+		// but is completely happy if we put it in a variable first
+		// Refactor with array_first() when we require PHP>=8.5.0
+		if ( \count( \array_intersect( $expectedIdPList, $authenticatingAuthority ) ) !== \count( $expectedIdPList ) ) {
+			throw new MismatchIdpException( $firstIdP, \reset( $authenticatingAuthority ) ?: null );
 		}
 	}
 
