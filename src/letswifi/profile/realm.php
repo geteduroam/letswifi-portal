@@ -62,7 +62,7 @@ class Realm implements JsonSerializable
 			description: $realmData->getMultiLanguageStringOrNull( 'description' ),
 			contactId: $realmData->getStringOrNull( 'contact' ),
 			admins: $realmData->has( 'admins' ) ? $realmData->getStringArray( 'admins' ) : [],
-			outerIdentity: $realmData->getStringOrNull('outer_identity'),
+			outerIdentity: $realmData->getStringOrNull( 'outer_identity' ),
 		);
 	}
 

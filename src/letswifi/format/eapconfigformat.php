@@ -180,15 +180,13 @@ class EapConfigFormat extends Format
 			. "\r\n\t\t\t\t</ServerSideCredential>";
 		$result .= ''
 			. "\r\n\t\t\t\t<ClientSideCredential>";
-		if ( null !== $identity ) {
-			// https://github.com/GEANT/CAT/blob/v2.0.3/devices/xml/eap-metadata.xsd
-			// The schema specifies <OuterIdentity>
-			// https://tools.ietf.org/html/draft-winter-opsawg-eap-metadata-02
-			// Expired draft specifices <AnonymousIdentity>
-			// cat.eduroam.org uses <OuterIdentity>, so we do too
-			$result .= ''
-				. "\r\n\t\t\t\t\t<OuterIdentity>" . $this->e( $identity ) . '</OuterIdentity>';
-		}
+		// https://github.com/GEANT/CAT/blob/v2.0.3/devices/xml/eap-metadata.xsd
+		// The schema specifies <OuterIdentity>
+		// https://tools.ietf.org/html/draft-winter-opsawg-eap-metadata-02
+		// Expired draft specifices <AnonymousIdentity>
+		// cat.eduroam.org uses <OuterIdentity>, so we do too
+		$result .= ''
+		  . "\r\n\t\t\t\t\t<OuterIdentity>" . $this->e( $identity ) . '</OuterIdentity>';
 		$result .= ''
 			. "\r\n\t\t\t\t\t" . '<ClientCertificate format="PKCS12" encoding="base64">' . \base64_encode( $pkcs12->getPKCS12Bytes( $this->passphrase ?: $defaultPassphrase ) ) . '</ClientCertificate>';
 		if ( !$this->passphrase ) {
