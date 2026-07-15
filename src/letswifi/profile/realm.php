@@ -39,7 +39,7 @@ class Realm implements JsonSerializable
 		public readonly ?Logo $logo = null,
 		public readonly ?string $contactId = null,
 		public readonly array $admins = [],
-		public readonly ?string $eapUsername = null,
+		public readonly ?string $outerIdentity = null,
 	) {
 	}
 
@@ -62,7 +62,7 @@ class Realm implements JsonSerializable
 			description: $realmData->getMultiLanguageStringOrNull( 'description' ),
 			contactId: $realmData->getStringOrNull( 'contact' ),
 			admins: $realmData->has( 'admins' ) ? $realmData->getStringArray( 'admins' ) : [],
-			eapUsername: $realmData->getStringOrNull('eap_username'),
+			outerIdentity: $realmData->getStringOrNull('outer_identity'),
 		);
 	}
 
@@ -80,7 +80,7 @@ class Realm implements JsonSerializable
 	}
 
 	/**
-	 * @return array{realm_id:string,display_name:MultiLanguageString,description:?MultiLanguageString,contact:?Contact,location:array<Location>,eap_username:?string,logo:bool,signer:string,trust:array<string>,networks:array<string,array{oids?:array<string>,nai_realms?:array<string>,ssid?:string,display_name:MultiLanguageString}>}
+	 * @return array{realm_id:string,display_name:MultiLanguageString,description:?MultiLanguageString,contact:?Contact,location:array<Location>,outer_identity:?string,logo:bool,signer:string,trust:array<string>,networks:array<string,array{oids?:array<string>,nai_realms?:array<string>,ssid?:string,display_name:MultiLanguageString}>}
 	 */
 	public function jsonSerialize(): array
 	{
@@ -89,7 +89,7 @@ class Realm implements JsonSerializable
 			'display_name' => $this->displayName,
 			'description' => $this->description,
 			'contact' => $this->getContact(),
-			'eap_username' => $this->eapUsername,
+			'outer_identity' => $this->outerIdentity,
 			'location' => $this->location,
 			'logo' => isset( $this->logo ),
 			'signer' => $this->signer,

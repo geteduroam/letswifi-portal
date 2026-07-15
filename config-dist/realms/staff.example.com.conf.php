@@ -75,11 +75,11 @@ return [
 	// REQUIRED: Array, list of network IDs
 	'networks' => ['eduroam'],
 
-	// EAP username to present during authentication.  Needed if
-	// you wish to override the identity to be anonymous by
-	// eliminating the identifier before the "@".  Some systems
-	// use a generic string like "anonymous@realm.tld".
-	'eap_username' => '@staff.example.com',
+	// Optional outer identity to send for credentials in this
+	// realm.  Used if you wish to use an anonymous ID for all EAP
+	// requests rather than the CN of the certificate.  Common
+	// values include "@realm.tld" or "anonymous@realm.tld".
+	'outer_identity' => '@staff.example.com',
 
 	// Logo for the realm
 	// This will be displayed prominent in the apps
