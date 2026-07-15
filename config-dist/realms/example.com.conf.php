@@ -78,6 +78,12 @@ return [
 	// REQUIRED: Array, list of network IDs
 	'networks' => ['eduroam'],
 
+	// EAP username to present during authentication.  Needed if
+	// you wish to override the identity to be anonymous by
+	// eliminating the identifier before the "@".  Some systems
+	// use a generic string like "anonymous@realm.tld".
+	'eap_username' => '@example.com',
+
 	// Logo for the realm
 	// This will be displayed prominent in the apps
 	// If no logo is to be set, omit this whole entry
