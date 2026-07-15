@@ -135,7 +135,9 @@ class GoogleOncFormat extends Format
 
 		$clientCertCN = $pkcs12->x509->getSubject()->getCommonName();
 
-		$networkConfigurations = \array_filter( \array_map( fn ( Network $network ) => $this->generateNetworkConfiguration( $network, $clientCertID, $clientCertCN, $caIDs, $serverSubjectMatch ), $this->credential->realm->networks ) );
+		$outerIdentity = $this->credential->getOuterIdentity();
+
+		$networkConfigurations = \array_filter( \array_map( fn ( Network $network ) => $this->generateNetworkConfiguration( $network, $clientCertID, $clientCertCN, $caIDs, $serverSubjectMatch, $outerIdentity ), $this->credential->realm->networks) );
 
 		return [
 			'Type' => 'UnencryptedConfiguration',
@@ -150,10 +152,11 @@ class GoogleOncFormat extends Format
 	 * @param string        $clientCertCN       Common name of client certificate
 	 * @param array<string> $caIDs              IDs of server CA certificates
 	 * @param string        $serverSubjectMatch Substring certificate subject name must match
+	 * @param string	$outerIdentity      EAP outer identity username
 	 *
 	 * @return ?array ONC NetworkConfiguration struct
 	 */
-	protected function generateNetworkConfiguration( Network $network, string $clientCertID, string $clientCertCN, array $caIDs, string $serverSubjectMatch ): ?array
+	protected function generateNetworkConfiguration( Network $network, string $clientCertID, string $clientCertCN, array $caIDs, string $serverSubjectMatch, $outerIdentity ): ?array
 	{
 		if ( !$network instanceof NetworkSSID ) {
 			return null;
@@ -175,6 +178,7 @@ class GoogleOncFormat extends Format
 					'ClientCertRef' => $clientCertID,
 					'ClientCertType' => 'Ref',
 					'Identity' => $clientCertCN,
+					'AnonymousIdentity' => $outerIdentity,
 					'Outer' => 'EAP-TLS',
 					'SaveCredentials' => true,
 					'ServerCARefs' => \array_values( $caIDs ),
