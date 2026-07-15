@@ -164,7 +164,7 @@ class AppleMobileconfigFormat extends Format
 				if ($this->credential->realm->eapUsername) {
 					$result .= "\n				<key>UserName</key>"
 					  . "\n				<value>"
-					  . $this::e( $this->credential->realm->eapUsername ) . "</value>"
+					  . $this::e( $this->credential->realm->eapUsername ) . "</value>";
 				}
 				$result .= "\n			</dict>"
 					. "\n			<key>EncryptionType</key>"
