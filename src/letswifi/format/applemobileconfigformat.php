@@ -160,13 +160,10 @@ class AppleMobileconfigFormat extends Format
 					$result .= '					<string>' . $this::e( $serverName ) . '</string>'
 						. "\n";
 				}
-				$result .= '				</array>';
-				if ($this->credential->realm->eapUsername) {
-					$result .= "\n				<key>UserName</key>"
-					  . "\n				<value>"
-					  . $this::e( $this->credential->realm->eapUsername ) . "</value>";
-				}
-				$result .= "\n			</dict>"
+				$result .= '				</array>'
+				  . "\n				<key>UserName</key>"
+				  . "\n				<value>" . $this::e( $this->credential->getOuterIdentity ) . '</value>'
+				  . "\n			</dict>"
 					. "\n			<key>EncryptionType</key>"
 					. "\n			<string>WPA2</string>"
 					. "\n			<key>HIDDEN_NETWORK</key>"

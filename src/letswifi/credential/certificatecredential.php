@@ -110,9 +110,4 @@ class CertificateCredential extends Credential
 	{
 		return null !== $this->revoked;
 	}
-
-	public function getOuterIdentity(): ?string
-	{
-		return $this->credentialId;
-	}
 }
