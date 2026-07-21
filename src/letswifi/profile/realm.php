@@ -20,10 +20,11 @@ use letswifi\configuration\Dictionary;
 class Realm implements JsonSerializable
 {
 	/**
-	 * @param array<string>   $serverNames
-	 * @param array<string>   $trust
-	 * @param array<Network>  $networks
-	 * @param array<Location> $location
+	 * @param array<string>        $serverNames
+	 * @param array<string>        $trust
+	 * @param array<Network>       $networks
+	 * @param array<Location>      $location
+	 * @param array<string,string> $extra
 	 */
 	public function __construct(
 		private readonly ProfileService $profileService,
@@ -39,7 +40,13 @@ class Realm implements JsonSerializable
 		public readonly ?Logo $logo = null,
 		public readonly ?string $contactId = null,
 		public readonly array $admins = [],
+		public readonly array $extra = [],
 	) {
+	}
+
+	public function getExtra( string $extra ): ?string
+	{
+		return $this->extra[$extra] ?? null;
 	}
 
 	public static function fromConfig( ProfileService $profileService, Dictionary $realmData ): self
@@ -61,6 +68,10 @@ class Realm implements JsonSerializable
 			description: $realmData->getMultiLanguageStringOrNull( 'description' ),
 			contactId: $realmData->getStringOrNull( 'contact' ),
 			admins: $realmData->has( 'admins' ) ? $realmData->getStringArray( 'admins' ) : [],
+			extra: \array_filter( [
+				'mobileconfig_identifier' => $realmData->getStringOrNull( 'mobileconfig_identifier' ),
+				'mobileconfig_display_name' => $realmData->getStringOrNull( 'mobileconfig_display_name' ),
+			] ),
 		);
 	}
 

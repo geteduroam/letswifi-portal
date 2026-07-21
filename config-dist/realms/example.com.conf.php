@@ -83,15 +83,31 @@ return [
 	// If no logo is to be set, omit this whole entry
 	// OPTIONAL: Array with data: string and content_type: string
 	// 'logo' => [
-	// The contents of the image file; it's recommended to instead use
-	// data#file and refer to a file instead
-	// REQUIRED: String
-	// 'data#file' => 'logo.png',
+	// 	The contents of the image file; it's recommended to instead use
+	// 	data#file and refer to a file instead
+	// 	REQUIRED: String
+	// 	'data#file' => 'logo.png',
 
-	// Content type, also known as MIME type; typically image/{png,jpeg},
-	// but image/svg+xml is also possible. Automatically detected
-	// from the file extension if you use data#file
-	// OPTIONAL: String
-	// 'content_type' => null,
+	// 	Content type, also known as MIME type; typically image/{png,jpeg},
+	// 	but image/svg+xml is also possible. Automatically detected
+	// 	from the file extension if you use data#file
+	// 	OPTIONAL: String
+	// 	'content_type' => null,
 	// ],
+
+	// Extra properties, use to tweak certain features
+	// All these properties are optional strings
+
+	// Override the PayloadIdentifier for mobileconfig files
+	// Use this if you used a different identifier earlier,
+	// and you'd like new mobileconfig files to override the old ones.
+	// The PayloadUUID is calculated as sha1 hash of the PayloadIdentifier.
+	// OPTIONAL: String
+	// 'mobileconfig_identifier' => 'com.example',
+
+	// Override the PayloadDisplayName for mobileconfig files
+	// Use this if using the realm display_name would be confusing for the user.
+	// This name is displayed in the System Settings app, under Device Management.
+	// OPTIONAL: String
+	// 'mobileconfig_display_name' => "Let's Wi-Fi',
 ];

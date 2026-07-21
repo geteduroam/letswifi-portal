@@ -23,11 +23,10 @@ class AppleMobileconfigFormat extends Format
 	 */
 	public function generate(): string
 	{
-		// Use a SHA1-based UUID for the profile, so that we can "update"
+		// Allow overriding the identifier so we can "update"
 		// the profile by installing a newer one within the same realm.
-		$uuid = static::uuidgen( $this->credential->realm->realmId );
-
-		$identifier = $this->getIdentifier();
+		$identifier = $this->credential->realm->getExtra( 'mobileconfig_identifier' ) ?: $this->getIdentifier();
+		$uuid = static::uuidgen( $identifier );
 		\assert( $this->credential instanceof CertificateCredential ); // TODO: We don't support anything else yet
 
 		$tlsAuthMethodUuid = static::uuidgen();
@@ -44,7 +43,7 @@ class AppleMobileconfigFormat extends Format
 			. "\n" . '<plist version="1.0">'
 			. "\n<dict>"
 			. "\n	<key>PayloadDisplayName</key>"
-			. "\n	<string>" . $this::e( $this->credential->realm->displayName ) . '</string>'
+			. "\n	<string>" . $this::e( $this->credential->realm->getExtra( 'mobileconfig_display_name' ) ?? $this->credential->realm->displayName ) . '</string>'
 			. "\n	<key>PayloadIdentifier</key>"
 			. "\n	<string>" . $this::e( $identifier ) . '</string>'
 			. "\n	<key>PayloadUUID</key>"
