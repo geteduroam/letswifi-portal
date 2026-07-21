@@ -22,13 +22,13 @@ cp -a config-dist/. "$WORKDIR/config"
 cp -a "$COMPOSER_VENDOR_DIR"/fyrkat/{multilang,oauth-server,openssl}/src/fyrkat "$WORKDIR/src/"
 cat src/_autoload.php | grep -v Composer | grep -v /vendor/ >"$WORKDIR/src/_autoload.php"
 
+( cd "$COMPOSER_VENDOR_DIR/twig/twig/src"; find . -path Resources -prune -o -type d; ) | tr '[:upper:]' '[:lower:]' | xargs -I % mkdir -p "$WORKDIR/src/twig/%"
 ( cd "$COMPOSER_VENDOR_DIR/twig/twig/src"; find . -path Resources -prune -o -type f; ) | while read file
 do
 	lowerfile="$(printf %s "$file" | tr '[:upper:]' '[:lower:]')"
-	mkdir -p "$WORKDIR/src/twig/$(dirname "$lowerfile")"
-	cp "$COMPOSER_VENDOR_DIR/twig/twig/src/$file" "$WORKDIR/src/twig/$lowerfile"
+	ln "$COMPOSER_VENDOR_DIR/twig/twig/src/$file" "$WORKDIR/src/twig/$lowerfile"
 done
-cp "$COMPOSER_VENDOR_DIR/twig/twig/LICENSE" "$WORKDIR/src/twig/"
+ln "$COMPOSER_VENDOR_DIR/twig/twig/LICENSE" "$WORKDIR/src/twig/"
 sed "/const RELEASE/ s/null/'${TAG:-"v$VERSION"}'/" src/letswifi/letswifiapp.php >"$WORKDIR/src/letswifi/letswifiapp.php"
 printf '%s\n' "${TAG:-"v$VERSION"}" >"$WORKDIR/VERSION"
 
