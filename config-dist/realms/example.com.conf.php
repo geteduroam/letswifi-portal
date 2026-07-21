@@ -109,5 +109,5 @@ return [
 	// Use this if using the realm display_name would be confusing for the user.
 	// This name is displayed in the System Settings app, under Device Management.
 	// OPTIONAL: String
-	// 'mobileconfig_display_name' => "Let's Wi-Fi',
+	// 'mobileconfig_display_name' => "Let's Wi-Fi",
 ];
