@@ -50,8 +50,8 @@ class CACommand extends Command
 	{
 		$certificateConfig = $this->config->getDictionary( 'certificate' );
 		$stdin = \file_get_contents( 'php://stdin' );
-		\preg_match_all( '/(^|\\n)-----BEGIN( EC| RSA)? PRIVATE KEY-----\\n.*?\\n-----END\\2 PRIVATE KEY-----($|\\n)/sm', $stdin, $keys );
-		\preg_match_all( '/(^|\\n)-----BEGIN CERTIFICATE-----\\n.*?\\n-----END CERTIFICATE-----($|\\n)/sm', $stdin, $certificates );
+		\preg_match_all( '/(?:^|\\R)-----BEGIN(?: (EC|RSA))? PRIVATE KEY-----\\R.*?\\R-----END(?: \1)? PRIVATE KEY-----(?:$|\\R)/sm', $stdin, $keys );
+		\preg_match_all( '/(?:^|\\R)-----BEGIN CERTIFICATE-----\\R.*?\\R-----END CERTIFICATE-----(?:$|\\R)/sm', $stdin, $certificates );
 
 		$keys = \array_map( static fn ( string $key ) => new PrivateKey( $key ), $keys[0] );
 		$certificates = \array_map( static fn ( string $certificate ) => new X509( $certificate ), $certificates[0] );
