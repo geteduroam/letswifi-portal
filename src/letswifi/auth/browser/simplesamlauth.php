@@ -46,6 +46,10 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 		public readonly ?string $autoloadInclude = null,
 	) {
 		if ( null !== $autoloadInclude ) {
+			if ( \strlen( $autoloadInclude ) > 2 && '.' === $autoloadInclude[0] && '.' !== $autoloadInclude[1] ) {
+				$autoloadInclude = \dirname( __DIR__, 4 ) . \DIRECTORY_SEPARATOR . $autoloadInclude;
+			}
+
 			require $autoloadInclude;
 		}
 		$this->as = new Simple( $authSource );
