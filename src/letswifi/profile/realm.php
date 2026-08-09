@@ -42,6 +42,9 @@ class Realm implements JsonSerializable
 		public readonly array $admins = [],
 		public readonly array $extra = [],
 	) {
+		$serverNames || throw new DomainException( "Realm {$realmId}: server_names cannot be empty" );
+		$trust || throw new DomainException( "Realm {$realmId}: trust cannot be empty" );
+		$networks || throw new DomainException( "Realm {$realmId}: networks cannot be empty" );
 	}
 
 	public function getExtra( string $extra ): ?string

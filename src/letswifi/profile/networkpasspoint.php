@@ -10,6 +10,7 @@
 
 namespace letswifi\profile;
 
+use DomainException;
 use fyrkat\multilang\MultiLanguageString;
 use letswifi\configuration\Dictionary;
 
@@ -26,6 +27,7 @@ class NetworkPasspoint extends Network
 		public readonly array $naiRealms,
 	) {
 		parent::__construct( networkId: $networkId, displayName: $displayName );
+		$oids || throw new DomainException( "Network {$networkId}: oid list cannot be empty" );
 	}
 
 	/**

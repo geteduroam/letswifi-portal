@@ -38,6 +38,7 @@ class Provider implements JsonSerializable
 		public readonly ?string $profileSigner = null,
 		public readonly array $admins = [],
 	) {
+		$realmMap || throw new DomainException( "Provider {$host}: realm map cannot be empty" );
 	}
 
 	/**
