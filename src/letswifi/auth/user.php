@@ -11,6 +11,7 @@
 namespace letswifi\auth;
 
 use JsonSerializable;
+use Throwable;
 use letswifi\error\ForbiddenException;
 use letswifi\error\RealmMismatchException;
 use letswifi\profile\Provider;
@@ -114,7 +115,11 @@ class User implements JsonSerializable
 
 	public function canPromote(): bool
 	{
-		return !empty( $this->getAdminRealms() );
+		try {
+			return !empty( $this->getAdminRealms() );
+		} catch ( Throwable $_ ) {
+			return false;
+		}
 	}
 
 	public function promote(): Admin
