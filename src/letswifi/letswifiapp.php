@@ -394,12 +394,12 @@ final class LetsWifiApp
 			] );
 			$this->twig->addFilter( new TwigFilter(
 				't',
-				fn( MultiLanguageString|string $untranslated, mixed ...$values ) => $this->getTranslationContext()->translateHtml( $untranslated, $_, ...$values ),
+				fn( MultiLanguageString|string|null $untranslated, mixed ...$values ) => $this->getTranslationContext()->translateHtml( $untranslated ?? '', $_, ...$values ),
 				['is_safe' => ['html']],
 			) );
 			$this->twig->addFilter( new TwigFilter(
 				'translate_raw',
-				fn( MultiLanguageString|string $untranslated, mixed ...$values ) => $this->getTranslationContext()->translate( $untranslated, $_, ...$values ),
+				fn( MultiLanguageString|string|null $untranslated, mixed ...$values ) => $this->getTranslationContext()->translate( $untranslated ?? '', $_, ...$values ),
 			) );
 		}
 
