@@ -51,7 +51,7 @@ class AuthenticationContext implements JsonSerializable
 		DateInterval $longLivedGrantTokenValidity = new DateInterval( 'P6M' ),
 	) {
 		if ( !\preg_match( '/^[A-Z][A-Za-z0-9]+$/', $authService ) ) {
-			throw new DomainException( 'Illegal auth.service specified in config' );
+			throw new DomainException( 'authService specified in config contains invalid characters' );
 		}
 		$authService = "letswifi\\auth\\browser\\{$authService}";
 		$browserAuth = new $authService( ...$authServiceParams );
@@ -68,7 +68,7 @@ class AuthenticationContext implements JsonSerializable
 			$oauthSecret = \base64_decode( \strtr( $oauthSecret, '_-', '/+' ), true );
 		}
 		if ( !$oauthSecret || empty( \trim( $oauthSecret, "\0" ) ) ) {
-			throw new DomainException( 'NULL OAuth secret provided' );
+			throw new DomainException( 'No usable OAuth secret provided' );
 		}
 
 		$accessTokenSealer = new JWTSealer( AccessToken::class, $oauthSecret );
