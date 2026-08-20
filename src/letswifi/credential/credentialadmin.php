@@ -58,7 +58,12 @@ abstract class CredentialAdmin
 	 */
 	abstract public function getCredential( string $ident, array $realms = [] ): ?Credential;
 
-	abstract public function revokeCredential( string $credentialId, ?string $requester = null ): void;
+	/**
+	 * @param string              $credentialId
+	 * @param array<Realm|string> $realms       Only revoke credentials within these realms
+	 * @param ?string             $requester    Only revoke credentials beloging to requester
+	 */
+	abstract public function revokeCredential( string $credentialId, array $realms = [], ?string $requester = null ): void;
 
 	/**
 	 * Revoke all credentials matching the query

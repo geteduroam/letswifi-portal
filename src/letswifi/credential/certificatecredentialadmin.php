@@ -114,8 +114,11 @@ class CertificateCredentialAdmin extends CredentialAdmin
 		}
 	}
 
-	public function revokeCredential( string $credentialId, ?string $requester = null ): void
+	public function revokeCredential( string $credentialId, array $realms = [], ?string $requester = null ): void
 	{
+		$pdo = $this->profileService->getPDO();
+		$realmConditions = $this->getRealmConditions( $realms, static fn( string $realm ) => $pdo->quote( $realm ),
+		);
 		$requesterCondition = null === $requester ? '' : 'AND requester = :requester';
 		$revokeStatement = $this->profileService->getPDO()->prepare( <<<SQL
 				UPDATE "realm_signing_log"
@@ -123,6 +126,7 @@ class CertificateCredentialAdmin extends CredentialAdmin
 				WHERE
 					"ident" = :ident
 					{$requesterCondition}
+					{$realmConditions}
 					AND revoked IS NULL
 			SQL );
 		$revokeStatement->bindValue( 'revoked', $this->formatUtc( $this->now ), PDO::PARAM_STR );
