@@ -40,7 +40,7 @@ if ( \array_key_exists( 'realm_id', $_GET ) && $realm = $admin->getRealm( $_GET[
 		throw new NotFoundException();
 	}
 
-	$safeFileName = \preg_replace( '/[a-z0-9._-]/i', '', $ca ) ?: $fileType;
+	$safeFileName = \preg_replace( '/[^a-z0-9._-]/i', '', $ca ) ?: $fileType;
 	$encodedFileName = \rawurlencode( $ca );
 	$caCertificate = $app->profileService->getCertificate( $ca );
 
