@@ -54,6 +54,18 @@ abstract class CredentialAdmin
 	abstract public function listCredentials( array $realms = [], ?string $requester = null, ?DateTimeInterface $validOn = null, bool $unrevokedOnly = false ): Generator;
 
 	/**
+	 * List all credentials that are signed by the specified CA, including revoked credentials
+	 *
+	 * @param string             $ca
+	 * @param ?string            $requester Filter requester
+	 * @param ?DateTimeInterface $validOn   Consider credentials that are valid on this point in time
+	 *
+	 * @return Generator<string,Credential>
+	 */
+	abstract public function listCredentialsBySigner( string $signingCa, ?DateTimeInterface $validOn = null ): Generator;
+
+	/**
+	 * @param string              $ident
 	 * @param array<Realm|string> $realms Only return from these realms, if empty all available realms are used
 	 */
 	abstract public function getCredential( string $ident, array $realms = [] ): ?Credential;

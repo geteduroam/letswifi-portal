@@ -14,6 +14,7 @@ use DateTimeInterface;
 use DomainException;
 use Generator;
 use PDO;
+use PDOStatement;
 use letswifi\error\RealmMismatchException;
 use letswifi\profile\Realm;
 
@@ -199,6 +200,24 @@ class CertificateCredentialAdmin extends CredentialAdmin
 		return null;
 	}
 
+	public function listCredentialsBySigner( string $signingCa, ?DateTimeInterface $validOn = null ): Generator
+	{
+		if ( null === $validOn ) {
+			$validOn = $this->now;
+		}
+		$pdo = $this->profileService->getPDO();
+		$stmt = $pdo->prepare( <<<SQL
+				SELECT
+					"serial", "realm", "ca_sub", "requester", "sub", "issued", "expires", "revoked", "usage", "client", "user_agent", "ip", "grant", "ident", "requester", "realm"
+				FROM "realm_signing_log"
+				WHERE "expires" > :valid_on AND "issued" < :valid_on AND "ca_sub" = :ca_sub
+				ORDER BY "issued" DESC;
+			SQL );
+		$stmt->bindParam( 'ca_sub', $signingCa, PDO::PARAM_STR );
+
+		yield from $this->listCredentialsInternal( $stmt );
+	}
+
 	public function listCredentials( array $realms = [], ?string $requester = null, ?DateTimeInterface $validOn = null, bool $unrevokedOnly = false ): Generator
 	{
 		if ( null === $validOn ) {
@@ -224,6 +243,15 @@ class CertificateCredentialAdmin extends CredentialAdmin
 		if ( null !== $requester ) {
 			$stmt->bindValue( 'requester', $requester, PDO::PARAM_STR );
 		}
+
+		yield from $this->listCredentialsInternal( $stmt );
+	}
+
+	/**
+	 * @return Generator<string,CertificateCredential>
+	 */
+	private function listCredentialsInternal( PDOStatement $stmt ): Generator
+	{
 		$stmt->execute();
 		while ( $row = $stmt->fetch( PDO::FETCH_ASSOC ) ) {
 			$expiry = $this->dateTimeFromUtc( $row['expires'] );

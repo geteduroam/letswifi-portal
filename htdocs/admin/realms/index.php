@@ -42,14 +42,14 @@ if ( \array_key_exists( 'realm_id', $_GET ) && $realm = $admin->getRealm( $_GET[
 		'__admin_menu_active' => 'realms/',
 		'__admin_menu' => ( require '../_menu.php' ),
 
-		'signer_crl_href' => 'certificate.php?' . \http_build_query( ['realm_id' => $realm->realmId, 'ca' => $realm->signer, 'file' => 'crl-pem'] ),
-		'signer_crt_href' => 'certificate.php?' . \http_build_query( ['realm_id' => $realm->realmId, 'ca' => $realm->signer, 'file' => 'crt-pem'] ),
+		'signer_crl_href' => 'certificate.php?' . \http_build_query( ['ca' => $realm->signer, 'file' => 'crl-pem'] ),
+		'signer_crt_href' => 'certificate.php?' . \http_build_query( ['ca' => $realm->signer, 'file' => 'crt-pem'] ),
 
 		'realm' => $realm,
 		'affiliations' => ['allow' => $affiliationAllow, 'block' => $affiliationBlock],
 	], 'admin-realm', [
 		Realm::class => static fn( Realm $r ): array => ( $stats[$r->realmId] ?? [] ) + [
-			'trust_crt' => \array_map( static fn( string $trust ) => ['cn' => $trust, 'href' => 'certificate.php?' . \http_build_query( ['realm_id' => $r->realmId, 'ca' => $trust, 'file' => 'crt-pem'] )], $r->trust ),
+			'trust_crt' => \array_map( static fn( string $trust ) => ['cn' => $trust, 'href' => 'certificate.php?' . \http_build_query( ['ca' => $trust, 'file' => 'crt-pem'] )], $r->trust ),
 		],
 	] );
 }

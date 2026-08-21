@@ -188,9 +188,6 @@ $config = ( new Config() )
 		'no_alias_functions' => true,
 		'no_alternative_syntax' => true,
 		'no_blank_lines_after_phpdoc' => true,
-		'no_break_comment' => [
-			'comment_text' => '@todo document implicit fall-through',
-		],
 		'no_closing_tag' => true,
 		'no_empty_comment' => true,
 		'no_empty_phpdoc' => true,
