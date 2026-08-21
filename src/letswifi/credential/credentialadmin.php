@@ -80,7 +80,7 @@ abstract class CredentialAdmin
 	/**
 	 * Revoke all credentials matching the query
 	 *
-	 * @param string              $requester Requester to revoke
+	 * @param string              $requester Only revoke credentials beloging to requester
 	 * @param array<Realm|string> $realms    Only revoke credentials within these realms
 	 * @param ?DateTimeInterface  $validOn   Consider credentials that are valid on this point in time
 	 */
@@ -89,7 +89,7 @@ abstract class CredentialAdmin
 	/**
 	 * Get statistics for the provided realms
 	 *
-	 * @param array<Realm|string> $realms  Only revoke credentials within these realms
+	 * @param array<Realm|string> $realms  Realms to get statistics for
 	 * @param ?DateTimeInterface  $validOn Consider credentials that are valid on this point in time
 	 *
 	 * @return Generator<string,array{realm:string,earliest_valid:DateTimeInterface,last_valid:DateTimeInterface,total_accounts:int,valid_accounts:int,total_requesters:int}>

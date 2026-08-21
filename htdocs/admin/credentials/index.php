@@ -23,8 +23,7 @@ $validOn = \array_key_exists( 'valid_on', $_GET ) && \is_string( $_GET['valid_on
 	? DateTimeImmutable::createFromFormat( '!Y-m-d\\TH:i:s', $_GET['valid_on'] ?? '' ) ?: null
 	: null;
 
-/** @psalm-suppress PossiblyUndefinedArrayOffset */
-if ( 'POST' === $_SERVER['REQUEST_METHOD'] ) {
+if ( 'POST' === ( $_SERVER['REQUEST_METHOD'] ?? '' ) ) {
 	if ( \array_key_exists( 'revoke_credential', $_POST ) && \is_string( $_POST['revoke_credential'] ) ) {
 		$credentialAdmin->revokeCredential(
 			credentialId: $_POST['revoke_credential'],

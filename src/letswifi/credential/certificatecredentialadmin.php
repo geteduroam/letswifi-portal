@@ -31,9 +31,9 @@ class CertificateCredentialAdmin extends CredentialAdmin
 			$validOn = $this->now;
 		}
 		$pdo = $this->profileService->getPDO();
-		$extraConditions = $this->getRealmConditions( $realms, static fn( $s ) => $pdo->quote( $s ) );
+		$realmConditions = $this->getRealmConditions( $realms, static fn( $s ) => $pdo->quote( $s ) );
 		if ( null !== $requester ) {
-			$extraConditions .= ' AND requester = :requester';
+			$realmConditions .= ' AND requester = :requester';
 		}
 		$stmt = $pdo->prepare( <<<SQL
 				SELECT
@@ -44,7 +44,7 @@ class CertificateCredentialAdmin extends CredentialAdmin
 					COUNT(CASE WHEN "revoked" IS NULL THEN "serial" END) "valid_accounts"
 				FROM "realm_signing_log"
 				WHERE "expires" > :valid_on AND "issued" < :valid_on
-					{$extraConditions}
+					{$realmConditions}
 				GROUP BY "requester", "realm"
 				ORDER BY "issued" DESC;
 			SQL );
@@ -80,7 +80,7 @@ class CertificateCredentialAdmin extends CredentialAdmin
 			$validOn = $this->now;
 		}
 		$pdo = $this->profileService->getPDO();
-		$extraConditions = $this->getRealmConditions( $realms, static fn( $s ) => $pdo->quote( $s ) );
+		$realmConditions = $this->getRealmConditions( $realms, static fn( $s ) => $pdo->quote( $s ) );
 		$stmt = $pdo->prepare( <<<SQL
 				SELECT
 					"realm",
@@ -91,7 +91,7 @@ class CertificateCredentialAdmin extends CredentialAdmin
 					COUNT(DISTINCT "requester") "total_requesters"
 				FROM "realm_signing_log"
 				WHERE "expires" > :valid_on AND "issued" < :valid_on
-					{$extraConditions}
+					{$realmConditions}
 				GROUP BY "realm"
 				ORDER BY "issued" DESC;
 			SQL );
@@ -144,14 +144,15 @@ class CertificateCredentialAdmin extends CredentialAdmin
 			$validOn = $this->now;
 		}
 		$pdo = $this->profileService->getPDO();
-		$extraConditions = $this->getRealmConditions( $realms, static fn( $s ) => $pdo->quote( $s ) );
+		$realmConditions = $this->getRealmConditions( $realms, static fn( string $realm ) => $pdo->quote( $realm ),
+		);
 		$revokeStatement = $pdo->prepare( <<<SQL
 				UPDATE "realm_signing_log"
 				SET "revoked" = :revoked
 				WHERE "requester" = :requester
 					AND "expires" > :valid_on AND "issued" < :valid_on
 					AND "revoked" IS NULL
-					{$extraConditions}
+					{$realmConditions}
 			SQL );
 		$revokeStatement->bindValue( 'valid_on', $this->formatUtc( $validOn ), PDO::PARAM_STR );
 		$revokeStatement->bindValue( 'revoked', $this->formatUtc( $this->now ), PDO::PARAM_STR );
@@ -162,13 +163,13 @@ class CertificateCredentialAdmin extends CredentialAdmin
 	public function getCredential( string $ident, array $realms = [] ): ?Credential
 	{
 		$pdo = $this->profileService->getPDO();
-		$extraConditions = $this->getRealmConditions( $realms, static fn( $s ) => $pdo->quote( $s ) );
+		$realmConditions = $this->getRealmConditions( $realms, static fn( $s ) => $pdo->quote( $s ) );
 		$stmt = $pdo->prepare( <<<SQL
 				SELECT
 					"serial", "realm", "ca_sub", "requester", "sub", "issued", "expires", "revoked", "usage", "client", "user_agent", "ip", "grant", "ident", "requester", "realm"
 				FROM "realm_signing_log"
 				WHERE "ident" = :ident
-					{$extraConditions}
+					{$realmConditions}
 				;
 			SQL );
 		$stmt->bindValue( 'ident', $ident, PDO::PARAM_STR );
@@ -297,9 +298,9 @@ class CertificateCredentialAdmin extends CredentialAdmin
 		if ( \in_array( false, $realms, true ) ) {
 			throw new DomainException( 'Unable to escape realm value' );
 		}
-		$extraConditions = ' AND realm IN (' . \implode( ', ', $realms ) . ')';
+		$realmConditions = ' AND realm IN (' . \implode( ', ', $realms ) . ')';
 
-		return $extraConditions;
+		return $realmConditions;
 	}
 
 	private static function convertSerial( int|string $decimalSerial ): int

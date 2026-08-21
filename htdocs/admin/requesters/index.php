@@ -19,20 +19,23 @@ $credentialLog = $app->getCredentialLog( $user );
 $credentialAdmin = $credentialLog->getCredentialAdministrator();
 $admin = $user->promote();
 
-/** @psalm-suppress PossiblyUndefinedArrayOffset */
-if ( 'POST' === $_SERVER['REQUEST_METHOD'] ) {
+if ( 'POST' === ( $_SERVER['REQUEST_METHOD'] ?? '' ) ) {
 	$validOn = \array_key_exists( 'valid_on', $_POST ) && \is_string( $_POST['valid_on'] )
 		? DateTimeImmutable::createFromFormat( '!Y-m-d\\TH:i:s', $_POST['valid_on'] ?? '' ) ?: null
 		: null;
-	$realms = \array_key_exists( 'realms', $_POST ) && \is_string( $_POST['realms'] )
-		? \array_filter( \explode( ',', $_POST['realms'] ?? '' ) )
+	$realms = \is_string( $_POST['realms'] )
+		? \explode( ',', $_POST['realms'] )
 		: [];
 	if ( empty( $realms ) ) {
 		throw new DomainException( 'No realms set' );
 	}
 
 	if ( \array_key_exists( 'revoke_requester', $_POST ) && \is_string( $_POST['revoke_requester'] ) ) {
-		$credentialAdmin->revokeRequester( $_POST['revoke_requester'], $realms, $validOn );
+		$credentialAdmin->revokeRequester(
+			requester: $_POST['revoke_requester'],
+			realms: $realms,
+			validOn: $validOn,
+		);
 	}
 	if ( $_POST['http_form_post_redirect'] ?? 0 ) {
 		\header( 'Location: ?' . \http_build_query( $_GET ), true, 303 );
@@ -44,10 +47,9 @@ if ( 'POST' === $_SERVER['REQUEST_METHOD'] ) {
 }
 
 if ( \array_key_exists( 'realms', $_GET ) && \is_array( $_GET['realms'] ) ) {
-	/** @psalm-suppress InvalidArgument */
 	$newRealmsFilter = \array_diff( \array_keys( $admin->realms ), $_GET['realms'] )
-	? \implode( ',', $_GET['realms'] )
-	: null;
+		? \implode( ',', $_GET['realms'] )
+		: null;
 	\header( 'Location: ?' . \http_build_query( \array_filter( ['realms' => $newRealmsFilter] + $_GET ) ) );
 	\setcookie(
 		'filter_admin_realms', $newRealmsFilter ?? '',
@@ -63,8 +65,8 @@ $validOn = \array_key_exists( 'valid_on', $_GET ) && \is_string( $_GET['valid_on
 
 $realmsFilter = \array_filter( \explode( ',', $_GET['realms'] ?? $_COOKIE['filter_admin_realms'] ?? '' ) );
 $requesterFilter = \array_key_exists( 'requester', $_GET ) && \is_string( $_GET['requester'] )
-? \trim( $_GET['requester'] ) ?: null
-:null;
+	? \trim( $_GET['requester'] ) ?: null
+	: null;
 
 $app->render( [
 	'_user' => $user,
