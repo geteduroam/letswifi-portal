@@ -22,7 +22,7 @@ $credentialAdmin = $credentialLog->getCredentialAdministrator();
 if ( \array_key_exists( 'realm_id', $_GET ) && $realm = $admin->getRealm( $_GET['realm_id'] ) ) {
 	$affiliationAllow = [];
 	$affiliationBlock = [];
-	foreach ( $provider->realmMap as $affiliation => $_ ) {
+	foreach ( $provider->realmAccess as $affiliation => $_ ) {
 		$realms = $provider->getRealmsByAffiliations( [$affiliation] );
 		if ( \in_array( $realm->realmId, \array_keys( $realms ), true ) ) {
 			$affiliationAllow[] = $affiliation;

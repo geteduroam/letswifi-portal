@@ -50,7 +50,7 @@ return [
 			// If the user has access to multiple realms, they will be prompted
 			// to select a realm when they attempt to generate a profile.
 			// REQUIRED: Array affiliation => list of available realms
-			'realm' => [
+			'realm_access' => [
 				// 'staff' => ['staff.example.com'],
 				// 'student' => ['student.example.com'],
 				'' => ['example.com'],

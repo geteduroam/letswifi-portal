@@ -21,16 +21,16 @@ use letswifi\auth\User;
 class Provider implements JsonSerializable
 {
 	/**
-	 * @param array<string,array<string>> $realmMap affiliation => realms
+	 * @param array<string,array<string>> $realmAccess affiliation => realms
 	 * @param array<Location>             $location
-	 * @param array<string>               $admins   Identities that are considered to be admins
+	 * @param array<string>               $admins      Identities that are considered to be admins
 	 */
 	public function __construct(
 		private readonly ProfileService $tenantConfig,
 		public readonly string $host,
 		public readonly MultiLanguageString $displayName,
 		public readonly AuthenticationContext $auth,
-		public readonly array $realmMap,
+		public readonly array $realmAccess,
 		public readonly array $location = [],
 		public readonly ?Logo $logo = null,
 		public readonly ?string $contactId = null,
@@ -38,18 +38,18 @@ class Provider implements JsonSerializable
 		public readonly ?string $profileSigner = null,
 		public readonly array $admins = [],
 	) {
-		$realmMap || throw new DomainException( "Provider {$host}: realm map cannot be empty" );
+		$realmAccess || throw new DomainException( "Provider {$host}: realm map cannot be empty" );
 	}
 
 	/**
-	 * @return array{host:string,display_name:MultiLanguageString,realm_map:array<string,array<string>>,contact:?Contact,description:?MultiLanguageString,location:array<Location>,logo:bool}
+	 * @return array{host:string,display_name:MultiLanguageString,realm_access:array<string,array<string>>,contact:?Contact,description:?MultiLanguageString,location:array<Location>,logo:bool}
 	 */
 	public function jsonSerialize(): array
 	{
 		return [
 			'host' => $this->host,
 			'display_name' => $this->displayName,
-			'realm_map' => $this->realmMap,
+			'realm_access' => $this->realmAccess,
 			'contact' => $this->getContact(),
 			'description' => $this->description,
 			'location' => $this->location,
@@ -83,7 +83,8 @@ class Provider implements JsonSerializable
 			host: $providerData->getParentKey(),
 			displayName: $providerData->getObject( 'display_name', MultiLanguageString::class ),
 			auth: $auth,
-			realmMap: $providerData->getArray( 'realm' ),
+			// Rename "realm" to "realm_access"
+			realmAccess: $providerData->getArrayOrNull( 'realm_access' ) ?? $providerData->getArrayOrNull( 'realm' ) ?? $providerData->getArray( 'realm_access' ),
 			location: \array_map( [Location::class, 'fromConfig'], $location ),
 			logo: null === $logo ? null : Logo::fromConfig( $logo ),
 			contactId: $providerData->getStringOrNull( 'contact' ),
@@ -100,7 +101,7 @@ class Provider implements JsonSerializable
 			$realm = $realm->realmId;
 		}
 
-		foreach ( $this->realmMap as $realms ) {
+		foreach ( $this->realmAccess as $realms ) {
 			if ( \in_array( $realm, $realms, true ) ) {
 				return true;
 			}
@@ -112,7 +113,7 @@ class Provider implements JsonSerializable
 	/** @return array<string,Realm> */
 	public function allRealms(): array
 	{
-		$keys = \array_merge( ...\array_values( $this->realmMap ) );
+		$keys = \array_merge( ...\array_values( $this->realmAccess ) );
 		$values = \array_map( [$this->tenantConfig, 'getRealm'], $keys );
 
 		return \array_combine( $keys, $values );
@@ -146,7 +147,7 @@ class Provider implements JsonSerializable
 	public function getRealmsByAffiliations( array $affiliations ): array
 	{
 		$result = [];
-		foreach ( $this->realmMap as $affiliation => $realms ) {
+		foreach ( $this->realmAccess as $affiliation => $realms ) {
 			if ( '' === $affiliation || \in_array( $affiliation, $affiliations, true ) ) {
 				if ( empty( $realms ) ) {
 					// Stop evaluating more affiliations
