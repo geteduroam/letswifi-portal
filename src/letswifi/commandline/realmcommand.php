@@ -10,12 +10,37 @@
 
 namespace letswifi\commandline;
 
+use fyrkat\configmap\ConfigurationException;
 use fyrkat\multilang\MultiLanguageString;
 
 class RealmCommand extends Command
 {
 	public const HELP = [
-		'', '<realm> [--newca <common-name>] [args ...]',
+		'' . self::BOLD . 'list' . self::NORMAL . '',
+		'' . self::BOLD . 'view' . self::NORMAL . ' realm',
+		'' . self::BOLD . 'create' . self::NORMAL . ' realm ( --newca | --signer ) common-name --network network [args ...]',
+	];
+
+	public const LONG_HELP = [
+		'List all realms',
+		'View details about the requested realm',
+		<<<CREATE
+			Create a new realm
+			--newca common-name    	Create a new CA that will be used as signer
+			--signer common-name   	Use existing CA as signer
+			--network network      	Name of the network that will be configured by profiles from this realm
+			--name names           	Name of the realm (localisable)
+			--description          	Description of the realm (localisable)
+			--days days            	Integer amount of days that the credential will be valid for after issuance
+			--servername servername	Name on the server certificate, to be verified by the client
+			--logofile filename    	Logo filename, file must already be present in directory
+
+			The options --network and --servername can be provided multiple times,
+			all provided values will be set in the realm.
+
+			The options --name and --description can be provided multiple times
+			together with --lang, in order to localise the name and description of this realm.
+			CREATE,
 	];
 
 	protected readonly ?string $realm;
@@ -26,7 +51,7 @@ class RealmCommand extends Command
 	public function __construct( array $argv )
 	{
 		parent::__construct( $argv );
-		$this->realm = $argv[1] ?? null;
+		$this->realm = $argv[2] ?? null;
 		$args = $argv;
 		\array_shift( $args );
 		\array_shift( $args );
@@ -35,50 +60,78 @@ class RealmCommand extends Command
 
 	public function run(): void
 	{
-		switch ( $this->realm ) {
-			case null:
+		switch ( $this->argv[1] ?? '' ) {
+			case 'list':
 				$this->listRealms();
 				break;
 
-			default:
-				$this->args ? $this->updateRealm() : $this->viewRealm();
+			case 'view':
+				$this->viewRealm();
 				break;
+
+			case 'create':
+				$this->updateRealm();
+				break;
+
+			default:
+				$helpCommand = new HelpCommand( [$this->argv[0], $this->getName()] );
+				$helpCommand->run();
+
+				exit( 2 );
 		}
 	}
 
 	private function listRealms(): void
 	{
-		$realms = $this->config->getDictionaryList( 'realm' );
-		echo "HTTP HOST\tDISPLAY NAME\tCONTACT\tVALIDITY\tSERVER NAME" . \PHP_EOL;
+		$realms = $this->config->getDictionary( 'realm' );
+		$table = new Table( 'http_host', 'display_name', 'contact', 'validity', 'server_name', 'network' );
 		foreach ( $realms as $name => $realm ) {
 			$displayName = $realm->getObject( 'display_name', MultiLanguageString::class )->jsonSerialize();
 			$contact = $realm->getStringOrNull( 'contact' ) ?? '-';
 			$validity = $realm->getInt( 'validity' );
 			$serverName = $realm->getStrings( 'server_names' )[0];
-			echo "{$name}\t" . \reset( $displayName )['display'] . "\t{$contact}\t{$validity}\t{$serverName}" . \PHP_EOL;
+			$network = $realm->getStrings( 'network' )[0];
+			$table->add( $name, \reset( $displayName )['display'], $contact, (string)$validity, $serverName, $network );
 		}
+
+		echo $table->printTable( margin: 0, header: true );
 	}
 
 	private function viewRealm(): void
 	{
 		\assert( null !== $this->realm );
 		$realm = $this->config->getDictionary( 'realm' )->getDictionary( $this->realm );
-		\var_export( $realm );
+		$table = new Table( 'setting', 'value' );
+		$displayName = $realm->getObject( 'display_name', MultiLanguageString::class )->jsonSerialize();
+		$table->add( 'display_name', \reset( $displayName )['display'] );
+		$table->add( 'contact', $realm->getStringOrNull( 'contact' ) ?? '-' );
+		$table->add( 'validity', (string)$realm->getInt( 'validity' ) );
+
+		/** @psalm-suppress PossiblyFalseArgument */
+		$table->add( 'server_name', \json_encode( $realm->getStrings( 'server_names' ) ) );
+
+		/** @psalm-suppress PossiblyFalseArgument */
+		$table->add( 'networks', \json_encode( $realm->getStrings( 'networks' ) ) );
+		$table->add( 'signer', $realm->getString( 'signer' ) );
+
+		echo $table->printTable( margin: 0, header: true )
+		. "trust\n            \t- "
+		. \implode( "\n            \t- ", $realm->getStrings( 'trust' ) )
+		. "\n";
 	}
 
 	private function updateRealm(): void
 	{
 		\assert( null !== $this->realm );
-		$realmDir = $this->config->getStringOrNull( 'realm#dir' );
-		$certificateDir = $this->config->getStringOrNull( 'certificate#dir' );
-		if ( null === $realmDir || null === $certificateDir ) {
-			static::print_error( 'Can only write realms if realm#dir and certificate#dir is used in the config file' );
+		$realmConfig = $this->config->getDictionary( 'realm' );
+		$certificateConfig = $this->config->getDictionary( 'certificate' );
+		$realm = $this->createConfig( $this->realm, $this->args );
 
-			exit( 2 );
+		try {
+			$realmConfig[$this->realm] = $realm;
+		} catch ( ConfigurationException $e ) {
+			static::die( 2, $e->getMessage() );
 		}
-		$config = $this->createConfig( $this->realm, $this->args );
-		$filename = $realmDir . \DIRECTORY_SEPARATOR . "{$this->realm}.conf.php";
-		\file_put_contents( $filename, '<?php return ' . $this->export( $config ) . ";\n" );
 	}
 
 	private function createConfig( string $realmId, array $args ): array
@@ -91,7 +144,7 @@ class RealmCommand extends Command
 				case '--newca':
 				case '--new-ca':
 					$i++;
-					$newCA = $args[$i];
+					$newCA = $args[$i] ?? static::die( 2, '--newca expects a name for the new CA' );
 					break;
 				case '--name':
 				case '--displayname':
@@ -122,6 +175,12 @@ class RealmCommand extends Command
 					$result['server_names'] ??= [];
 					$result['server_names'][] = $args[$i];
 					break;
+				case '--networks':
+				case '--network':
+					$i++;
+					$result['networks'] ??= [];
+					$result['networks'][] = $args[$i];
+					break;
 				case '--signer':
 					$i++;
 					$result['signer'] = $args[$i];
@@ -150,23 +209,27 @@ class RealmCommand extends Command
 			if ( !\array_key_exists( 'validity', $result ) ) {
 				$result['validity'] = 365;
 			}
-			if ( !\array_key_exists( 'networks', $result ) ) {
-				$result['networks'] = ['eduroam'];
-			}
 			if ( !\array_key_exists( 'contact', $result ) ) {
 				$result['contact'] = null;
 			}
 		}
+		if ( null === $newCA && !\array_key_exists( 'signer', $result ) ) {
+			static::die( 2, 'Must provide either --signer or --newca' );
+		}
 		if ( null !== $newCA && \array_key_exists( 'signer', $result ) ) {
-			static::print_error( 'Cannot provide --signer when also creating a new CA;', 'the new CA will be the signer.' );
-
-			exit( 2 );
+			static::die( 2, 'Cannot provide --signer when also creating a new CA;', 'the new CA will be the signer.' );
 		}
 		if ( null !== $newCA ) {
 			$result['signer'] = $this->createSigningCertificate( $newCA );
-			if ( !\array_key_exists( 'trust', $result ) ) {
+			if ( empty( $result['trust'] ?? [] ) ) {
 				$result['trust'] = [$result['signer']];
 			}
+		}
+		if ( empty( $result['trust'] ?? [] ) ) {
+			static::die( 2, 'Must provide at least one trusted CA' );
+		}
+		if ( empty( $result['networks'] ?? [] ) ) {
+			static::die( 2, 'Must provide at least one network' );
 		}
 
 		return $result;

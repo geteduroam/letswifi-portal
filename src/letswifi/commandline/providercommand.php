@@ -14,17 +14,36 @@ use fyrkat\multilang\MultiLanguageString;
 
 class ProviderCommand extends Command
 {
-	public const HELP = [''];
+	public const HELP = [
+		'' . self::BOLD . 'list' . self::NORMAL . '',
+	];
 
 	public function run(): void
 	{
-		$providers = $this->config->getDictionaryList( 'provider' );
-		echo "HTTP HOST\tDISPLAY NAME\tCONTACT\tAUTH SERVICE" . \PHP_EOL;
+		switch ( $this->argv[1] ?? '' ) {
+			case 'list':
+				$this->list();
+				break;
+
+			default:
+				$helpCommand = new HelpCommand( [$this->argv[0], $this->getName()] );
+				$helpCommand->run();
+
+				exit( 2 );
+		}
+	}
+
+	public function list(): void
+	{
+		$providers = $this->config->getDictionary( 'provider' );
+		$table = new Table( 'http_host', 'display_name', 'contact', 'auth_service' );
 		foreach ( $providers as $name => $provider ) {
 			$displayName = $provider->getObject( 'display_name', MultiLanguageString::class )->jsonSerialize();
 			$contact = $provider->getStringOrNull( 'contact' ) ?? '-';
 			$authService = $provider->getDictionary( 'auth' )->getString( 'service' );
-			echo "{$name}\t" . \reset( $displayName )['display'] . "\t{$contact}\t{$authService}" . \PHP_EOL;
+			$table->add( $name, \reset( $displayName )['display'], $contact, $authService );
 		}
+
+		echo $table->printTable( margin: 0, header: true );
 	}
 }

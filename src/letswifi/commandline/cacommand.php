@@ -21,26 +21,27 @@ class CACommand extends Command
 		'' . self::BOLD . 'import' . self::NORMAL . '',
 	];
 
+	public const LONG_HELP = [
+		'Create a new certificate with private key, with the provided common name.',
+		'Import an existing certificate and (optionally) private key, read from stdin.',
+	];
+
 	public function run(): void
 	{
-		$arg1 = \array_key_exists( 1, $this->argv ) ? $this->argv[1] : '';
-		$arg2 = \array_key_exists( 2, $this->argv ) ? $this->argv[2] : null;
-
-		switch ( $arg1 ) {
+		switch ( $this->argv[1] ?? '' ) {
 			case 'import':
 				$this->importCertificates();
 				break;
 			case 'create':
-				if ( null === $arg2 ) {
-					static::print_error( 'No common-name provided ' );
-
-					exit( 2 );
+				if ( $this->argv[2] ?? '' ) {
+					static::die( 2, 'No common-name provided' );
 				}
-				$this->createSigningCertificate( $arg2 );
+				$this->createSigningCertificate( $this->argv[2] );
 				break;
 
 			default:
-				static::print_error( 'Unknown command: ' . $arg1 );
+				$helpCommand = new HelpCommand( [$this->argv[0], $this->getName()] );
+				$helpCommand->run();
 
 				exit( 2 );
 		}
@@ -49,12 +50,12 @@ class CACommand extends Command
 	protected function importCertificates(): void
 	{
 		$certificateConfig = $this->config->getDictionary( 'certificate' );
-		$stdin = \file_get_contents( 'php://stdin' );
+		$stdin = \file_get_contents( 'php://stdin' ) ?: '';
 		\preg_match_all( '/(^|\\n)-----BEGIN( EC| RSA)? PRIVATE KEY-----\\n.*?\\n-----END\\2 PRIVATE KEY-----($|\\n)/sm', $stdin, $keys );
 		\preg_match_all( '/(^|\\n)-----BEGIN CERTIFICATE-----\\n.*?\\n-----END CERTIFICATE-----($|\\n)/sm', $stdin, $certificates );
 
-		$keys = \array_map( static fn ( string $key ) => new PrivateKey( $key ), $keys[0] );
-		$certificates = \array_map( static fn ( string $certificate ) => new X509( $certificate ), $certificates[0] );
+		$keys = \array_map( static fn( string $key ) => new PrivateKey( $key ), $keys[0] );
+		$certificates = \array_map( static fn( string $certificate ) => new X509( $certificate ), $certificates[0] );
 
 		for ( $i = \count( $certificates ) - 1; 0 <= $i; --$i ) {
 			$x509 = $certificates[$i];

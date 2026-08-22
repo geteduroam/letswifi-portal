@@ -11,7 +11,8 @@
 namespace letswifi\commandline;
 
 use Throwable;
-use fyrkat\configmap\DictionaryFile;
+use UnexpectedValueException;
+use fyrkat\configmap\ConfigurationException;
 use fyrkat\configmap\DictionaryPhpFile;
 use fyrkat\openssl\CSR;
 use fyrkat\openssl\DN;
@@ -29,9 +30,7 @@ class Command
 		'help' => HelpCommand::class,
 		'provider' => ProviderCommand::class,
 		'realm' => RealmCommand::class,
-		'database' => DatabaseCommand::class,
 		'ca' => CACommand::class,
-		'sign' => SignCommand::class,
 		'onc' => ONCCommand::class,
 	];
 
@@ -39,15 +38,16 @@ class Command
 
 	public const NORMAL = "\033[0m";
 
-	/** @var array<string> */
+	/** @var array<int,string> */
 	public const HELP = [];
+
+	/** @var array<int,string> */
+	public const LONG_HELP = [];
 
 	/** @var non-empty-array<int,string> */
 	public readonly array $argv;
 
-	public readonly string $dir;
-
-	protected readonly DictionaryFile $config;
+	protected readonly DictionaryPhpFile $config;
 
 	/**
 	 * @param non-empty-array<string> $argv
@@ -60,7 +60,7 @@ class Command
 		$this->argv = \array_values( $argv );
 
 		$this->config = new DictionaryPhpFile( 'letswifi.conf.php', [
-			$this->dir = \dirname( __DIR__, 3 ) . \DIRECTORY_SEPARATOR . 'config',
+			\dirname( __DIR__, 3 ) . \DIRECTORY_SEPARATOR . 'config',
 		], sigils: [
 			...DictionaryPhpFile::sigils(),
 			...DictionaryPemFile::sigils(),
@@ -90,6 +90,13 @@ class Command
 		$command->run();
 	}
 
+	protected static function die( int $status, string ...$s ): never
+	{
+		static::print_error( ...$s );
+
+		exit( $status );
+	}
+
 	protected static function print_error( string ...$s ): void
 	{
 		\fwrite( \STDERR, \implode( \PHP_EOL, $s ) . \PHP_EOL );
@@ -115,83 +122,30 @@ class Command
 	protected function importCA( X509 $x509, ?PrivateKey $key ): string
 	{
 		$certificateConfig = $this->config->getDictionary( 'certificate' );
-		$certificateDir = $certificateConfig instanceof DictionaryPemDir ? $this->dir : null;
-		if ( null === $certificateDir ) {
-			static::print_error( 'Can only write certificates if certificate#dir is used in the config file' );
 
-			exit( 2 );
+		if ( !$certificateConfig instanceof DictionaryPemDir ) {
+			static::die( 2, 'Can only write certificates if certificate#pemdir is used in the config file' );
 		}
-		$subject = $x509->getSubject( longNames: false )->__toString();
-		if ( \str_contains( $subject, '/' ) || \str_contains( $subject, '\\' ) ) {
-			\var_export( \str_contains( $subject, '/' ) );
-			\var_export( \str_contains( $subject, '\\' ) );
-			static::print_error( 'Certificate subject contains invalid sequences' );
 
-			exit( 2 );
+		try {
+			return $certificateConfig->importCertificate( $x509, $key );
+		} catch ( ConfigurationException $e ) {
+			static::die( 2, $e->getMessage() );
 		}
-		$filename = $certificateDir . \DIRECTORY_SEPARATOR . "{$subject}.pem";
-		$privKeyPem = \trim( $key?->getPrivateKeyPem( null ) ?? '' );
-		if ( !empty( $privKeyPem ) ) {
-			$privKeyPem .= "\n";
-		}
-		\file_put_contents( $filename, \implode( "\n", [
-			\trim( $x509->getX509Pem() ),
-			$privKeyPem,
-		] ) );
-
-		return $subject;
 	}
 
-	/**
-	 * @param null|array|scalar $v
-	 */
-	protected function export( mixed $v, int $indent = 0 ): string
+	protected function getName(): string
 	{
-		if ( \is_array( $v ) ) {
-			return $this->exportArray( $v, $indent );
-		}
-		if ( null === $v ) {
-			return 'null';
-		}
-		if ( true === $v ) {
-			return 'true';
-		}
-		if ( false === $v ) {
-			return 'false';
+		$classSegments = \explode( '\\', static::class );
+		$class = \end( $classSegments );
+		if ( \str_ends_with( $class, 'Command' ) ) {
+			return \strtolower( \substr( $class, 0, -7 ) );
 		}
 
-		return \var_export( $v, true );
-	}
-
-	protected function exportArray( array $a, int $indent = 0 ): string
-	{
-		switch ( \count( $a ) ) {
-			case 0:
-				return '[]';
-			case 1:
-				if ( 0 === \key( $a ) ) {
-					return '[' . $this->export( \current( $a ), $indent + 1 ) . ']';
-				}
-		}
-		$in = \str_repeat( "\t", $indent );
-		$showKeys = false;
-		$count = 0;
-		foreach ( $a as $k => $_ ) {
-			if ( $k !== $count++ ) {
-				$showKeys = true;
-			}
-		}
-		$output = '[' . \PHP_EOL;
-		foreach ( $a as $k => $v ) {
-			$output .= "{$in}\t"
-				. ( $showKeys ? $this->export( $k, $indent + 1 ) . ' => ' : '' )
-				. $this->export( $v, $indent + 1 )
-				. ',' . \PHP_EOL;
-		}
-
-		return "{$output}{$in}]";
+		throw new UnexpectedValueException( 'Cannot find command name from class name ' . $class );
 	}
 }
+
 if ( \PHP_SAPI !== 'cli' ) {
 	\fwrite( \STDERR, 'This program is intended to be run from the command line.' . \PHP_EOL );
 

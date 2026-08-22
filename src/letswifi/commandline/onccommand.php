@@ -15,40 +15,62 @@ namespace letswifi\commandline;
  */
 class ONCCommand extends Command
 {
-	public const HELP = ['pin'];
+	public const HELP = [
+		'' . self::BOLD . 'decrypt' . self::NORMAL . ' <pin>',
+	];
+
+	public const LONG_HELP = [<<<EOT
+		Read an encrypted ONC file from stdin,
+		decrypt it using <pin> and write the unencrypted ONC to stdout.
+		EOT];
 
 	public function run(): void
 	{
-		if ( !\array_key_exists( 1, $this->argv ) ) {
-			self::print_error( 'No PIN provided' );
+		switch ( $this->argv[1] ?? '' ) {
+			case 'decrypt':
+				$this->decrypt();
+				break;
 
-			exit( 2 );
+			default:
+				$helpCommand = new HelpCommand( [$this->argv[0], $this->getName()] );
+				$helpCommand->run();
+
+				exit( 2 );
 		}
-		$password = $this->argv[1];
-		$input = \file_get_contents( 'php://stdin' );
+	}
+
+	public function decrypt(): void
+	{
+		$password = $this->argv[1] ?? self::die( 2, 'No PIN provided' );
+		$input = \file_get_contents( 'php://stdin' ) ?: self::die( 2, 'Malformed ONC' );
 		$parsed = \json_decode( $input, true );
-		$salt = \base64_decode( $parsed['Salt'], true );
-		$initVector = \base64_decode( $parsed['IV'], true );
+		$salt = \base64_decode( $parsed['Salt'], true ) ?: self::die( 2, 'Malformed ONC' );
+		$initVector = \base64_decode( $parsed['IV'], true ) ?: self::die( 2, 'Malformed ONC' );
 
 		$encryptionKey = \hash_pbkdf2( 'sha1', $password, $salt, $parsed['Iterations'], 32, true );
-		$data = \openssl_decrypt( \base64_decode( $parsed['Ciphertext'], true ), 'AES-256-CBC', $encryptionKey, \OPENSSL_RAW_DATA, $initVector );
-		$hmac = \hash_hmac( 'sha1', \base64_decode( $parsed['Ciphertext'], true ), $encryptionKey, true );
+		$data = \openssl_decrypt(
+			\base64_decode( $parsed['Ciphertext'], true ) ?: self::die( 2, 'Malformed ONC' ),
+			'AES-256-CBC',
+			$encryptionKey,
+			\OPENSSL_RAW_DATA,
+			$initVector,
+		);
+		$hmac = \hash_hmac(
+			'sha1',
+			\base64_decode( $parsed['Ciphertext'], true ) ?: self::die( 2, 'Malformed ONC' ),
+			$encryptionKey,
+			true,
+		);
 
 		if ( 'SHA1' !== $parsed['HMACMethod'] ) {
-			self::print_error( 'Invalid HMAC algo' );
-
-			exit( 2 );
+			self::die( 2, 'Invalid HMAC algo' );
 		}
 		if ( \base64_decode( $parsed['HMAC'], true ) !== $hmac ) {
-			self::print_error( 'Invalid HMAC' );
-
-			exit( 2 );
+			self::die( 2, 'Invalid HMAC' );
 		}
 
 		if ( false === $data ) {
-			self::print_error( 'Decrypt failed' );
-
-			exit( 2 );
+			self::die( 2, 'ONC Decrypt failed' );
 		}
 
 		echo "{$data}\n";
