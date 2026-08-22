@@ -15,6 +15,7 @@ use DateTimeImmutable;
 use DomainException;
 use JsonSerializable;
 use PDO;
+use fyrkat\configmap\Dictionary;
 use fyrkat\oauth\Client;
 use fyrkat\oauth\OAuth;
 use fyrkat\oauth\exception\BearerException;
@@ -26,7 +27,6 @@ use fyrkat\oauth\token\Grant;
 use fyrkat\oauth\token\RefreshToken;
 use letswifi\LetsWifiApp;
 use letswifi\auth\browser\BrowserAuthInterface;
-use letswifi\configuration\Dictionary;
 use letswifi\error\ForbiddenException;
 use letswifi\error\UnauthorizedException;
 use letswifi\profile\Provider;
@@ -43,14 +43,13 @@ class AuthenticationContext implements JsonSerializable
 	private static bool $csrfCookieSet = false;
 
 	/**
-	 * @param array<string,mixed>                                                                                               $authServiceParams
-	 * @param array<array{clientId:string,redirectUris?:array<string>,scopes:array<string>,refresh?:bool,clientSecret?:string}> $oauthClients
+	 * @param iterable<array{clientId:string,redirectUris?:array<string>,scopes:array<string>,refresh?:bool,clientSecret?:string}> $oauthClients
 	 */
 	public function __construct(
 		public readonly string $authService,
-		array $authServiceParams,
+		Dictionary $authServiceParams,
 		string $oauthSecret,
-		array $oauthClients,
+		iterable $oauthClients,
 		Dictionary $pdoData,
 		protected readonly DateTimeImmutable $now = new DateTimeImmutable(),
 		DateInterval $longLivedGrantTokenValidity = new DateInterval( 'P6M' ),
@@ -88,15 +87,6 @@ class AuthenticationContext implements JsonSerializable
 			$longLivedGrantTokenValidity,
 		);
 		foreach ( $oauthClients as $name => $client ) {
-			// TODO: Temporary workaround until configuration code is improved
-			// If clients are set with #dir, a syntethic array is created with full paths
-			// However, this code will fail with manual created #inc entries,
-			// because we're most likely in a different working directory.
-			if ( \str_ends_with( $name, '#inc' ) ) {
-				/** @psalm-suppress UnresolvableInclude temporary fix */
-				$client = require $client;
-			}
-
 			/** @psalm-suppress PossiblyNullArgument null coalescing prevents this */
 			$this->oauth->registerClient( new Client(
 				$client['clientId'],

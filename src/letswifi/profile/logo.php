@@ -12,7 +12,7 @@ namespace letswifi\profile;
 
 use Closure;
 use DomainException;
-use letswifi\configuration\Dictionary;
+use fyrkat\configmap\Dictionary;
 
 class Logo
 {

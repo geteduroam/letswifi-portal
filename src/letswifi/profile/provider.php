@@ -13,10 +13,10 @@ namespace letswifi\profile;
 use DateInterval;
 use DomainException;
 use JsonSerializable;
+use fyrkat\configmap\Dictionary;
 use fyrkat\multilang\MultiLanguageString;
 use letswifi\auth\AuthenticationContext;
 use letswifi\auth\User;
-use letswifi\configuration\Dictionary;
 
 class Provider implements JsonSerializable
 {
@@ -61,16 +61,16 @@ class Provider implements JsonSerializable
 	{
 		$authData = $providerData->getDictionary( 'auth' );
 		$authService = $authData->getString( 'service' );
-		$authServiceParams = $authData->getRawArray( 'param' );
+		$authServiceParams = $authData->getDictionary( 'param' );
 		$longLivedGrantTokenValidity = new DateInterval( 'P6M' );
 		if ( $authData->has( 'longLivedGrantTokenValidity' ) ) {
-			$longLivedGrantTokenValidity = static::getTokenValidity( $authData->getInteger( 'longLivedGrantTokenValidity' ) );
+			$longLivedGrantTokenValidity = static::getTokenValidity( $authData->getInt( 'longLivedGrantTokenValidity' ) );
 		}
 		$auth = new AuthenticationContext(
 			authService: $authService,
 			authServiceParams: $authServiceParams,
 			oauthSecret: $providerData->getString( 'oauthsecret' ),
-			oauthClients: $providerData->getRawArray( 'clients' ),
+			oauthClients: $providerData->getDictionary( 'clients' ),
 			pdoData: $providerData->getDictionary( 'pdo' ),
 			longLivedGrantTokenValidity: $longLivedGrantTokenValidity,
 		);
@@ -81,15 +81,16 @@ class Provider implements JsonSerializable
 		return new self(
 			tenantConfig: $tenantConfig,
 			host: $providerData->getParentKey(),
-			displayName: $providerData->getMultiLanguageString( 'display_name' ),
+			displayName: $providerData->getObject( 'display_name', MultiLanguageString::class ),
 			auth: $auth,
-			realmMap: $providerData->getRawArray( 'realm' ),
+			realmMap: $providerData->getArray( 'realm' ),
 			location: \array_map( [Location::class, 'fromConfig'], $location ),
 			logo: null === $logo ? null : Logo::fromConfig( $logo ),
 			contactId: $providerData->getStringOrNull( 'contact' ),
-			description: $providerData->getMultiLanguageStringOrNull( 'description' ),
-			profileSigner: $providerData->getStringOrNull( 'profile-signer' ),
-			admins: $providerData->has( 'admins' ) ? $providerData->getStringArray( 'admins' ) : [],
+			description: $providerData->getObject( 'description', MultiLanguageString::class ),
+			// Rename "profile-signer" to "profile_signer"
+			profileSigner: $providerData->getStringOrNull( 'profile_signer' ) ?? $providerData->getStringOrNull( 'profile-signer' ),
+			admins: $providerData->has( 'admins' ) ? $providerData->getStrings( 'admins' ) : [],
 		);
 	}
 

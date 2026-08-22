@@ -19,7 +19,7 @@ export COMPOSER_VENDOR_DIR=build/vendor
 
 cp -a bin htdocs locale src template "$WORKDIR"
 cp -a config-dist/. "$WORKDIR/config"
-cp -a "$COMPOSER_VENDOR_DIR"/fyrkat/{multilang,oauth-server,openssl}/src/fyrkat "$WORKDIR/src/"
+cp -a "$COMPOSER_VENDOR_DIR"/fyrkat/{configmap,multilang,oauth-server,openssl}/src/fyrkat "$WORKDIR/src/"
 cat src/_autoload.php | grep -v Composer | grep -v /vendor/ >"$WORKDIR/src/_autoload.php"
 
 ( cd "$COMPOSER_VENDOR_DIR/twig/twig/src"; find . -path Resources -prune -o -type d; ) | tr '[:upper:]' '[:lower:]' | xargs -I % mkdir -p "$WORKDIR/src/twig/%"

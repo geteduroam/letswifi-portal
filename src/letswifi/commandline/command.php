@@ -11,14 +11,16 @@
 namespace letswifi\commandline;
 
 use Throwable;
+use fyrkat\configmap\DictionaryFile;
+use fyrkat\configmap\DictionaryPhpFile;
 use fyrkat\openssl\CSR;
 use fyrkat\openssl\DN;
 use fyrkat\openssl\OpenSSLConfig;
 use fyrkat\openssl\OpenSSLKey;
 use fyrkat\openssl\PrivateKey;
 use fyrkat\openssl\X509;
-use letswifi\configuration\DictionaryFile;
-use letswifi\configuration\DictionaryPemDir;
+use letswifi\configmap\DictionaryPemDir;
+use letswifi\configmap\DictionaryPemFile;
 
 class Command
 {
@@ -43,6 +45,8 @@ class Command
 	/** @var non-empty-array<int,string> */
 	public readonly array $argv;
 
+	public readonly string $dir;
+
 	protected readonly DictionaryFile $config;
 
 	/**
@@ -54,7 +58,13 @@ class Command
 			$argv[0] = \basename( $argv[0] );
 		}
 		$this->argv = \array_values( $argv );
-		$this->config = new DictionaryFile( \dirname( __DIR__, 3 ) . '/config/letswifi.conf.php' );
+
+		$this->config = new DictionaryPhpFile( 'letswifi.conf.php', [
+			$this->dir = \dirname( __DIR__, 3 ) . \DIRECTORY_SEPARATOR . 'config',
+		], sigils: [
+			...DictionaryPhpFile::sigils(),
+			...DictionaryPemFile::sigils(),
+		] );
 	}
 
 	public function run(): void
@@ -105,7 +115,7 @@ class Command
 	protected function importCA( X509 $x509, ?PrivateKey $key ): string
 	{
 		$certificateConfig = $this->config->getDictionary( 'certificate' );
-		$certificateDir = $certificateConfig instanceof DictionaryPemDir ? $certificateConfig->dir : null;
+		$certificateDir = $certificateConfig instanceof DictionaryPemDir ? $this->dir : null;
 		if ( null === $certificateDir ) {
 			static::print_error( 'Can only write certificates if certificate#dir is used in the config file' );
 

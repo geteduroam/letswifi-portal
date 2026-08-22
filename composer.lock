@@ -4,8 +4,43 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1d2b5547e2f97b09edd634e8476eb0a1",
+    "content-hash": "e6fd74d8e48840bcf84f8de957e82688",
     "packages": [
+        {
+            "name": "fyrkat/configmap",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://git.sr.ht/~jornane/php-configmap",
+                "reference": "631cfbd83de7efe182fea1e64a9bed8da9bce4b0"
+            },
+            "require": {
+                "php": ">=8.1"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.64",
+                "phpunit/phpunit": "^10",
+                "vimeo/psalm": "^5.26"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "src/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Jørn Åne de Jong",
+                    "email": "git@jornane.no"
+                }
+            ],
+            "description": "Configuration classes",
+            "time": "2026-08-13T21:22:43+00:00"
+        },
         {
             "name": "fyrkat/multilang",
             "version": "v1.0.4",

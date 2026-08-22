@@ -199,7 +199,7 @@ return [
 			// A normal, valid, server certificate for TLS suffices,
 			// the hostname is not important.
 			// OPTIONAL: String name of the certificate in the certificate list
-			// 'profile-signer' => 'CN=example.com',
+			// 'profile_signer' => 'CN=example.com',
 		],
 	],
 

@@ -10,8 +10,7 @@
 
 namespace letswifi\commandline;
 
-use letswifi\configuration\DictionaryDir;
-use letswifi\configuration\DictionaryPemDir;
+use fyrkat\multilang\MultiLanguageString;
 
 class RealmCommand extends Command
 {
@@ -52,10 +51,10 @@ class RealmCommand extends Command
 		$realms = $this->config->getDictionaryList( 'realm' );
 		echo "HTTP HOST\tDISPLAY NAME\tCONTACT\tVALIDITY\tSERVER NAME" . \PHP_EOL;
 		foreach ( $realms as $name => $realm ) {
-			$displayName = $realm->getMultiLanguageString( 'display_name' )->jsonSerialize();
+			$displayName = $realm->getObject( 'display_name', MultiLanguageString::class )->jsonSerialize();
 			$contact = $realm->getStringOrNull( 'contact' ) ?? '-';
-			$validity = $realm->getInteger( 'validity' );
-			$serverName = $realm->getStringArray( 'server_names' )[0];
+			$validity = $realm->getInt( 'validity' );
+			$serverName = $realm->getStrings( 'server_names' )[0];
 			echo "{$name}\t" . \reset( $displayName )['display'] . "\t{$contact}\t{$validity}\t{$serverName}" . \PHP_EOL;
 		}
 	}
@@ -70,10 +69,8 @@ class RealmCommand extends Command
 	private function updateRealm(): void
 	{
 		\assert( null !== $this->realm );
-		$realmConfig = $this->config->getDictionary( 'realm' );
-		$certificateConfig = $this->config->getDictionary( 'certificate' );
-		$realmDir = $realmConfig instanceof DictionaryDir ? $realmConfig->dir : null;
-		$certificateDir = $certificateConfig instanceof DictionaryPemDir ? $certificateConfig->dir : null;
+		$realmDir = $this->config->getStringOrNull( 'realm#dir' );
+		$certificateDir = $this->config->getStringOrNull( 'certificate#dir' );
 		if ( null === $realmDir || null === $certificateDir ) {
 			static::print_error( 'Can only write realms if realm#dir and certificate#dir is used in the config file' );
 

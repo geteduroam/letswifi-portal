@@ -10,6 +10,8 @@
 
 namespace letswifi\commandline;
 
+use fyrkat\multilang\MultiLanguageString;
+
 class ProviderCommand extends Command
 {
 	public const HELP = [''];
@@ -19,7 +21,7 @@ class ProviderCommand extends Command
 		$providers = $this->config->getDictionaryList( 'provider' );
 		echo "HTTP HOST\tDISPLAY NAME\tCONTACT\tAUTH SERVICE" . \PHP_EOL;
 		foreach ( $providers as $name => $provider ) {
-			$displayName = $provider->getMultiLanguageString( 'display_name' )->jsonSerialize();
+			$displayName = $provider->getObject( 'display_name', MultiLanguageString::class )->jsonSerialize();
 			$contact = $provider->getStringOrNull( 'contact' ) ?? '-';
 			$authService = $provider->getDictionary( 'auth' )->getString( 'service' );
 			echo "{$name}\t" . \reset( $displayName )['display'] . "\t{$contact}\t{$authService}" . \PHP_EOL;

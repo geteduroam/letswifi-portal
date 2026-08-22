@@ -10,8 +10,8 @@
 
 namespace letswifi\profile;
 
+use fyrkat\configmap\Dictionary;
 use fyrkat\multilang\MultiLanguageString;
-use letswifi\configuration\Dictionary;
 
 class NetworkSSID extends Network
 {
@@ -39,7 +39,7 @@ class NetworkSSID extends Network
 	{
 		return new self(
 			networkId: $networkConfig->getParentKey(),
-			displayName: $networkConfig->getMultiLanguageString( 'display_name' ),
+			displayName: $networkConfig->getObject( 'display_name', MultiLanguageString::class ),
 			ssid: $networkConfig->getString( 'ssid' ),
 		);
 	}

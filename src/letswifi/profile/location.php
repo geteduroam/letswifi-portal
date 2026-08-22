@@ -11,7 +11,7 @@
 namespace letswifi\profile;
 
 use JsonSerializable;
-use letswifi\configuration\Dictionary;
+use fyrkat\configmap\Dictionary;
 
 class Location implements JsonSerializable
 {

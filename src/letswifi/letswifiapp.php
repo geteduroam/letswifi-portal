@@ -18,12 +18,13 @@ use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Loader\FilesystemLoader;
 use Twig\TwigFilter;
+use fyrkat\configmap\Dictionary;
+use fyrkat\configmap\DictionaryPhpFile;
 use fyrkat\multilang\MultiLanguageString;
 use fyrkat\multilang\TranslationContext;
 use fyrkat\openssl\PKCS7;
 use letswifi\auth\User;
-use letswifi\configuration\Dictionary;
-use letswifi\configuration\DictionaryFile;
+use letswifi\configmap\DictionaryPemFile;
 use letswifi\credential\CertificateCredentialLog;
 use letswifi\credential\CredentialIssuer;
 use letswifi\credential\CredentialLog;
@@ -82,7 +83,12 @@ final class LetsWifiApp
 
 	public function __construct( public readonly string $basePath, ?Dictionary $globalConfig = null, bool $registerExceptionHandler = true )
 	{
-		$this->globalConfig = $globalConfig ?? new DictionaryFile( \dirname( __DIR__, 2 ) . \DIRECTORY_SEPARATOR . 'config' . \DIRECTORY_SEPARATOR . 'letswifi.conf.php' );
+		$this->globalConfig = $globalConfig ?? new DictionaryPhpFile( 'letswifi.conf.php', [
+			\dirname( __DIR__, 2 ) . \DIRECTORY_SEPARATOR . 'config',
+		], sigils: [
+			...DictionaryPhpFile::sigils(),
+			...DictionaryPemFile::sigils(),
+		] );
 		$this->profileService = new ProfileService( $this->globalConfig, $this->getHttpHost() );
 
 		if ( \PHP_SAPI === 'cli-server' ) {
