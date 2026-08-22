@@ -85,11 +85,15 @@ final class LetsWifiApp
 	{
 		$this->globalConfig = $globalConfig ?? new DictionaryPhpFile( 'letswifi.conf.php', [
 			\dirname( __DIR__, 2 ) . \DIRECTORY_SEPARATOR . 'config',
+			\dirname( __DIR__, 2 ) . \DIRECTORY_SEPARATOR . 'defaults',
 		], sigils: [
 			...DictionaryPhpFile::sigils(),
 			...DictionaryPemFile::sigils(),
 		] );
-		$this->profileService = new ProfileService( $this->globalConfig, $this->getHttpHost() );
+		$this->profileService = new ProfileService(
+			$this->globalConfig,
+			\strstr( $this->getHttpHost(), ':', true ) ?: $this->getHttpHost(), // remove port number
+		);
 
 		if ( \PHP_SAPI === 'cli-server' ) {
 			// Ensure that we are setting restrictive security headers when developing,

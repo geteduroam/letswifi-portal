@@ -17,7 +17,7 @@ mkdir -p "$WORKDIR"
 export COMPOSER_VENDOR_DIR=build/vendor
 [ -f composer.phar ] && php composer.phar --quiet --no-dev install || composer --quiet --no-dev install
 
-cp -a bin htdocs locale src template "$WORKDIR"
+cp -a bin defaults htdocs locale src template "$WORKDIR"
 cp -a config-dist/. "$WORKDIR/config"
 cp -a "$COMPOSER_VENDOR_DIR"/fyrkat/{configmap,multilang,oauth-server,openssl}/src/fyrkat "$WORKDIR/src/"
 cat src/_autoload.php | grep -v Composer | grep -v /vendor/ >"$WORKDIR/src/_autoload.php"

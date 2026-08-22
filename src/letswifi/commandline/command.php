@@ -61,6 +61,7 @@ class Command
 
 		$this->config = new DictionaryPhpFile( 'letswifi.conf.php', [
 			\dirname( __DIR__, 3 ) . \DIRECTORY_SEPARATOR . 'config',
+			\dirname( __DIR__, 3 ) . \DIRECTORY_SEPARATOR . 'defaults',
 		], sigils: [
 			...DictionaryPhpFile::sigils(),
 			...DictionaryPemFile::sigils(),

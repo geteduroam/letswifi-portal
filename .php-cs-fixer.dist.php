@@ -14,6 +14,7 @@ use PhpCsFixer\Finder;
 $finder = Finder::create()->in( [
 	__DIR__ . \DIRECTORY_SEPARATOR . 'bin',
 	__DIR__ . \DIRECTORY_SEPARATOR . 'config-dist',
+	__DIR__ . \DIRECTORY_SEPARATOR . 'defaults',
 	__DIR__ . \DIRECTORY_SEPARATOR . 'htdocs',
 	__DIR__ . \DIRECTORY_SEPARATOR . 'src',
 	__DIR__ . \DIRECTORY_SEPARATOR . 'tests',
