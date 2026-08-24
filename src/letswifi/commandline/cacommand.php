@@ -50,7 +50,7 @@ class CACommand extends Command
 	protected function importCertificates(): void
 	{
 		$certificateConfig = $this->config->getDictionary( 'certificate' );
-		$stdin = \file_get_contents( 'php://stdin' );
+		$stdin = \file_get_contents( 'php://stdin' ) ?: '';
 		\preg_match_all( '/(?:^|\\R)-----BEGIN(?: (EC|RSA))? PRIVATE KEY-----\\R.*?\\R-----END(?: \1)? PRIVATE KEY-----(?:$|\\R)/sm', $stdin, $keys );
 		\preg_match_all( '/(?:^|\\R)-----BEGIN CERTIFICATE-----\\R.*?\\R-----END CERTIFICATE-----(?:$|\\R)/sm', $stdin, $certificates );
 
