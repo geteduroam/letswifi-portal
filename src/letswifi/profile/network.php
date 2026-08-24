@@ -12,8 +12,8 @@ namespace letswifi\profile;
 
 use DomainException;
 use JsonSerializable;
+use fyrkat\configmap\Dictionary;
 use fyrkat\multilang\MultiLanguageString;
-use letswifi\configuration\Dictionary;
 
 abstract class Network implements JsonSerializable
 {

@@ -11,9 +11,9 @@
 namespace letswifi\profile;
 
 use PDO;
+use fyrkat\configmap\Dictionary;
 use fyrkat\openssl\PrivateKey;
 use fyrkat\openssl\X509;
-use letswifi\configuration\Dictionary;
 use letswifi\error\MisdirectException;
 
 class ProfileService

@@ -32,7 +32,7 @@ apt-get install \
 	php-fpm php-dom php-sqlite3 php-mbstring php-curl composer \
 	apache2 \
 	sqlite3
-a2enmod proxy_fcgi setenvif headers
+a2enmod proxy_fcgi setenvif headers ssl
 a2enconf "$(basename /etc/apache2/conf-available/php*-fpm.conf)"
 a2dismod status
 systemctl restart apache2
@@ -64,7 +64,7 @@ Remember to enable HTTPS.
 
 ```html
 <VirtualHost *:443>
-	ServerName  	letswifi
+	ServerName  	letswifi-portal
 	DocumentRoot	/usr/local/share/letswifi-portal/htdocs
 	Alias       	/simplesaml	/usr/local/share/simplesamlphp/public
 
@@ -115,12 +115,17 @@ so you may need to loosen it if you also need to use the SimpleSAMLphp web UI.
 ### Install Let's Wi-Fi portal
 
 ```sh
+brand=eduroam
 cd /usr/local/share
 git clone -b beta https://github.com/geteduroam/letswifi-portal
 cd letswifi-portal
 composer --no-dev --quiet install
 cp -a config-dist /etc/letswifi
 ln -s /etc/letswifi/ config
+cd /etc/letswifi/
+mv clients-$brand.conf.php clients.conf.php && rm clients-*.conf.php
+sed -i.bak -e"/=> 'branding-$brand.conf.php',/ s@// @@" letswifi.conf.php
+rm realms/*example.com.conf.php *.bak
 
 mkdir -p /var/lib/letswifi
 ln -s /var/lib/letswifi var
@@ -150,20 +155,19 @@ chmod 440 oauthsecret.txt
 chgrp www-data oauthsecret.txt
 
 cd /usr/local/share/letswifi-portal
-mkdir -p var
 sqlite3 var/letswifi.sqlite <sql/letswifi.sqlite.sql
 chown www-data var/letswifi.sqlite
 chown -R www-data var
 ```
 
-This will configure most defaults.
+This will configure most common settings.
 You might want to change **database.conf.php** if you don't want to use SQLite.
 
 >[!TIP]
 > You can remove all config files containing **.dist**, **.dev** and **README.md**;
 > these are examples and are never read by the application.
 >
-> `rm /etc/letswifi/*.dev* /etc/letswifi/*.dist* /etc/letswifi/README.md /etc/letswifi/*/README.md`
+> `rm /etc/letswifi/*.dev* /etc/letswifi/*.dist*`
 
 #### RADIUS certificate
 
@@ -184,7 +188,10 @@ curl -fsS https://www.tbs-certificats.com/issuerdata/HaricaECCRootCA2015.crt | l
 <details><summary>Let's Encrypt (ISRG)</summary>
 
 ```sh
-curl -fsS https://letsencrypt.org/certs/isrg{rootx1,-root-x2}.pem | letswifi ca import
+curl -fsS \
+	https://letsencrypt.org/certs/isrg{rootx1,-root-x2}.pem \
+	https://letsencrypt.org/certs/gen-y/root-y{e-by-x2,r-by-x1}.pem \
+	| letswifi ca import
 ```
 </details>
 
@@ -209,7 +216,7 @@ to prevent the command from running before it's complete.
 This is the recommended option; the signing CA can be long lived and the RADIUS certificate can be one that's signed by a public CA.
 
 ```sh
-letswifi realm example.com \
+letswifi realm create example.com \
 	--newca 'Example CA' \
 	--lang en-GB --description 'The wireless network at the office' \
 	--lang nl-NL --description 'Het draadloos netwerk op kantoor' \
@@ -219,7 +226,10 @@ letswifi realm example.com \
 	--trust 'C=GR, L=Athens, O=Hellenic Academic and Research Institutions Cert. Authority, CN=Hellenic Academic and Research Institutions ECC RootCA 2015' \
 	--trust 'C=US, O=Internet Security Research Group, CN=ISRG Root X1' \
 	--trust 'C=US, O=Internet Security Research Group, CN=ISRG Root X2' \
-	--server-name 'radius.example.com'
+	--trust 'C=US, O=ISRG, CN=Root YR' \
+	--trust 'C=US, O=ISRG, CN=Root YE' \
+	--server-name 'radius.example.com' \
+	--network 'eduroam'
 ```
 
 </details>

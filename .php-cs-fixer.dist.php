@@ -14,6 +14,7 @@ use PhpCsFixer\Finder;
 $finder = Finder::create()->in( [
 	__DIR__ . \DIRECTORY_SEPARATOR . 'bin',
 	__DIR__ . \DIRECTORY_SEPARATOR . 'config-dist',
+	__DIR__ . \DIRECTORY_SEPARATOR . 'defaults',
 	__DIR__ . \DIRECTORY_SEPARATOR . 'htdocs',
 	__DIR__ . \DIRECTORY_SEPARATOR . 'src',
 	__DIR__ . \DIRECTORY_SEPARATOR . 'tests',
@@ -188,9 +189,6 @@ $config = ( new Config() )
 		'no_alias_functions' => true,
 		'no_alternative_syntax' => true,
 		'no_blank_lines_after_phpdoc' => true,
-		'no_break_comment' => [
-			'comment_text' => '@todo document implicit fall-through',
-		],
 		'no_closing_tag' => true,
 		'no_empty_comment' => true,
 		'no_empty_phpdoc' => true,

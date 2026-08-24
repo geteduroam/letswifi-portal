@@ -13,24 +13,24 @@ namespace letswifi\profile;
 use DateInterval;
 use DomainException;
 use JsonSerializable;
+use fyrkat\configmap\Dictionary;
 use fyrkat\multilang\MultiLanguageString;
 use letswifi\auth\AuthenticationContext;
 use letswifi\auth\User;
-use letswifi\configuration\Dictionary;
 
 class Provider implements JsonSerializable
 {
 	/**
-	 * @param array<string,array<string>> $realmMap affiliation => realms
+	 * @param array<string,array<string>> $realmAccess affiliation => realms
 	 * @param array<Location>             $location
-	 * @param array<string>               $admins   Identities that are considered to be admins
+	 * @param array<string>               $admins      Identities that are considered to be admins
 	 */
 	public function __construct(
 		private readonly ProfileService $tenantConfig,
 		public readonly string $host,
 		public readonly MultiLanguageString $displayName,
 		public readonly AuthenticationContext $auth,
-		public readonly array $realmMap,
+		public readonly array $realmAccess,
 		public readonly array $location = [],
 		public readonly ?Logo $logo = null,
 		public readonly ?string $contactId = null,
@@ -38,17 +38,18 @@ class Provider implements JsonSerializable
 		public readonly ?string $profileSigner = null,
 		public readonly array $admins = [],
 	) {
+		$realmAccess || throw new DomainException( "Provider {$host}: realm map cannot be empty" );
 	}
 
 	/**
-	 * @return array{host:string,display_name:MultiLanguageString,realm_map:array<string,array<string>>,contact:?Contact,description:?MultiLanguageString,location:array<Location>,logo:bool}
+	 * @return array{host:string,display_name:MultiLanguageString,realm_access:array<string,array<string>>,contact:?Contact,description:?MultiLanguageString,location:array<Location>,logo:bool}
 	 */
 	public function jsonSerialize(): array
 	{
 		return [
 			'host' => $this->host,
 			'display_name' => $this->displayName,
-			'realm_map' => $this->realmMap,
+			'realm_access' => $this->realmAccess,
 			'contact' => $this->getContact(),
 			'description' => $this->description,
 			'location' => $this->location,
@@ -60,16 +61,16 @@ class Provider implements JsonSerializable
 	{
 		$authData = $providerData->getDictionary( 'auth' );
 		$authService = $authData->getString( 'service' );
-		$authServiceParams = $authData->getRawArray( 'param' );
+		$authServiceParams = $authData->getDictionary( 'param' );
 		$longLivedGrantTokenValidity = new DateInterval( 'P6M' );
 		if ( $authData->has( 'longLivedGrantTokenValidity' ) ) {
-			$longLivedGrantTokenValidity = static::getTokenValidity( $authData->getInteger( 'longLivedGrantTokenValidity' ) );
+			$longLivedGrantTokenValidity = static::getTokenValidity( $authData->getInt( 'longLivedGrantTokenValidity' ) );
 		}
 		$auth = new AuthenticationContext(
 			authService: $authService,
 			authServiceParams: $authServiceParams,
 			oauthSecret: $providerData->getString( 'oauthsecret' ),
-			oauthClients: $providerData->getRawArray( 'clients' ),
+			oauthClients: $providerData->getDictionary( 'clients' ),
 			pdoData: $providerData->getDictionary( 'pdo' ),
 			longLivedGrantTokenValidity: $longLivedGrantTokenValidity,
 		);
@@ -80,15 +81,17 @@ class Provider implements JsonSerializable
 		return new self(
 			tenantConfig: $tenantConfig,
 			host: $providerData->getParentKey(),
-			displayName: $providerData->getMultiLanguageString( 'display_name' ),
+			displayName: $providerData->getObject( 'display_name', MultiLanguageString::class ),
 			auth: $auth,
-			realmMap: $providerData->getRawArray( 'realm' ),
+			// Rename "realm" to "realm_access"
+			realmAccess: $providerData->getArrayOrNull( 'realm_access' ) ?? $providerData->getArrayOrNull( 'realm' ) ?? $providerData->getArray( 'realm_access' ),
 			location: \array_map( [Location::class, 'fromConfig'], $location ),
 			logo: null === $logo ? null : Logo::fromConfig( $logo ),
 			contactId: $providerData->getStringOrNull( 'contact' ),
-			description: $providerData->getMultiLanguageStringOrNull( 'description' ),
-			profileSigner: $providerData->getStringOrNull( 'profile-signer' ),
-			admins: $providerData->has( 'admins' ) ? $providerData->getStringArray( 'admins' ) : [],
+			description: $providerData->getObject( 'description', MultiLanguageString::class ),
+			// Rename "profile-signer" to "profile_signer"
+			profileSigner: $providerData->getStringOrNull( 'profile_signer' ) ?? $providerData->getStringOrNull( 'profile-signer' ),
+			admins: $providerData->has( 'admins' ) ? $providerData->getStrings( 'admins' ) : [],
 		);
 	}
 
@@ -98,7 +101,7 @@ class Provider implements JsonSerializable
 			$realm = $realm->realmId;
 		}
 
-		foreach ( $this->realmMap as $realms ) {
+		foreach ( $this->realmAccess as $realms ) {
 			if ( \in_array( $realm, $realms, true ) ) {
 				return true;
 			}
@@ -110,7 +113,7 @@ class Provider implements JsonSerializable
 	/** @return array<string,Realm> */
 	public function allRealms(): array
 	{
-		$keys = \array_merge( ...\array_values( $this->realmMap ) );
+		$keys = \array_merge( ...\array_values( $this->realmAccess ) );
 		$values = \array_map( [$this->tenantConfig, 'getRealm'], $keys );
 
 		return \array_combine( $keys, $values );
@@ -144,7 +147,7 @@ class Provider implements JsonSerializable
 	public function getRealmsByAffiliations( array $affiliations ): array
 	{
 		$result = [];
-		foreach ( $this->realmMap as $affiliation => $realms ) {
+		foreach ( $this->realmAccess as $affiliation => $realms ) {
 			if ( '' === $affiliation || \in_array( $affiliation, $affiliations, true ) ) {
 				if ( empty( $realms ) ) {
 					// Stop evaluating more affiliations

@@ -17,9 +17,9 @@ $app = new LetsWifiApp( basePath: '..' );
 if ( $installProfiles = $app->getBrandingConfiguration() ) {
 	// TODO: Make platform class that handles this, move this code out of the view
 	$userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
-	$platforms = $installProfiles->getRawArray( 'platforms' );
-	$apps = $installProfiles->getRawArray( 'apps' );
-	$profiles = $installProfiles->getRawArray( 'profiles' );
+	$platforms = $installProfiles->getArray( 'platforms' );
+	$apps = $installProfiles->getArray( 'apps' );
+	$profiles = $installProfiles->getArray( 'profiles' );
 
 	foreach ( $platforms as $key => &$platform ) {
 		$pattern = \str_replace( '@', '\\@', $platform['match'] );

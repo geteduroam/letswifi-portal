@@ -15,6 +15,7 @@ use DateTimeImmutable;
 use DomainException;
 use JsonSerializable;
 use PDO;
+use fyrkat\configmap\Dictionary;
 use fyrkat\oauth\Client;
 use fyrkat\oauth\OAuth;
 use fyrkat\oauth\exception\BearerException;
@@ -26,32 +27,35 @@ use fyrkat\oauth\token\Grant;
 use fyrkat\oauth\token\RefreshToken;
 use letswifi\LetsWifiApp;
 use letswifi\auth\browser\BrowserAuthInterface;
-use letswifi\configuration\Dictionary;
+use letswifi\error\ForbiddenException;
 use letswifi\error\UnauthorizedException;
 use letswifi\profile\Provider;
 use letswifi\profile\Realm;
 
 class AuthenticationContext implements JsonSerializable
 {
+	public const USER_ID_COOKIE_NAME = 'letswifi-portal-user';
+
 	public readonly BrowserAuthInterface $browserAuth;
 
 	public readonly OAuth $oauth;
 
+	private static bool $csrfCookieSet = false;
+
 	/**
-	 * @param array<string,mixed>                                                                                               $authServiceParams
-	 * @param array<array{clientId:string,redirectUris?:array<string>,scopes:array<string>,refresh?:bool,clientSecret?:string}> $oauthClients
+	 * @param iterable<array{clientId:string,redirectUris?:array<string>,scopes:array<string>,refresh?:bool,clientSecret?:string}> $oauthClients
 	 */
 	public function __construct(
 		public readonly string $authService,
-		array $authServiceParams,
+		Dictionary $authServiceParams,
 		string $oauthSecret,
-		array $oauthClients,
+		iterable $oauthClients,
 		Dictionary $pdoData,
 		protected readonly DateTimeImmutable $now = new DateTimeImmutable(),
 		DateInterval $longLivedGrantTokenValidity = new DateInterval( 'P6M' ),
 	) {
 		if ( !\preg_match( '/^[A-Z][A-Za-z0-9]+$/', $authService ) ) {
-			throw new DomainException( 'Illegal auth.service specified in config' );
+			throw new DomainException( 'authService specified in config contains invalid characters' );
 		}
 		$authService = "letswifi\\auth\\browser\\{$authService}";
 		$browserAuth = new $authService( ...$authServiceParams );
@@ -68,7 +72,7 @@ class AuthenticationContext implements JsonSerializable
 			$oauthSecret = \base64_decode( \strtr( $oauthSecret, '_-', '/+' ), true );
 		}
 		if ( !$oauthSecret || empty( \trim( $oauthSecret, "\0" ) ) ) {
-			throw new DomainException( 'NULL OAuth secret provided' );
+			throw new DomainException( 'No usable OAuth secret provided' );
 		}
 
 		$accessTokenSealer = new JWTSealer( AccessToken::class, $oauthSecret );
@@ -83,15 +87,6 @@ class AuthenticationContext implements JsonSerializable
 			$longLivedGrantTokenValidity,
 		);
 		foreach ( $oauthClients as $name => $client ) {
-			// TODO: Temporary workaround until configuration code is improved
-			// If clients are set with #dir, a syntethic array is created with full paths
-			// However, this code will fail with manual created #inc entries,
-			// because we're most likely in a different working directory.
-			if ( \str_ends_with( $name, '#inc' ) ) {
-				/** @psalm-suppress UnresolvableInclude temporary fix */
-				$client = require $client;
-			}
-
 			/** @psalm-suppress PossiblyNullArgument null coalescing prevents this */
 			$this->oauth->registerClient( new Client(
 				$client['clientId'],
@@ -113,15 +108,48 @@ class AuthenticationContext implements JsonSerializable
 		// TODO: provide a flag to indicate that browser auth is not acceptable;
 		// only Bearer token will be considered
 
-		$userId = ( $force && LetsWifiApp::isBrowser() ) ? $this->browserAuth->requireAuth() : $this->browserAuth->getUserId();
+		$userId = ( $force && LetsWifiApp::isBrowser() )
+			? $this->browserAuth->requireAuth()
+			: $this->browserAuth->getUserId();
 
 		if ( $userId ) {
+			switch ( $_SERVER['REQUEST_METHOD'] ?? '' ) {
+				// Safe methods
+				// https://tools.ietf.org/html/rfc7231#section-4.2.1
+				case 'GET':
+				case 'HEAD':
+				case 'OPTIONS':
+				case 'TRACE':
+					$userCandidate = $userId;
+					break;
+
+				default:
+					$userCandidate = $_COOKIE[self::USER_ID_COOKIE_NAME] ?? '';
+			}
+
+			if ( $userCandidate !== $userId ) {
+				throw new ForbiddenException( 'CSRF check failed' );
+			}
+
+			// This protection relies on browsers supporting SameSite=Strict
+			// This applies to all mainstream browsers since 2018
+			// https://caniuse.com/same-site-cookie-attribute
+			static::$csrfCookieSet = static::$csrfCookieSet ?: \setcookie( self::USER_ID_COOKIE_NAME, $userId, [
+				'path' => '/', // TODO: Can we ue LetsWifiApp::getBasePath() here?
+				'secure' => LetsWifiApp::isHttps(),
+				'httponly' => true,
+				'SameSite' => 'Strict',
+			] );
+
 			return $this->constructAuthenticatedUser(
 				provider: $provider,
 				userId: $userId,
 				clientId: 'browser',
 				grantSid: null,
 			);
+		}
+		if ( \array_key_exists( self::USER_ID_COOKIE_NAME, $_COOKIE ) ) {
+			static::$csrfCookieSet = static::$csrfCookieSet ?: \setcookie( self::USER_ID_COOKIE_NAME, '', 1, '/' );
 		}
 
 		if ( null === $scope ) {

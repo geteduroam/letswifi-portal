@@ -18,12 +18,13 @@ use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Loader\FilesystemLoader;
 use Twig\TwigFilter;
+use fyrkat\configmap\Dictionary;
+use fyrkat\configmap\DictionaryPhpFile;
 use fyrkat\multilang\MultiLanguageString;
 use fyrkat\multilang\TranslationContext;
 use fyrkat\openssl\PKCS7;
 use letswifi\auth\User;
-use letswifi\configuration\Dictionary;
-use letswifi\configuration\DictionaryFile;
+use letswifi\configmap\DictionaryPemFile;
 use letswifi\credential\CertificateCredentialLog;
 use letswifi\credential\CredentialIssuer;
 use letswifi\credential\CredentialLog;
@@ -82,8 +83,17 @@ final class LetsWifiApp
 
 	public function __construct( public readonly string $basePath, ?Dictionary $globalConfig = null, bool $registerExceptionHandler = true )
 	{
-		$this->globalConfig = $globalConfig ?? new DictionaryFile( \dirname( __DIR__, 2 ) . \DIRECTORY_SEPARATOR . 'config' . \DIRECTORY_SEPARATOR . 'letswifi.conf.php' );
-		$this->profileService = new ProfileService( $this->globalConfig, $this->getHttpHost() );
+		$this->globalConfig = $globalConfig ?? new DictionaryPhpFile( 'letswifi.conf.php', [
+			\dirname( __DIR__, 2 ) . \DIRECTORY_SEPARATOR . 'config',
+			\dirname( __DIR__, 2 ) . \DIRECTORY_SEPARATOR . 'defaults',
+		], sigils: [
+			...DictionaryPhpFile::sigils(),
+			...DictionaryPemFile::sigils(),
+		] );
+		$this->profileService = new ProfileService(
+			$this->globalConfig,
+			\strstr( $this->getHttpHost(), ':', true ) ?: $this->getHttpHost(), // remove port number
+		);
 
 		if ( \PHP_SAPI === 'cli-server' ) {
 			// Ensure that we are setting restrictive security headers when developing,
@@ -394,12 +404,12 @@ final class LetsWifiApp
 			] );
 			$this->twig->addFilter( new TwigFilter(
 				't',
-				fn( MultiLanguageString|string $untranslated, mixed ...$values ) => $this->getTranslationContext()->translateHtml( $untranslated, $_, ...$values ),
+				fn( MultiLanguageString|string|null $untranslated, mixed ...$values ) => $this->getTranslationContext()->translateHtml( $untranslated ?? '', $_, ...$values ),
 				['is_safe' => ['html']],
 			) );
 			$this->twig->addFilter( new TwigFilter(
 				'translate_raw',
-				fn( MultiLanguageString|string $untranslated, mixed ...$values ) => $this->getTranslationContext()->translate( $untranslated, $_, ...$values ),
+				fn( MultiLanguageString|string|null $untranslated, mixed ...$values ) => $this->getTranslationContext()->translate( $untranslated ?? '', $_, ...$values ),
 			) );
 		}
 

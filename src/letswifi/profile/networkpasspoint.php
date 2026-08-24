@@ -10,8 +10,9 @@
 
 namespace letswifi\profile;
 
+use DomainException;
+use fyrkat\configmap\Dictionary;
 use fyrkat\multilang\MultiLanguageString;
-use letswifi\configuration\Dictionary;
 
 class NetworkPasspoint extends Network
 {
@@ -26,6 +27,7 @@ class NetworkPasspoint extends Network
 		public readonly array $naiRealms,
 	) {
 		parent::__construct( networkId: $networkId, displayName: $displayName );
+		$oids || throw new DomainException( "Network {$networkId}: oid list cannot be empty" );
 	}
 
 	/**
@@ -45,18 +47,18 @@ class NetworkPasspoint extends Network
 	{
 		return new self(
 			networkId: $networkConfig->getParentKey(),
-			displayName: $networkConfig->getMultiLanguageString( 'display_name' ),
+			displayName: $networkConfig->getObject( 'display_name', MultiLanguageString::class ),
 			// We're migrating from "oid" to "oids",
 			// this can be simplified a lot when that's done.
 			// Prefer oids, otherwise oid, but any error message must mention oids, not oid
 			oids: $networkConfig->has( 'oids' )
-				? $networkConfig->getStringArray( 'oids' )
+				? $networkConfig->getStrings( 'oids' )
 				: (
 					$networkConfig->has( 'oid' )
-						? $networkConfig->getStringArray( 'oid' )
-						: $networkConfig->getStringArray( 'oids' )
+						? $networkConfig->getStrings( 'oid' )
+						: $networkConfig->getStrings( 'oids' )
 				),
-			naiRealms: $networkConfig->has( 'nai_realms' ) ? $networkConfig->getStringArray( 'nai_realms' ) : [],
+			naiRealms: $networkConfig->has( 'nai_realms' ) ? $networkConfig->getStrings( 'nai_realms' ) : [],
 		);
 	}
 }

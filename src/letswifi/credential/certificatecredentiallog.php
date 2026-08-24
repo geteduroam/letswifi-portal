@@ -13,8 +13,8 @@ namespace letswifi\credential;
 use DomainException;
 use Generator;
 use PDO;
+use fyrkat\configmap\ConfigurationException;
 use fyrkat\openssl\PKCS12;
-use letswifi\configuration\ConfigurationException;
 use letswifi\profile\Realm;
 
 /**

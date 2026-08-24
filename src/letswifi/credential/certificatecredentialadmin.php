@@ -14,6 +14,7 @@ use DateTimeInterface;
 use DomainException;
 use Generator;
 use PDO;
+use PDOStatement;
 use letswifi\error\RealmMismatchException;
 use letswifi\profile\Realm;
 
@@ -30,9 +31,9 @@ class CertificateCredentialAdmin extends CredentialAdmin
 			$validOn = $this->now;
 		}
 		$pdo = $this->profileService->getPDO();
-		$extraConditions = $this->getRealmConditions( $realms, static fn( $s ) => $pdo->quote( $s ) );
+		$realmConditions = $this->getRealmConditions( $realms, static fn( $s ) => $pdo->quote( $s ) );
 		if ( null !== $requester ) {
-			$extraConditions .= ' AND requester = :requester';
+			$realmConditions .= ' AND requester = :requester';
 		}
 		$stmt = $pdo->prepare( <<<SQL
 				SELECT
@@ -43,7 +44,7 @@ class CertificateCredentialAdmin extends CredentialAdmin
 					COUNT(CASE WHEN "revoked" IS NULL THEN "serial" END) "valid_accounts"
 				FROM "realm_signing_log"
 				WHERE "expires" > :valid_on AND "issued" < :valid_on
-					{$extraConditions}
+					{$realmConditions}
 				GROUP BY "requester", "realm"
 				ORDER BY "issued" DESC;
 			SQL );
@@ -79,7 +80,7 @@ class CertificateCredentialAdmin extends CredentialAdmin
 			$validOn = $this->now;
 		}
 		$pdo = $this->profileService->getPDO();
-		$extraConditions = $this->getRealmConditions( $realms, static fn( $s ) => $pdo->quote( $s ) );
+		$realmConditions = $this->getRealmConditions( $realms, static fn( $s ) => $pdo->quote( $s ) );
 		$stmt = $pdo->prepare( <<<SQL
 				SELECT
 					"realm",
@@ -90,7 +91,7 @@ class CertificateCredentialAdmin extends CredentialAdmin
 					COUNT(DISTINCT "requester") "total_requesters"
 				FROM "realm_signing_log"
 				WHERE "expires" > :valid_on AND "issued" < :valid_on
-					{$extraConditions}
+					{$realmConditions}
 				GROUP BY "realm"
 				ORDER BY "issued" DESC;
 			SQL );
@@ -114,8 +115,11 @@ class CertificateCredentialAdmin extends CredentialAdmin
 		}
 	}
 
-	public function revokeCredential( string $credentialId, ?string $requester = null ): void
+	public function revokeCredential( string $credentialId, array $realms = [], ?string $requester = null ): void
 	{
+		$pdo = $this->profileService->getPDO();
+		$realmConditions = $this->getRealmConditions( $realms, static fn( string $realm ) => $pdo->quote( $realm ),
+		);
 		$requesterCondition = null === $requester ? '' : 'AND requester = :requester';
 		$revokeStatement = $this->profileService->getPDO()->prepare( <<<SQL
 				UPDATE "realm_signing_log"
@@ -123,6 +127,7 @@ class CertificateCredentialAdmin extends CredentialAdmin
 				WHERE
 					"ident" = :ident
 					{$requesterCondition}
+					{$realmConditions}
 					AND revoked IS NULL
 			SQL );
 		$revokeStatement->bindValue( 'revoked', $this->formatUtc( $this->now ), PDO::PARAM_STR );
@@ -139,14 +144,15 @@ class CertificateCredentialAdmin extends CredentialAdmin
 			$validOn = $this->now;
 		}
 		$pdo = $this->profileService->getPDO();
-		$extraConditions = $this->getRealmConditions( $realms, static fn( $s ) => $pdo->quote( $s ) );
+		$realmConditions = $this->getRealmConditions( $realms, static fn( string $realm ) => $pdo->quote( $realm ),
+		);
 		$revokeStatement = $pdo->prepare( <<<SQL
 				UPDATE "realm_signing_log"
 				SET "revoked" = :revoked
 				WHERE "requester" = :requester
 					AND "expires" > :valid_on AND "issued" < :valid_on
 					AND "revoked" IS NULL
-					{$extraConditions}
+					{$realmConditions}
 			SQL );
 		$revokeStatement->bindValue( 'valid_on', $this->formatUtc( $validOn ), PDO::PARAM_STR );
 		$revokeStatement->bindValue( 'revoked', $this->formatUtc( $this->now ), PDO::PARAM_STR );
@@ -157,13 +163,13 @@ class CertificateCredentialAdmin extends CredentialAdmin
 	public function getCredential( string $ident, array $realms = [] ): ?Credential
 	{
 		$pdo = $this->profileService->getPDO();
-		$extraConditions = $this->getRealmConditions( $realms, static fn( $s ) => $pdo->quote( $s ) );
+		$realmConditions = $this->getRealmConditions( $realms, static fn( $s ) => $pdo->quote( $s ) );
 		$stmt = $pdo->prepare( <<<SQL
 				SELECT
 					"serial", "realm", "ca_sub", "requester", "sub", "issued", "expires", "revoked", "usage", "client", "user_agent", "ip", "grant", "ident", "requester", "realm"
 				FROM "realm_signing_log"
 				WHERE "ident" = :ident
-					{$extraConditions}
+					{$realmConditions}
 				;
 			SQL );
 		$stmt->bindValue( 'ident', $ident, PDO::PARAM_STR );
@@ -195,6 +201,24 @@ class CertificateCredentialAdmin extends CredentialAdmin
 		return null;
 	}
 
+	public function listCredentialsBySigner( string $signingCa, ?DateTimeInterface $validOn = null ): Generator
+	{
+		if ( null === $validOn ) {
+			$validOn = $this->now;
+		}
+		$pdo = $this->profileService->getPDO();
+		$stmt = $pdo->prepare( <<<SQL
+				SELECT
+					"serial", "realm", "ca_sub", "requester", "sub", "issued", "expires", "revoked", "usage", "client", "user_agent", "ip", "grant", "ident", "requester", "realm"
+				FROM "realm_signing_log"
+				WHERE "expires" > :valid_on AND "issued" < :valid_on AND "ca_sub" = :ca_sub
+				ORDER BY "issued" DESC;
+			SQL );
+		$stmt->bindParam( 'ca_sub', $signingCa, PDO::PARAM_STR );
+
+		yield from $this->listCredentialsInternal( $stmt );
+	}
+
 	public function listCredentials( array $realms = [], ?string $requester = null, ?DateTimeInterface $validOn = null, bool $unrevokedOnly = false ): Generator
 	{
 		if ( null === $validOn ) {
@@ -220,6 +244,15 @@ class CertificateCredentialAdmin extends CredentialAdmin
 		if ( null !== $requester ) {
 			$stmt->bindValue( 'requester', $requester, PDO::PARAM_STR );
 		}
+
+		yield from $this->listCredentialsInternal( $stmt );
+	}
+
+	/**
+	 * @return Generator<string,CertificateCredential>
+	 */
+	private function listCredentialsInternal( PDOStatement $stmt ): Generator
+	{
 		$stmt->execute();
 		while ( $row = $stmt->fetch( PDO::FETCH_ASSOC ) ) {
 			$expiry = $this->dateTimeFromUtc( $row['expires'] );
@@ -265,9 +298,9 @@ class CertificateCredentialAdmin extends CredentialAdmin
 		if ( \in_array( false, $realms, true ) ) {
 			throw new DomainException( 'Unable to escape realm value' );
 		}
-		$extraConditions = ' AND realm IN (' . \implode( ', ', $realms ) . ')';
+		$realmConditions = ' AND realm IN (' . \implode( ', ', $realms ) . ')';
 
-		return $extraConditions;
+		return $realmConditions;
 	}
 
 	private static function convertSerial( int|string $decimalSerial ): int

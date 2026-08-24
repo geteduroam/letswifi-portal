@@ -94,7 +94,6 @@ This will be fixed in a later release.
 ```sh
 % curl -sS --fail-with-body -HAuthorization:Bearer\ $TOKEN \
 	--get -o "example.com Let's Wi-Fi CA.crl" \
-	-d realm_id=example.com \
 	-d "ca=CN=example.com+Let's+Wi-Fi+CA" \
 	-d file=crl-pem \
 	'https://HOSTNAME/admin/realms/certificate.php'

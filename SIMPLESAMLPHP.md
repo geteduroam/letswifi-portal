@@ -21,7 +21,7 @@ we think you should install it in `/usr/local/share` instead.
 <details open><summary>Fresh installation</summary>
 
 ```sh
-export SSPVER=2.5.2
+export SSPVER=2.5.3.1
 cd /usr/local/share
 curl -L https://github.com/simplesamlphp/simplesamlphp/releases/download/v$SSPVER/simplesamlphp-$SSPVER-full.tar.gz | tar xzvf -
 mv simplesamlphp-$SSPVER simplesamlphp
@@ -41,7 +41,7 @@ chown www-data /var/lib/simplesamlphp /var/cache/simplesamlphp /etc/simplesamlph
 <details><summary>Upgrade process</summary>
 
 ```sh
-export SSPVER=2.5.2
+export SSPVER=2.5.3.1
 cd /usr/local/share
 curl -L https://github.com/simplesamlphp/simplesamlphp/releases/download/v$SSPVER/simplesamlphp-$SSPVER-full.tar.gz | tar xzvf -
 mv simplesamlphp simplesamlphp-old
@@ -61,7 +61,7 @@ For Apache, you can add this snippet to your VirtualHost:
 <VirtualHost *>
 	# ...
 
-	Alias /simplesaml /usr/local/share/simplesamlphp/public
+	Alias       	/simplesaml	/usr/local/share/simplesamlphp/public
 
 	<Directory /usr/local/share/simplesamlphp/public>
 		Require all granted
@@ -105,7 +105,6 @@ Generate a secret salt with `base64 </dev/random | tr -d /+ | head -c32 ; echo`
 
 ```diff
 	'module.enable' => [
-		'exampleauth' => false,
 +		'metarefresh' => true,
 +		'cron' => true,
 		'core' => true,
@@ -172,7 +171,7 @@ Run `crontab -u www-data -e` and make sure it contains a line to run the script.
 Then run the script manually to confirm it works.
 
 ```sh
-sudo -u www-data php /usr/local/share/simplesamlphp/modules/cron/bin/cron.php -t daily
+su -m www-data -c 'php /usr/local/share/simplesamlphp/modules/cron/bin/cron.php -t daily'
 ```
 
 Confirm that output contains `Cron did run tag [daily]`, and that a file `/etc/simplesamlphp/metadata/saml20-idp-remote.php` has been created.

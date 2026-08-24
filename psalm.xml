@@ -37,10 +37,5 @@
 				<file name="src/_autoload.php"/>
 			</errorLevel>
 		</PossiblyFalseOperand>
-		<PossiblyFalseArgument>
-			<errorLevel type="suppress">
-				<directory name="src/letswifi/commandline"/>
-			</errorLevel>
-		</PossiblyFalseArgument>
 	</issueHandlers>
 </psalm>

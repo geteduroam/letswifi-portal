@@ -17,16 +17,16 @@ $provider = $app->getProvider();
 if ( $installProfiles = $app->getBrandingConfiguration() ) {
 	// TODO: Make platform class that handles this, move this code out of the view
 	$userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
-	$platforms = $installProfiles->getDictionaryList( 'platforms' );
-	$apps = $installProfiles->getRawArray( 'apps' );
-	$profiles = $installProfiles->getRawArray( 'profiles' );
+	$platforms = $installProfiles->getArray( 'platforms' );
+	$apps = $installProfiles->getArray( 'apps' );
+	$profiles = $installProfiles->getArray( 'profiles' );
 	$matchedPlatform = null;
 
 	foreach ( $platforms as $key => $platform ) {
-		$pattern = \str_replace( '@', '\\@', $platform->getString( 'match' ) );
+		$pattern = \str_replace( '@', '\\@', (string)$platform['match'] );
 
 		if ( \preg_match( "@{$pattern}@", $userAgent ) ) {
-			$matchedPlatform = $installProfiles->getDictionary( 'platforms' )->getRawArray( $key );
+			$matchedPlatform = $platforms[$key];
 
 			// Set "apps" and "profiles" for the platform to the actual apps and profiles,
 			// instead of just references.

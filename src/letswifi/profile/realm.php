@@ -13,9 +13,9 @@ namespace letswifi\profile;
 use DateInterval;
 use DomainException;
 use JsonSerializable;
+use fyrkat\configmap\Dictionary;
 use fyrkat\multilang\MultiLanguageString;
 use fyrkat\openssl\X509;
-use letswifi\configuration\Dictionary;
 
 class Realm implements JsonSerializable
 {
@@ -42,6 +42,9 @@ class Realm implements JsonSerializable
 		public readonly array $admins = [],
 		public readonly array $extra = [],
 	) {
+		$serverNames || throw new DomainException( "Realm {$realmId}: server_names cannot be empty" );
+		$trust || throw new DomainException( "Realm {$realmId}: trust cannot be empty" );
+		$networks || throw new DomainException( "Realm {$realmId}: networks cannot be empty" );
 	}
 
 	public function getExtra( string $extra ): ?string
@@ -57,17 +60,17 @@ class Realm implements JsonSerializable
 		return new self(
 			profileService: $profileService,
 			realmId: $realmData->getParentKey(),
-			displayName: $realmData->getMultiLanguageString( 'display_name' ),
-			serverNames: $realmData->getStringArray( 'server_names' ),
-			trust: $realmData->getStringArray( 'trust' ),
+			displayName: $realmData->getObject( 'display_name', MultiLanguageString::class ),
+			serverNames: $realmData->getStrings( 'server_names' ),
+			trust: $realmData->getStrings( 'trust' ),
 			signer: $realmData->getString( 'signer' ),
-			validity: static::getValidity( $realmData->getInteger( 'validity' ) ),
-			networks: $profileService->getNetworks( ...$realmData->getStringArray( 'networks' ) ),
+			validity: static::getValidity( $realmData->getInt( 'validity' ) ),
+			networks: $profileService->getNetworks( ...$realmData->getStrings( 'networks' ) ),
 			location: \array_map( [Location::class, 'fromConfig'], $location ),
 			logo: null === $logo ? null : Logo::fromConfig( $logo ),
-			description: $realmData->getMultiLanguageStringOrNull( 'description' ),
+			description: $realmData->getObjectOrNull( 'description', MultiLanguageString::class ),
 			contactId: $realmData->getStringOrNull( 'contact' ),
-			admins: $realmData->has( 'admins' ) ? $realmData->getStringArray( 'admins' ) : [],
+			admins: $realmData->has( 'admins' ) ? $realmData->getStrings( 'admins' ) : [],
 			extra: \array_filter( [
 				'mobileconfig_identifier' => $realmData->getStringOrNull( 'mobileconfig_identifier' ),
 				'mobileconfig_display_name' => $realmData->getStringOrNull( 'mobileconfig_display_name' ),
@@ -102,7 +105,7 @@ class Realm implements JsonSerializable
 			'logo' => isset( $this->logo ),
 			'signer' => $this->signer,
 			'trust' => $this->trust,
-			'networks' => \array_reduce( $this->networks, static fn ( array $carry, Network $network ): array => [
+			'networks' => \array_reduce( $this->networks, static fn( array $carry, Network $network ): array => [
 				$network->networkId => ['display_name' => $network->displayName]
 				+ ( $network instanceof NetworkPasspoint
 					? ['oids' => $network->oids, 'nai_realms' => $network->naiRealms] : [] )
