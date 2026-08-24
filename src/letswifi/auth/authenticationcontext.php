@@ -27,15 +27,20 @@ use fyrkat\oauth\token\RefreshToken;
 use letswifi\LetsWifiApp;
 use letswifi\auth\browser\BrowserAuthInterface;
 use letswifi\configuration\Dictionary;
+use letswifi\error\ForbiddenException;
 use letswifi\error\UnauthorizedException;
 use letswifi\profile\Provider;
 use letswifi\profile\Realm;
 
 class AuthenticationContext implements JsonSerializable
 {
+	public const USER_ID_COOKIE_NAME = 'letswifi-portal-user';
+
 	public readonly BrowserAuthInterface $browserAuth;
 
 	public readonly OAuth $oauth;
+
+	private static bool $csrfCookieSet = false;
 
 	/**
 	 * @param array<string,mixed>                                                                                               $authServiceParams
@@ -113,15 +118,48 @@ class AuthenticationContext implements JsonSerializable
 		// TODO: provide a flag to indicate that browser auth is not acceptable;
 		// only Bearer token will be considered
 
-		$userId = ( $force && LetsWifiApp::isBrowser() ) ? $this->browserAuth->requireAuth() : $this->browserAuth->getUserId();
+		$userId = ( $force && LetsWifiApp::isBrowser() )
+			? $this->browserAuth->requireAuth()
+			: $this->browserAuth->getUserId();
 
 		if ( $userId ) {
+			switch ( $_SERVER['REQUEST_METHOD'] ?? '' ) {
+				// Safe methods
+				// https://tools.ietf.org/html/rfc7231#section-4.2.1
+				case 'GET':
+				case 'HEAD':
+				case 'OPTIONS':
+				case 'TRACE':
+					$userCandidate = $userId;
+					break;
+
+				default:
+					$userCandidate = $_COOKIE[self::USER_ID_COOKIE_NAME] ?? '';
+			}
+
+			if ( $userCandidate !== $userId ) {
+				throw new ForbiddenException( 'CSRF check failed' );
+			}
+
+			// This protection relies on browsers supporting SameSite=Strict
+			// This applies to all mainstream browsers since 2018
+			// https://caniuse.com/same-site-cookie-attribute
+			static::$csrfCookieSet = static::$csrfCookieSet ?: \setcookie( self::USER_ID_COOKIE_NAME, $userId, [
+				'path' => '/', // TODO: Can we ue LetsWifiApp::getBasePath() here?
+				'secure' => LetsWifiApp::isHttps(),
+				'httponly' => true,
+				'SameSite' => 'Strict',
+			] );
+
 			return $this->constructAuthenticatedUser(
 				provider: $provider,
 				userId: $userId,
 				clientId: 'browser',
 				grantSid: null,
 			);
+		}
+		if ( \array_key_exists( self::USER_ID_COOKIE_NAME, $_COOKIE ) ) {
+			static::$csrfCookieSet = static::$csrfCookieSet ?: \setcookie( self::USER_ID_COOKIE_NAME, '', 1, '/' );
 		}
 
 		if ( null === $scope ) {
