@@ -214,6 +214,7 @@ class CertificateCredentialAdmin extends CredentialAdmin
 				WHERE "expires" > :valid_on AND "issued" < :valid_on AND "ca_sub" = :ca_sub
 				ORDER BY "issued" DESC;
 			SQL );
+		$stmt->bindValue( 'valid_on', $this->formatUtc( $validOn ), PDO::PARAM_STR );
 		$stmt->bindParam( 'ca_sub', $signingCa, PDO::PARAM_STR );
 
 		yield from $this->listCredentialsInternal( $stmt );
