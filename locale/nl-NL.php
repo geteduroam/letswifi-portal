@@ -107,5 +107,8 @@ return [
 	'Download_on_the_App_Store_Badge_US-UK_RGB_blk_092917.svg' => 'Download_on_the_App_Store_Badge_NL_RGB_blk_100317.svg',
 
 	'Get it on Google Play' => 'Ontdek het op Google Play',
-	'Google_Play_Store_badge_EN.svg' => 'Google_Play_Store_badge_NL.svg',
+	'GetItOnGooglePlay_Badge_Web_color_English.svg' => 'GetItOnGooglePlay_Badge_Web_color_Dutch.svg',
+
+	'Get it on Flathub' => 'Ontdek het op Flathub',
+	'flathub-badge-en.svg' => 'flathub-badge-de.svg',
 ];
