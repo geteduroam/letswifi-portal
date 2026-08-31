@@ -91,15 +91,18 @@ return [
 	'google-onc instructions' => 'Efter att du laddat ner filen, öppna Chrome-webbläsaren och gå till denna URL: <a href="chrome://network">chrome://network</a>. Använd sedan knappen <strong>Importera ONC-fil</strong>. Importen sker tyst; de nya nätverksdefinitionerna läggs till i de föredragna nätverken.',
 
 	// filenames for localised store badges
-	'Download from the Microsoft Store' => 'Ladda ner från Microsoft Store',
-	'en-us%%20%s.svg' => 'sv-se%%20%s.svg',
+	'Download from the Microsoft Store' => 'Ladda ned från Microsoft Store',
+	'en-us%%20%s.svg' => 'sv%%20%s.svg',
 
-	'Get it on F-Droid' => 'Hämta på F-Droid',
+	'Get it on F-Droid' => 'Ladda ned på F-Droid',
 	'get-it-on-en.svg' => 'get-it-on-sv.svg',
 
-	'Download on the App Store' => 'Ladda ner på App Store',
-	'Download_on_the_App_Store_Badge_US-UK_RGB_blk_092917.svg' => 'Download_on_the_App_Store_Badge_SE_RGB_blk_092917.svg',
+	'Download on the App Store' => 'Hämta i App Store',
+	'Download_on_the_App_Store_Badge_US-UK_RGB_blk_092917.svg' => 'Download_on_the_App_Store_Badge_SE_RGB_blk_100317.svg',
 
-	'Get it on Google Play' => 'Hämta på Google Play',
-	'Google_Play_Store_badge_EN.svg' => 'Google_Play_Store_badge_SV.svg',
+	'Get it on Google Play' => 'Ladda ned på Google Play',
+	'Google_Play_Store_badge_EN.svg' => 'GetItOnGooglePlay_Badge_Web_color_Swedish.svg',
+
+	'Get it on Flathub' => 'Finns på Flathub',
+	'badge-en.svg' => 'badge-sv.svg',
 ];
