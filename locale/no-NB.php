@@ -9,7 +9,7 @@
  */
 
 return [
-	'no-NB' => 'Norsk (Bokmål)',
+	'no-NB' => 'norsk bokmål',
 
 	// Pages showing apps and profiles for different platforms
 	'If you cannot use the official app, you can download an installation profile for manual installation.' => 'Hvis du ikke kan bruke den ofisielle appen, kan du laste ned en WiFi-profil for manuell installasjon.',
@@ -100,17 +100,17 @@ return [
 
 	// filenames for localised store badges
 	'Download from the Microsoft Store' => 'Last ned fra Microsoft Store',
-	'en-us%%20%s.svg' => 'en-us%%20%s.svg',
+	'en-us%%20%s.svg' => 'nn%%20%s.svg', // Microsoft has no bokmål, only nynorsk
 
-	'Get it on F-Droid' => 'Hent fra F-Droid',
-	'get-it-on-en.svg' => 'get-it-on-en.svg',
+	'Get it on F-Droid' => 'Tilgjengelig på F-Droid',
+	'get-it-on-en.svg' => 'get-it-on-no.svg',
 
 	'Download on the App Store' => 'Last ned fra App Store',
-	'Download_on_the_App_Store_Badge_US-UK_RGB_blk_092917.svg' => 'Download_on_the_App_Store_Badge_US-UK_RGB_blk_092917.svg',
+	'Download_on_the_App_Store_Badge_US-UK_RGB_blk_092917.svg' => 'Download_on_the_App_Store_Badge_NO_RGB_blk_100317.svg',
 
-	'Get it on Google Play' => 'Last ned fra Google Play',
-	'Google_Play_Store_badge_EN.svg' => 'Google_Play_Store_badge_EN.svg',
+	'Get it on Google Play' => 'Last ned på Google Play',
+	'GetItOnGooglePlay_Badge_Web_color_English.svg' => 'GetItOnGooglePlay_Badge_Web_color_Norwegian.svg',
 
 	'Get it on Flathub' => 'Last ned fra Flathub',
-	'flathub-badge-en.svg' => 'flathub-badge-en.svg',
+	'flathub-badge-en.svg' => 'flathub-badge-nb.svg',
 ];
