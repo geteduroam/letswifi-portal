@@ -72,20 +72,20 @@ return [
 
 	// me.twig
 	'User ID' => 'Bruker-ID',
-	'Affiliations' => 'Tilknytninger',
+	'Affiliations' => 'Tilhørighet',
 	'User information is not stored after you log out.' => 'Denne informasjonen lagres ikke når du logger ut.',
 	'User ID is connected to credentials while they are valid and short time thereafter.' => 'Din Bruker-ID er tilknyttet dine pseudo-IDer mens de er gyldige, og en stund etter.',
 	'Available realms' => 'Tilgjengelige realmer',
-	'No realms available' => 'Ingen realms er tilgjengelige',
+	'No realms available' => 'Du har ingen realmer tilgjengelige for deg',
 	'Authorised applications' => 'Autoriserte applikasjoner',
-	'No authorised applications' => 'Ingen applikasjoner er autoriserte',
+	'No authorised applications' => 'Du har ikke autorisert noen applikasjon',
 	'Client ID' => 'Klient-ID',
 	'Issued' => 'Opprettet',
 	'Expires' => 'Utløper',
 	'Revoke' => 'Annuller',
 	'Credentials' => 'Dine pseudo-ID',
 	'Credential' => 'Brukernavn',
-	'No credentials' => 'Ingen pseudo-ID utstedt enda',
+	'No credentials' => 'Ingen pseudo-ID er blitt utstedt',
 
 	// authorize.twig
 	'Authorize %s' => 'Autoriser %s',
