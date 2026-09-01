@@ -9,34 +9,35 @@
  */
 
 return [
-	'no-NB' => 'norsk bokmål',
+	'nb-NO' => 'norsk bokmål',
 
 	// Pages showing apps and profiles for different platforms
-	'If you cannot use the official app, you can download an installation profile for manual installation.' => 'Hvis du ikke kan bruke den ofisielle appen, kan du laste ned en WiFi-profil for manuell installasjon.',
+	'If you cannot use the official app, you can download an installation profile for manual installation.' => 'Hvis du ikke kan bruke den offisielle appen, kan du laste ned en WiFi-profil for manuell installasjon.',
 	'There is no app available for %s.' => 'Det finnes ingen app for %s.',
 	'Download an installation profile for manual installation.' => 'Last ned profil for manuell installasjon.',
 	'Other options' => 'Andre valg',
-	'Options for professional users' => 'Valg for profesjonelle brukere',
-	'Options for other platforms and professional users' => 'Valg for profesjonelle brukere og andre plattformer',
-	'Generate a certificate for manual use' => 'Generer sertifikat for manuelt bruk',
+	'Advanced options' => 'Avanserte valg',
+	'Other platforms and advanced options' => 'Valg for andre plattformer og avanserte brukere',
+	'Generate a certificate for manual use' => 'Opprett et sertifikat til manuelt bruk',
 
 	// base.twig
 	'Language' => 'Språk',
 	'Account' => 'Konto',
 	'Login' => 'Logg inn',
 	'Logout' => 'Logg ut',
-	'Account information' => 'Kontoinformasjon',
+	'Account information' => 'Brukerinformasjon',
+	'Set up your device' => 'Sett opp din enhet',
 
 	// start.twig
 	'Welcome to %1$s at %2$s' => 'Velkommen til %1$s for %2$s',
 	'To use %1$s at %2$s, download the app or profile for your device below.' => 'For å bruke %1$s hos %2$s, last ned appen for din enhet under.',
-	'Download the %s app to configure your device.' => 'Last ned %s appen for å konfigurere opp din enhet.',
+	'Download the %s app to configure your device.' => 'Last ned %s-appen for å konfigurere opp din enhet.',
 	'View apps and profiles for all platforms' => 'Vis apper og profiler for alle plattformer',
 	'login required' => 'krever pålogging',
 
 	// app.twig
 	'Apps' => 'Apper',
-	'All installer apps' => 'Alle appinstallasjoner',
+	'All installer apps' => 'Alle installasjonsapper',
 
 	// realm-picker.twig
 	'Realm' => 'Realm',
@@ -51,47 +52,47 @@ return [
 
 	// profile-advanced.twig
 	'Download the app' => 'Last ned appen',
-	'We recommend that you use the app' => 'Det enklest å bruke de ofisielle appene, for de fleste brukere.',
-	'Manual certificate creation' => 'Manuell oppretting av sertifikat',
-	'Manual advanced profile creation' => 'Manuell avansert oppretting av profil',
+	'We recommend that you use the app' => 'Det enkleste for de fleste brukere er å bruke de offisielle appene.',
+	'Manual certificate creation' => 'Manuell oppretting av et sertifikat',
+	'Manual advanced profile creation' => 'Manuell oppretting av et avansert profil',
 	'Create configuration profile' => 'Opprett profil',
 	'Alternatively, you can use a configuration profile' => 'For avanserte brukere, eller hvis appen ikke er tilgjengelig for din enhet, er det mulig å laste ned en profil manuelt.',
 	'Encryption' => 'Kryptering',
-	'When encrypting you need a passphrase when installing' => 'Hvis du vil kryptere profilen din må du skrive inn passordet for å dekryptere innholdet.',
-	'Passphrase is only needed during installation' => 'Når profilen er installert trenger du ikke passordet lenger; passordet brukes kun når du installerer profilen.',
-	'Use the feature depending encryption support on your system' => 'Bruk av dette valget avhenger av om din enhet støtter krypterte eller ukrypterte profiler.',
-	'Enter passphrase for encryption' => 'Skriv inn passord for å kryptere profilen',
+	'When encrypting you need a passphrase when installing' => 'Hvis du krypterer profilen din må du skrive inn passordet når du installerer den.',
+	'Passphrase is only needed during installation' => 'Når profilen er installert trenger du ikke passordet lenger; passordet brukes kun til dekryptering under installasjonen.',
+	'Use the feature depending encryption support on your system' => 'Bruk dette valget i tråd med din enhets støtte for krypterte konfigurasjonsprofiler.',
+	'Enter passphrase for encryption' => 'Skriv inn et passord til å kryptere profilen med',
 	'advanced' => 'avansert',
 	'optional' => 'valgfritt',
 
 	// error.twig
 	'An error occurred' => 'En feil oppstod',
-	'Debug info' => 'Detaljert feilmelding (feilsøking er skrudd på)',
+	'Debug info' => 'Detaljert feilmelding (detaljerte feilmeldinger er skrudd på)',
 	'Contact helpdesk' => 'Kontakt ditt universitet, høyskole eller arbeidsgiver for hjelp',
 
 	// me.twig
 	'User ID' => 'Bruker-ID',
 	'Affiliations' => 'Tilknytninger',
-	'User information is not stored after you log out.' => 'Når du logger ut blir ingen informasjon om deg lagret.',
-	'User ID is connected to credentials while they are valid and short time thereafter.' => 'Bruker-ID er tilknyttet legitimasjonsinformasjonen mens de er gyldige, og en kort tid etter.',
-	'Available realms' => 'Tilgjengelige realms',
+	'User information is not stored after you log out.' => 'Denne informasjonen lagres ikke når du logger ut.',
+	'User ID is connected to credentials while they are valid and short time thereafter.' => 'Din Bruker-ID er tilknyttet dine pseudo-IDer mens de er gyldige, og en stund etter.',
+	'Available realms' => 'Tilgjengelige realmer',
 	'No realms available' => 'Ingen realms er tilgjengelige',
 	'Authorised applications' => 'Autoriserte applikasjoner',
-	'No authorised applications' => 'Ingen autoriserte applikasjoner tilgjengelig',
+	'No authorised applications' => 'Ingen applikasjoner er autoriserte',
 	'Client ID' => 'Klient-ID',
 	'Issued' => 'Opprettet',
-	'Expires' => 'Slutter å virke',
-	'Revoke' => 'Slett',
-	'Credentials' => 'Din legitimasjonsinfo',
+	'Expires' => 'Utløper',
+	'Revoke' => 'Annuller',
+	'Credentials' => 'Dine pseudo-ID',
 	'Credential' => 'Brukernavn',
-	'No credentials' => 'Ingen brukernavn funnet for deg',
+	'No credentials' => 'Ingen pseudo-ID utstedt enda',
 
 	// authorize.twig
 	'Authorize %s' => 'Autoriser %s',
-	'Do you want to issue a pseudo-credential?' => 'Vil du at din konto skal brukes for koble denne enheten til WiFI-nettverket ?',
-	'Approve' => 'Tillat',
+	'Do you want to issue a pseudo-credential?' => 'Vil du at din konto skal brukes for koble denne enheten til WiFI-nettverket?',
+	'Approve' => 'Godkjenn',
 	'Why is this needed?' => 'Hvorfor trengs dette?',
-	'Requiring a manual step prevents automated enrollment.' => 'Ved å trykke tillatt, tillater du at applikasjonen mottar WiFi-profiler på dine vegne.',
+	'Requiring a manual step prevents automated enrollment.' => 'Ved å trykke godkjenn, tillater du at applikasjonen mottar WiFi-profiler på dine vegne.',
 	'Select your user realm' => 'Vennligst velg brukergruppe for å fortsette',
 	'Continue' => 'Fortsett',
 
