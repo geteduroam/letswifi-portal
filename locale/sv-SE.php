@@ -9,7 +9,7 @@
  */
 
 return [
-	'sv-SE' => 'Svenska',
+	'sv-SE' => 'svenska',
 
 	// Pages showing apps and profiles for different platforms
 	'If you cannot use the official app, you can download an installation profile for manual installation.' => 'Om du inte kan använda den officiella appen kan du ladda ner en installationsprofil för manuell installation.',
