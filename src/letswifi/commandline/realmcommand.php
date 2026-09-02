@@ -84,14 +84,17 @@ class RealmCommand extends Command
 	private function listRealms(): void
 	{
 		$realms = $this->config->getDictionary( 'realm' );
-		$table = new Table( 'http_host', 'display_name', 'contact', 'validity', 'server_name', 'network' );
+		$table = new Table( 'http_host', 'display_name', 'contact', 'validity' );
 		foreach ( $realms as $name => $realm ) {
 			$displayName = $realm->getObject( 'display_name', MultiLanguageString::class )->jsonSerialize();
 			$contact = $realm->getStringOrNull( 'contact' ) ?? '-';
 			$validity = $realm->getInt( 'validity' );
-			$serverName = $realm->getStrings( 'server_names' )[0];
-			$network = $realm->getStrings( 'network' )[0];
-			$table->add( $name, \reset( $displayName )['display'], $contact, (string)$validity, $serverName, $network );
+			$table->add(
+				$name,
+				\reset( $displayName )['display'],
+				$contact,
+				(string)$validity,
+			);
 		}
 
 		echo $table->printTable( margin: 0, header: true );
