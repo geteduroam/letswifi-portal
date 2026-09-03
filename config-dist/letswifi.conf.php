@@ -270,6 +270,17 @@ return [
 		],
 	],
 
+	// List of locales that can be chosen by the user,
+	// or can be picked from the users' Accept-Languages header.
+	// If not provided or empty, any supported locale is available.
+	// If provided, the first locale from the list is the default locale.
+	// If only one locale is listed, the UI will hide the language chooser.
+	// Ordering beyond the first locale is only used as a last resort priority list.
+	// This may not have any effect, as virtually every browser will
+	// have en, en-US configured as a supported locale.
+	// OPTIONAL: List of languages
+	// 'locales' => ['en', 'nl', 'de', 'sv', 'nb'],
+
 	// Settings for branding of the application.
 	// This will change some strings in the user interface,
 	// as well as make some visual changes

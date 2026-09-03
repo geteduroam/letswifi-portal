@@ -20,6 +20,7 @@ use Twig\Loader\FilesystemLoader;
 use Twig\TwigFilter;
 use fyrkat\configmap\Dictionary;
 use fyrkat\configmap\DictionaryPhpFile;
+use fyrkat\multilang\Locale;
 use fyrkat\multilang\MultiLanguageString;
 use fyrkat\multilang\TranslationContext;
 use fyrkat\openssl\PKCS7;
@@ -291,7 +292,7 @@ final class LetsWifiApp
 			\header( 'Location: ' . $url, true, 302 );
 			\header( 'Content-Type: text/plain' );
 			\header( 'Cache-Control: no-store' );
-			\header( 'Content-Language: en-GB' );
+			\header( 'Content-Language: en-001' );
 
 			exit( \implode( "\r\n", [
 				"Language in cookie set to \"{$_GET['lang']}\"",
@@ -303,10 +304,14 @@ final class LetsWifiApp
 			] ) );
 		}
 		if ( null === $this->translationContext ) {
+			$allowedLocales = \array_values( $this->globalConfig->getStrings( 'locales' ) );
 			$this->translationContext = new TranslationContext(
 				userLocale: $_COOKIE['lang'] ?? null,
 				localeDirectory: \dirname( __DIR__, 2 ) . \DIRECTORY_SEPARATOR . 'locale',
 				localeDirectoryType: 'php',
+				acceptLanguage: $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '',
+				fallbackLocale: new Locale( $allowedLocales[0] ?? 'en' ),
+				allowedLocales: $allowedLocales,
 			);
 		}
 

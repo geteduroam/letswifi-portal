@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e6fd74d8e48840bcf84f8de957e82688",
+    "content-hash": "86b0880767afba61cff9bbe54443e63f",
     "packages": [
         {
             "name": "fyrkat/configmap",
@@ -43,11 +43,11 @@
         },
         {
             "name": "fyrkat/multilang",
-            "version": "v1.0.4",
+            "version": "v1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://git.sr.ht/~jornane/php-multilang",
-                "reference": "b9bef730a17f2a980d37a980b3792dbbac0e49a8"
+                "reference": "a3414b8a980d9be3016dd423ae16c2823869f6f5"
             },
             "require": {
                 "php": ">=8.1"
@@ -75,7 +75,7 @@
                     "email": "git@jornane.no"
                 }
             ],
-            "time": "2025-12-08T16:17:44+00:00"
+            "time": "2026-09-02T20:28:29+00:00"
         },
         {
             "name": "fyrkat/oauth-server",

@@ -8,7 +8,7 @@
 <link rel="icon" href="{{ _basePath }}/assets/branding/{{ _product_shortname }}/{{ _branding_favicon_file }}">
 {% endif %}
 {% block viewport %}
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width">
 {% endblock %}
 {% if meta_redirect ?? '' %}
 <meta http-equiv="refresh" content="0; url={{ meta_redirect }}">
@@ -17,26 +17,27 @@
 <header>
 	{% block header %}<span id="product-name" aria-hidden>{{ _product_name }}</span>{% endblock %}
 	<div id="systray">
+		{% if _supportedLocales|length > 1 %}
 		<div class="dropdown-container">
 			<button class="dropdown-header" popovertarget="languages-dropdown">
 				<span class="oojs-icon oojs-icon-language dropdown-header-collapse"></span>{{ 'Language'|t }}
 			</button>
 			<dialog popover class="dropdown" id="languages-dropdown">
 				<ul class="dropdown-menu">
-				{% for locale in _supportedLocales %}
-				{% if locale.active %}
+				{% for locale in _supportedLocales|filter(l => l.active) %}
 					<li lang="{{ locale.locale }}"><a draggable="false" href="{{ locale.href }}"><small class="oojs-icon oojs-icon-check"></small>{{ locale.display_name }}</a></li>
+				{% if _supportedLocales|length > 2 %}
 					<li><hr>
 				{% endif %}
 				{% endfor %}
-				{% for locale in _supportedLocales|sort %}
-				{% if not locale.active %}
+
+				{% for locale in _supportedLocales|filter(l => not l.active)|sort %}
 					<li lang="{{ locale.locale }}"><a draggable="false" href="{{ locale.href }}"><small class="oojs-icon{{ locale.active ? ' oojs-icon-check' : '' }}"></small>{{ locale.display_name }}</a></li>
-				{% endif %}
 				{% endfor %}
 				</ul>
 			</dialog>
 		</div>
+		{% endif %}
 		{% block userMenu %}
 		{% if _user %}
 		<div class="dropdown-container">
