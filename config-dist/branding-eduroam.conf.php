@@ -41,6 +41,7 @@ return [
 		'macos' => [
 			'name' => 'macOS',
 			'match' => 'Mac OS X [1-9][0-9]+[._][0-9]',
+			'apps' => ['app-store'],
 			'profiles' => ['apple-mobileconfig'],
 		],
 		'windows' => [
