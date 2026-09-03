@@ -94,22 +94,18 @@ Generate a secret salt with `base64 </dev/random | tr -d /+ | head -c32 ; echo`
 ```
 
 ```diff
--	'auth.adminpassword' => '123',
-+	'auth.adminpassword' => '1234',
-```
-
-```diff
 -	'metadatadir' => 'metadata',
 +	'metadatadir' => 'config/metadata',
 ```
 
 ```diff
 	'module.enable' => [
+		'core' => true,
+-		'admin' => true,
++		'admin' => false,
+		'saml' => true,
 +		'metarefresh' => true,
 +		'cron' => true,
-		'core' => true,
-		'admin' => true,
-		'saml' => true
 	],
 ```
 
@@ -178,9 +174,9 @@ Confirm that output contains `Cron did run tag [daily]`, and that a file `/etc/s
 
 ## Metadata exchange
 
-Navigate to **/simplesaml/module.php/admin/federation** on your webserver,
-e.g. go to `https://example.com/simplesaml/module.php/admin/federation`, replacing `example.com` with your domain.
+Your metadata URL is at **/simplesaml/module.php/saml/sp/metadata/default-sp** on your webserver,
+e.g. `https://example.com/simplesaml/module.php/saml/sp/metadata/default-sp`, replacing `example.com` with your domain.
 
-Here you will find the metadata or metadata URL to provide to your IdP.
+Provide this URL to your IdP, or if they need a metadata file, download it by navigating to the URL.  It's an XML file.
 
-After you've exchanged metadata, you can test the authentication by pressing **Test**, and then **default-sp**.
+After you've exchanged metadata with your IdP, you can test the authentication by pressing **Test**, and then **default-sp**.
