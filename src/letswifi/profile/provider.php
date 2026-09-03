@@ -59,9 +59,9 @@ class Provider implements JsonSerializable
 
 	public static function fromConfig( ProfileService $tenantConfig, Dictionary $providerData ): self
 	{
-		$authData = $providerData->getDictionary( 'auth' );
-		$authService = $authData->getString( 'service' );
-		$authServiceParams = $authData->getDictionary( 'param' );
+		$authData = $providerData->getDictionaryOrNull( 'auth' );
+		$authService = $authData?->getString( 'service' ) ?? $providerData->getString( 'auth_service' );
+		$authServiceParams = $authData?->getDictionary( 'param' ) ?? $providerData->getDictionary( 'auth_param' );
 		$longLivedGrantTokenValidity = new DateInterval( 'P6M' );
 		if ( $authData->has( 'longLivedGrantTokenValidity' ) ) {
 			$longLivedGrantTokenValidity = static::getTokenValidity( $authData->getInt( 'longLivedGrantTokenValidity' ) );
