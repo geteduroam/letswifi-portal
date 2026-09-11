@@ -1,4 +1,4 @@
-# Let's Wi-fi Portal Server
+# Let's Wi-Fi Portal Server
 
 >[!NOTE]
 > This is the **beta** branch
@@ -14,7 +14,7 @@ The software provides a portal for users to obtain certificates embedded in conf
 as well as an API that's used by various apps to configure a wireless network directly on the device.
 We recommend to use the apps where possible, and the portal will encourage users to do so.
 
-User authentication before issuing a certificate is done through [SimpleSAMLphp](https://www.simplesamlphp.org),
+User authentication before issuing a certificate is done through [SimpleSAMLphp](https://www.simplesamlphp.org/),
 which can be configured with various identity providers.
 
 * [Features](FEATURES.md)
@@ -22,4 +22,4 @@ which can be configured with various identity providers.
 * [Deployment considerations](DEPLOY.md)
 * [Production installation](INSTALL.md)
 
-See https://eduroam.app for more information.
+See [www.eduroam.app](https://www.eduroam.app/) for more information.
