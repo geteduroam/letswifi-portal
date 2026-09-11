@@ -25,10 +25,5 @@
 			"name": "Jørn Åne de Jong",
 			"email": "jornane.dejong@letswifi.eu"
 		}
-	],
-	"config": {
-		"allow-plugins": {
-			"composer/package-versions-deprecated": true
-		}
-	}
+	]
 }

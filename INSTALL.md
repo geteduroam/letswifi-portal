@@ -117,28 +117,29 @@ so you may need to loosen it if you also need to use the SimpleSAMLphp web UI.
 ```sh
 brand=eduroam
 cd /usr/local/share
-git clone -b beta https://github.com/geteduroam/letswifi-portal
+git clone https://github.com/geteduroam/letswifi-portal.git
 cd letswifi-portal
-composer --no-dev --quiet install
+composer --no-dev --no-plugins --no-scripts --quiet install
 cp -a config-dist /etc/letswifi
 ln -s /etc/letswifi/ config
-cd /etc/letswifi/
-mv clients-$brand.conf.php clients.conf.php && rm clients-*.conf.php
-sed -i.bak -e"/=> 'branding-$brand.conf.php',/ s@// @@" letswifi.conf.php
-rm realms/*example.com.conf.php *.bak
+ln -s /var/lib/letswifi/ var
 
-mkdir -p /var/lib/letswifi
-ln -s /var/lib/letswifi var
-chown www-data:www-data /var/lib/letswifi
-chmod 750 /var/lib/letswifi
-
-tee ../../bin/letswifi <<EOF
+tee /bin/letswifi <<EOF
 #!/usr/bin/env php
 <?php
 putenv( 'LETSWIFI_CONFIG_DIR=/etc/letswifi' );
 require '$PWD/bin/letswifi';
 EOF
-chmod +x ../../bin/letswifi
+chmod +x /bin/letswifi
+
+cd /etc/letswifi
+mv clients-$brand.conf.php clients.conf.php && rm clients-*.conf.php
+sed -i.bak -e"/=> 'branding-$brand.conf.php',/ s@// @@" letswifi.conf.php
+rm realms/*example.com.conf.php *.bak
+
+mkdir -p /var/lib/letswifi
+chown www-data:www-data /var/lib/letswifi
+chmod 750 /var/lib/letswifi
 ```
 
 #### Configuration
