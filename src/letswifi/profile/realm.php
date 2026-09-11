@@ -92,6 +92,16 @@ class Realm implements JsonSerializable
 	}
 
 	/**
+	 * Return the complete trust chain for the CA that signs the user certs
+	 *
+	 * @return array<X509>
+	 */
+	public function getSignerChain(): array
+	{
+		return $this->profileService->getCertificatesWithChain( $this->signer );
+	}
+
+	/**
 	 * @return array{realm_id:string,display_name:MultiLanguageString,description:?MultiLanguageString,contact:?Contact,location:array<Location>,logo:bool,signer:string,trust:array<string>,networks:array<string,array{oids?:array<string>,nai_realms?:array<string>,ssid?:string,display_name:MultiLanguageString}>}
 	 */
 	public function jsonSerialize(): array
