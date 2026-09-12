@@ -32,7 +32,7 @@ For platforms where no app is available, configuration profiles can be made, suc
 These options are clearly listed on the landing page if the platform requires this,
 and are available with one additional click for other platforms, as these are presented the app as the primary option.
 
-## Multirealm and multitenant configuration files
+## Multi realm and multi tenant configuration files
 
 The configuration file allows to define multiple providers (e.g. institutions) and multiple realms per provider, allowing a national roaming operator to just run one instance of the portal to serve many providers at once.
 
@@ -43,6 +43,8 @@ These can be configured independently for every realm.
 
 Realms are accesible based on SAML attributes.
 If multiple realms are available, the user is presented a realm chooser.
+Administrator access is configured for individual users,
+for either the whole instance or for a provider.
 
 ## Multilanguage
 
