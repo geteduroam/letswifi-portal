@@ -26,13 +26,19 @@ class RealmCommand extends Command
 		'View details about the requested realm',
 		<<<CREATE
 			Create a new realm
+
 			--newca common-name    	Create a new CA that will be used as signer
 			--signer common-name   	Use existing CA as signer
-			--network network      	Name of the network that will be configured by profiles from this realm
+
 			--name names           	Name of the realm (localisable)
 			--description          	Description of the realm (localisable)
-			--days days            	Integer amount of days that the credential will be valid for after issuance
-			--servername servername	Name on the server certificate, to be verified by the client
+
+			--network network      	Name of the network that will be configured by profiles from this realm (e.g. eduroam)
+			--contact contact      	Contact id as defined in contacts configuration
+
+			--days days            	Integer amount of days that the credential will be valid for after issuance (default 365)
+			--servername servername	Name on the server certificate, to be verified by the client (default radius.\$realm)
+			--trust common-name    	Common name of the CA to trust, default the same as signer
 			--logofile filename    	Logo filename, file must already be present in directory
 
 			The options --network and --servername can be provided multiple times,
