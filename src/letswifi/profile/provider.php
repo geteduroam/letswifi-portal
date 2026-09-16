@@ -63,7 +63,7 @@ class Provider implements JsonSerializable
 		$authService = $authData?->getString( 'service' ) ?? $providerData->getString( 'auth_service' );
 		$authServiceParams = $authData?->getDictionary( 'param' ) ?? $providerData->getDictionary( 'auth_param' );
 		$longLivedGrantTokenValidity = new DateInterval( 'P6M' );
-		if ( $authData->has( 'longLivedGrantTokenValidity' ) ) {
+		if ( $authData?->has( 'longLivedGrantTokenValidity' ) ) {
 			$longLivedGrantTokenValidity = static::getTokenValidity( $authData->getInt( 'longLivedGrantTokenValidity' ) );
 		}
 		$auth = new AuthenticationContext(
