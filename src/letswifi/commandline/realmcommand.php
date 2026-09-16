@@ -224,15 +224,35 @@ class RealmCommand extends Command
 		}
 		if ( null !== $newCA ) {
 			$result['signer'] = $this->createSigningCertificate( $newCA );
-			if ( empty( $result['trust'] ?? [] ) ) {
-				$result['trust'] = [$result['signer']];
-			}
 		}
 		if ( empty( $result['trust'] ?? [] ) ) {
-			static::die( 2, 'Must provide at least one trusted CA' );
+			$result['trust'] = [$result['signer']];
 		}
 		if ( empty( $result['networks'] ?? [] ) ) {
 			static::die( 2, 'Must provide at least one network' );
+		}
+		$certificates = $this->config->getDictionary( 'certificate' );
+		$networks = $this->config->getDictionary( 'network' );
+
+		foreach ( $result['networks'] ?? [] as $network ) {
+			if ( !$networks->has( $network ) ) {
+				static::die( 4, $network . ': Network not found in configuration' );
+			}
+		}
+		foreach ( $result['trust'] ?? [] as $trust ) {
+			if ( !$certificates->has( $trust ) ) {
+				static::die( 4, $trust . ': CA not installed' );
+			}
+		}
+		if ( !$certificates->has( $result['signer'] ) ) {
+			static::die( 4, $result['signer'] . ': CA not installed' );
+		}
+		if ( !$certificates->getDictionary( $result['signer'] )->has( 'key' ) ) {
+			static::die( 4, 'signer: ' . $result['signer'] . ': CA has no private key' );
+		}
+		$contact = $result['contact'] ?? null;
+		if ( null !== $contact && !$certificates->has( $contact ) ) {
+			static::die( 4, $contact . ': Contact not found in configuration' );
 		}
 
 		return $result;
