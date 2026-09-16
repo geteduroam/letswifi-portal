@@ -6,7 +6,8 @@
 	<h1>{{ 'Requesters by realm'|t }}</h1>
 	<section class="highlight">
 	<form>
-		<details {{ __filter_requester or __filter_realms ? 'open ' : '' }}class="form">
+		{% set filter_open = __filter_requester or __filter_realms ? 'open ' : '' %}
+		<details {{ filter_open }} class="form">
 		<summary>{{ 'Filter'|t }}</summary>
 			<div class="cols">
 				<div>

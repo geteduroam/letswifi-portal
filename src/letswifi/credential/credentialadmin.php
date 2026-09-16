@@ -44,14 +44,21 @@ abstract class CredentialAdmin
 	abstract public function listRequesters( array $realms = [], ?string $requester = null, ?DateTimeInterface $validOn = null ): Generator;
 
 	/**
-	 * @param array<Realm|string> $realms        Only return from these realms, if empty all available realms are used
-	 * @param ?string             $requester     Filter requester
-	 * @param ?DateTimeInterface  $validOn       Consider credentials that are valid on this point in time
-	 * @param bool                $unrevokedOnly Only return credentials that are not revoked
+	 * @param array<Realm|string> $realms    Only return from these realms, if empty all available realms are used
+	 * @param ?string             $requester Filter requester
+	 * @param ?DateTimeInterface  $validOn   Consider credentials that are valid on this point in time
+	 * @param bool                $revoked   Whether to return credentials that are revoked
+	 * @param bool                $unrevoked Whether to return credentials that are not revoked
 	 *
 	 * @return Generator<string,Credential>
 	 */
-	abstract public function listCredentials( array $realms = [], ?string $requester = null, ?DateTimeInterface $validOn = null, bool $unrevokedOnly = false ): Generator;
+	abstract public function listCredentials(
+		array $realms = [],
+		?string $requester = null,
+		?DateTimeInterface $validOn = null,
+		bool $revoked = true,
+		bool $unrevoked = true,
+	): Generator;
 
 	/**
 	 * List all credentials that are signed by the specified CA, including revoked credentials

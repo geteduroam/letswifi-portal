@@ -97,6 +97,31 @@ return [
 	'apple-mobileconfig instructions' => 'After opening the file on MacOS, install it by opening the <strong>System Settings</strong> app, click <strong>Profile Downloaded</strong> and then double-click the new profile.',
 	'google-onc instructions' => 'After downloading the file, open the Chrome browser and browse to this URL: <a href="chrome://network">chrome://network</a>. Then, use the <strong>Import ONC file</strong> button. The import is silent; the new network definitions will be added to the preferred networks.',
 
+	// admin-credentials.twig
+	'admin_filter_heading' => 'Filter',
+	'admin_filter_valid_on' => 'Valid on',
+	'admin_filter_ident' => 'Ident',
+	'admin_filter_requester' => 'Requester',
+	'admin_filter_mask' => 'Mask',
+	'admin_filter_show' => 'Display',
+	'admin_filter_mask_revoked' => 'revoked',
+	'admin_filter_mask_unrevoked' => 'unrevoked',
+	'admin_filter_show_times' => 'timestamps',
+	'admin_filter_submit' => 'Filter',
+
+	'admin_table_credentials_header_ident' => 'Ident',
+	'admin_table_credentials_header_requester' => 'Requester',
+	'admin_table_credentials_header_issued' => 'Issued',
+	'admin_table_credentials_header_expires' => 'Expires',
+	'admin_table_credentials_header_revoked' => 'Revoked',
+	'admin_table_credentials_button_revoke' => 'Revoke',
+
+	'admin_dialog_revoke_credential_caption' => 'Are you sure you want to revoke the following credential?',
+	'admin_dialog_revoke_credential_ident' => 'Ident',
+	'admin_dialog_revoke_credential_requester' => 'Requester',
+	'admin_dialog_revoke_credential_button_revoke' => 'Revoke',
+	'admin_dialog_revoke_credential_button_cancel' => 'Cancel',
+
 	// filenames for localised store badges
 	'Download from the Microsoft Store' => 'Download from the Microsoft Store',
 	'en-us%%20%s.svg' => 'en-us%%20%s.svg',

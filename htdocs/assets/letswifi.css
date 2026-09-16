@@ -389,6 +389,13 @@ dialog.modal h2 {
 	font-size: 1em;
 }
 
+.hidden-timestamp {
+	display: none;
+}
+main:has(section input#filter-show-times:checked) .hidden-timestamp {
+	display: block;
+}
+
 fieldset {
 	border: thin solid var(--light-border-color);
 	border-radius: .15em;

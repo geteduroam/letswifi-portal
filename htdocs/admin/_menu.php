@@ -14,7 +14,7 @@ return [
 		'Realms' => 'realms/',
 	],
 	'Credentials' => [
-		'Pseudocredentials' => 'credentials/',
+		'Pseudo credentials' => 'credentials/',
 		'Requesters' => 'requesters/',
 	],
 ];

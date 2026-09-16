@@ -62,8 +62,8 @@
 {% for grant in grants %}
 			<tr>
 				<td>{{ grant.client_id }}</td>
-				<td>{{ grant.not_before|split('T', 2)|first }}</td>
-				<td>{{ grant.not_after|split('T', 2)|first }}</td>
+				<td>{{ grant.not_before|date('Y-m-d H:i:s') }}</td>
+				<td>{{ grant.not_after|date('Y-m-d H:i:s') }}</td>
 				<td><button class="btn-danger" name="revoke_grant" value="{{ grant.session_id }}">{{ 'Revoke'|t }}</button></td>
 			</tr>
 {% endfor %}
@@ -85,8 +85,8 @@
 {% for credential in credentials %}
 			<tr>
 				<td><span class="{{ credential.revoked ? 'revoked' : '' }}">{{ credential.credential_id }}</span></td>
-				<td>{{ credential.not_before|split('T', 2)|first }}</td>
-				<td>{{ credential.not_after|split('T', 2)|first }}</td>
+				<td>{{ credential.not_before|date('Y-m-d H:i:s') }}</td>
+				<td>{{ credential.not_after|date('Y-m-d H:i:s') }}</td>
 				<td><button class="btn-danger" name="revoke_credential" value="{{ credential.credential_id }}">{{ 'Revoke'|t }}</button></td>
 			</tr>
 {% endfor %}

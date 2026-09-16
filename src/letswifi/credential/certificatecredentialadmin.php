@@ -220,8 +220,16 @@ class CertificateCredentialAdmin extends CredentialAdmin
 		yield from $this->listCredentialsInternal( $stmt );
 	}
 
-	public function listCredentials( array $realms = [], ?string $requester = null, ?DateTimeInterface $validOn = null, bool $unrevokedOnly = false ): Generator
-	{
+	public function listCredentials(
+		array $realms = [],
+		?string $requester = null,
+		?DateTimeInterface $validOn = null,
+		bool $revoked = true,
+		bool $unrevoked = true,
+	): Generator {
+		if ( !$unrevoked && !$revoked ) {
+			return;
+		}
 		if ( null === $validOn ) {
 			$validOn = $this->now;
 		}
@@ -230,8 +238,11 @@ class CertificateCredentialAdmin extends CredentialAdmin
 		if ( null !== $requester ) {
 			$extraConditions .= ' AND requester = :requester';
 		}
-		if ( $unrevokedOnly ) {
+		if ( !$revoked ) {
 			$extraConditions .= ' AND revoked IS NULL';
+		}
+		if ( !$unrevoked ) {
+			$extraConditions .= ' AND revoked IS NOT NULL';
 		}
 		$stmt = $pdo->prepare( <<<SQL
 				SELECT

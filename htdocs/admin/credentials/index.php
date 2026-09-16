@@ -58,7 +58,9 @@ $requesterFilter = \array_key_exists( 'requester', $_GET ) && \is_string( $_GET[
 $identFilter = \array_key_exists( 'ident', $_GET ) && \is_string( $_GET['ident'] )
 	? \trim( $_GET['ident'] ) ?: null
 	: null;
-$revokedFilter = !\array_key_exists( 'revoked', $_GET ) || ( '0' !== $_GET['revoked'] && 'off' !== $_GET['revoked'] );
+$filterMaskRevoked = \array_key_exists( 'revoked', $_GET ) && \in_array( $_GET['revoked'], ['0', 'off'], true );
+$filterMaskUnrevoked = \array_key_exists( 'unrevoked', $_GET ) && \in_array( $_GET['unrevoked'], ['0', 'off'], true );
+$filterShowTimes = \array_key_exists( 'times', $_GET ) && !\in_array( $_GET['times'], ['', '0', 'off'], true );
 
 $app->render( [
 	'_user' => $user,
@@ -70,7 +72,9 @@ $app->render( [
 	'__filter_realms' => $realmsFilter,
 	'__filter_requester' => $requesterFilter,
 	'__filter_ident' => $identFilter,
-	'__filter_revoked' => !$revokedFilter,
+	'__filter_mask_revoked' => $filterMaskRevoked,
+	'__filter_mask_unrevoked' => $filterMaskUnrevoked,
+	'__filter_show_times' => $filterShowTimes,
 
 	'__admin_menu_prefix' => '../',
 	'__admin_menu_active' => 'credentials/',
@@ -78,12 +82,18 @@ $app->render( [
 
 	'credentials' => isset( $identFilter )
 		? \array_filter( [$credentialAdmin->getCredential( $identFilter )] )
-		: \iterator_to_array( $credentialAdmin->listCredentials( $realmsFilter, requester: $requesterFilter, validOn: $validOn, unrevokedOnly: !$revokedFilter ) ),
+		: \iterator_to_array( $credentialAdmin->listCredentials(
+			$realmsFilter,
+			requester: $requesterFilter,
+			validOn: $validOn,
+			revoked: !$filterMaskRevoked,
+			unrevoked: !$filterMaskUnrevoked,
+		) ),
 ], 'admin-credentials', [
 	Credential::class => static fn ( Credential $c ) => [
-		'not_before' => $c->getIssued()->format( 'Y-m-d' ),
-		'not_after' => $c->getExpiry()?->format( 'Y-m-d' ),
-		'revoked' => $c->getRevoked()?->format( 'Y-m-d' ),
+		'not_before' => $c->getIssued(),
+		'not_after' => $c->getExpiry(),
+		'revoked' => $c->getRevoked(),
 
 		'requester_href' => '?' . \http_build_query( ['ident' => null, 'requester' => $c->userId] + $_GET ),
 		'ident_href' => '?' . \http_build_query( ['ident' => $c->credentialId] + $_GET ),

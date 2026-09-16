@@ -89,7 +89,7 @@ $app->render( [
 		'realm_href' => '?' . \http_build_query( ['realms' => $ra->requester->realm] + $_GET ),
 		'credential_href' => '../credentials/?' . \http_build_query( ['requester' => $ra->requester->name, 'realms' => $ra->requester->realm] ),
 		'credential_unrevoked_href' => '../credentials/?' . \http_build_query( ['revoked' => 'off', 'requester' => $ra->requester->name, 'realms' => $ra->requester->realm] ),
-		'earliest_valid' => $ra->earliestValid->format( 'Y-m-d' ),
-		'last_valid' => $ra->lastValid->format( 'Y-m-d' ),
+		'earliest_valid' => $ra->earliestValid,
+		'last_valid' => $ra->lastValid,
 	],
 ] );
