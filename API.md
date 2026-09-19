@@ -42,7 +42,7 @@ Now you can obtain your API key.
 	'https://HOSTNAME/oauth/token/'
 ```
 
-If succesful, the result is a JSON document with a key called `access_token`.
+If successful, the result is a JSON document with a key called `access_token`.
 
 You can use this API key in any request to the configuration panel.
 
