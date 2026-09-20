@@ -155,7 +155,7 @@ class CertificateCredentialIssuer implements CredentialIssuer
 		$userCert = $csr->sign( $caCert, $caKey, $expiry, $conf, $serial );
 		$this->logCompletedUserCredential( $userCert, 'client' );
 
-		return new PKCS12( $userCert, $userKey, [$caCert] );
+		return new PKCS12( $userCert, $userKey, $this->realm->getSignerChain() );
 	}
 
 	/**
