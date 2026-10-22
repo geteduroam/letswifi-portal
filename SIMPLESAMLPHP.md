@@ -161,7 +161,7 @@ Run `crontab -u www-data -e` and make sure it contains a line to run the script.
 
 ```cron
 # m h dom mon dow   command
-  * 4 *   *   *     php /usr/local/share/simplesamlphp/modules/cron/bin/cron.php -t daily >/dev/null
+  9 4 *   *   *     php /usr/local/share/simplesamlphp/modules/cron/bin/cron.php -t daily >/dev/null
 ```
 
 Then run the script manually to confirm it works.
