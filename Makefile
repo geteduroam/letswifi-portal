@@ -4,6 +4,9 @@ PHP := php
 SIMPLESAMLPHP_VERSION := 2.4.10
 SIMPLESAMLPHP_FLAVOUR := slim
 
+build:
+	./build-release.sh
+
 camera-ready-dev: camera-ready dev
 .PHONY: camera-ready-dev
 
@@ -18,7 +21,7 @@ dev: check-php vendor config/certs config/letswifi.conf.php config/clients.conf.
 .PHONY: dev
 
 clean:
-	rm -rf composer.phar vendor \
+	rm -rf composer.phar vendor build \
 		phan.phar php-cs-fixer-v2.phar php-cs-fixer-v3.phar psalm.phar phpunit-7.phar \
 		simplesamlphp* htdocs/simplesaml \
 
