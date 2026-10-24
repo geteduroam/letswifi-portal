@@ -47,8 +47,44 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 	) {
 		if ( null !== $autoloadInclude ) {
 			if ( \strlen( $autoloadInclude ) > 2 && '.' === $autoloadInclude[0] && '.' !== $autoloadInclude[1] ) {
+				// Rewrite relative path to be relative to application root, not relative to htdocs
 				$autoloadInclude = \dirname( __DIR__, 4 ) . \DIRECTORY_SEPARATOR . $autoloadInclude;
 			}
+
+			/*
+			 * When both SimpleSAMLphp and the calling application use Twig,
+			 * which is the case here, an error may occur where both autoloaders
+			 * will immediately attempt to load a few files with deprecated functions;
+			 * redefining a function leads to a fatal error.
+			 * It does not matter if the dependency is actually used.
+			 *
+			 * This problem is known by Twig but no fix will be provided:
+			 * https://github.com/twigphp/Twig/issues/4180
+			 * This problem is known by SimpleSAMLphp but no fix will be provided:
+			 * https://github.com/simplesamlphp/simplesamlphp/issues/2687
+			 *
+			 * Composer uses a global state array to keep track of which files were included,
+			 * instead of relying on PHP's {require,include}_once built-in funcionality.
+			 * This global array identifies files by a hash of their namespace and the
+			 * path within that namespace.
+			 * The good news is that these are identical in both letswifi-portal and
+			 * SimpleSAMLphp, even if the Twig versions differ slightly, because the
+			 * hash is based on the filename, not on the file contents.
+			 * https://github.com/composer/composer/blob/2.10.3/src/Composer/Autoload/AutoloadGenerator.php#L1119-L1123
+			 *
+			 * The following code will put the hashes of the problematic files in this array
+			 * so that they are not included.  This will work as long as SimpleSAMLphp uses
+			 * the Composer autoloader (normal or optimized).
+			 * If SimpleSAMLphp is packaged by an OS, that package may have switched out the
+			 * Composer autoloader by something better, in which case we should ask them to
+			 * patch out these problematic files, or to patch in support for the global variable.
+			 */
+
+			$GLOBALS['__composer_autoload_files']['89efb1254ef2d1c5d80096acd12c4098'] = // twig/twig:src/Resources/core.php
+			$GLOBALS['__composer_autoload_files']['ffecb95d45175fd40f75be8a23b34f90'] = // twig/twig:src/Resources/debug.php
+			$GLOBALS['__composer_autoload_files']['c7baa00073ee9c61edf148c51917cfb4'] = // twig/twig:src/Resources/escaper.php
+			$GLOBALS['__composer_autoload_files']['f844ccf1d25df8663951193c3fc307c8'] = // twig/twig:src/Resources/string_loader.php
+			true; // Anything not null is accepted by Composer; true is the same value that Composer sets
 
 			require $autoloadInclude;
 		}
