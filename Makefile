@@ -7,13 +7,14 @@ SIMPLESAMLPHP_FLAVOUR := slim
 build:
 	./build-release.sh
 
-camera-ready-dev: camera-ready dev
-.PHONY: camera-ready-dev
+neat-dev: neat dev
+.PHONY: neat-dev
 
-camera-ready: syntax codestyle phpunit psalm
+neat: syntax codestyle phpunit psalm
 	@# We disabled phan checking for now, due to a bug affecting Phan in this codebase
 	@# https://github.com/phan/phan/issues/4887
-.PHONY: camera-ready
+camera-ready: neat
+.PHONY: neat camera-ready
 
 dev: check-php vendor config/certs config/letswifi.conf.php config/clients.conf.php config/branding.conf.php config/database.conf.php config/realms config/oauthsecret.txt
 	@test -f var/letswifi-dev.sqlite || make var/letswifi-dev.sqlite

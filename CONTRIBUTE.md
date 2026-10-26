@@ -31,7 +31,7 @@ and send us the patch using the appropriate method of the platform.
 
 Before committing, please run
 
-	make camera-ready
+	make neat
 
-And only commit if there are no errors.
+And only commit if there are no errors or warnings.
 This will test your code for common errors and ensure you follow the style guide.
