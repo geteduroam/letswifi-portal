@@ -88,7 +88,7 @@ class Provider implements JsonSerializable
 			location: \array_map( [Location::class, 'fromConfig'], $location ),
 			logo: null === $logo ? null : Logo::fromConfig( $logo ),
 			contactId: $providerData->getStringOrNull( 'contact' ),
-			description: $providerData->getObject( 'description', MultiLanguageString::class ),
+			description: $providerData->getObjectOrNull( 'description', MultiLanguageString::class ),
 			// Rename "profile-signer" to "profile_signer"
 			profileSigner: $providerData->getStringOrNull( 'profile_signer' ) ?? $providerData->getStringOrNull( 'profile-signer' ),
 			admins: $providerData->has( 'admins' ) ? $providerData->getStrings( 'admins' ) : [],
