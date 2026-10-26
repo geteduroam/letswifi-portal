@@ -144,7 +144,7 @@ class AuthenticationContext implements JsonSerializable
 			return $this->constructAuthenticatedUser(
 				provider: $provider,
 				userId: $userId,
-				clientId: 'browser',
+				clientId: null,
 				grantSid: null,
 			);
 		}
@@ -203,7 +203,7 @@ class AuthenticationContext implements JsonSerializable
 		);
 	}
 
-	private function constructAuthenticatedUser( Provider $provider, string $userId, string $clientId, ?string $grantSid, ?array $affiliations = null, ?Realm $realm = null ): User
+	private function constructAuthenticatedUser( Provider $provider, string $userId, ?string $clientId, ?string $grantSid, ?array $affiliations = null, ?Realm $realm = null ): User
 	{
 		return new User(
 			userId: $userId,
