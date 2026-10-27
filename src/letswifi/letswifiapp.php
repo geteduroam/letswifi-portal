@@ -196,15 +196,14 @@ final class LetsWifiApp
 
 		$template = $this->getTwig()->load( "{$template}.twig" );
 
-		$provider = null;
-		$user = null;
+		$branding = $provider = $user = null;
 
 		try {
+			$branding = $this->getBrandingConfiguration();
 			$provider = $this->getProvider();
 			$user = $provider->getAuthenticatedUser();
 		} catch ( Throwable ) {
 		}
-		$branding = $this->getBrandingConfiguration();
 
 		$supportedLocales = [];
 		foreach ( $this->getTranslationContext()->getSupportedLocales() as $displayName => $locale ) {
