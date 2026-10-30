@@ -1,6 +1,7 @@
 
 REALM := example.com
 PHP := php
+DEVPORT := 1080
 SIMPLESAMLPHP_VERSION := 2.4.10
 SIMPLESAMLPHP_FLAVOUR := slim
 
@@ -18,7 +19,7 @@ camera-ready: neat
 
 dev: check-php vendor config/certs config/letswifi.conf.php config/clients.conf.php config/branding.conf.php config/database.conf.php config/realms config/oauthsecret.txt
 	@test -f var/letswifi-dev.sqlite || make var/letswifi-dev.sqlite
-	$(PHP) -S [::1]:1080 -t htdocs/
+	$(PHP) -S [::1]:$(DEVPORT) -t htdocs/
 .PHONY: dev
 
 clean:
@@ -36,12 +37,15 @@ config/oauthsecret.txt:
 # Code dependencies
 
 composer.phar:
-	stat composer.phar >/dev/null 2>&1 || curl -sSLO https://getcomposer.org/download/latest-stable/composer.phar || wget https://getcomposer.org/download/latest-stable/composer.phar
+	stat composer.phar >/dev/null 2>&1 \
+	|| curl -sSLO https://getcomposer.org/download/latest-stable/composer.phar \
+	|| wget https://getcomposer.org/download/latest-stable/composer.phar \
 
-vendor: composer.json check-php composer.phar
+vendor: composer.json composer.phar
 	@# Some dev dependencies have very strict PHP requirements
 	@# Allowing running --no-dev to work around this
-	$(PHP) composer.phar --quiet --no-progress install || $(PHP) composer.phar --quiet --no-progress install --no-dev
+	$(PHP) composer.phar --quiet --no-plugins --no-scripts --no-progress install \
+	|| $(PHP) composer.phar --no-dev --quiet --no-plugins --no-scripts --no-progress install
 
 config/clients.conf.php:
 	mkdir -p config
@@ -75,7 +79,6 @@ var:
 var/letswifi-dev.sqlite: var
 	rm -f var/letswifi-dev.sqlite
 	sqlite3 var/letswifi-dev.sqlite <sql/letswifi.sqlite.sql
-	## TODO: Automatically add realm and signing CA
 
 simplesamlphp:
 	-cp -n config-dist/letswifi.conf.dist.php config/letswifi.conf.php
@@ -108,5 +111,9 @@ phpunit: vendor
 .PHONY: phpunit
 
 syntax: check-php
-	find . ! -path './vendor/*' ! -path './simplesaml*' ! -path './lib/*' ! -path './var/*' ! -path './build/*' -type f -name \*.php -print0 | xargs -0 -n1 -P50 $(PHP) -l
+	@find config-dev config-dist defaults htdocs locale src -type f -name \*.php -print0 \
+	| xargs -0 -n1 -P200 $(PHP) -l \
+	| grep -Fv 'No syntax errors detected' \
+	| tee /dev/stderr \
+	| diff - /dev/null >/dev/null
 .PHONY: syntax
