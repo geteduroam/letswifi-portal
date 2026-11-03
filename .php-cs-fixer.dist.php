@@ -49,7 +49,7 @@ $config = ( new Config() )
 		'align_multiline_comment' => ['comment_type' => 'all_multiline'],
 		'array_indentation' => true,
 		'array_push' => true,
-		'array_syntax' => ['syntax' => 'short'],
+		'array_syntax' => true, /* use default rule configuration */
 		'backtick_to_shell_exec' => true,
 		'blank_line_after_namespace' => true,
 		'blank_line_after_opening_tag' => false, /* declare strict types definition goes here */
@@ -84,11 +84,7 @@ $config = ( new Config() )
 			'space' => 'none',
 		],
 		'class_attributes_separation' => true,
-		'class_definition' => [/* default */
-			'multi_line_extends_each_single_line' => false,
-			'single_item_single_line' => false,
-			'single_line' => false,
-		],
+		'class_definition' => true, /* use default rule configuration */
 		'combine_consecutive_issets' => true,
 		'combine_consecutive_unsets' => true,
 		'combine_nested_dirname' => true,
@@ -96,18 +92,16 @@ $config = ( new Config() )
 		'concat_space' => [
 			'spacing' => 'one',
 		],
-		'constant_case' => ['case' => 'lower'], // constants such as true, false, null
+		'constant_case' => true, /* use default rule configuration */ // lowercase true|false|null
 		'control_structure_braces' => true,
-		'control_structure_continuation_position' => ['position' => 'same_line'],
+		'control_structure_continuation_position' => true, /* use default rule configuration */
 		'date_time_create_from_format_call' => true,
 		'date_time_immutable' => true,
 		'declare_parentheses' => false,
 		'declare_strict_types' => true,
 		'dir_constant' => true,
 		'elseif' => true,
-		'empty_loop_body' => [
-			'style' => 'semicolon',
-		],
+		'empty_loop_body' => true, /* use default rule configuration */
 		'encoding' => true,
 		'ereg_to_preg' => true,
 		'error_suppression' => [
@@ -128,17 +122,12 @@ $config = ( new Config() )
 			'import_symbols' => true,
 			'leading_backslash_in_global_namespace' => false,
 		],
-		'function_declaration' => false, /* Would remove spaces in function definitions */
-		'function_to_constant' => [
-			'functions' => [/* default */
-				'get_called_class',
-				'get_class',
-				'get_class_this',
-				'php_sapi_name',
-				'phpversion',
-				'pi',
-			],
+		'function_declaration' => [
+			'closure_fn_spacing' => 'none',
+			'closure_function_spacing' => 'none',
+			'trailing_comma_single_line' => false,
 		],
+		'function_to_constant' => true, /* use default rule configuration */
 		'global_namespace_import' => [
 			'import_classes' => true,
 			'import_constants' => null,
@@ -147,9 +136,10 @@ $config = ( new Config() )
 		'implode_call' => true,
 		'include' => true,
 		'indentation_type' => true,
+		'increment_style' => ['style' => 'pre'],
 		'is_null' => true,
 		'line_ending' => true,
-		'linebreak_after_opening_tag' => false, /* declare strict types definition goes here */
+		'linebreak_after_opening_tag' => false, /* opening tag and strict_types on same line */
 		'logical_operators' => true,
 		'lowercase_cast' => true,
 		'lowercase_keywords' => true,
@@ -164,28 +154,15 @@ $config = ( new Config() )
 		'method_chaining_indentation' => true,
 		'modernize_types_casting' => true,
 		'multiline_comment_opening_closing' => true,
-		'multiline_whitespace_before_semicolons' => [
-			'strategy' => 'new_line_for_chained_calls',
-		],
-		'native_constant_invocation' => [
-			'exclude' => ['null', 'false', 'true'], /* default */
-			'fix_built_in' => true,
-			'include' => [],
-		],
+		'multiline_whitespace_before_semicolons' => ['strategy' => 'new_line_for_chained_calls'],
+		'native_constant_invocation' => true, /* use default rule configuration */
 		'native_function_casing' => true,
-		'native_function_invocation' => [
-			'exclude' => [], /* default */
-			'include' => ['@all'], /* default */
-			'scope' => 'all', /* default */
-		],
-		'new_with_parentheses' => [
-			'anonymous_class' => true,
-			'named_class' => true,
-		],
+		'native_function_invocation' => true, /* use default rule configuration */
+		'new_with_parentheses' => true, /* use default rule configuration, future change */
 		'no_alias_functions' => true,
 		'no_alternative_syntax' => true,
 		'no_blank_lines_after_phpdoc' => true,
-		'no_break_comment' => false,
+		'no_break_comment' => false, /* would be useful if we can disable case-by-case */
 		'no_closing_tag' => true,
 		'no_empty_comment' => true,
 		'no_empty_phpdoc' => true,
@@ -241,43 +218,20 @@ $config = ( new Config() )
 		'no_useless_nullsafe_operator' => true,
 		'no_useless_return' => true,
 		'no_useless_sprintf' => true,
-		'no_whitespace_before_comma_in_array' => [
-			// There's also an implicit rule here, that fixes stuff like array( 1 , 2 ) => array( 1, 2 )
-			'after_heredoc' => true,
-		],
+		'no_whitespace_before_comma_in_array' => true, /* use default rule configuration */
 		'no_whitespace_in_blank_line' => true,
-		'non_printable_character' => ['use_escape_sequences_in_strings' => true],
+		'non_printable_character' => true, /* use default rule configuration */
 		'normalize_index_brace' => true,
 		'nullable_type_declaration_for_default_null_value' => true,
 		'object_operator_without_whitespace' => true,
-		'ordered_class_elements' => [
-			'order' => [
-				'use_trait',
-				'constant_public',
-				'constant_protected',
-				'constant_private',
-				'property_public',
-				'property_protected',
-				'property_private',
-				'construct',
-				'destruct',
-				'magic',
-				'phpunit',
-				'method_public',
-				'method_protected',
-				'method_private',
-			],
-		],
+		'ordered_class_elements' => true, /* use default rule configuration */
 		'ordered_imports' => [
 			'case_sensitive' => true,
 			'sort_algorithm' => 'alpha',
 		],
 		'ordered_traits' => true,
 		'phpdoc_add_missing_param_annotation' => true,
-		'phpdoc_align' => [
-			'align' => 'vertical',
-			'tags' => ['param', 'return', 'throws', 'type', 'var'],
-		],
+		'phpdoc_align' => true, /* use default rule configuration */
 		'phpdoc_annotation_without_dot' => true,
 		'phpdoc_indent' => true,
 		'phpdoc_inline_tag_normalizer' => true,
@@ -290,21 +244,20 @@ $config = ( new Config() )
 		'phpdoc_single_line_var_spacing' => true,
 		'phpdoc_summary' => false,
 		'phpdoc_tag_type' => true,
-		'phpdoc_to_comment' => false, /* converts Psalm suppress to comment, so turn it off */
+		'phpdoc_to_comment' => [
+			'ignored_tags' => ['psalm-suppress'],
+		],
 		'phpdoc_trim' => true,
 		'phpdoc_trim_consecutive_blank_line_separation' => true,
 		'phpdoc_types' => true,
-		'phpdoc_types_order' => [
-			'null_adjustment' => 'always_first', /* default */
-			'sort_algorithm' => 'alpha',
-		],
+		'phpdoc_types_order' => true, /* use default rule configuration */
 		'phpdoc_var_without_name' => true,
 		'php_unit_construct' => true,
 		'php_unit_mock_short_will_return' => true,
 		'php_unit_set_up_tear_down_visibility' => true,
 		'php_unit_test_annotation' => true,
 		'pow_to_exponentiation' => true,
-		'psr_autoloading' => false, /* PSR4 is in conflict with SPL (Standard Php Library), we use SPL, not PSR4 */
+		'psr_autoloading' => false, /* we use SPL, not PSR4 */
 		'return_assignment' => true,
 		'return_type_declaration' => true,
 		'self_accessor' => true,
@@ -323,7 +276,7 @@ $config = ( new Config() )
 		'spaces_inside_parentheses' => ['space' => 'single'],
 		'standardize_increment' => true,
 		'standardize_not_equals' => true,
-		'statement_indentation' => ['stick_comment_to_next_continuous_control_statement' => false],
+		'statement_indentation' => true, /* use default rule configuration */
 		'static_lambda' => true,
 		'strict_comparison' => true,
 		'strict_param' => true,
@@ -337,25 +290,19 @@ $config = ( new Config() )
 		'ternary_operator_spaces' => true,
 		'ternary_to_elvis_operator' => true,
 		'ternary_to_null_coalescing' => true,
-		'trailing_comma_in_multiline' => [
-			'after_heredoc' => true,
-			'elements' => ['arrays', 'arguments', 'parameters', 'match'],
-		],
+		'trailing_comma_in_multiline' => true, /* use default rule configuration */
 		'trim_array_spaces' => true,
-		'type_declaration_spaces' => ['elements' => ['function', 'property']],
-		'types_spaces' => [
-			'space' => 'none',
-			'space_multiple_catch' => 'single',
-		],
+		'type_declaration_spaces' => true, /* use default rule configuration, future change */
+		'types_spaces' => ['space' => 'none'],
 		'unary_operator_spaces' => true,
 		'use_arrow_functions' => true,
 		'visibility_required' => true,
 		'whitespace_after_comma_in_array' => true,
 		'yoda_style' => [
+			'always_move_variable' => true,
 			'equal' => true,
 			'identical' => true,
 			'less_and_greater' => true,
-			'always_move_variable' => true,
 		],
 	] )
 	->setFinder( $finder )
