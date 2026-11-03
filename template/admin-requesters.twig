@@ -21,6 +21,13 @@
 							<input type="text" name="requester" value="{{ __filter_requester }}">
 						</dd>
 					</dl>
+					<dl>
+						<dt>{{ 'admin_filter_show'|t }}</dt>
+						<dd>
+							<input type="checkbox" id="filter-show-times" name="times" value="on" {{ __filter_show_times ? ' checked' : '' }}>
+							<label for="filter-show-times">{{ 'admin_filter_show_times'|t }}</label>
+						</dd>
+					</dl>
 				</div>
 				{% set realms = _realms %}
 				{{ include('_realms-picker.twig') }}
@@ -49,8 +56,14 @@
 		<tr>
 			<td class="overflow"><a href="{{ requester.requester_href }}">{{ requester.requester.name }}</a></td>
 			<td><a href="{{ requester.realm_href }}">{{ requester.requester.realm }}</a></td>
-			<td class="center-col">{{ requester.earliest_valid }}</td>
-			<td class="center-col">{{ requester.last_valid }}</td>
+			<td title="{{ requester.earliest_valid|date('Y-m-d H:i:s') }}">
+				{{ requester.earliest_valid|date('Y-m-d') }}
+				<span class="hidden-timestamp">{{ requester.earliest_valid|date('H:i:s') }}</span>
+			</td>
+			<td title="{{ requester.last_valid|date('Y-m-d H:i:s') }}">
+				{{ requester.last_valid|date('Y-m-d') }}
+				<span class="hidden-timestamp">{{ requester.last_valid|date('H:i:s') }}</span>
+			</td>
 			<td class="right-col">
 				<a href="{{ requester.credential_unrevoked_href }}">{{ requester.valid_accounts }}
 					<small class="oojs-icon oojs-icon-funnel"></small>

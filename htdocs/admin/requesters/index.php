@@ -67,6 +67,7 @@ $realmsFilter = \array_filter( \explode( ',', $_GET['realms'] ?? $_COOKIE['filte
 $requesterFilter = \array_key_exists( 'requester', $_GET ) && \is_string( $_GET['requester'] )
 	? \trim( $_GET['requester'] ) ?: null
 	: null;
+$filterShowTimes = \array_key_exists( 'times', $_GET ) && !\in_array( $_GET['times'], ['', '0', 'off'], true );
 
 $app->render( [
 	'_user' => $user,
@@ -77,6 +78,7 @@ $app->render( [
 	'__filter_valid_on' => $validOn ?? new DateTimeImmutable(),
 	'__filter_realms' => $realmsFilter,
 	'__filter_requester' => $requesterFilter,
+	'__filter_show_times' => $filterShowTimes,
 
 	'__admin_menu_prefix' => '../',
 	'__admin_menu_active' => 'requesters/',
