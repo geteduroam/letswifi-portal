@@ -393,7 +393,19 @@ dialog.modal h2 {
 	display: none;
 }
 main:has(section input#filter-show-times:checked) .hidden-timestamp {
-	display: block;
+	display: inherit;
+}
+.hidden-useragent {
+	display: none;
+}
+main:has(section input#filter-show-useragent:checked) .hidden-useragent {
+	display: inherit;
+}
+.hidden-clientid {
+	display: none;
+}
+main:has(section input#filter-show-clientid:checked) .hidden-clientid {
+	display: inherit;
 }
 
 fieldset {

@@ -45,6 +45,7 @@ abstract class Credential implements JsonSerializable
 				'grant_sid' => $this->grantSid,
 				'ip' => $this->ip,
 				'user_agent' => $this->userAgent,
+				'client_id' => $this->clientId,
 			],
 			'realm' => $this->realm,
 		];

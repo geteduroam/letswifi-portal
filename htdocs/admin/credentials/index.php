@@ -61,6 +61,8 @@ $identFilter = \array_key_exists( 'ident', $_GET ) && \is_string( $_GET['ident']
 $filterMaskRevoked = \array_key_exists( 'revoked', $_GET ) && \in_array( $_GET['revoked'], ['0', 'off'], true );
 $filterMaskUnrevoked = \array_key_exists( 'unrevoked', $_GET ) && \in_array( $_GET['unrevoked'], ['0', 'off'], true );
 $filterShowTimes = \array_key_exists( 'times', $_GET ) && !\in_array( $_GET['times'], ['', '0', 'off'], true );
+$filterShowUserAgent = \array_key_exists( 'useragent', $_GET ) && !\in_array( $_GET['useragent'], ['', '0', 'off'], true );
+$filterShowClientID = \array_key_exists( 'clientid', $_GET ) && !\in_array( $_GET['clientid'], ['', '0', 'off'], true );
 
 $app->render( [
 	'_user' => $user,
@@ -75,6 +77,8 @@ $app->render( [
 	'__filter_mask_revoked' => $filterMaskRevoked,
 	'__filter_mask_unrevoked' => $filterMaskUnrevoked,
 	'__filter_show_times' => $filterShowTimes,
+	'__filter_show_useragent' => $filterShowUserAgent,
+	'__filter_show_clientid' => $filterShowClientID,
 
 	'__admin_menu_prefix' => '../',
 	'__admin_menu_active' => 'credentials/',
