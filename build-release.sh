@@ -21,7 +21,7 @@ export COMPOSER_VENDOR_DIR=build/vendor
 	&& php composer.phar --quiet --no-plugins --no-scripts --no-dev install \
 	|| composer --quiet --no-plugins --no-scripts --no-dev install
 
-cp -R $dirs "$WORKDIR"
+cp -R $dirs LICENSE CREDITS.md "$WORKDIR"
 rm -f "$WORKDIR/htdocs/simplesaml"
 cp -R "$COMPOSER_VENDOR_DIR"/fyrkat/{configmap,multilang,oauth-server,openssl}/src/fyrkat "$WORKDIR/src/"
 awk '$0 ~ /Composer/ { exit } { print $0 }' src/_autoload.php >"$WORKDIR/src/_autoload.php"

@@ -1,5 +1,5 @@
 {
-	"name": "uninett/lets-wifi-portal",
+	"name": "letswifi/letswifi-portal",
 	"type": "project",
 	"license": "BSD-3-Clause",
 	"autoload": {
@@ -19,11 +19,5 @@
 		"friendsofphp/php-cs-fixer": "^3",
 		"vincentlanglet/twig-cs-fixer": "^3.5",
 		"phpunit/phpunit": "^9.5"
-	},
-	"authors": [
-		{
-			"name": "Jørn Åne de Jong",
-			"email": "jornane.dejong@letswifi.eu"
-		}
-	]
+	}
 }
