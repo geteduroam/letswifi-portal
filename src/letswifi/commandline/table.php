@@ -25,7 +25,7 @@ class Table
 	{
 		$this->headerColumns = $headerColumns;
 		$this->headerCount = \count( $headerColumns );
-		$this->columnWidths = \array_map( 'strlen', $headerColumns );
+		$this->columnWidths = array_map( 'strlen', $headerColumns );
 	}
 
 	public function __toString(): string
@@ -40,56 +40,56 @@ class Table
 		}
 		$this->table[] = $columns;
 		for ( $i = 0; $i < $columnCount; ++$i ) {
-			$this->columnWidths[$i] = \max( $this->columnWidths[$i], \strlen( $columns[$i] ) );
+			$this->columnWidths[$i] = max( $this->columnWidths[$i], \strlen( $columns[$i] ) );
 		}
 	}
 
 	public function printTsv( bool $header = true ): string
 	{
 		$output = $header ? [
-			\implode(
+			implode(
 				"\t",
-				\array_map(
-					static fn( string $h ) => \strtoupper( \strtr( $h, '_', ' ' ) ),
+				array_map(
+					static fn( string $h ) => strtoupper( strtr( $h, '_', ' ' ) ),
 					$this->headerColumns,
 				) ),
 		] : [];
 
 		foreach ( $this->table as $row ) {
-			$output[] = \implode( "\t", $row );
+			$output[] = implode( "\t", $row );
 		}
 
-		return \implode( \PHP_EOL, $output ) . \PHP_EOL;
+		return implode( \PHP_EOL, $output ) . \PHP_EOL;
 	}
 
 	public function printTable( int $margin = 0, bool $header = true ): string
 	{
 		$output = $header ? [
-			\rtrim( \implode(
+			rtrim( implode(
 				$margin ? '' : "\t",
-				\array_map(
-					fn( int $i ) => \str_pad(
-						\strtoupper( \strtr( $this->headerColumns[$i], '_', ' ' ) ),
+				array_map(
+					fn( int $i ) => str_pad(
+						strtoupper( strtr( $this->headerColumns[$i], '_', ' ' ) ),
 						$this->columnWidths[$i] + $margin,
 					),
-					\range( 0, $this->headerCount - 1 ),
+					range( 0, $this->headerCount - 1 ),
 				),
 			) ),
 		] : [];
 
 		foreach ( $this->table as $row ) {
-			$output[] = \rtrim( \implode(
+			$output[] = rtrim( implode(
 				$margin ? '' : "\t",
-				\array_map(
-					fn( int $i ) => \str_pad(
+				array_map(
+					fn( int $i ) => str_pad(
 						(string)( $row[$i] ?? '' ),
 						$this->columnWidths[$i] + $margin,
 					),
-					\range( 0, $this->headerCount - 1 ),
+					range( 0, $this->headerCount - 1 ),
 				),
 			) );
 		}
 
-		return \implode( \PHP_EOL, $output ) . \PHP_EOL;
+		return implode( \PHP_EOL, $output ) . \PHP_EOL;
 	}
 }

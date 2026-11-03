@@ -8,7 +8,7 @@
 
 use letswifi\LetsWifiApp;
 
-require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 1 ), 'src', '_autoload.php'] );
+require implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 1 ), 'src', '_autoload.php'] );
 $app = new LetsWifiApp( basePath: '.' );
 $provider = $app->getProvider();
 
@@ -21,21 +21,21 @@ if ( $installProfiles = $app->getBrandingConfiguration() ) {
 	$matchedPlatform = null;
 
 	foreach ( $platforms as $key => $platform ) {
-		$pattern = \str_replace( '@', '\\@', (string)$platform['match'] );
+		$pattern = str_replace( '@', '\\@', (string)$platform['match'] );
 
-		if ( \preg_match( "@{$pattern}@", $userAgent ) ) {
+		if ( preg_match( "@{$pattern}@", $userAgent ) ) {
 			$matchedPlatform = $platforms[$key];
 
 			// Set "apps" and "profiles" for the platform to the actual apps and profiles,
 			// instead of just references.
-			$matchedPlatform['apps'] = \array_combine(
+			$matchedPlatform['apps'] = array_combine(
 				$platform['apps'] ?? [],
-				\array_map( static fn ( string $appName ): array => $apps[$appName], $platform['apps'] ?? [] ),
+				array_map( static fn( string $appName ): array => $apps[$appName], $platform['apps'] ?? [] ),
 			);
-			$matchedPlatform['profiles'] = \array_combine(
+			$matchedPlatform['profiles'] = array_combine(
 				$platform['profiles'] ?? [],
-				\array_map(
-					static fn ( string $profileName ): array => $profiles[$profileName] + ['href' => "{$app->basePath}/profiles/new/{$profileName}/"],
+				array_map(
+					static fn( string $profileName ): array => $profiles[$profileName] + ['href' => "{$app->basePath}/profiles/new/{$profileName}/"],
 					$platform['profiles'] ?? [],
 				),
 			);
@@ -53,7 +53,7 @@ $apiConfiguration = [
 ];
 
 // The platform field is user-agent dependent
-\header( 'Vary: User-Agent' );
+header( 'Vary: User-Agent' );
 
 $app->render( [
 	'platform' => $matchedPlatform ?? null,

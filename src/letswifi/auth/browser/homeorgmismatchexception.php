@@ -27,7 +27,7 @@ class HomeOrgMismatchException extends MismatchIdpException
 	public function __construct( $required, array $provided, ?string $username = null )
 	{
 		if ( \is_array( $required ) && 1 === \count( $required ) ) {
-			$required = \reset( $required );
+			$required = reset( $required );
 		}
 
 		$this->required = $required;
@@ -36,10 +36,10 @@ class HomeOrgMismatchException extends MismatchIdpException
 
 		$requiredStr = \is_string( $required )
 			? \sprintf( "'%s'", $required )
-			: \sprintf( '[%s]', \implode( ', ', $required ) );
+			: \sprintf( '[%s]', implode( ', ', $required ) );
 		$providedStr = 1 === \count( $provided )
-			? \sprintf( "'%s'", \reset( $provided ) )
-			: \sprintf( '[%s]', \implode( ', ', $provided ) );
+			? \sprintf( "'%s'", reset( $provided ) )
+			: \sprintf( '[%s]', implode( ', ', $provided ) );
 		RuntimeException::__construct( "Cannot reconsiliate {$requiredStr} with {$providedStr}" . ( isset( $username ) ? " with username {$username}" : '' ) );
 	}
 }

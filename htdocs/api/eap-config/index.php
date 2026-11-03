@@ -14,7 +14,7 @@ use letswifi\error\HttpMethodException;
 if ( 'POST' !== ( $_SERVER['REQUEST_METHOD'] ?? null ) ) {
 	// We were planning on just including another file and letting it handle all startup formalities
 	// but since we already have to handle an error here, just do a quick startup sequence here
-	require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'src', '_autoload.php'] );
+	require implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'src', '_autoload.php'] );
 	$app = new LetsWifiApp( basePath: '../..' );
 
 	throw new HttpMethodException( ['POST'] );
@@ -22,4 +22,4 @@ if ( 'POST' !== ( $_SERVER['REQUEST_METHOD'] ?? null ) ) {
 
 $_GET['format'] ??= 'eap-config';
 
-require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 2 ), 'profiles', 'new', 'index.php'] );
+require implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 2 ), 'profiles', 'new', 'index.php'] );

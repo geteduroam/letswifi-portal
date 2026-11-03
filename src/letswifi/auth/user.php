@@ -43,10 +43,10 @@ class User implements JsonSerializable
 
 	public function jsonSerialize(): array
 	{
-		return \array_filter( [
+		return array_filter( [
 			'user_id' => $this->userId,
 			'provider' => $this->provider->host,
-			'realms' => \array_keys( $this->realms ),
+			'realms' => array_keys( $this->realms ),
 			'affiliations' => $this->affiliations,
 			'client_id' => $this->clientId,
 			'grant_sid' => $this->grantSid,
@@ -86,7 +86,7 @@ class User implements JsonSerializable
 	{
 		return \in_array(
 			\is_string( $realm ) ? $realm : $realm->realmId,
-			\array_map(
+			array_map(
 				static fn( Realm $r ) => $r->realmId,
 				$this->getRealms() ),
 			true );
@@ -152,6 +152,6 @@ class User implements JsonSerializable
 		// or check each realm individually.
 
 			? $this->provider->allRealms()
-			: \array_filter( $this->provider->allRealms(), fn( Realm $r ) => $this->hasAffiliations( ...$r->admins ) );
+			: array_filter( $this->provider->allRealms(), fn( Realm $r ) => $this->hasAffiliations( ...$r->admins ) );
 	}
 }

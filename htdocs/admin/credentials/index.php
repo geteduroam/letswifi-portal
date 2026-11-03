@@ -9,7 +9,7 @@
 use letswifi\LetsWifiApp;
 use letswifi\credential\Credential;
 
-require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'src', '_autoload.php'] );
+require implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'src', '_autoload.php'] );
 $app = new LetsWifiApp( basePath: '../..' );
 $provider = $app->getProvider();
 $user = $provider->requireAuth( scope: 'admin' );
@@ -28,20 +28,20 @@ if ( 'POST' === ( $_SERVER['REQUEST_METHOD'] ?? '' ) ) {
 		);
 	}
 	if ( $_POST['http_form_post_redirect'] ?? 0 ) {
-		\header( 'Location: ?' . \http_build_query( $_GET ), true, 303 );
+		header( 'Location: ?' . http_build_query( $_GET ), true, 303 );
 	} else {
-		\header( 'Content-Type: application/x-zerosize', true, 204 );
+		header( 'Content-Type: application/x-zerosize', true, 204 );
 	}
 
 	exit;
 }
 if ( \array_key_exists( 'realms', $_GET ) && \is_array( $_GET['realms'] ) ) {
 	/** @psalm-suppress InvalidArgument */
-	$realmsFilter = \array_diff( \array_keys( $admin->realms ), $_GET['realms'] )
-	? \implode( ',', $_GET['realms'] )
+	$realmsFilter = array_diff( array_keys( $admin->realms ), $_GET['realms'] )
+	? implode( ',', $_GET['realms'] )
 	: null;
-	\header( 'Location: ?' . \http_build_query( \array_filter( ['realms' => $realmsFilter] + $_GET ) ) );
-	\setcookie(
+	header( 'Location: ?' . http_build_query( array_filter( ['realms' => $realmsFilter] + $_GET ) ) );
+	setcookie(
 		'filter_admin_realms', $realmsFilter ?? '',
 		['path' => '/admin/', 'httponly' => true],
 	);
@@ -49,12 +49,12 @@ if ( \array_key_exists( 'realms', $_GET ) && \is_array( $_GET['realms'] ) ) {
 	exit;
 }
 
-$realmsFilter = \array_filter( \explode( ',', $_GET['realms'] ?? $_COOKIE['filter_admin_realms'] ?? '' ) );
+$realmsFilter = array_filter( explode( ',', $_GET['realms'] ?? $_COOKIE['filter_admin_realms'] ?? '' ) );
 $requesterFilter = \array_key_exists( 'requester', $_GET ) && \is_string( $_GET['requester'] )
-	? \trim( $_GET['requester'] ) ?: null
+	? trim( $_GET['requester'] ) ?: null
 	: null;
 $identFilter = \array_key_exists( 'ident', $_GET ) && \is_string( $_GET['ident'] )
-	? \trim( $_GET['ident'] ) ?: null
+	? trim( $_GET['ident'] ) ?: null
 	: null;
 $filterMaskRevoked = \array_key_exists( 'revoked', $_GET ) && \in_array( $_GET['revoked'], ['0', 'off'], true );
 $filterMaskUnrevoked = \array_key_exists( 'unrevoked', $_GET ) && \in_array( $_GET['unrevoked'], ['0', 'off'], true );
@@ -83,8 +83,8 @@ $app->render( [
 	'__admin_menu' => ( require '../_menu.php' ),
 
 	'credentials' => isset( $identFilter )
-		? \array_filter( [$credentialAdmin->getCredential( $identFilter )] )
-		: \iterator_to_array( $credentialAdmin->listCredentials(
+		? array_filter( [$credentialAdmin->getCredential( $identFilter )] )
+		: iterator_to_array( $credentialAdmin->listCredentials(
 			$realmsFilter,
 			requester: $requesterFilter,
 			validOn: $validOn,
@@ -92,13 +92,13 @@ $app->render( [
 			unrevoked: !$filterMaskUnrevoked,
 		) ),
 ], 'admin-credentials', [
-	Credential::class => static fn ( Credential $c ) => [
+	Credential::class => static fn( Credential $c ) => [
 		'not_before' => $c->getIssued(),
 		'not_after' => $c->getExpiry(),
 		'revoked' => $c->getRevoked(),
 
-		'requester_href' => '?' . \http_build_query( ['ident' => null, 'requester' => $c->userId] + $_GET ),
-		'ident_href' => '?' . \http_build_query( ['ident' => $c->credentialId] + $_GET ),
-		'realm_href' => '?' . \http_build_query( ['ident' => null, 'realms' => $c->realm->realmId] + $_GET ),
+		'requester_href' => '?' . http_build_query( ['ident' => null, 'requester' => $c->userId] + $_GET ),
+		'ident_href' => '?' . http_build_query( ['ident' => $c->credentialId] + $_GET ),
+		'realm_href' => '?' . http_build_query( ['ident' => null, 'realms' => $c->realm->realmId] + $_GET ),
 	],
 ] );

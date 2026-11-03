@@ -20,6 +20,6 @@ class HttpMethodException extends UserException
 	public function __construct( public readonly array $allowed, ?string $provided = null, ?Throwable $previous = null )
 	{
 		$this->provided = $provided ?? $_SERVER['REQUEST_METHOD'] ?? null;
-		parent::__construct( "{$this->provided} request not allowed, only " . \implode( ', ', $allowed ) . ' allowed', 405, $previous );
+		parent::__construct( "{$this->provided} request not allowed, only " . implode( ', ', $allowed ) . ' allowed', 405, $previous );
 	}
 }

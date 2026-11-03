@@ -45,13 +45,13 @@ abstract class Format
 		);
 
 		// Convert "class-name" to "\letswifi\format\ClassNameFormat"
-		if ( !\preg_match( '/[^0-9a-z\\-]|--|^[0-9]|^-|-$/m', $type ) ) {
-			$className = \sprintf( '\\letswifi\\format\\%sFormat', \ucfirst(
-				\preg_replace_callback(
+		if ( !preg_match( '/[^0-9a-z\\-]|--|^[0-9]|^-|-$/m', $type ) ) {
+			$className = \sprintf( '\\letswifi\\format\\%sFormat', ucfirst(
+				preg_replace_callback(
 					'/(\\-[a-z])/',
-					static fn( $m ) => \strtoupper( \ltrim( $m[1], '-' ) ), $type ) ?? '-',
+					static fn( $m ) => strtoupper( ltrim( $m[1], '-' ) ), $type ) ?? '-',
 			) );
-			if ( !\str_contains( $className, '-' ) && \class_exists( $className ) && \is_subclass_of( $className, self::class ) ) {
+			if ( !str_contains( $className, '-' ) && class_exists( $className ) && is_subclass_of( $className, self::class ) ) {
 				return new $className( $credential, $provider, $translator, $profileSigner, $passphrase );
 			}
 		}
@@ -61,19 +61,19 @@ abstract class Format
 
 	public function emit(): never
 	{
-		if ( \headers_sent() ) {
+		if ( headers_sent() ) {
 			throw new DomainException( 'Cannot emit file, headers already sent' );
 		}
 		$payload = $this->generate();
-		if ( \headers_sent() ) {
+		if ( headers_sent() ) {
 			// TODO revoke credential here?
 			throw new DomainException( 'Cannot emit file, headers sent while generating file' );
 		}
-		\header( 'Content-Disposition: attachment; filename="' . $this->getFilename() . '"' );
-		\header( 'Content-Type: ' . $this->getContentType() );
-		\header( 'Content-Length: ' . \strlen( $payload ) );
+		header( 'Content-Disposition: attachment; filename="' . $this->getFilename() . '"' );
+		header( 'Content-Type: ' . $this->getContentType() );
+		header( 'Content-Length: ' . \strlen( $payload ) );
 		if ( !$this instanceof Pkcs12Format ) {
-			\header( 'Vary: Accept-Language' );
+			header( 'Vary: Accept-Language' );
 		}
 
 		exit( $payload );
@@ -82,7 +82,7 @@ abstract class Format
 	public function getFilename(): string
 	{
 		$identifier = $this->getIdentifier();
-		$datetime = \date( 'YmdHis' );
+		$datetime = date( 'YmdHis' );
 		$extension = $this->getFileExtension();
 
 		return "{$identifier}.{$datetime}.{$extension}";
@@ -90,7 +90,7 @@ abstract class Format
 
 	public function getIdentifier(): string
 	{
-		return \implode( '.', \array_reverse( \explode( '.', $this->credential->realm->realmId ) ) );
+		return implode( '.', array_reverse( explode( '.', $this->credential->realm->realmId ) ) );
 	}
 
 	abstract public function getFileExtension(): string;
@@ -105,7 +105,7 @@ abstract class Format
 			$s = $this->translator->translate( $s );
 		}
 
-		return \htmlspecialchars( $s, \ENT_QUOTES, 'UTF-8' );
+		return htmlspecialchars( $s, \ENT_QUOTES, 'UTF-8' );
 	}
 
 	/**
@@ -115,9 +115,9 @@ abstract class Format
 	{
 		\assert( 0 < $length, '$length must be at least 1' );
 
-		return \implode(
-			"\n" . \str_repeat( "\t", $indentation ),
-			\str_split( $data, $length ),
+		return implode(
+			"\n" . str_repeat( "\t", $indentation ),
+			str_split( $data, $length ),
 		);
 	}
 
@@ -127,15 +127,15 @@ abstract class Format
 	protected static function uuidgen( ?string $data = null ): string
 	{
 		if ( null === $data ) {
-			$data = \random_bytes( 16 );
+			$data = random_bytes( 16 );
 			$version = 0x40;
 		} else {
-			$data = \substr( \hash( 'sha1', $data, true ), 0, 16 );
+			$data = substr( hash( 'sha1', $data, true ), 0, 16 );
 			$version = 0x50;
 		}
 		$data[6] = \chr( \ord( $data[6] ) & 0x0F | $version ); // set version bits to b0100 or b0101
 		$data[8] = \chr( \ord( $data[8] ) & 0x3F | 0x80 ); // set bits 6-7 to b10
 
-		return \vsprintf( '%s%s-%s-%s-%s-%s%s%s', \str_split( \bin2hex( $data ), 4 ) );
+		return vsprintf( '%s%s-%s-%s-%s-%s%s%s', str_split( bin2hex( $data ), 4 ) );
 	}
 }

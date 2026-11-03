@@ -53,9 +53,9 @@ class Command
 	public function __construct( array $argv )
 	{
 		if ( '/' === $argv[0][0] ) {
-			$argv[0] = \basename( $argv[0] );
+			$argv[0] = basename( $argv[0] );
 		}
-		$this->argv = \array_values( $argv );
+		$this->argv = array_values( $argv );
 
 		$this->config = new DictionaryPhpFile( 'letswifi.conf.php', [
 			\dirname( __DIR__, 3 ) . \DIRECTORY_SEPARATOR . 'config',
@@ -70,14 +70,14 @@ class Command
 	{
 		\assert( self::class === static::class );
 		$argv = $this->argv;
-		$arg0 = \array_shift( $argv );
-		$arg1 = \array_shift( $argv ) ?? 'help';
+		$arg0 = array_shift( $argv );
+		$arg1 = array_shift( $argv ) ?? 'help';
 		if ( !\array_key_exists( $arg1, self::COMMANDS ) ) {
 			static::print_error( "Unknown command: {$arg1}" );
 			$arg1 = 'help';
 		}
 		$class = self::COMMANDS[$arg1];
-		\array_unshift( $argv, 'help' === $arg1 ? $arg0 : "{$arg0}-{$arg1}" );
+		array_unshift( $argv, 'help' === $arg1 ? $arg0 : "{$arg0}-{$arg1}" );
 
 		try {
 			$command = new $class( $argv );
@@ -98,7 +98,7 @@ class Command
 
 	protected static function print_error( string ...$s ): void
 	{
-		\fwrite( \STDERR, \implode( \PHP_EOL, $s ) . \PHP_EOL );
+		fwrite( \STDERR, implode( \PHP_EOL, $s ) . \PHP_EOL );
 	}
 
 	protected function createSigningCertificate( string $commonName ): string
@@ -135,10 +135,10 @@ class Command
 
 	protected function getName(): string
 	{
-		$classSegments = \explode( '\\', static::class );
-		$class = \end( $classSegments );
-		if ( \str_ends_with( $class, 'Command' ) ) {
-			return \strtolower( \substr( $class, 0, -7 ) );
+		$classSegments = explode( '\\', static::class );
+		$class = end( $classSegments );
+		if ( str_ends_with( $class, 'Command' ) ) {
+			return strtolower( substr( $class, 0, -7 ) );
 		}
 
 		throw new UnexpectedValueException( 'Cannot find command name from class name ' . $class );
@@ -146,7 +146,7 @@ class Command
 }
 
 if ( \PHP_SAPI !== 'cli' ) {
-	\fwrite( \STDERR, 'This program is intended to be run from the command line.' . \PHP_EOL );
+	fwrite( \STDERR, 'This program is intended to be run from the command line.' . \PHP_EOL );
 
 	exit( 1 );
 }

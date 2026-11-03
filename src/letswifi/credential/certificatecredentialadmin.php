@@ -304,11 +304,11 @@ class CertificateCredentialAdmin extends CredentialAdmin
 				}
 			}
 		}
-		$realms = \array_map( static fn( Realm|string $r ) => $sqlEscape( $r instanceof Realm ? $r->realmId : $r ), $realms );
+		$realms = array_map( static fn( Realm|string $r ) => $sqlEscape( $r instanceof Realm ? $r->realmId : $r ), $realms );
 		if ( \in_array( false, $realms, true ) ) {
 			throw new DomainException( 'Unable to escape realm value' );
 		}
-		$realmConditions = ' AND realm IN (' . \implode( ', ', $realms ) . ')';
+		$realmConditions = ' AND realm IN (' . implode( ', ', $realms ) . ')';
 
 		return $realmConditions;
 	}

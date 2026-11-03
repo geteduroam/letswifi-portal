@@ -91,16 +91,16 @@ final class LetsWifiApp
 		] );
 		$this->profileService = new ProfileService(
 			$this->globalConfig,
-			\strstr( $this->getHttpHost(), ':', true ) ?: $this->getHttpHost(), // remove port number
+			strstr( $this->getHttpHost(), ':', true ) ?: $this->getHttpHost(), // remove port number
 		);
 
 		if ( \PHP_SAPI === 'cli-server' ) {
 			// Ensure that we are setting restrictive security headers when developing,
 			// to prevent nasty surprises later on.
-			\header( 'Content-Security-Policy: default-src \'none\'; img-src \'self\'; style-src \'self\'; font-src \'self\'; form-action \'self\'; base-uri \'none\'; frame-ancestors \'none\';' );
-			\header( 'Referrer-Policy: "no-referrer"' );
-			\header( 'X-Frame-Options: "DENY"' );
-			\header( 'X-Content-Type-Options: "nosniff"' );
+			header( 'Content-Security-Policy: default-src \'none\'; img-src \'self\'; style-src \'self\'; font-src \'self\'; form-action \'self\'; base-uri \'none\'; frame-ancestors \'none\';' );
+			header( 'Referrer-Policy: "no-referrer"' );
+			header( 'X-Frame-Options: "DENY"' );
+			header( 'X-Content-Type-Options: "nosniff"' );
 		}
 
 		if ( $registerExceptionHandler ) {
@@ -124,17 +124,17 @@ final class LetsWifiApp
 
 	public static function isBrowser(): bool
 	{
-		return \str_starts_with( $_SERVER['HTTP_ACCEPT'] ?? '', 'text/html' );
+		return str_starts_with( $_SERVER['HTTP_ACCEPT'] ?? '', 'text/html' );
 	}
 
 	public function registerExceptionHandler(): void
 	{
-		\set_exception_handler( [$this, 'handleException'] );
+		set_exception_handler( [$this, 'handleException'] );
 	}
 
 	public function handleException( Throwable $ex ): void
 	{
-		\error_log( $ex->__toString() );
+		error_log( $ex->__toString() );
 		$code = $ex->getCode();
 		if ( !\array_key_exists( $code, static::HTTP_CODES ) ) {
 			$code = 500;
@@ -142,9 +142,9 @@ final class LetsWifiApp
 		$codeExplain = static::HTTP_CODES[$code];
 		$message = $ex instanceof UserException
 		? $ex->getMessage()
-		: ( \preg_replace( '/^.*\\\\/', '', $ex::class ) ?? $ex::class ) . ': ' . $ex->getMessage();
-		if ( \PHP_SAPI !== 'cli' && !\headers_sent() ) {
-			\header( 'Content-Type: text/plain', true, $code );
+		: ( preg_replace( '/^.*\\\\/', '', $ex::class ) ?? $ex::class ) . ': ' . $ex->getMessage();
+		if ( \PHP_SAPI !== 'cli' && !headers_sent() ) {
+			header( 'Content-Type: text/plain', true, $code );
 			if ( !$this->crashing ) {
 				$this->crashing = true;
 
@@ -178,11 +178,11 @@ final class LetsWifiApp
 		if ( null === $template || $forceJson || !$this->isBrowser() ) {
 			$filter = $forceDebug
 				? static fn( string $k ): bool => true
-				: static fn( string $k ): bool => $k && !\str_starts_with( $k, '_' );
-			\header( 'Content-Type: application/json' );
+				: static fn( string $k ): bool => $k && !str_starts_with( $k, '_' );
+			header( 'Content-Type: application/json' );
 
-			exit( (string)\json_encode(
-				\array_filter(
+			exit( (string)json_encode(
+				array_filter(
 					$data,
 					$filter,
 					\ARRAY_FILTER_USE_KEY,
@@ -190,7 +190,7 @@ final class LetsWifiApp
 				\JSON_UNESCAPED_SLASHES,
 			) . "\r\n" );
 		}
-		\header( 'Content-Type: text/html;charset=utf8' );
+		header( 'Content-Type: text/html;charset=utf8' );
 
 		$template = $this->getTwig()->load( "{$template}.twig" );
 
@@ -209,7 +209,7 @@ final class LetsWifiApp
 				'locale' => $locale,
 				'lang' => $locale->baseLanguage,
 				'display_name' => $displayName,
-				'href' => '?' . \http_build_query( $_GET + ['lang' => $locale->baseLanguage] ),
+				'href' => '?' . http_build_query( $_GET + ['lang' => $locale->baseLanguage] ),
 				'active' => $locale->isA( $this->getTranslationContext()->primaryLocale ),
 			];
 		}
@@ -277,21 +277,21 @@ final class LetsWifiApp
 			$url = $this->getRequestUrl();
 			unset( $get['lang'] );
 			if ( !empty( $get ) ) {
-				$url .= '?' . \http_build_query( $get );
+				$url .= '?' . http_build_query( $get );
 			}
-			\setcookie( 'lang', $_GET['lang'], [
+			setcookie( 'lang', $_GET['lang'], [
 				'path' => $this->getBasePath(),
 				'secure' => $this->isHttps(),
 				'samesite' => $this->isHttps() ? 'None' : 'Lax', // Some browser require HTTPS for 'None'
 				// https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#controlling_third-party_cookies_with_samesite
 			] );
 
-			\header( 'Location: ' . $url, true, 302 );
-			\header( 'Content-Type: text/plain' );
-			\header( 'Cache-Control: no-store' );
-			\header( 'Content-Language: en-001' );
+			header( 'Location: ' . $url, true, 302 );
+			header( 'Content-Type: text/plain' );
+			header( 'Cache-Control: no-store' );
+			header( 'Content-Language: en-001' );
 
-			exit( \implode( "\r\n", [
+			exit( implode( "\r\n", [
 				"Language in cookie set to \"{$_GET['lang']}\"",
 				'',
 				'Please return to the previous page, or redirect:',
@@ -301,7 +301,7 @@ final class LetsWifiApp
 			] ) );
 		}
 		if ( null === $this->translationContext ) {
-			$allowedLocales = \array_values( $this->globalConfig->getStrings( 'locales' ) );
+			$allowedLocales = array_values( $this->globalConfig->getStrings( 'locales' ) );
 			$this->translationContext = new TranslationContext(
 				userLocale: $_COOKIE['lang'] ?? null,
 				localeDirectory: \dirname( __DIR__, 2 ) . \DIRECTORY_SEPARATOR . 'locale',
@@ -373,31 +373,31 @@ final class LetsWifiApp
 	{
 		$requestUri = $_SERVER['REQUEST_URI'] ?? '';
 
-		return \strstr( $requestUri, '?', true ) ?: $requestUri;
+		return strstr( $requestUri, '?', true ) ?: $requestUri;
 	}
 
 	protected function getBasePath(): string
 	{
 		$requestUri = $_SERVER['REQUEST_URI'] ?? '';
-		$path = \explode( '/', \rtrim( $this->getIndexPath(), '/' ) );
-		$baseParts = \explode( '/', $this->basePath );
+		$path = explode( '/', rtrim( $this->getIndexPath(), '/' ) );
+		$baseParts = explode( '/', $this->basePath );
 		while ( !empty( $baseParts ) ) {
-			$element = \array_shift( $baseParts );
+			$element = array_shift( $baseParts );
 			if ( '..' === $element ) {
-				\array_pop( $path );
+				array_pop( $path );
 			} elseif ( '.' !== $element && '' !== $element ) {
 				$path[] = $element;
 			}
 		}
 
-		return \implode( '/', $path ) . '/';
+		return implode( '/', $path ) . '/';
 	}
 
 	protected function getTwig(): Environment
 	{
 		if ( null === $this->twig ) {
 			$loader = new FilesystemLoader(
-				[\implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 2 ), 'template'] )],
+				[implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 2 ), 'template'] )],
 			);
 			$this->twig = new Environment( $loader, [
 				'strict_variables' => true,
@@ -443,7 +443,7 @@ final class LetsWifiApp
 			if ( \is_object( $value ) ) {
 				$reshapeFunction = null;
 				foreach ( $reshape as $class => $f ) {
-					if ( \is_a( $value, $class ) ) {
+					if ( is_a( $value, $class ) ) {
 						$reshapeFunction = $f;
 					}
 				}
@@ -452,16 +452,16 @@ final class LetsWifiApp
 						$value = $this->deepConvertToJson( $value->jsonSerialize(), $reshape );
 					} else {
 						/** @psalm-suppress InvalidArgument $value is both instance of JsonSerializable and T */
-						$value = \array_filter(
+						$value = array_filter(
 							$this->deepConvertToJson( $reshapeFunction( $value ) + $value->jsonSerialize(), $reshape ),
-							fn ( $v ) => $this->jsonOutputDelete !== $v,
+							fn( $v ) => $this->jsonOutputDelete !== $v,
 						);
 					}
 				} elseif ( null !== $reshapeFunction ) {
 					/** @psalm-suppress InvalidArgument $value is T */
-					$value = \array_filter(
+					$value = array_filter(
 						$this->deepConvertToJson( $reshapeFunction( $value ), $reshape ),
-						fn ( $v ) => $this->jsonOutputDelete !== $v,
+						fn( $v ) => $this->jsonOutputDelete !== $v,
 					);
 				}
 			}

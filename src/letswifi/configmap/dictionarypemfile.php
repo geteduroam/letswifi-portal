@@ -36,7 +36,7 @@ class DictionaryPemFile extends DictionaryFile
 	 */
 	protected function readFile( string $filePath ): mixed
 	{
-		if ( !\file_exists( $filePath ) ) {
+		if ( !file_exists( $filePath ) ) {
 			throw new DomainException( 'PEM file missing: ' . $filePath );
 		}
 
@@ -49,12 +49,12 @@ class DictionaryPemFile extends DictionaryFile
 		}
 		$issuer = $x509->getIssuerSubject( longNames: false )->__toString();
 		$subject = $x509->getSubject( longNames: false )->__toString();
-		\assert( \str_ends_with( $filePath, \DIRECTORY_SEPARATOR . "{$subject}.pem" ) );
+		\assert( str_ends_with( $filePath, \DIRECTORY_SEPARATOR . "{$subject}.pem" ) );
 		if ( $issuer === $subject ) {
 			$issuer = null;
 		}
 
-		return \array_filter( [
+		return array_filter( [
 			'x509' => (string)$x509,
 			'key' => $privateKey?->getPrivateKeyPem( null ),
 			'issuer' => $issuer,

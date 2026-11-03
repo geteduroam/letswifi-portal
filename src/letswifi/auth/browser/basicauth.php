@@ -31,7 +31,7 @@ class BasicAuth implements BrowserAuthInterface
 		if ( null !== $userId ) {
 			return $userId;
 		}
-		\header( 'WWW-Authenticate: Basic realm="letswifi-ca"', true, 401 );
+		header( 'WWW-Authenticate: Basic realm="letswifi-ca"', true, 401 );
 
 		exit( "401 Unauthorized\r\n" );
 	}
@@ -46,7 +46,7 @@ class BasicAuth implements BrowserAuthInterface
 		if ( \array_key_exists( 'PHP_AUTH_USER', $this->server ) ) {
 			$user = $this->server['PHP_AUTH_USER'];
 			if ( \array_key_exists( $user, $this->accounts ) ) {
-				if ( \hash_equals( $this->accounts[$user], $this->server['PHP_AUTH_PW'] ?? '' ) ) {
+				if ( hash_equals( $this->accounts[$user], $this->server['PHP_AUTH_PW'] ?? '' ) ) {
 					return $user;
 				}
 			}

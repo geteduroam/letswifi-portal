@@ -31,7 +31,7 @@ class EapConfigFormat extends Format
 			. "\r\n\t" . '<EAPIdentityProvider ID="' . $this->e( $this->credential->realm->realmId ) . '" namespace="urn:RFC4282:realm" version="1">';
 		if ( null !== $expiry = $this->credential->getExpiry() ) {
 			$result .= ''
-				. "\r\n\t\t<ValidUntil>" . $this->e( \gmdate( 'Y-m-d\\TH:i:s\\Z', $expiry->getTimestamp() ) ) . '</ValidUntil>';
+				. "\r\n\t\t<ValidUntil>" . $this->e( gmdate( 'Y-m-d\\TH:i:s\\Z', $expiry->getTimestamp() ) ) . '</ValidUntil>';
 		}
 		$result .= ''
 			. "\r\n\t\t<AuthenticationMethods>";
@@ -60,7 +60,7 @@ class EapConfigFormat extends Format
 		}
 		if ( null !== $logo = $this->credential->provider->logo ?? $this->credential->realm->logo ) {
 			$result .= ''
-				. "\r\n\t\t\t" . '<ProviderLogo mime="' . $this->e( $logo->contentType ) . '" encoding="base64">' . \base64_encode( $logo->getBytes() ) . '</ProviderLogo>';
+				. "\r\n\t\t\t" . '<ProviderLogo mime="' . $this->e( $logo->contentType ) . '" encoding="base64">' . base64_encode( $logo->getBytes() ) . '</ProviderLogo>';
 		}
 		/*
 		if ( null !== $tos = $this->profileData->getTermsOfUse() ) {
@@ -168,7 +168,7 @@ class EapConfigFormat extends Format
 			. "\r\n\t\t\t\t<ServerSideCredential>";
 		foreach ( $this->credential->realm->getTrustedCACertificates() as $ca ) {
 			$result .= ''
-				. "\r\n\t\t\t\t\t" . '<CA format="X.509" encoding="base64">' . \base64_encode( $ca->getX509Der() ) . '</CA>';
+				. "\r\n\t\t\t\t\t" . '<CA format="X.509" encoding="base64">' . base64_encode( $ca->getX509Der() ) . '</CA>';
 		}
 		foreach ( $this->credential->realm->serverNames as $serverName ) {
 			$result .= ''
@@ -188,7 +188,7 @@ class EapConfigFormat extends Format
 				. "\r\n\t\t\t\t\t<OuterIdentity>" . $this->e( $identity ) . '</OuterIdentity>';
 		}
 		$result .= ''
-			. "\r\n\t\t\t\t\t" . '<ClientCertificate format="PKCS12" encoding="base64">' . \base64_encode( $pkcs12->getPKCS12Bytes( $this->passphrase ?: $defaultPassphrase ) ) . '</ClientCertificate>';
+			. "\r\n\t\t\t\t\t" . '<ClientCertificate format="PKCS12" encoding="base64">' . base64_encode( $pkcs12->getPKCS12Bytes( $this->passphrase ?: $defaultPassphrase ) ) . '</ClientCertificate>';
 		if ( !$this->passphrase ) {
 			$result .= ''
 				. "\r\n\t\t\t\t\t<Passphrase>" . $this->e( $defaultPassphrase ) . '</Passphrase>';

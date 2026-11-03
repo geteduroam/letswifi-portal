@@ -64,12 +64,12 @@ class Realm implements JsonSerializable
 			signer: $realmData->getString( 'signer' ),
 			validity: static::getValidity( $realmData->getInt( 'validity' ) ),
 			networks: $profileService->getNetworks( ...$realmData->getStrings( 'networks' ) ),
-			location: \array_map( [Location::class, 'fromConfig'], $location ),
+			location: array_map( [Location::class, 'fromConfig'], $location ),
 			logo: null === $logo ? null : Logo::fromConfig( $logo ),
 			description: $realmData->getObjectOrNull( 'description', MultiLanguageString::class ),
 			contactId: $realmData->getStringOrNull( 'contact' ),
 			admins: $realmData->has( 'admins' ) ? $realmData->getStrings( 'admins' ) : [],
-			extra: \array_filter( [
+			extra: array_filter( [
 				'mobileconfig_identifier' => $realmData->getStringOrNull( 'mobileconfig_identifier' ),
 				'mobileconfig_display_name' => $realmData->getStringOrNull( 'mobileconfig_display_name' ),
 			] ),
@@ -103,7 +103,7 @@ class Realm implements JsonSerializable
 			'logo' => isset( $this->logo ),
 			'signer' => $this->signer,
 			'trust' => $this->trust,
-			'networks' => \array_reduce( $this->networks, static fn( array $carry, Network $network ): array => [
+			'networks' => array_reduce( $this->networks, static fn( array $carry, Network $network ): array => [
 				$network->networkId => ['display_name' => $network->displayName]
 				+ ( $network instanceof NetworkPasspoint
 					? ['oids' => $network->oids, 'nai_realms' => $network->naiRealms] : [] )
@@ -125,7 +125,7 @@ class Realm implements JsonSerializable
 			return $in;
 		}
 		if ( \is_float( $in ) ) {
-			$in = (int)\round( $in );
+			$in = (int)round( $in );
 		}
 		if ( \is_int( $in ) && 0 < $in ) {
 			return new DateInterval( "P{$in}D" );

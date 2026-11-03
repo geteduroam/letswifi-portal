@@ -39,7 +39,7 @@ class GoogleOncFormat extends Format
 			$payload = $this->encrypt( $payload, $this->passphrase );
 		}
 
-		$payload = \json_encode(
+		$payload = json_encode(
 			$payload,
 			\JSON_UNESCAPED_SLASHES | \JSON_PRETTY_PRINT | \JSON_THROW_ON_ERROR,
 		) . "\n";
@@ -84,7 +84,7 @@ class GoogleOncFormat extends Format
 			throw new InvalidArgumentException( "Can only encrypt UnencryptedConfiguration, got '{$unencryptedONC['Type']}'" );
 		}
 
-		$clearText = \json_encode(
+		$clearText = json_encode(
 			$unencryptedONC,
 			\JSON_UNESCAPED_SLASHES | \JSON_THROW_ON_ERROR,
 		);
@@ -92,24 +92,24 @@ class GoogleOncFormat extends Format
 		/** @psalm-suppress RedundantConditionGivenDocblockType phan is not so sure about json_encode not returning false */
 		\assert( \is_string( $clearText ), 'json_encode can only generate string when JSON_THROW_ON_ERROR is set' );
 
-		$salt = \random_bytes( 8 );
-		$key = \hash_pbkdf2( 'sha1', $passphrase, $salt, self::PBKDF2_ITERATIONS, 32, true );
-		$iv = \random_bytes( 16 );
-		$cipherText = \openssl_encrypt( $clearText, 'AES-256-CBC', $key, \OPENSSL_RAW_DATA, $iv );
+		$salt = random_bytes( 8 );
+		$key = hash_pbkdf2( 'sha1', $passphrase, $salt, self::PBKDF2_ITERATIONS, 32, true );
+		$iv = random_bytes( 16 );
+		$cipherText = openssl_encrypt( $clearText, 'AES-256-CBC', $key, \OPENSSL_RAW_DATA, $iv );
 		if ( false === $cipherText ) {
 			throw new RuntimeException( 'Unable to encrypt profile' );
 		}
-		$hmac = \hash_hmac( 'sha1', $cipherText, $key, true );
+		$hmac = hash_hmac( 'sha1', $cipherText, $key, true );
 
 		return [
 			'Cipher' => 'AES256',
-			'Ciphertext' => \base64_encode( $cipherText ),
-			'HMAC' => \base64_encode( $hmac ),
+			'Ciphertext' => base64_encode( $cipherText ),
+			'HMAC' => base64_encode( $hmac ),
 			'HMACMethod' => 'SHA1',
-			'Salt' => \base64_encode( $salt ),
+			'Salt' => base64_encode( $salt ),
 			'Stretch' => 'PBKDF2',
 			'Iterations' => self::PBKDF2_ITERATIONS,
-			'IV' => \base64_encode( $iv ),
+			'IV' => base64_encode( $iv ),
 			'Type' => 'EncryptedConfiguration',
 		];
 	}
@@ -127,18 +127,18 @@ class GoogleOncFormat extends Format
 		$caCertificates = $this->getCAPayloadFromAuthMethod( $this->credential->realm->getTrustedCACertificates() );
 		$clientCertificate = $this->getClientCredentialPayloadFromAuthMethod( $pkcs12 );
 
-		$caIDs = \array_map( static fn ( $certData ) => $certData['GUID'], $caCertificates );
+		$caIDs = array_map( static fn( $certData ) => $certData['GUID'], $caCertificates );
 		$clientCertID = $clientCertificate['GUID'];
 		$serverSubjectMatch = $this->getLongestSuffix( ...$this->credential->realm->serverNames );
 
 		$clientCertCN = $pkcs12->x509->getSubject()->getCommonName();
 
-		$networkConfigurations = \array_filter( \array_map( fn ( Network $network ) => $this->generateNetworkConfiguration( $network, $clientCertID, $clientCertCN, $caIDs, $serverSubjectMatch ), $this->credential->realm->networks ) );
+		$networkConfigurations = array_filter( array_map( fn( Network $network ) => $this->generateNetworkConfiguration( $network, $clientCertID, $clientCertCN, $caIDs, $serverSubjectMatch ), $this->credential->realm->networks ) );
 
 		return [
 			'Type' => 'UnencryptedConfiguration',
-			'Certificates' => \array_values( \array_merge( $caCertificates, [$clientCertificate] ) ),
-			'NetworkConfigurations' => \array_values( $networkConfigurations ),
+			'Certificates' => array_values( array_merge( $caCertificates, [$clientCertificate] ) ),
+			'NetworkConfigurations' => array_values( $networkConfigurations ),
 		];
 	}
 
@@ -175,7 +175,7 @@ class GoogleOncFormat extends Format
 					'Identity' => $clientCertCN,
 					'Outer' => 'EAP-TLS',
 					'SaveCredentials' => true,
-					'ServerCARefs' => \array_values( $caIDs ),
+					'ServerCARefs' => array_values( $caIDs ),
 					'SubjectMatch' => $serverSubjectMatch,
 					'UseSystemCAs' => false,
 				],
@@ -193,14 +193,14 @@ class GoogleOncFormat extends Format
 	 */
 	protected static function getCAPayloadFromAuthMethod( array $certificates ): array
 	{
-		return \array_map( static function ( X509 $x509 ): array {
+		return array_map( static function( X509 $x509 ): array {
 			$uuid = static::uuidgen();
 
 			return [
 				'GUID' => "{{$uuid}}",
 				'Remove' => false,
 				'Type' => 'Authority',
-				'X509' => \base64_encode( $x509->getX509Der() ),
+				'X509' => base64_encode( $x509->getX509Der() ),
 			];
 		}, $certificates );
 	}
@@ -220,7 +220,7 @@ class GoogleOncFormat extends Format
 			'GUID' => "[{$uuid}]",
 			'Remove' => false,
 			'Type' => 'Client',
-			'PKCS12' => \base64_encode( $pkcs12->getPKCS12Bytes( '' ) ),
+			'PKCS12' => base64_encode( $pkcs12->getPKCS12Bytes( '' ) ),
 		];
 	}
 
@@ -237,24 +237,24 @@ class GoogleOncFormat extends Format
 			return '';
 		}
 		if ( \count( $hostnames ) === 1 ) {
-			return \reset( $hostnames );
+			return reset( $hostnames );
 		}
 		$longest = $hostnames[0];
 		foreach ( $hostnames as $candidate ) {
 			$pos = \strlen( $candidate );
 			do {
-				$pos = (int)\strrpos( $candidate, '.', -1 * \strlen( $candidate ) + $pos - 1 );
-			} while ( 0 < $pos && \str_ends_with( $longest, \substr( $candidate, $pos ) ) );
-			if ( !\str_ends_with( $longest, \substr( $candidate, $pos ) ) ) {
-				$pos = \strpos( $candidate, '.', $pos + 1 );
+				$pos = (int)strrpos( $candidate, '.', -1 * \strlen( $candidate ) + $pos - 1 );
+			} while ( 0 < $pos && str_ends_with( $longest, substr( $candidate, $pos ) ) );
+			if ( !str_ends_with( $longest, substr( $candidate, $pos ) ) ) {
+				$pos = strpos( $candidate, '.', $pos + 1 );
 			}
 			if ( false === $pos ) {
 				$longest = '';
 
 				break;
 			}
-			if ( \str_ends_with( $longest, \substr( $candidate, $pos ) ) ) {
-				$longest = \substr( $candidate, 0 === $pos ? 0 : $pos + 1 );
+			if ( str_ends_with( $longest, substr( $candidate, $pos ) ) ) {
+				$longest = substr( $candidate, 0 === $pos ? 0 : $pos + 1 );
 			}
 		}
 
@@ -271,9 +271,9 @@ class GoogleOncFormat extends Format
 	 */
 	private static function spacesToTabs( string $document, int $indentSize = 4 ): string
 	{
-		return \preg_replace_callback(
+		return preg_replace_callback(
 			'/^\\s+/m',
-			static fn ( array $match ): string => \str_replace( \str_repeat( ' ', $indentSize ), "\t", $match[0] ),
+			static fn( array $match ): string => str_replace( str_repeat( ' ', $indentSize ), "\t", $match[0] ),
 			$document,
 		) ?? $document;
 	}

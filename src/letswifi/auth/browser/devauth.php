@@ -16,7 +16,7 @@ class DevAuth implements BrowserAuthInterface
 	public function __construct( private readonly ?string $username = null, private readonly array $affiliations = [] )
 	{
 		if ( \PHP_SAPI !== 'cli-server' ) {
-			\header( 'Content-Type: text/plain' );
+			header( 'Content-Type: text/plain' );
 
 			exit( 'Development auth module cannot be used in production' . \PHP_EOL );
 		}
@@ -35,9 +35,9 @@ class DevAuth implements BrowserAuthInterface
 	public function getUserId(): string
 	{
 		// Get the running user ID
-		$user = $this->username ?? \get_current_user();
-		\assert( !\str_contains( $user, 'SYSTEM' ), 'Running as Windows SYSTEM user' );
-		\assert( !\str_contains( $user, 'root' ), 'Running as root' );
+		$user = $this->username ?? get_current_user();
+		\assert( !str_contains( $user, 'SYSTEM' ), 'Running as Windows SYSTEM user' );
+		\assert( !str_contains( $user, 'root' ), 'Running as root' );
 
 		return $user;
 	}

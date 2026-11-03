@@ -83,7 +83,7 @@ class Provider implements JsonSerializable
 			auth: $auth,
 			// Rename "realm" to "realm_access"
 			realmAccess: $providerData->getArrayOrNull( 'realm_access' ) ?? $providerData->getArrayOrNull( 'realm' ) ?? $providerData->getArray( 'realm_access' ),
-			location: \array_map( [Location::class, 'fromConfig'], $location ),
+			location: array_map( [Location::class, 'fromConfig'], $location ),
 			logo: null === $logo ? null : Logo::fromConfig( $logo ),
 			contactId: $providerData->getStringOrNull( 'contact' ),
 			description: $providerData->getObjectOrNull( 'description', MultiLanguageString::class ),
@@ -111,10 +111,10 @@ class Provider implements JsonSerializable
 	/** @return array<string,Realm> */
 	public function allRealms(): array
 	{
-		$keys = \array_merge( ...\array_values( $this->realmAccess ) );
-		$values = \array_map( [$this->tenantConfig, 'getRealm'], $keys );
+		$keys = array_merge( ...array_values( $this->realmAccess ) );
+		$values = array_map( [$this->tenantConfig, 'getRealm'], $keys );
 
-		return \array_combine( $keys, $values );
+		return array_combine( $keys, $values );
 	}
 
 	public function getRealm( string $realm ): ?Realm

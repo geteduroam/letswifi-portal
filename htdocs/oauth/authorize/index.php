@@ -11,7 +11,7 @@ use letswifi\LetsWifiApp;
 use letswifi\auth\browser\MismatchIdpException;
 use letswifi\error\ForbiddenException;
 
-require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'src', '_autoload.php'] );
+require implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'src', '_autoload.php'] );
 \assert( \array_key_exists( 'REQUEST_METHOD', $_SERVER ) ); // Psalm
 
 const POST_FIELD = 'approve';

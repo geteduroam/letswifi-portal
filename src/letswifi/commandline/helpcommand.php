@@ -35,12 +35,12 @@ class HelpCommand extends Command
 		$normal = static::NORMAL;
 		if ( \count( $command::HELP ) === 1 ) {
 			$output = [
-				"usage:  {$bold}{$this->argv[0]} {$name}{$normal} " . \current( $command::HELP ),
+				"usage:  {$bold}{$this->argv[0]} {$name}{$normal} " . current( $command::HELP ),
 			]; if ( \count( $command::LONG_HELP ) === 1 ) {
-				$output[] = "\n\t" . \str_replace(
+				$output[] = "\n\t" . str_replace(
 					"\n",
 					"\n\t",
-					(string)\current( $command::LONG_HELP ),
+					(string)current( $command::LONG_HELP ),
 				) . "\n";
 			}
 		} else {
@@ -49,9 +49,9 @@ class HelpCommand extends Command
 				'',
 			];
 			foreach ( $command::HELP as $i => $_ ) {
-				$output[] = "\t" . \rtrim( " {$command::HELP[$i]}" );
+				$output[] = "\t" . rtrim( " {$command::HELP[$i]}" );
 				if ( \array_key_exists( $i, $command::LONG_HELP ) ) {
-					$output[] = "\t\t" . \str_replace(
+					$output[] = "\t\t" . str_replace(
 						"\n",
 						"\n\t\t",
 						(string)$command::LONG_HELP[$i],
@@ -59,7 +59,7 @@ class HelpCommand extends Command
 				}
 			}
 		}
-		echo \implode( \PHP_EOL, $output ) . \PHP_EOL;
+		echo implode( \PHP_EOL, $output ) . \PHP_EOL;
 
 		exit( 1 );
 	}
@@ -75,10 +75,10 @@ class HelpCommand extends Command
 		];
 		foreach ( static::COMMANDS as $command => $class ) {
 			foreach ( $class::HELP as $help ) {
-				$output[] = "\t" . static::BOLD . $command . static::NORMAL . \rtrim( " {$help}" );
+				$output[] = "\t" . static::BOLD . $command . static::NORMAL . rtrim( " {$help}" );
 			}
 		}
-		echo \implode( \PHP_EOL, $output ) . \PHP_EOL;
+		echo implode( \PHP_EOL, $output ) . \PHP_EOL;
 
 		exit( 1 );
 	}

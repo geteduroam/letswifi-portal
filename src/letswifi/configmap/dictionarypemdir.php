@@ -50,7 +50,7 @@ class DictionaryPemDir extends DictionaryDir
 	public function importCertificate( X509 $x509, ?PrivateKey $privateKey = null, ?string $subjectHint = null ): string
 	{
 		$subject = $x509->getSubject( longNames: false )->__toString();
-		if ( \str_contains( $subject, '/' ) || \str_contains( $subject, '\\' ) ) {
+		if ( str_contains( $subject, '/' ) || str_contains( $subject, '\\' ) ) {
 			throw new ConfigurationException( "{$subject}: Certificate subject contains invalid sequences" );
 		}
 		if ( null !== $subjectHint && $subjectHint !== $subject ) {
@@ -61,12 +61,12 @@ class DictionaryPemDir extends DictionaryDir
 			break; // Replace foreach with array_first for PHP>=8.5.0
 		}
 		$filename = $baseDir . \DIRECTORY_SEPARATOR . $this->dirPath . \DIRECTORY_SEPARATOR . "{$subject}.pem";
-		$privKeyPem = \trim( $privateKey?->getPrivateKeyPem( null ) ?? '' );
+		$privKeyPem = trim( $privateKey?->getPrivateKeyPem( null ) ?? '' );
 		if ( !empty( $privKeyPem ) ) {
 			$privKeyPem .= "\n";
 		}
-		\file_put_contents( $filename, \implode( "\n", [
-			\trim( $x509->getX509Pem() ),
+		file_put_contents( $filename, implode( "\n", [
+			trim( $x509->getX509Pem() ),
 			$privKeyPem,
 		] ) );
 

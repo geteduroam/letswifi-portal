@@ -11,7 +11,7 @@ use letswifi\LetsWifiApp;
 use letswifi\credential\Credential;
 use letswifi\profile\Realm;
 
-require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 2 ), 'src', '_autoload.php'] );
+require implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 2 ), 'src', '_autoload.php'] );
 $app = new LetsWifiApp( basePath: '..' );
 $provider = $app->getProvider();
 $oauth = $provider->auth->oauth;
@@ -28,7 +28,7 @@ if ( 'POST' === ( $_SERVER['REQUEST_METHOD'] ?? '' ) ) {
 	if ( \array_key_exists( 'revoke_grant', $_POST ) && $revokeGrantSid = \is_string( $_POST['revoke_grant'] ) ? $_POST['revoke_grant'] : null ) {
 		$oauth->revokeSession( $revokeGrantSid );
 	}
-	\header( "Location: {$indexUrl}" );
+	header( "Location: {$indexUrl}" );
 
 	exit; // Stop after redirect
 }
@@ -38,8 +38,8 @@ $app->render(
 	[
 		'user' => $user,
 		'realms' => $user->getRealms(),
-		'credentials' => \iterator_to_array( $credentialLog->listCredentials() ),
-		'grants' => \iterator_to_array( $oauth->listGrants( $user->userId ) ),
+		'credentials' => iterator_to_array( $credentialLog->listCredentials() ),
+		'grants' => iterator_to_array( $oauth->listGrants( $user->userId ) ),
 		'form_action' => $indexUrl,
 		// TODO show realms with credential counts
 	], 'me', [
@@ -47,7 +47,7 @@ $app->render(
 			'logo' => $app->jsonOutputDelete,
 			'logo_endpoint' => null === $r->logo
 				? ( null === $provider->logo ? $app->jsonOutputDelete : "{$app->basePath}/profiles/info/logo.php" )
-				: "{$app->basePath}/profiles/info/logo.php?" . \http_build_query( ['realm' => $r->realmId] ),
+				: "{$app->basePath}/profiles/info/logo.php?" . http_build_query( ['realm' => $r->realmId] ),
 		],
 		Credential::class => static fn( Credential $c ) => [
 			'user' => $app->jsonOutputDelete,

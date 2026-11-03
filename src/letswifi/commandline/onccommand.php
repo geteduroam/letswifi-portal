@@ -40,22 +40,22 @@ class ONCCommand extends Command
 	public function decrypt(): void
 	{
 		$password = $this->argv[1] ?? self::die( 2, 'No PIN provided' );
-		$input = \file_get_contents( 'php://stdin' ) ?: self::die( 2, 'Malformed ONC' );
-		$parsed = \json_decode( $input, true );
-		$salt = \base64_decode( $parsed['Salt'], true ) ?: self::die( 2, 'Malformed ONC' );
-		$initVector = \base64_decode( $parsed['IV'], true ) ?: self::die( 2, 'Malformed ONC' );
+		$input = file_get_contents( 'php://stdin' ) ?: self::die( 2, 'Malformed ONC' );
+		$parsed = json_decode( $input, true );
+		$salt = base64_decode( $parsed['Salt'], true ) ?: self::die( 2, 'Malformed ONC' );
+		$initVector = base64_decode( $parsed['IV'], true ) ?: self::die( 2, 'Malformed ONC' );
 
-		$encryptionKey = \hash_pbkdf2( 'sha1', $password, $salt, $parsed['Iterations'], 32, true );
-		$data = \openssl_decrypt(
-			\base64_decode( $parsed['Ciphertext'], true ) ?: self::die( 2, 'Malformed ONC' ),
+		$encryptionKey = hash_pbkdf2( 'sha1', $password, $salt, $parsed['Iterations'], 32, true );
+		$data = openssl_decrypt(
+			base64_decode( $parsed['Ciphertext'], true ) ?: self::die( 2, 'Malformed ONC' ),
 			'AES-256-CBC',
 			$encryptionKey,
 			\OPENSSL_RAW_DATA,
 			$initVector,
 		);
-		$hmac = \hash_hmac(
+		$hmac = hash_hmac(
 			'sha1',
-			\base64_decode( $parsed['Ciphertext'], true ) ?: self::die( 2, 'Malformed ONC' ),
+			base64_decode( $parsed['Ciphertext'], true ) ?: self::die( 2, 'Malformed ONC' ),
 			$encryptionKey,
 			true,
 		);
@@ -63,7 +63,7 @@ class ONCCommand extends Command
 		if ( 'SHA1' !== $parsed['HMACMethod'] ) {
 			self::die( 2, 'Invalid HMAC algo' );
 		}
-		if ( \base64_decode( $parsed['HMAC'], true ) !== $hmac ) {
+		if ( base64_decode( $parsed['HMAC'], true ) !== $hmac ) {
 			self::die( 2, 'Invalid HMAC' );
 		}
 

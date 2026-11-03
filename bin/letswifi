@@ -9,6 +9,6 @@
 
 use letswifi\commandline\Command;
 
-require \dirname( __DIR__ ) . \implode( \DIRECTORY_SEPARATOR, ['', 'src', '_autoload.php'] );
+require \dirname( __DIR__ ) . implode( \DIRECTORY_SEPARATOR, ['', 'src', '_autoload.php'] );
 $command = new Command( $argv );
 $command->run();

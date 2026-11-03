@@ -10,7 +10,7 @@ use letswifi\LetsWifiApp;
 use letswifi\error\HttpMethodException;
 use letswifi\format\Format;
 
-require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'src', '_autoload.php'] );
+require implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'src', '_autoload.php'] );
 \assert( \array_key_exists( 'REQUEST_METHOD', $_SERVER ) );
 
 $app = new LetsWifiApp( basePath: '../..' );
@@ -44,7 +44,7 @@ if ( 'GET' === $_SERVER['REQUEST_METHOD'] && isset( $_GET['download'] ) ) {
 		// Remove the cookie
 		// Ensure this request can only be served one time
 		// Does not affect the current $_COOKIE variable
-		\setcookie( "{$formatCandidate}-download-token", '', [
+		setcookie( "{$formatCandidate}-download-token", '', [
 			'expires' => 0,
 			'httponly' => true,
 			'secure' => false,
@@ -54,8 +54,8 @@ if ( 'GET' === $_SERVER['REQUEST_METHOD'] && isset( $_GET['download'] ) ) {
 
 		if ( $_GET['format'] === $formatCandidate && isset( $_COOKIE["{$formatCandidate}-download-token"] ) ) {
 			$cookieTime = (int)$_COOKIE["{$formatCandidate}-download-token"];
-			$earliestOkTime = \time() - 60; // allow cookies up to 60 seconds old
-			if ( \time() >= $cookieTime && $cookieTime >= $earliestOkTime ) {
+			$earliestOkTime = time() - 60; // allow cookies up to 60 seconds old
+			if ( time() >= $cookieTime && $cookieTime >= $earliestOkTime ) {
 				$overrideMethod = 'POST';
 				$overrideFormat = $formatCandidate;
 			}
@@ -69,7 +69,7 @@ if ( 'GET' === $_SERVER['REQUEST_METHOD'] && isset( $_GET['download'] ) ) {
 	// also remove the GET parameters that attempted this from the URL
 	if ( !isset( $overrideMethod ) && \array_key_exists( 'REQUEST_URI', $_SERVER ) ) {
 		/** @psalm-suppress PossiblyFalseOperand */
-		\header( 'Location: ' . \strstr( $_SERVER['REQUEST_URI'], '?', true ) );
+		header( 'Location: ' . strstr( $_SERVER['REQUEST_URI'], '?', true ) );
 
 		exit; // Stop after redirect
 	}

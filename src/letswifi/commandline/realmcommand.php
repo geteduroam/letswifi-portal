@@ -57,8 +57,8 @@ class RealmCommand extends Command
 		parent::__construct( $argv );
 		$this->realm = $argv[2] ?? null;
 		$args = $argv;
-		\array_shift( $args );
-		\array_shift( $args );
+		array_shift( $args );
+		array_shift( $args );
 		$this->args = $args;
 	}
 
@@ -95,7 +95,7 @@ class RealmCommand extends Command
 			$validity = $realm->getInt( 'validity' );
 			$table->add(
 				$name,
-				\reset( $displayName )['display'],
+				reset( $displayName )['display'],
 				$contact,
 				(string)$validity,
 			);
@@ -110,20 +110,20 @@ class RealmCommand extends Command
 		$realm = $this->config->getDictionary( 'realm' )->getDictionary( $this->realm );
 		$table = new Table( 'setting', 'value' );
 		$displayName = $realm->getObject( 'display_name', MultiLanguageString::class )->jsonSerialize();
-		$table->add( 'display_name', \reset( $displayName )['display'] );
+		$table->add( 'display_name', reset( $displayName )['display'] );
 		$table->add( 'contact', $realm->getStringOrNull( 'contact' ) ?? '-' );
 		$table->add( 'validity', (string)$realm->getInt( 'validity' ) );
 
 		/** @psalm-suppress PossiblyFalseArgument */
-		$table->add( 'server_name', \json_encode( $realm->getStrings( 'server_names' ) ) );
+		$table->add( 'server_name', json_encode( $realm->getStrings( 'server_names' ) ) );
 
 		/** @psalm-suppress PossiblyFalseArgument */
-		$table->add( 'networks', \json_encode( $realm->getStrings( 'networks' ) ) );
+		$table->add( 'networks', json_encode( $realm->getStrings( 'networks' ) ) );
 		$table->add( 'signer', $realm->getString( 'signer' ) );
 
 		echo $table->printTable( margin: 0, header: true )
 		. "trust\n            \t- "
-		. \implode( "\n            \t- ", $realm->getStrings( 'trust' ) )
+		. implode( "\n            \t- ", $realm->getStrings( 'trust' ) )
 		. "\n";
 	}
 
@@ -147,7 +147,7 @@ class RealmCommand extends Command
 		$newCA = null;
 		$lang = 'en-GB';
 		for ( $i = 0; \count( $args ) > $i; ++$i ) {
-			switch ( \strtolower( $args[$i] ) ) {
+			switch ( strtolower( $args[$i] ) ) {
 				case '--newca':
 				case '--new-ca':
 					$i++;

@@ -28,7 +28,7 @@ class Logo
 		}
 		$contentType = $logo->getStringOrNull( 'content_type' );
 		if ( null === $contentType && isset( $logo['data#file'] ) ) {
-			$ext = \preg_replace( '/^.*\\./', '', $logo['data#file'] );
+			$ext = preg_replace( '/^.*\\./', '', $logo['data#file'] );
 
 			switch ( $ext ) {
 				case 'jpg':
@@ -53,15 +53,15 @@ class Logo
 
 	public function emit(): never
 	{
-		if ( \headers_sent() ) {
+		if ( headers_sent() ) {
 			throw new DomainException( 'Headers already sent' );
 		}
 		$bytes = $this->getBytes();
-		if ( \headers_sent() ) {
+		if ( headers_sent() ) {
 			throw new DomainException( 'Headers sent when trying to get logo payload' );
 		}
-		\header( 'Content-Type: ' . $this->contentType );
-		\header( 'Content-Length: ' . \strlen( $bytes ) );
+		header( 'Content-Type: ' . $this->contentType );
+		header( 'Content-Length: ' . \strlen( $bytes ) );
 
 		exit( $bytes );
 	}

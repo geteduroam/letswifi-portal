@@ -8,7 +8,7 @@
 
 use letswifi\LetsWifiApp;
 
-require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'src', '_autoload.php'] );
+require implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'src', '_autoload.php'] );
 
 // Fetch your code by running authorize/index.php
 // export code=…

@@ -188,7 +188,7 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 			throw new OutOfBoundsException( "Attribute {$key} was expected to have exactly 1 value, but has " . \count( $attributeValues ) );
 		}
 
-		return \reset( $attributeValues );
+		return reset( $attributeValues );
 	}
 
 	/**
@@ -236,12 +236,12 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 				throw new Exception( "Attribute {$attribute} not present in SAML assertion" );
 			}
 			if ( \is_array( $value ) ) {
-				if ( !\array_intersect( $value, $this->attributes[$attribute] ) ) {
+				if ( !array_intersect( $value, $this->attributes[$attribute] ) ) {
 					throw new Exception( "Attribute {$attribute} does not have one of the required values" );
 				}
 			}
 			if ( \is_string( $value ) ) {
-				if ( !\array_intersect( [$value], $this->attributes[$attribute] ) ) {
+				if ( !array_intersect( [$value], $this->attributes[$attribute] ) ) {
 					throw new Exception( "Attribute {$attribute} does not have the required value of {$value}" );
 				}
 			}
@@ -296,12 +296,12 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 	 */
 	private static function checkIdPList( array $expectedIdPList, array $authenticatingAuthority ): void
 	{
-		$firstIdP = \reset( $expectedIdPList );
+		$firstIdP = reset( $expectedIdPList );
 		// Psalm thinks reset() can return false if we use it inline
 		// but is completely happy if we put it in a variable first
 		// Refactor with array_first() when we require PHP>=8.5.0
-		if ( \count( \array_intersect( $expectedIdPList, $authenticatingAuthority ) ) !== \count( $expectedIdPList ) ) {
-			throw new MismatchIdpException( $firstIdP, \reset( $authenticatingAuthority ) ?: null );
+		if ( \count( array_intersect( $expectedIdPList, $authenticatingAuthority ) ) !== \count( $expectedIdPList ) ) {
+			throw new MismatchIdpException( $firstIdP, reset( $authenticatingAuthority ) ?: null );
 		}
 	}
 

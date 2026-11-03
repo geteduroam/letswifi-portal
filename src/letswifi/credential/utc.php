@@ -34,7 +34,7 @@ trait UTC
 	protected static function formatUtc( DateTimeInterface|int $dateTime ): string
 	{
 		return \is_int( $dateTime )
-			? \gmdate( 'Y-m-d H:i:s', $dateTime )
-			: \gmdate( 'Y-m-d H:i:s', $dateTime->getTimestamp() );
+			? gmdate( 'Y-m-d H:i:s', $dateTime )
+			: gmdate( 'Y-m-d H:i:s', $dateTime->getTimestamp() );
 	}
 }

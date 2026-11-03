@@ -55,7 +55,7 @@ class ProfileService
 			while ( $subject ) {
 				$certificateData = $certificates->getDictionary( $subject );
 				if ( !\in_array( $subject, $subjects, true ) ) {
-					\array_unshift( $result, new X509( $certificateData->getString( 'x509' ) ) );
+					array_unshift( $result, new X509( $certificateData->getString( 'x509' ) ) );
 				}
 				$subjects[] = $subject;
 				$subject = $certificateData->getStringOrNull( 'issuer' );
@@ -88,7 +88,7 @@ class ProfileService
 	{
 		$networkData = $this->config->getDictionary( 'network' );
 
-		return \array_merge( ...\array_values( \array_map(
+		return array_merge( ...array_values( array_map(
 			static fn( string $n ) => Network::allFromConfig( $networkData->getDictionary( $n ) ),
 			$networks,
 		) ) );
@@ -108,7 +108,7 @@ class ProfileService
 		$pdo = new PDO( $dsn, $username, $password );
 		$pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 
-		if ( \strstr( $dsn, ':', true ) === 'mysql' ) {
+		if ( strstr( $dsn, ':', true ) === 'mysql' ) {
 			// https://dev.mysql.com/doc/refman/8.4/en/set-variable.html
 			// https://dev.mysql.com/doc/refman/8.4/en/sql-mode.html#sqlmode_ansi_quotes
 			// TODO do we override existing modes this way, do we want to keep them, how?

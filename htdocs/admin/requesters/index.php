@@ -9,7 +9,7 @@
 use letswifi\LetsWifiApp;
 use letswifi\credential\RequesterAggregate;
 
-require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'src', '_autoload.php'] );
+require implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'src', '_autoload.php'] );
 $app = new LetsWifiApp( basePath: '../..' );
 $provider = $app->getProvider();
 $user = $provider->requireAuth( scope: 'admin' );
@@ -22,7 +22,7 @@ if ( 'POST' === ( $_SERVER['REQUEST_METHOD'] ?? '' ) ) {
 		? DateTimeImmutable::createFromFormat( '!Y-m-d\\TH:i:s', $_POST['valid_on'] ?? '' ) ?: null
 		: null;
 	$realms = \is_string( $_POST['realms'] )
-		? \explode( ',', $_POST['realms'] )
+		? explode( ',', $_POST['realms'] )
 		: [];
 	if ( empty( $realms ) ) {
 		throw new DomainException( 'No realms set' );
@@ -36,20 +36,20 @@ if ( 'POST' === ( $_SERVER['REQUEST_METHOD'] ?? '' ) ) {
 		);
 	}
 	if ( $_POST['http_form_post_redirect'] ?? 0 ) {
-		\header( 'Location: ?' . \http_build_query( $_GET ), true, 303 );
+		header( 'Location: ?' . http_build_query( $_GET ), true, 303 );
 	} else {
-		\header( 'Content-Type: application/x-zerosize', true, 204 );
+		header( 'Content-Type: application/x-zerosize', true, 204 );
 	}
 
 	exit;
 }
 
 if ( \array_key_exists( 'realms', $_GET ) && \is_array( $_GET['realms'] ) ) {
-	$newRealmsFilter = \array_diff( \array_keys( $admin->realms ), $_GET['realms'] )
-		? \implode( ',', $_GET['realms'] )
+	$newRealmsFilter = array_diff( array_keys( $admin->realms ), $_GET['realms'] )
+		? implode( ',', $_GET['realms'] )
 		: null;
-	\header( 'Location: ?' . \http_build_query( \array_filter( ['realms' => $newRealmsFilter] + $_GET ) ) );
-	\setcookie(
+	header( 'Location: ?' . http_build_query( array_filter( ['realms' => $newRealmsFilter] + $_GET ) ) );
+	setcookie(
 		'filter_admin_realms', $newRealmsFilter ?? '',
 		['path' => '/admin/', 'httponly' => true],
 	);
@@ -61,9 +61,9 @@ $validOn = \array_key_exists( 'valid_on', $_GET ) && \is_string( $_GET['valid_on
 	? DateTimeImmutable::createFromFormat( '!Y-m-d\\TH:i:s', $_GET['valid_on'] ?? '' ) ?: null
 	: null;
 
-$realmsFilter = \array_filter( \explode( ',', $_GET['realms'] ?? $_COOKIE['filter_admin_realms'] ?? '' ) );
+$realmsFilter = array_filter( explode( ',', $_GET['realms'] ?? $_COOKIE['filter_admin_realms'] ?? '' ) );
 $requesterFilter = \array_key_exists( 'requester', $_GET ) && \is_string( $_GET['requester'] )
-	? \trim( $_GET['requester'] ) ?: null
+	? trim( $_GET['requester'] ) ?: null
 	: null;
 $filterShowTimes = \array_key_exists( 'times', $_GET ) && !\in_array( $_GET['times'], ['', '0', 'off'], true );
 
@@ -82,13 +82,13 @@ $app->render( [
 	'__admin_menu_active' => 'requesters/',
 	'__admin_menu' => ( require '../_menu.php' ),
 
-	'requesters' => \iterator_to_array( $credentialAdmin->listRequesters( $realmsFilter, requester: $requesterFilter, validOn: $validOn ) ),
+	'requesters' => iterator_to_array( $credentialAdmin->listRequesters( $realmsFilter, requester: $requesterFilter, validOn: $validOn ) ),
 ], 'admin-requesters', [
-	RequesterAggregate::class => static fn ( RequesterAggregate $ra ) => [
-		'requester_href' => '?' . \http_build_query( ['requester' => $ra->requester->name] + $_GET ),
-		'realm_href' => '?' . \http_build_query( ['realms' => $ra->requester->realm] + $_GET ),
-		'credential_href' => '../credentials/?' . \http_build_query( ['requester' => $ra->requester->name, 'realms' => $ra->requester->realm] ),
-		'credential_unrevoked_href' => '../credentials/?' . \http_build_query( ['revoked' => 'off', 'requester' => $ra->requester->name, 'realms' => $ra->requester->realm] ),
+	RequesterAggregate::class => static fn( RequesterAggregate $ra ) => [
+		'requester_href' => '?' . http_build_query( ['requester' => $ra->requester->name] + $_GET ),
+		'realm_href' => '?' . http_build_query( ['realms' => $ra->requester->realm] + $_GET ),
+		'credential_href' => '../credentials/?' . http_build_query( ['requester' => $ra->requester->name, 'realms' => $ra->requester->realm] ),
+		'credential_unrevoked_href' => '../credentials/?' . http_build_query( ['revoked' => 'off', 'requester' => $ra->requester->name, 'realms' => $ra->requester->realm] ),
 		'earliest_valid' => $ra->earliestValid,
 		'last_valid' => $ra->lastValid,
 	],

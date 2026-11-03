@@ -13,7 +13,7 @@ use letswifi\credential\CertificateCredential;
 use letswifi\error\ForbiddenException;
 use letswifi\error\NotFoundException;
 
-require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'src', '_autoload.php'] );
+require implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'src', '_autoload.php'] );
 $app = new LetsWifiApp( basePath: '../..' );
 $provider = $app->getProvider();
 $user = $provider->requireAuth( scope: 'admin' );
@@ -67,38 +67,38 @@ foreach ( $admin->realms as $realm ) {
 if ( null === $realm ) {
 	throw new ForbiddenException( 'Requested CA is not used by any of your realms' );
 }
-$safeFileName = \preg_replace( '/[^a-z0-9._-]/i', '', $ca ) ?: $fileType;
-$encodedFileName = \rawurlencode( $ca );
+$safeFileName = preg_replace( '/[^a-z0-9._-]/i', '', $ca ) ?: $fileType;
+$encodedFileName = rawurlencode( $ca );
 $caCertificate = $app->profileService->getCertificate( $ca );
 
 switch ( $fileType ) {
 	case 'crt-der':
-		\header( 'Content-Type: application/x-x509-ca-cert' );
-		\header( "Content-Disposition: attachment; filename={$safeFileName}.crt; filename*=UTF-8''{$encodedFileName}.crt" );
+		header( 'Content-Type: application/x-x509-ca-cert' );
+		header( "Content-Disposition: attachment; filename={$safeFileName}.crt; filename*=UTF-8''{$encodedFileName}.crt" );
 		echo $caCertificate->getX509Der();
 
 		exit;
 	case 'crt-pem':
-		\header( 'Content-Type: application/x-pem-file' );
-		\header( "Content-Disposition: inline; filename={$safeFileName}.crt.pem; filename*=UTF-8''{$encodedFileName}.crt.pem" );
+		header( 'Content-Type: application/x-pem-file' );
+		header( "Content-Disposition: inline; filename={$safeFileName}.crt.pem; filename*=UTF-8''{$encodedFileName}.crt.pem" );
 		echo $caCertificate->getX509Pem( withText: true );
 
 		exit;
 	case 'index':
-		$index = \getIndex( $ca );
-		\header( 'Content-Type: text/plain' );
-		\header( "Content-Disposition: inline; filename={$safeFileName}.index.txt; filename*=UTF-8''{$encodedFileName}.index.txt" );
+		$index = getIndex( $ca );
+		header( 'Content-Type: text/plain' );
+		header( "Content-Disposition: inline; filename={$safeFileName}.index.txt; filename*=UTF-8''{$encodedFileName}.index.txt" );
 		echo $index->export();
 
 		exit;
 	case 'crl-der':
 		// Not implemented yet
 	case 'crl-pem':
-		$index = \getIndex( $ca );
+		$index = getIndex( $ca );
 		$privateKey = $app->profileService->getPrivateKey( $ca );
 		$crl = new CRL( $privateKey, $caCertificate );
-		\header( 'Content-Type: application/x-pkcs7-crl' );
-		\header( "Content-Disposition: inline; filename={$safeFileName}.crl.pem; filename*=UTF-8''{$encodedFileName}.crl.pem" );
+		header( 'Content-Type: application/x-pkcs7-crl' );
+		header( "Content-Disposition: inline; filename={$safeFileName}.crl.pem; filename*=UTF-8''{$encodedFileName}.crl.pem" );
 		// TODO: Prints in PEM format, do we want to allow DER too?
 		echo $crl->generateCrl( $index, validDays: 7 );
 

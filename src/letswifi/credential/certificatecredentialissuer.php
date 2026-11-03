@@ -83,8 +83,8 @@ class CertificateCredentialIssuer implements CredentialIssuer
 		$statement->bindValue( 'ca_sub', $caCert->getSubject(), PDO::PARAM_STR );
 		$statement->bindValue( 'sub', $csr->getSubject(), PDO::PARAM_STR );
 		$statement->bindValue( 'usage', $usage, PDO::PARAM_STR );
-		$statement->bindValue( 'issued', \gmdate( static::DATE_FORMAT, $this->now->getTimestamp() ), PDO::PARAM_STR );
-		$statement->bindValue( 'expires', \gmdate( static::DATE_FORMAT, $expiry->getTimestamp() ), PDO::PARAM_STR );
+		$statement->bindValue( 'issued', gmdate( static::DATE_FORMAT, $this->now->getTimestamp() ), PDO::PARAM_STR );
+		$statement->bindValue( 'expires', gmdate( static::DATE_FORMAT, $expiry->getTimestamp() ), PDO::PARAM_STR );
 		$statement->bindValue( 'csr', $csrData, PDO::PARAM_STR );
 		$statement->bindValue( 'client', $this->user->clientId, PDO::PARAM_STR );
 		$statement->bindValue( 'user_agent', $this->user->userAgent, PDO::PARAM_STR );
@@ -119,8 +119,8 @@ class CertificateCredentialIssuer implements CredentialIssuer
 					AND "usage" = :usage
 					AND "ca_sub" = :ca_sub
 			SQL );
-		$statement->bindValue( 'issued', \gmdate( static::DATE_FORMAT, $userCert->getValidFrom()->getTimestamp() ), PDO::PARAM_STR );
-		$statement->bindValue( 'expires', \gmdate( static::DATE_FORMAT, $userCert->getValidTo()->getTimestamp() ), PDO::PARAM_STR );
+		$statement->bindValue( 'issued', gmdate( static::DATE_FORMAT, $userCert->getValidFrom()->getTimestamp() ), PDO::PARAM_STR );
+		$statement->bindValue( 'expires', gmdate( static::DATE_FORMAT, $userCert->getValidTo()->getTimestamp() ), PDO::PARAM_STR );
 		$statement->bindValue( 'x509', $userCert->getX509Pem(), PDO::PARAM_STR );
 		$statement->bindValue( 'serial', $userCert->getSerialNumber(), PDO::PARAM_INT );
 		$statement->bindValue( 'realm', $this->realm->realmId, PDO::PARAM_STR );
@@ -161,13 +161,13 @@ class CertificateCredentialIssuer implements CredentialIssuer
 	 */
 	private function generateIdent(): string
 	{
-		$realm = \rawurlencode( $this->realm->realmId );
+		$realm = rawurlencode( $this->realm->realmId );
 		if ( \strlen( $realm ) > 47 ) {
 			throw new DomainException( 'Realm is too long to fit in certificate' );
 		}
 
 		// $local will be 16 bytes long
-		$local = \strtolower( \strtr( \base64_encode( \random_bytes( 12 ) ), '/+9876', '012345' ) );
+		$local = strtolower( strtr( base64_encode( random_bytes( 12 ) ), '/+9876', '012345' ) );
 		\assert( \strlen( $local ) === 16 );
 
 		// result is at most 47 + 1 + 16 = 64 bytes

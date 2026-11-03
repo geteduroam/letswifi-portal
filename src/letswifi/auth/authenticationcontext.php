@@ -52,7 +52,7 @@ class AuthenticationContext implements JsonSerializable
 		protected readonly DateTimeImmutable $now = new DateTimeImmutable(),
 		DateInterval $longLivedGrantTokenValidity = new DateInterval( 'P6M' ),
 	) {
-		if ( !\preg_match( '/^[A-Z][A-Za-z0-9]+$/', $authService ) ) {
+		if ( !preg_match( '/^[A-Z][A-Za-z0-9]+$/', $authService ) ) {
 			throw new DomainException( 'authService specified in config contains invalid characters' );
 		}
 		$authService = "letswifi\\auth\\browser\\{$authService}";
@@ -67,9 +67,9 @@ class AuthenticationContext implements JsonSerializable
 		);
 		$pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 		if ( \strlen( $oauthSecret ) === 44 || \strlen( $oauthSecret ) === 43 ) {
-			$oauthSecret = \base64_decode( \strtr( $oauthSecret, '_-', '/+' ), true );
+			$oauthSecret = base64_decode( strtr( $oauthSecret, '_-', '/+' ), true );
 		}
-		if ( !$oauthSecret || empty( \trim( $oauthSecret, "\0" ) ) ) {
+		if ( !$oauthSecret || empty( trim( $oauthSecret, "\0" ) ) ) {
 			throw new DomainException( 'No usable OAuth secret provided' );
 		}
 
@@ -132,7 +132,7 @@ class AuthenticationContext implements JsonSerializable
 			// This protection relies on browsers supporting SameSite=Strict
 			// This applies to all mainstream browsers since 2018
 			// https://caniuse.com/same-site-cookie-attribute
-			static::$csrfCookieSet = static::$csrfCookieSet ?: \setcookie( self::USER_ID_COOKIE_NAME, $userId, [
+			static::$csrfCookieSet = static::$csrfCookieSet ?: setcookie( self::USER_ID_COOKIE_NAME, $userId, [
 				'path' => '/', // TODO: Can we ue LetsWifiApp::getBasePath() here?
 				'secure' => LetsWifiApp::isHttps(),
 				'httponly' => true,
@@ -147,7 +147,7 @@ class AuthenticationContext implements JsonSerializable
 			);
 		}
 		if ( \array_key_exists( self::USER_ID_COOKIE_NAME, $_COOKIE ) ) {
-			static::$csrfCookieSet = static::$csrfCookieSet ?: \setcookie( self::USER_ID_COOKIE_NAME, '', 1, '/' );
+			static::$csrfCookieSet = static::$csrfCookieSet ?: setcookie( self::USER_ID_COOKIE_NAME, '', 1, '/' );
 		}
 
 		if ( null === $scope ) {
@@ -184,7 +184,7 @@ class AuthenticationContext implements JsonSerializable
 				throw new DomainException( "Realm {$grant->realm} is not available at this provider" );
 			}
 		}
-		$affiliations = \explode( ',', $grant->__get( 'affiliations' ) ?? '' );
+		$affiliations = explode( ',', $grant->__get( 'affiliations' ) ?? '' );
 
 		if ( null === $grant->client_id ) {
 			throw new DomainException( "User {$sub} with realm {$grant->realm} has no client_id" );

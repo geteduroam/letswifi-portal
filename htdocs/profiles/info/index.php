@@ -8,7 +8,7 @@
 
 use letswifi\LetsWifiApp;
 
-require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'src', '_autoload.php'] );
+require implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'src', '_autoload.php'] );
 $app = new LetsWifiApp( basePath: '../..' );
 $provider = $app->getProvider();
 $profileInfo = (array)$provider->getContact();
@@ -18,7 +18,7 @@ if ( null !== $profileInfo['logo'] ) {
 	// Override the logo object with an URL to the logo
 	unset( $profileInfo['logo'] );
 	$profileInfo['logo_endpoint'] = "{$app->getIndexUrl()}logo.php";
-	\ksort( $profileInfo );
+	ksort( $profileInfo );
 }
 $app->render(
 	[

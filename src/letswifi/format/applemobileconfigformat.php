@@ -61,7 +61,7 @@ class AppleMobileconfigFormat extends Format
 
 		/** @psalm-suppress RedundantCondition Always set for certificate, may be unset for other types */
 		if ( null !== $expiry = $this->credential->getExpiry() ) {
-			$expiryString = \gmdate( 'Y-m-d\\TH:i:s\\Z', $expiry->getTimestamp() );
+			$expiryString = gmdate( 'Y-m-d\\TH:i:s\\Z', $expiry->getTimestamp() );
 			$result .= '	<key>RemovalDate</key>'
 					. "\n	<date>" . $this::e( $expiryString ) . '</date>'
 					. "\n";
@@ -85,7 +85,7 @@ class AppleMobileconfigFormat extends Format
 			. "\n			<string>" . $this::e( $pkcs12->x509->getSubject()->getCommonName() ) . '</string>'
 			. "\n			<key>PayloadContent</key>"
 			. "\n			<data>"
-			. "\n				" . $this::e( static::columnFormat( \base64_encode( $pkcs12->getPKCS12Bytes( $this->passphrase ?: $defaultPassphrase ) ), 52, 4 ) )
+			. "\n				" . $this::e( static::columnFormat( base64_encode( $pkcs12->getPKCS12Bytes( $this->passphrase ?: $defaultPassphrase ) ), 52, 4 ) )
 			. "\n			</data>"
 			. "\n			<key>PayloadType</key>"
 			. "\n			<string>com.apple.security.pkcs12</string>"
@@ -94,13 +94,13 @@ class AppleMobileconfigFormat extends Format
 			. "\n		</dict>"
 			. "\n";
 
-		$uuids = \array_map(
-			static fn ( $_ ) => static::uuidgen(),
-			\array_fill( 0, \count( $caCertificates ), null ),
+		$uuids = array_map(
+			static fn( $_ ) => static::uuidgen(),
+			array_fill( 0, \count( $caCertificates ), null ),
 		);
 
 		/** @var array<string,X509> */
-		$caCertificates = \array_combine( $uuids, $caCertificates );
+		$caCertificates = array_combine( $uuids, $caCertificates );
 		foreach ( $caCertificates as $uuid => $ca ) {
 			$result .= ''
 				. "\n		<dict>"
@@ -108,7 +108,7 @@ class AppleMobileconfigFormat extends Format
 				. "\n			<string>" . $this::e( $ca->getSubject()->getCommonName() ) . '.cer</string>'
 				. "\n			<key>PayloadContent</key>"
 				. "\n			<data>"
-				. "\n				" . static::columnFormat( \base64_encode( $ca->getX509Der() ), indentation: 4 )
+				. "\n				" . static::columnFormat( base64_encode( $ca->getX509Der() ), indentation: 4 )
 				. "\n			</data>"
 				. "\n			<key>PayloadDisplayName</key>"
 				. "\n			<string>" . $this::e( $ca->getSubject()->getCommonName() ) . '</string>'
@@ -197,7 +197,7 @@ class AppleMobileconfigFormat extends Format
 					. "\n			<array>"
 					. "\n";
 				foreach ( $network->oids as $oid ) {
-					$result .= '				<string>' . \strtoupper( $this::e( $oid ) ) . '</string>'
+					$result .= '				<string>' . strtoupper( $this::e( $oid ) ) . '</string>'
 						. "\n";
 				}
 				$result .= '			</array>'

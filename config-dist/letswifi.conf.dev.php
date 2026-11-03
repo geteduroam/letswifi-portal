@@ -71,7 +71,7 @@ return [
 				// DevAuth only works with the PHP CLI server
 				'service' => 'DevAuth',
 				'param' => [
-					'username' => \get_current_user(),
+					'username' => get_current_user(),
 					'affiliations' => ['staff', 'student', 'employee'],
 				],
 			],

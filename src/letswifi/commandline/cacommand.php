@@ -92,12 +92,12 @@ class CACommand extends Command
 	protected function importCertificates(): void
 	{
 		$certificateConfig = $this->config->getDictionary( 'certificate' );
-		$stdin = \file_get_contents( 'php://stdin' ) ?: '';
-		\preg_match_all( '/(?:^|\\R)-----BEGIN(?: (EC|RSA))? PRIVATE KEY-----\\R.*?\\R-----END(?: \\1)? PRIVATE KEY-----(?:$|\\R)/sm', $stdin, $keys );
-		\preg_match_all( '/(?:^|\\R)-----BEGIN CERTIFICATE-----\\R.*?\\R-----END CERTIFICATE-----(?:$|\\R)/sm', $stdin, $certificates );
+		$stdin = file_get_contents( 'php://stdin' ) ?: '';
+		preg_match_all( '/(?:^|\\R)-----BEGIN(?: (EC|RSA))? PRIVATE KEY-----\\R.*?\\R-----END(?: \\1)? PRIVATE KEY-----(?:$|\\R)/sm', $stdin, $keys );
+		preg_match_all( '/(?:^|\\R)-----BEGIN CERTIFICATE-----\\R.*?\\R-----END CERTIFICATE-----(?:$|\\R)/sm', $stdin, $certificates );
 
-		$keys = \array_map( static fn( string $key ) => new PrivateKey( $key ), $keys[0] );
-		$certificates = \array_map( static fn( string $certificate ) => new X509( $certificate ), $certificates[0] );
+		$keys = array_map( static fn( string $key ) => new PrivateKey( $key ), $keys[0] );
+		$certificates = array_map( static fn( string $certificate ) => new X509( $certificate ), $certificates[0] );
 
 		for ( $i = \count( $certificates ) - 1; 0 <= $i; --$i ) {
 			$x509 = $certificates[$i];

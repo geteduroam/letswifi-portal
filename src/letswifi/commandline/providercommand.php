@@ -39,7 +39,7 @@ class ProviderCommand extends Command
 			$displayName = $provider->getObject( 'display_name', MultiLanguageString::class )->jsonSerialize();
 			$contact = $provider->getStringOrNull( 'contact' ) ?? '-';
 			$authService = $provider->getDictionary( 'auth' )->getString( 'service' );
-			$table->add( $name, \reset( $displayName )['display'], $contact, $authService );
+			$table->add( $name, reset( $displayName )['display'], $contact, $authService );
 		}
 
 		echo $table->printTable( margin: 0, header: true );
