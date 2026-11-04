@@ -23,7 +23,7 @@ There may be easier installation methods available.
 The software can run on any platform with PHP 8.1 or newer,
 but it has been tested and is known to work on:
 
-<details><summary>Debian Linux 12 / Ubuntu 22+</summary>
+<details><summary>Debian Linux 12+ / Ubuntu 22+</summary>
 
 ```sh
 apt-get install \
@@ -35,10 +35,10 @@ apt-get install \
 a2enmod proxy_fcgi setenvif headers ssl
 a2enconf "$(basename /etc/apache2/conf-available/php*-fpm.conf)"
 a2dismod status
-systemctl restart apache2
+service apache2 restart
 ```
 </details>
-<details><summary>FreeBSD 14</summary>
+<details><summary>FreeBSD 14+</summary>
 
 ```sh
 pkg install \
