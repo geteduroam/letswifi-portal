@@ -119,6 +119,7 @@ brand=eduroam
 cd /usr/local/share
 git clone https://github.com/geteduroam/letswifi-portal.git
 cd letswifi-portal
+git checkout "$(git describe --tags --abbrev=0)"
 composer --no-dev --no-plugins --no-scripts --quiet install
 cp -a config-dist /etc/letswifi
 ln -s /etc/letswifi/ config
