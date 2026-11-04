@@ -128,7 +128,7 @@ ln -s /var/lib/letswifi/ var
 tee /bin/letswifi <<EOF
 #!/usr/bin/env php
 <?php
-putenv( 'LETSWIFI_CONFIG_DIR=/etc/letswifi' );
+getenv('LETSWIFI_CONFIG_DIR') or putenv('LETSWIFI_CONFIG_DIR=$PWD/config');
 require '$PWD/bin/letswifi';
 EOF
 chmod +x /bin/letswifi
