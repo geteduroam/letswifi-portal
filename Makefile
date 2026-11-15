@@ -50,23 +50,31 @@ vendor: composer.json composer.phar
 
 config/clients.conf.php:
 	mkdir -p config
-	-cp -n config-dist/clients.conf.dist.php config/clients.conf.php
+	-cp -n config-dist/clients-eduroam.conf.php config/clients.conf.php
+	@test -f config/clients.conf.php
 config/branding.conf.php:
 	mkdir -p config
-	-cp -n config-dist/branding.conf.dist-eduroam.php config/branding.conf.php
+	-cp -n config-dist/branding-eduroam.conf.php config/branding.conf.php
+	@test -f config/branding.conf.php
 config/letswifi.conf.php:
 	mkdir -p config
 	-cp -n config-dist/letswifi.conf.dev.php config/letswifi.conf.php
+	@test -f config/letswifi.conf.php
 config/database.conf.php:
 	mkdir -p config
 	-cp -n config-dist/database.conf.dev.php config/database.conf.php
+	@test -f config/database.conf.php
 config/realms: vendor
 	mkdir -p config/realms
-	-cp -n config-dist/realms/example.com.conf.dist.php config/realms/example.com.conf.php
-	-cp -n config-dist/realms/staff.example.com.conf.dist.php config/realms/staff.example.com.conf.php
-	-cp -n config-dist/realms/student.example.com.conf.dist.php config/realms/student.example.com.conf.php
+	-cp -n config-dist/realms/example.com.conf.php config/realms/example.com.conf.php
+	@test -f config/realms/example.com.conf.php
+	-cp -n config-dist/realms/staff.example.com.conf.php config/realms/staff.example.com.conf.php
+	@test -f config/realms/staff.example.com.conf.php
+	-cp -n config-dist/realms/student.example.com.conf.php config/realms/student.example.com.conf.php
+	@test -f config/realms/student.example.com.conf.php
 	test -f "config/certs/CN=example.com Let's Wi-Fi CA.pem" \
 		|| bin/letswifi ca create "example.com Let's Wi-Fi CA"
+	@test -f "config/certs/CN=example.com Let's Wi-Fi CA.pem"
 config/certs:
 	mkdir -p config
 	-cp -na config-dist/certs config/
