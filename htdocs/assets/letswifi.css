@@ -170,7 +170,7 @@ header #product-name {
 	padding: .1em 1em;
 	margin: 0;
 	display: block;
-	top: 0 !important;
+	top: 0;
 	color: var(--text-color);
 	text-decoration: none;
 	position: relative;
@@ -179,7 +179,7 @@ header #product-name {
 	margin: .4em 0 .2em 0;
 }
 #systray > .dropdown-container > .dropdown > ul.dropdown-menu > li > a {
-	color: var(--text-color) !important;
+	color: var(--text-color);
 }
 #systray > .dropdown-container > button:active,
 #systray > .dropdown-container > a:active,
@@ -188,7 +188,7 @@ header #product-name {
 #systray > .dropdown-container > .dropdown > ul.dropdown-menu > li > a:active,
 #systray > .dropdown-container > .dropdown > ul.dropdown-menu > li > a:focus-visible {
 	background-color: var(--accent-color);
-	color: var(--button-text-color) !important;
+	color: var(--button-text-color);
 }
 #systray > .dropdown-container > button:active .oojs-icon:before,
 #systray > .dropdown-container > a:active .oojs-icon:before,
