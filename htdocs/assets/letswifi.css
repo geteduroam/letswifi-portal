@@ -286,6 +286,10 @@ details:has(p), table {
 }
 details:has(p) > summary {
 	display: inline;
+	list-style: none;
+}
+details:has(p) > summary::-webkit-details-marker {
+	display: none;
 }
 details:has(p) > summary:before {
 	display: inline-block;
@@ -293,7 +297,7 @@ details:has(p) > summary:before {
 	background-position: 50% 50%;
 	width: .7em;
 	height: .7em;
-	padding: 0 !important;
+	padding: 0;
 	margin-right: .5em;
 }
 details[open]:has(p) > summary:before {
@@ -563,9 +567,11 @@ button:not(.dropdown-header) .oojs-icon:before, button:not(.dropdown-header) .oo
 
 .oojs-icon{
 }
+.oojs-icon:before, .apps .link a:after, .apps .download a:before {
+	padding: .1em .5em .1em 1.5em;
+}
 .oojs-icon:before, .apps .link a:after, .apps .download a:before,
 details:has(p) > summary:before {
-	padding: .1em .5em .1em 1.5em;
 	background-repeat: no-repeat;
 	background-position: 0 50%;
 	background-size: contain;
